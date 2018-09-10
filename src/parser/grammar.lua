@@ -47,6 +47,13 @@ local function errorpos(lua, file, pos, err)
     }
 end
 
+grammar 'Comment' [[
+    Comment         <-  '--' (CommentMulti / CommentSingle)
+    CommentMulti    <-  '[' {:eq: '='* :} '[' CommentClose
+    CommentClose    <-  ']' =eq ']' / . CommentClose
+    CommentSingle   <-  (!%nl .)*
+]]
+
 return function (lua, mode, parser_)
     parser = parser_ or {}
     mode = mode or 'lua'
