@@ -20,7 +20,7 @@ local function check_str(str, name, mode)
 ===========================
 %s
 ===========================
-]]):format(err.err, err.file, err.line, text)
+]]):format(err.err, name, err.line, text)
 
         error(([[
 %s
@@ -75,4 +75,31 @@ check 'Sp'
 [===[--[[123
 123
 123]]]===],
+}
+
+check 'Nil'
+{
+'nil',
+}
+
+check 'Boolean'
+{
+'true',
+'false',
+}
+
+check 'String'
+{
+[['']],
+[[""]],
+[['123']],
+[['123\'']],
+[['123\\']],
+[['123\
+']],
+[['123\z
+    345']],
+[===[[[123]]]===],
+[===[[[123
+345]]]===],
 }

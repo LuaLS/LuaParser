@@ -22,6 +22,13 @@ defs.nl = (m.P'\r\n' + m.S'\r\n') / function ()
 end
 defs.s  = m.S' \t'
 defs.S  = - defs.s
+defs.ea = '\a'
+defs.eb = '\b'
+defs.ef = '\f'
+defs.en = '\n'
+defs.er = '\r'
+defs.et = '\t'
+defs.ev = '\v'
 local eof = re.compile '!. / %{SYNTAX_ERROR}'
 
 local function grammar(tag)
@@ -49,14 +56,72 @@ local function errorpos(lua, pos, err)
 end
 
 grammar 'Comment' [[
-Comment         <-  '--' (CommentMulti / CommentSingle)
-CommentMulti    <-  '[' {:eq: '='* :} '[' CommentClose
+Comment         <-  '--' (LongComment / ShortComment)
+LongComment     <-  '[' {:eq: '='* :} '[' CommentClose
 CommentClose    <-  ']' =eq ']' / . CommentClose
-CommentSingle   <-  (!%nl .)*
+ShortComment    <-  (!%nl .)*
 ]]
 
 grammar 'Sp' [[
 Sp  <-  (Comment / %nl / %s)*
+]]
+
+grammar 'Common' [[
+Cut         <-  ![a-zA-Z0-9_]
+AND         <-  Sp 'and'        Cut
+BREAK       <-  Sp 'break'      Cut
+DO          <-  Sp 'do'         Cut
+ELSE        <-  Sp 'else'       Cut
+ELSEIF      <-  Sp 'elseif'     Cut
+END         <-  Sp 'end'        Cut
+FALSE       <-  Sp 'false'      Cut
+FOR         <-  Sp 'for'        Cut
+FUNCTION    <-  Sp 'function'   Cut
+GOTO        <-  Sp 'goto'       Cut
+IF          <-  Sp 'if'         Cut
+IN          <-  Sp 'in'         Cut
+LOCAL       <-  Sp 'local'      Cut
+NIL         <-  Sp 'nil'        Cut
+NOT         <-  Sp 'not'        Cut
+OR          <-  Sp 'or'         Cut
+REPEAT      <-  Sp 'repeat'     Cut
+RETURN      <-  Sp 'return'     Cut
+THEN        <-  Sp 'then'       Cut
+TRUE        <-  Sp 'true'       Cut
+UNTIL       <-  Sp 'until'      Cut
+WHILE       <-  Sp 'while'      Cut
+]]
+
+grammar 'Esc' [[
+Esc         <-  '\' EChar
+EChar       <-  'a' -> ea
+            /   'b' -> eb
+            /   'f' -> ef
+            /   'n' -> en
+            /   'r' -> er
+            /   't' -> et
+            /   'v' -> ev
+            /   '\'
+            /   '"'
+            /   "'"
+            /   %nl
+            /   'z' (%nl / %s)* -> ''
+]]
+
+grammar 'Nil' [[
+Nil         <-  NIL
+]]
+
+grammar 'Boolean' [[
+Boolean     <-  TRUE
+            /   FALSE
+]]
+
+grammar 'String' [[
+String      <-  '"' (Esc / !%nl !'"' .)* '"'
+            /   "'" (Esc / !%nl !"'" .)* "'"
+            /   '[' {:eq: '='* :} '[' StringClose
+StringClose <-  ']' =eq ']' / . StringClose
 ]]
 
 return function (lua, mode, parser_)
@@ -64,7 +129,7 @@ return function (lua, mode, parser_)
     mode = mode or 'lua'
     local r, e, pos = compiled[mode]:match(lua)
     if not r then
-        local err = errorpos(lua, pos, labels[e])
+        local err = errorpos(lua, pos, e)
         return nil, err
     end
 
