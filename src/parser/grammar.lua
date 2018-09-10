@@ -20,6 +20,8 @@ defs.nl = (m.P'\r\n' + m.S'\r\n') / function ()
         return parser.nl()
     end
 end
+defs.s  = m.S' \t'
+defs.S  = - defs.s
 local eof = re.compile '!. / %{SYNTAX_ERROR}'
 
 local function grammar(tag)
@@ -33,12 +35,11 @@ local labels = {
 
 }
 
-local function errorpos(lua, file, pos, err)
+local function errorpos(lua, pos, err)
     local row, col = calcline.rowcol(lua, pos)
     local str = calcline.line(lua, row)
     return {
         lua = lua,
-        file = file,
         line = row,
         pos = col,
         err = err,
@@ -48,10 +49,14 @@ local function errorpos(lua, file, pos, err)
 end
 
 grammar 'Comment' [[
-    Comment         <-  '--' (CommentMulti / CommentSingle)
-    CommentMulti    <-  '[' {:eq: '='* :} '[' CommentClose
-    CommentClose    <-  ']' =eq ']' / . CommentClose
-    CommentSingle   <-  (!%nl .)*
+Comment         <-  '--' (CommentMulti / CommentSingle)
+CommentMulti    <-  '[' {:eq: '='* :} '[' CommentClose
+CommentClose    <-  ']' =eq ']' / . CommentClose
+CommentSingle   <-  (!%nl .)*
+]]
+
+grammar 'Sp' [[
+Sp  <-  (Comment / %nl / %s)*
 ]]
 
 return function (lua, mode, parser_)
@@ -59,7 +64,7 @@ return function (lua, mode, parser_)
     mode = mode or 'lua'
     local r, e, pos = compiled[mode]:match(lua)
     if not r then
-        local err = errorpos(lua, file, pos, labels[e])
+        local err = errorpos(lua, pos, labels[e])
         return nil, err
     end
 
