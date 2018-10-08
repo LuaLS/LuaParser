@@ -68,6 +68,7 @@ Sp  <-  (Comment / %nl / %s)*
 
 grammar 'Common' [[
 Cut         <-  ![a-zA-Z0-9_]
+X16         <-  [a-fA-F0-9]
 AND         <-  Sp 'and'        Cut
 BREAK       <-  Sp 'break'      Cut
 DO          <-  Sp 'do'         Cut
@@ -106,6 +107,9 @@ EChar       <-  'a' -> ea
             /   "'"
             /   %nl
             /   'z' (%nl / %s)* -> ''
+            /   [xX] X16 X16
+            /   [0-9] [0-9]? [0-9]?
+            /   'u{' X16 X16 X16 '}'
 ]]
 
 grammar 'Nil' [[
@@ -132,8 +136,8 @@ Integer10   <-  '0' / [1-9] [0-9]*
 Float10     <-  ('.' [0-9]*)? ([eE] [+-]? [1-9]? [0-9]*)?
 
 Number16    <-  Integer16 Float16
-Integer16   <-  '0' [xX] [0-9a-fA-F]*
-Float16     <-  ('.' [0-9a-fA-F]*)? ([pP] [+-]? [1-9]? [0-9]*)?
+Integer16   <-  '0' [xX] X16*
+Float16     <-  ('.' X16*)? ([pP] [+-]? [1-9]? [0-9]*)?
 ]]
 
 return function (lua, mode, parser_)
