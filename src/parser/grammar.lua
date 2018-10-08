@@ -70,28 +70,28 @@ grammar 'Common' [[
 Cut         <-  ![a-zA-Z0-9_]
 X16         <-  [a-fA-F0-9]
 
-AND         <-  Sp 'and'        Cut
-BREAK       <-  Sp 'break'      Cut
-DO          <-  Sp 'do'         Cut
-ELSE        <-  Sp 'else'       Cut
-ELSEIF      <-  Sp 'elseif'     Cut
-END         <-  Sp 'end'        Cut
-FALSE       <-  Sp 'false'      Cut
-FOR         <-  Sp 'for'        Cut
-FUNCTION    <-  Sp 'function'   Cut
-GOTO        <-  Sp 'goto'       Cut
-IF          <-  Sp 'if'         Cut
-IN          <-  Sp 'in'         Cut
-LOCAL       <-  Sp 'local'      Cut
-NIL         <-  Sp 'nil'        Cut
-NOT         <-  Sp 'not'        Cut
-OR          <-  Sp 'or'         Cut
-REPEAT      <-  Sp 'repeat'     Cut
-RETURN      <-  Sp 'return'     Cut
-THEN        <-  Sp 'then'       Cut
-TRUE        <-  Sp 'true'       Cut
-UNTIL       <-  Sp 'until'      Cut
-WHILE       <-  Sp 'while'      Cut
+AND         <-  Sp 'and'      Cut
+BREAK       <-  Sp 'break'    Cut
+DO          <-  Sp 'do'       Cut
+ELSE        <-  Sp 'else'     Cut
+ELSEIF      <-  Sp 'elseif'   Cut
+END         <-  Sp 'end'      Cut
+FALSE       <-  Sp 'false'    Cut
+FOR         <-  Sp 'for'      Cut
+FUNCTION    <-  Sp 'function' Cut
+GOTO        <-  Sp 'goto'     Cut
+IF          <-  Sp 'if'       Cut
+IN          <-  Sp 'in'       Cut
+LOCAL       <-  Sp 'local'    Cut
+NIL         <-  Sp 'nil'      Cut
+NOT         <-  Sp 'not'      Cut
+OR          <-  Sp 'or'       Cut
+REPEAT      <-  Sp 'repeat'   Cut
+RETURN      <-  Sp 'return'   Cut
+THEN        <-  Sp 'then'     Cut
+TRUE        <-  Sp 'true'     Cut
+UNTIL       <-  Sp 'until'    Cut
+WHILE       <-  Sp 'while'    Cut
 
 Esc         <-  '\' EChar
 EChar       <-  'a' -> ea
@@ -121,14 +121,16 @@ Boolean     <-  TRUE
 ]]
 
 grammar 'String' [[
-String      <-  '"' (Esc / !%nl !'"' .)* '"'
+String      <-  Sp StringDef
+StringDef   <-  '"' (Esc / !%nl !'"' .)* '"'
             /   "'" (Esc / !%nl !"'" .)* "'"
             /   '[' {:eq: '='* :} '[' StringClose
 StringClose <-  ']' =eq ']' / . StringClose
 ]]
 
 grammar 'Number' [[
-Number      <-  Number16 / Number10
+Number      <-  Sp NumberDef
+NumberDef   <-  Number16 / Number10
 
 Number10    <-  Integer10 Float10
 Integer10   <-  '0' / [1-9] [0-9]*
@@ -144,7 +146,64 @@ Name        <-  Sp [a-zA-Z_] [a-zA-Z0-9_]*
 ]]
 
 grammar 'Exp' [[
+Exp         <-  ExpOr
+ExpOr       <-  ExpAnd     (OR     ExpAnd)*
+ExpAnd      <-  ExpCompare (AND    ExpCompare)*
+ExpCompare  <-  ExpBor     (Comp   ExpBor)*
+ExpBor      <-  ExpBxor    (BOR    ExpBxor)*
+ExpBxor     <-  ExpBand    (BXOR   ExpBand)*
+ExpBand     <-  ExpBshift  (BAND   ExpBshift)*
+ExpBshift   <-  ExpConcat  (Bshift ExpConcat)*
+ExpConcat   <-  ExpAdds    (Concat ExpAdds)*
+ExpAdds     <-  ExpMuls    (Adds   ExpMuls)*
+ExpMuls     <-  ExpUnary   (Muls   ExpUnary)*
+ExpUnary    <-             (Unary  ExpPower)
+            /                      ExpPower
+ExpPower    <-  ExpUnit    (POWER  ExpUnit)*
+ExpUnit     <-  Nil
+            /   Boolean
+            /   String
+            /   Number
+            /   Call
 
+Call        <-  Name PL ArgList? PR
+ArgList     <-  Arg (COMMA Arg)*
+Arg         <-  DOTS
+            /   Exp
+
+Comp        <-  Sp CompList
+CompList    <-  '<='
+            /   '>='
+            /   '<'
+            /   '>'
+            /   '~='
+            /   '=='
+BOR         <-  Sp '|'
+BXOR        <-  Sp '~'
+BAND        <-  Sp '&'
+Bshift      <-  Sp BshiftList
+BshiftList  <-  '<<'
+            /   '>>'
+Concat      <-  Sp '..'
+Adds        <-  Sp AddsList
+AddsList    <-  '+'
+            /   '-'
+Muls        <-  Sp MulsList
+MulsList    <-  '*'
+            /   '//'
+            /   '/'
+            /   '%'
+Unary       <-  Sp UnaryList
+UnaryList   <-  'not'
+            /   '#'
+            /   '-'
+            /   '~'
+POWER       <-  Sp '^'
+
+PL          <-  Sp '('
+PR          <-  Sp ')'
+COMMA       <-  Sp ','
+DOTS        <-  Sp '...'
 ]]
 
 return function (lua, mode, parser_)
