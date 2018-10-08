@@ -160,16 +160,25 @@ ExpMuls     <-  ExpUnary   (Muls   ExpUnary)*
 ExpUnary    <-             (Unary  ExpPower)
             /                      ExpPower
 ExpPower    <-  ExpUnit    (POWER  ExpUnit)*
-ExpUnit     <-  Nil
+ExpUnit     <-  Paren
+            /   Nil
             /   Boolean
             /   String
             /   Number
-            /   Call
+            /   Dots
+            /   Suffixed
 
-Call        <-  Name PL ArgList? PR
+Paren       <-  PL Exp PR
+Dots        <-  DOTS
+Suffixed    <-  Name (Call / Index / Field / Method)*
+
+Call        <-  PL ArgList? PR
 ArgList     <-  Arg (COMMA Arg)*
 Arg         <-  DOTS
             /   Exp
+Index       <-  BL Exp BR
+Field       <-  DOT Name
+Method      <-  COLON Name
 
 Comp        <-  Sp CompList
 CompList    <-  '<='
@@ -202,8 +211,12 @@ POWER       <-  Sp '^'
 
 PL          <-  Sp '('
 PR          <-  Sp ')'
+BL          <-  Sp '['
+BR          <-  Sp ']'
 COMMA       <-  Sp ','
 DOTS        <-  Sp '...'
+DOT         <-  Sp '.'
+COLON       <-  Sp ':'
 ]]
 
 return function (lua, mode, parser_)
