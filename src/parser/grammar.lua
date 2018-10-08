@@ -69,6 +69,7 @@ Sp  <-  (Comment / %nl / %s)*
 grammar 'Common' [[
 Cut         <-  ![a-zA-Z0-9_]
 X16         <-  [a-fA-F0-9]
+
 AND         <-  Sp 'and'        Cut
 BREAK       <-  Sp 'break'      Cut
 DO          <-  Sp 'do'         Cut
@@ -91,9 +92,7 @@ THEN        <-  Sp 'then'       Cut
 TRUE        <-  Sp 'true'       Cut
 UNTIL       <-  Sp 'until'      Cut
 WHILE       <-  Sp 'while'      Cut
-]]
 
-grammar 'Esc' [[
 Esc         <-  '\' EChar
 EChar       <-  'a' -> ea
             /   'b' -> eb
@@ -142,6 +141,10 @@ Float16     <-  ('.' X16*)? ([pP] [+-]? [1-9]? [0-9]*)?
 
 grammar 'Name' [[
 Name        <-  Sp [a-zA-Z_] [a-zA-Z0-9_]*
+]]
+
+grammar 'Exp' [[
+
 ]]
 
 return function (lua, mode, parser_)
