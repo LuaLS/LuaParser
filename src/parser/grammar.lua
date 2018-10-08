@@ -63,7 +63,7 @@ ShortComment    <-  (!%nl .)*
 ]]
 
 grammar 'Sp' [[
-Sp  <-  (Comment / %nl / %s)*
+Sp  <-  (';' / Comment / %nl / %s)*
 ]]
 
 grammar 'Common' [[
@@ -143,10 +143,14 @@ PL          <-  Sp '('
 PR          <-  Sp ')'
 BL          <-  Sp '['
 BR          <-  Sp ']'
+TL          <-  Sp '{'
+TR          <-  Sp '}'
 COMMA       <-  Sp ','
+SEMICOLON   <-  Sp ';'
 DOTS        <-  Sp '...'
 DOT         <-  Sp '.'
 COLON       <-  Sp ':'
+ASSIGN      <-  Sp '='
 ]]
 
 grammar 'Nil' [[
@@ -204,6 +208,8 @@ ExpUnit     <-  Paren
             /   String
             /   Number
             /   Dots
+            /   Table
+            /   Function
             /   Suffixed
 
 Paren       <-  PL Exp PR
@@ -217,6 +223,15 @@ Arg         <-  DOTS
 Index       <-  BL Exp BR
 Field       <-  DOT Name
 Method      <-  COLON Name
+
+Table       <-  TL TableFields? TR
+TableFields <-  TableField ((COMMA / SEMICOLON) TableField)*
+TableField  <-  NewIndex / NewField / Exp
+NewIndex    <-  BL Exp BR ASSIGN Exp
+NewField    <-  Name ASSIGN Exp
+
+Function    <-  FUNCTION PL ArgList? PR
+                END
 ]]
 
 return function (lua, mode, parser_)

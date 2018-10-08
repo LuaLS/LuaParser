@@ -75,6 +75,7 @@ check 'Sp'
 [===[--[[123
 123
 123]]]===],
+';',
 }
 
 check 'Nil'
@@ -201,4 +202,20 @@ check 'Exp'
 'x.y.z',
 'get_point().x',
 'obj:remove()',
+
+'function () end',
+'function (...) end',
+'function (1) end',
+'function (1, 2) end',
+'function (1, ...) end',
+
+'{}',
+'{...}',
+'{1, 2, 3}',
+'{x = 1, y = 2}',
+'{["x"] = 1, ["y"] = 2}',
+'{[x] = 1, [y] = 2}',
+'{{}}',
+'{ a = { b = { c = {} } } }',
+'{{}, {}, {{}, {}}}',
 }
