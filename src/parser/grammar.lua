@@ -109,6 +109,44 @@ EChar       <-  'a' -> ea
             /   'x' X16 X16
             /   [0-9] [0-9]? [0-9]?
             /   'u{' X16^+1^-6 '}'
+
+Comp        <-  Sp CompList
+CompList    <-  '<='
+            /   '>='
+            /   '<'
+            /   '>'
+            /   '~='
+            /   '=='
+BOR         <-  Sp '|'
+BXOR        <-  Sp '~'
+BAND        <-  Sp '&'
+Bshift      <-  Sp BshiftList
+BshiftList  <-  '<<'
+            /   '>>'
+Concat      <-  Sp '..'
+Adds        <-  Sp AddsList
+AddsList    <-  '+'
+            /   '-'
+Muls        <-  Sp MulsList
+MulsList    <-  '*'
+            /   '//'
+            /   '/'
+            /   '%'
+Unary       <-  Sp UnaryList
+UnaryList   <-  'not'
+            /   '#'
+            /   '-'
+            /   '~'
+POWER       <-  Sp '^'
+
+PL          <-  Sp '('
+PR          <-  Sp ')'
+BL          <-  Sp '['
+BR          <-  Sp ']'
+COMMA       <-  Sp ','
+DOTS        <-  Sp '...'
+DOT         <-  Sp '.'
+COLON       <-  Sp ':'
 ]]
 
 grammar 'Nil' [[
@@ -179,44 +217,6 @@ Arg         <-  DOTS
 Index       <-  BL Exp BR
 Field       <-  DOT Name
 Method      <-  COLON Name
-
-Comp        <-  Sp CompList
-CompList    <-  '<='
-            /   '>='
-            /   '<'
-            /   '>'
-            /   '~='
-            /   '=='
-BOR         <-  Sp '|'
-BXOR        <-  Sp '~'
-BAND        <-  Sp '&'
-Bshift      <-  Sp BshiftList
-BshiftList  <-  '<<'
-            /   '>>'
-Concat      <-  Sp '..'
-Adds        <-  Sp AddsList
-AddsList    <-  '+'
-            /   '-'
-Muls        <-  Sp MulsList
-MulsList    <-  '*'
-            /   '//'
-            /   '/'
-            /   '%'
-Unary       <-  Sp UnaryList
-UnaryList   <-  'not'
-            /   '#'
-            /   '-'
-            /   '~'
-POWER       <-  Sp '^'
-
-PL          <-  Sp '('
-PR          <-  Sp ')'
-BL          <-  Sp '['
-BR          <-  Sp ']'
-COMMA       <-  Sp ','
-DOTS        <-  Sp '...'
-DOT         <-  Sp '.'
-COLON       <-  Sp ':'
 ]]
 
 return function (lua, mode, parser_)
