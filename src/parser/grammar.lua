@@ -124,6 +124,18 @@ String      <-  '"' (Esc / !%nl !'"' .)* '"'
 StringClose <-  ']' =eq ']' / . StringClose
 ]]
 
+grammar 'Number' [[
+Number      <-  Number16 / Number10
+
+Number10    <-  Integer10 Float10
+Integer10   <-  '0' / [1-9] [0-9]*
+Float10     <-  ('.' [0-9]*)? ([eE] [+-]? [1-9]? [0-9]*)?
+
+Number16    <-  Integer16 Float16
+Integer16   <-  '0' [xX] [0-9a-fA-F]*
+Float16     <-  ('.' [0-9a-fA-F]*)? ([pP] [+-]? [1-9]? [0-9]*)?
+]]
+
 return function (lua, mode, parser_)
     parser = parser_ or {}
     mode = mode or 'lua'

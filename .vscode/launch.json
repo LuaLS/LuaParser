@@ -17,6 +17,7 @@
             "path": "${workspaceRoot}/bin/?.lua",
             "cpath": "${workspaceRoot}/bin/?.dll;",
             "arg0": [
+                "-E",
                 "-e",
                 "DEBUG=true",
             ],
