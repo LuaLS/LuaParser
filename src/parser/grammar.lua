@@ -140,6 +140,10 @@ Integer16   <-  '0' [xX] X16*
 Float16     <-  ('.' X16*)? ([pP] [+-]? [1-9]? [0-9]*)?
 ]]
 
+grammar 'Name' [[
+Name        <-  Sp [a-zA-Z_] [a-zA-Z0-9_]*
+]]
+
 return function (lua, mode, parser_)
     parser = parser_ or {}
     mode = mode or 'lua'
