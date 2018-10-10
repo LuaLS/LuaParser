@@ -16,9 +16,9 @@ local function main()
         require(name)
         print(('测试[%s]用时[%.3f]'):format(name, os.clock() - clock))
     end
-    
+
     test 'grammar'
-    
+
     print('测试完成')
 end
 

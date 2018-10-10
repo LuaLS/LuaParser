@@ -293,6 +293,11 @@ end]],
 [[repeat
     x = 1
 until 1]],
+
+'local a',
+'local function test() end',
+'function test() end',
+'function a.b:c() end',
 }
 
 check 'Lua'
