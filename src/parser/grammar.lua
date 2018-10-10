@@ -185,7 +185,7 @@ Float16     <-  ('.' X16*)? ([pP] [+-]? [1-9]? [0-9]*)?
 ]]
 
 grammar 'Name' [[
-Name        <-  Sp [a-zA-Z_] [a-zA-Z0-9_]*
+Name        <-  Sp ({} {[a-zA-Z_] [a-zA-Z0-9_]*}) -> Name
 ]]
 
 grammar 'Exp' [[
@@ -296,7 +296,7 @@ Set         <-  LOCAL Name ASSIGN Exp
             /   Simple     ASSIGN Exp
 
 Local       <-  LOCAL Function
-            /   LOCAL Name
+            /   LOCAL (Sp {} Name) -> LocalVar
 
 Call        <-  Prefix (Suffix)*
 ]]
