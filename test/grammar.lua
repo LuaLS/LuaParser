@@ -75,7 +75,6 @@ check 'Sp'
 [===[--[[123
 123
 123]]]===],
-';',
 }
 
 check 'Nil'
@@ -202,6 +201,7 @@ check 'Exp'
 'x.y.z',
 'get_point().x',
 'obj:remove()',
+'(...)[1]',
 
 'function () end',
 'function (...) end',
@@ -218,4 +218,74 @@ check 'Exp'
 '{{}}',
 '{ a = { b = { c = {} } } }',
 '{{}, {}, {{}, {}}}',
+'{1, 2, 3,}',
+}
+
+check 'Action'
+{
+';',
+
+'x = 1',
+'local x = 1',
+'x = function () end',
+'x.y = function () end',
+
+'func()',
+'func(1, 2)',
+'func.x()',
+'func.x(1, 2)',
+'func:x()',
+'func:x(1, 2)',
+'("%s"):format(1)',
+
+'do x = 1 end',
+
+'break',
+
+'return',
+'return 1',
+'return 1, 2',
+
+'::CONTINUE::',
+
+'goto CONTINUE',
+
+[[if 1 then
+end]],
+[[if 1 then
+    x = 1
+end]],
+[[if 1 then
+    x = 1
+elseif 1 then
+    x = 1
+end]],
+[[if 1 then
+    x = 1
+elseif 1 then
+    x = 1
+else
+    x = 1
+end]],
+
+[[for i = 1, 10 do
+    x = 1
+end]],
+[[for i = 1, 10, 1 do
+    x = 1
+end]],
+[[for k, v in pairs(t) do
+    x = 1
+end]],
+[[for k, v in next, t, nil do
+    x = 1
+end]],
+
+[[while 1 do
+    x = 1
+end]],
+
+[[repeat
+    x = 1
+until 1]],
 }

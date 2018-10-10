@@ -63,7 +63,7 @@ ShortComment    <-  (!%nl .)*
 ]]
 
 grammar 'Sp' [[
-Sp  <-  (';' / Comment / %nl / %s)*
+Sp  <-  (Comment / %nl / %s)*
 ]]
 
 grammar 'Common' [[
@@ -150,6 +150,7 @@ SEMICOLON   <-  Sp ';'
 DOTS        <-  Sp '...'
 DOT         <-  Sp '.'
 COLON       <-  Sp ':'
+LABEL       <-  Sp '::'
 ASSIGN      <-  Sp '='
 ]]
 
@@ -202,36 +203,95 @@ ExpMuls     <-  ExpUnary   (Muls   ExpUnary)*
 ExpUnary    <-             (Unary  ExpPower)
             /                      ExpPower
 ExpPower    <-  ExpUnit    (POWER  ExpUnit)*
-ExpUnit     <-  Paren
-            /   Nil
+ExpUnit     <-  Nil
             /   Boolean
             /   String
             /   Number
             /   Dots
             /   Table
             /   Function
-            /   Suffixed
+            /   Suffix
 
 Paren       <-  PL Exp PR
 Dots        <-  DOTS
-Suffixed    <-  Name (Call / Index / Field / Method)*
+Var         <-  Prefix (BL Exp BR / DOT Name)
+            /   Name
+Prefix      <-  Paren
+            /   Call
+            /   Var
 
-Call        <-  PL ArgList? PR
+Call        <-  Prefix (COLON Name)? CallArgs
+CallArgs    <-  PL ArgList? PR
+            /   Table
+            /   String
 ArgList     <-  Arg (COMMA Arg)*
 Arg         <-  DOTS
             /   Exp
-Index       <-  BL Exp BR
-Field       <-  DOT Name
-Method      <-  COLON Name
 
 Table       <-  TL TableFields? TR
-TableFields <-  TableField ((COMMA / SEMICOLON) TableField)*
+TableFields <-  TableField (TableSep TableField)* TableSep?
+TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
 NewIndex    <-  BL Exp BR ASSIGN Exp
 NewField    <-  Name ASSIGN Exp
 
 Function    <-  FUNCTION PL ArgList? PR
+                    Action*
                 END
+
+-- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
+Action      <-  !. .
+]]
+
+grammar 'Action' [[
+Action      <-  !END (SEMICOLON / Do / Break / Return / Label / GoTo / If / For / While / Repeat / Set / Call)
+
+ExpList     <-  Exp (COMMA Exp)*
+
+Do          <-  DO Action* END
+
+Break       <-  BREAK
+
+Return      <-  RETURN ExpList? SEMICOLON?
+
+Label       <-  LABEL Name LABEL
+
+GoTo        <-  GOTO Name
+
+If          <-  IfPart
+                ElseIfPart*
+                ElsePart?
+                END
+IfPart      <-  IF Exp THEN
+                    Action*
+ElseIfPart  <-  ELSEIF Exp THEN
+                    Action*
+ElsePart    <-  ELSE
+                    Action*
+
+For         <-  Loop / In
+Loop        <-  FOR LoopStart LoopFinish LoopStep? DO
+                    Action*
+                END
+LoopStart   <-  Name ASSIGN Exp
+LoopFinish  <-  COMMA Exp
+LoopStep    <-  COMMA Exp
+
+In          <-  FOR NameList IN ExpList DO
+                    Action*
+                END
+NameList    <-  Name (COMMA Name)*
+
+While       <-  WHILE Exp DO
+                    Action*
+                END
+
+Repeat      <-  REPEAT
+                    Action*
+                UNTIL Exp
+
+Set         <-  LOCAL Name ASSIGN Exp
+            /   Suffix     ASSIGN Exp
 ]]
 
 return function (lua, mode, parser_)
