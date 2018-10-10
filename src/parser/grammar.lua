@@ -207,23 +207,21 @@ ExpUnit     <-  Nil
             /   Boolean
             /   String
             /   Number
-            /   Dots
+            /   DOTS
             /   Table
             /   Function
-            /   Suffix
+            /   Simple
 
-Paren       <-  PL Exp PR
-Dots        <-  DOTS
-Var         <-  Prefix (BL Exp BR / DOT Name)
+Simple      <-  Prefix (Suffix)*
+Prefix      <-  PL Exp PR
             /   Name
-Prefix      <-  Paren
-            /   Call
-            /   Var
-
-Call        <-  Prefix (COLON Name)? CallArgs
-CallArgs    <-  PL ArgList? PR
+Suffix      <-  DOT Name
+            /   COLON Name
             /   Table
             /   String
+            /   BL Exp BR
+            /   PL ArgList? PR
+
 ArgList     <-  Arg (COMMA Arg)*
 Arg         <-  DOTS
             /   Exp
@@ -236,7 +234,7 @@ NewIndex    <-  BL Exp BR ASSIGN Exp
 NewField    <-  Name ASSIGN Exp
 
 Function    <-  FUNCTION PL ArgList? PR
-                    Action*
+                    (!END Action)*
                 END
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
@@ -244,11 +242,11 @@ Action      <-  !. .
 ]]
 
 grammar 'Action' [[
-Action      <-  !END (SEMICOLON / Do / Break / Return / Label / GoTo / If / For / While / Repeat / Set / Call)
+Action      <-  SEMICOLON / Do / Break / Return / Label / GoTo / If / For / While / Repeat / Set / Call
 
 ExpList     <-  Exp (COMMA Exp)*
 
-Do          <-  DO Action* END
+Do          <-  DO (!END Action)* END
 
 Break       <-  BREAK
 
@@ -263,35 +261,37 @@ If          <-  IfPart
                 ElsePart?
                 END
 IfPart      <-  IF Exp THEN
-                    Action*
+                    (!ELSEIF !ELSE !END Action)*
 ElseIfPart  <-  ELSEIF Exp THEN
-                    Action*
+                    (!ELSE !END Action)*
 ElsePart    <-  ELSE
-                    Action*
+                    (!END Action)*
 
 For         <-  Loop / In
 Loop        <-  FOR LoopStart LoopFinish LoopStep? DO
-                    Action*
+                    (!END Action)*
                 END
 LoopStart   <-  Name ASSIGN Exp
 LoopFinish  <-  COMMA Exp
 LoopStep    <-  COMMA Exp
 
 In          <-  FOR NameList IN ExpList DO
-                    Action*
+                    (!END Action)*
                 END
 NameList    <-  Name (COMMA Name)*
 
 While       <-  WHILE Exp DO
-                    Action*
+                    (!END Action)*
                 END
 
 Repeat      <-  REPEAT
-                    Action*
+                    (!UNTIL Action)*
                 UNTIL Exp
 
 Set         <-  LOCAL Name ASSIGN Exp
-            /   Suffix     ASSIGN Exp
+            /   Simple     ASSIGN Exp
+
+Call        <-  Prefix (Suffix)*
 ]]
 
 return function (lua, mode, parser_)
