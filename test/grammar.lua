@@ -1,8 +1,8 @@
 require 'filesystem'
-local grammar = require 'parser.grammar'
+local parser = require 'parser'
 
 local function check_str(str, name, mode)
-    local gram, err = grammar(str, mode)
+    local gram, err = parser.grammar(str, mode)
     if err then
         local spc = ''
         for i = 1, err.pos - 1 do
