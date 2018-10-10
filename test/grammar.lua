@@ -294,3 +294,12 @@ end]],
     x = 1
 until 1]],
 }
+
+check 'Lua'
+{
+'',
+[[
+]],
+[[return function ()
+end]]
+}

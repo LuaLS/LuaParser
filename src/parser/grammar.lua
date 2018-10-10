@@ -250,7 +250,7 @@ Do          <-  DO (!END Action)* END
 
 Break       <-  BREAK
 
-Return      <-  RETURN ExpList? SEMICOLON?
+Return      <-  RETURN ExpList?
 
 Label       <-  LABEL Name LABEL
 
@@ -292,6 +292,10 @@ Set         <-  LOCAL Name ASSIGN Exp
             /   Simple     ASSIGN Exp
 
 Call        <-  Prefix (Suffix)*
+]]
+
+grammar 'Lua' [[
+Lua         <-  (Sp Action)* Sp
 ]]
 
 return function (lua, mode, parser_)
