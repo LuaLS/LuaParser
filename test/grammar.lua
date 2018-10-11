@@ -226,7 +226,9 @@ check 'Action'
 ';',
 
 'x = 1',
+'x, y, z = 1, 2, 3',
 'local x = 1',
+'local x, y, z = 1, 2, 3',
 'x = function () end',
 'x.y = function () end',
 
