@@ -252,7 +252,9 @@ Action      <-  SEMICOLON / Do / Break / Return / Label / GoTo / If / For / Whil
 
 ExpList     <-  Exp (COMMA Exp)*
 
-Do          <-  DO (!END Action)* END
+Do          <-  DO                  -> DoDef
+                    (!END Action)*  -> Do
+                END
 
 Break       <-  BREAK
 
@@ -266,25 +268,26 @@ If          <-  IfPart
                 ElseIfPart*
                 ElsePart?
                 END
-IfPart      <-  IF Exp THEN
-                    (!ELSEIF !ELSE !END Action)*
-ElseIfPart  <-  ELSEIF Exp THEN
-                    (!ELSE !END Action)*
-ElsePart    <-  ELSE
-                    (!END Action)*
+IfPart      <-  (IF Exp THEN)                       -> IfDef
+                    (!ELSEIF !ELSE !END Action)*    -> If
+ElseIfPart  <-  (ELSEIF Exp THEN)                   -> ElseIfDef
+                    (!ELSE !END Action)*            -> ElseIf
+ElsePart    <-  ELSE                                -> ElseDef
+                    (!END Action)*                  -> Else
 
 For         <-  Loop / In
-Loop        <-  FOR LoopStart LoopFinish LoopStep? DO
-                    (!END Action)*
+
+Loop        <-  (FOR LoopStart LoopFinish LoopStep? DO) -> LoopDef
+                    (!END Action)*                      -> Loop
                 END
-LoopStart   <-  Name ASSIGN Exp
+LoopStart   <-  (Name ASSIGN Exp)                       -> LoopStart
 LoopFinish  <-  COMMA Exp
 LoopStep    <-  COMMA Exp
 
-In          <-  FOR NameList IN ExpList DO
-                    (!END Action)*
+In          <-  (FOR InList IN ExpList DO)  -> InDef
+                    (!END Action)*          -> In
                 END
-NameList    <-  Name (COMMA Name)*
+InList      <-  (Name (COMMA Name)*)        -> InList
 
 While       <-  WHILE Exp DO
                     (!END Action)*
