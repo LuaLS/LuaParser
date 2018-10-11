@@ -233,13 +233,10 @@ TableField  <-  NewIndex / NewField / Exp
 NewIndex    <-  BL Exp BR ASSIGN Exp
 NewField    <-  Name ASSIGN Exp
 
-Function    <-  {|
-                FUNCTION FuncName? PL ArgList? PR
-                    (!END Action)*
+Function    <-  (FUNCTION {| FuncName? |} PL ArgList? PR) -> FunctionDef
+                    (!END Action)*                  -> Function
                 END
-                |}
-            ->  Function
-FuncName    <-  {:name: {| Name (FuncSuffix)* |} :}
+FuncName    <-  Name (FuncSuffix)*
 FuncSuffix  <-  DOT Name
             /   COLON Name
 
@@ -290,13 +287,13 @@ In          <-  (FOR NameList IN ExpList DO)    -> InDef
                     (!END Action)*              -> In
                 END
 
-While       <-  WHILE Exp DO
-                    (!END Action)*
+While       <-  (WHILE Exp DO)      -> WhileDef
+                    (!END Action)*  -> While
                 END
 
-Repeat      <-  REPEAT
-                    (!UNTIL Action)*
-                UNTIL Exp
+Repeat      <-  REPEAT                  -> RepeatDef
+                    (!UNTIL Action)*    -> Repeat
+                (UNTIL Exp)             -> Until
 
 Set         <-  (LOCAL !FUNCTION NameList ASSIGN ExpList)
             ->  LocalSet

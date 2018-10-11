@@ -297,6 +297,7 @@ end]],
 until 1]],
 
 'local a',
+'local a, b, c',
 'local function test() end',
 'function test() end',
 'function a.b:c() end',
