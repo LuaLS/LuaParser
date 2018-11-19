@@ -147,9 +147,11 @@ TL          <-  Sp '{'
 TR          <-  Sp '}'
 COMMA       <-  Sp ','
 SEMICOLON   <-  Sp ';'
-DOTS        <-  Sp '...'
+DOTS        <-  Sp {} -> DOTSPos
+                '...' -> DOTS
 DOT         <-  Sp '.'
-COLON       <-  Sp ':'
+COLON       <-  Sp {} -> COLONPos
+                ':'   -> COLON
 LABEL       <-  Sp '::'
 ASSIGN      <-  Sp '='
 ]]
@@ -185,7 +187,8 @@ Float16     <-  ('.' X16*)? ([pP] [+-]? [1-9]? [0-9]*)?
 ]]
 
 grammar 'Name' [[
-Name        <-  Sp ({} {[a-zA-Z_] [a-zA-Z0-9_]*}) -> Name
+Name        <-  Sp {} -> NamePos
+                {[a-zA-Z_] [a-zA-Z0-9_]*} -> Name
 ]]
 
 grammar 'Exp' [[
@@ -215,14 +218,17 @@ ExpUnit     <-  Nil
 Simple      <-  Prefix (Suffix)*
 Prefix      <-  PL Exp PR
             /   Name
+ColonName   <-  (COLON Name)
+            ->  ColonName
 Suffix      <-  DOT Name
-            /   COLON Name
+            /   ColonName
             /   Table
             /   String
             /   BL Exp BR
             /   PL ArgList? PR
 
-ArgList     <-  Arg (COMMA Arg)*
+ArgList     <-  (Arg (COMMA Arg)*)?
+            ->  ArgList
 Arg         <-  DOTS
             /   Exp
 
@@ -233,12 +239,13 @@ TableField  <-  NewIndex / NewField / Exp
 NewIndex    <-  BL Exp BR ASSIGN Exp
 NewField    <-  Name ASSIGN Exp
 
-Function    <-  (FUNCTION {| FuncName? |} PL ArgList? PR) -> FunctionDef
-                    (!END Action)*                  -> Function
+Function    <-  (FUNCTION FuncName PL ArgList PR)   -> FunctionDef
+                    (!END Action)*                          -> Function
                 END
-FuncName    <-  Name (FuncSuffix)*
+FuncName    <-  (Name (FuncSuffix)*)?
+            ->  FuncName
 FuncSuffix  <-  DOT Name
-            /   COLON Name
+            /   ColonName
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
 Action      <-  !. .
@@ -257,7 +264,7 @@ Do          <-  DO                  -> DoDef
 
 Break       <-  BREAK
 
-Return      <-  RETURN ExpList?
+Return      <-  RETURN !END ExpList?
 
 Label       <-  LABEL Name LABEL
 
