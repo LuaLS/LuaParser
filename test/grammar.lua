@@ -274,6 +274,13 @@ elseif 1 then
 else
     x = 1
 end]],
+[[
+if 1 then
+elseif 1 then
+elseif 1 then
+elseif 1 then
+end
+]],
 
 [[for i = 1, 10 do
     x = 1
