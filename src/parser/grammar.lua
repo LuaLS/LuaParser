@@ -279,6 +279,7 @@ If          <-  IfPart
                 ElseIfPart*
                 ElsePart?
                 END
+            ->  EndIf
 IfPart      <-  (IF Exp THEN)                       -> IfDef
                     (!ELSEIF !ELSE !END Action)*    -> If
 ElseIfPart  <-  (ELSEIF Exp THEN)                   -> ElseIfDef
@@ -315,7 +316,8 @@ Set         <-  (LOCAL NameList ASSIGN ExpList)
 Local       <-  LOCAL NameList
             ->  LocalVar
 
-Call        <-  Prefix (Suffix)*
+Call        <-  Simple
+            ->  Call
 ]]
 
 grammar 'Lua' [[
