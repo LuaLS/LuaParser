@@ -1,4 +1,3 @@
-require 'filesystem'
 local parser = require 'parser'
 
 local function check_str(str, name, mode)

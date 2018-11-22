@@ -11,9 +11,9 @@
             "env": {
                 "PATH": "${workspaceRoot}\\bin\\"
             },
-            "luaRuntime": "5.3 32bit",
+            "luaRuntime": "5.4 32bit",
             "luaexe": "${workspaceRoot}\\bin\\lua.exe",
-            "luadll": "${workspaceRoot}\\bin\\lua53.dll",
+            "luadll": "${workspaceRoot}\\bin\\lua54.dll",
             "path": "${workspaceRoot}/bin/?.lua",
             "cpath": "${workspaceRoot}/bin/?.dll;",
             "arg0": [

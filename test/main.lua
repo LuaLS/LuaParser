@@ -4,7 +4,6 @@ package.path = package.path .. ';' .. root .. '\\src\\?.lua'
                             .. ';' .. root .. '\\test\\?.lua'
                             .. ';' .. root .. '\\test\\?\\init.lua'
 
-require 'filesystem'
 require 'utility'
 require 'global_protect'
 local parser = require 'parser'
