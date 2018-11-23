@@ -1,5 +1,6 @@
 local parser = require 'parser'
 local table_writer = require 'table_writer'
+local fs = require 'bee.filesystem'
 
 rawset(_G, 'CHECK', false)
 
@@ -34,6 +35,7 @@ local function test(type)
                 error(('语法树生成失败：%s'):format(err))
             end
             if not eq(my_ast, target_ast) then
+                fs.create_directory(ROOT / 'test' / 'log')
                 io.save(ROOT / 'test' / 'log' / 'my_ast.lua', table_writer(my_ast))
                 io.save(ROOT / 'test' / 'log' / 'target_ast.lua', table_writer(target_ast))
                 error(('语法树不相等：%s\n%s'):format(type, buf))
@@ -44,3 +46,5 @@ local function test(type)
 end
 
 test 'Nil'
+test 'Boolean'
+test 'String'

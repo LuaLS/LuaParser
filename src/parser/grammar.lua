@@ -29,6 +29,10 @@ defs.en = '\n'
 defs.er = '\r'
 defs.et = '\t'
 defs.ev = '\v'
+
+defs.First = function (first, ...)
+    return first
+end
 local eof = re.compile '!. / %{SYNTAX_ERROR}'
 
 local function grammar(tag)
@@ -96,7 +100,8 @@ TRUE        <-  Sp {}         -> TRUE
 UNTIL       <-  Sp 'until'    Cut
 WHILE       <-  Sp 'while'    Cut
 
-Esc         <-  '\' EChar
+Esc         <-  '\' -> ''
+                EChar
 EChar       <-  'a' -> ea
             /   'b' -> eb
             /   'f' -> ef
@@ -108,7 +113,7 @@ EChar       <-  'a' -> ea
             /   '"'
             /   "'"
             /   %nl
-            /   'z' (%nl / %s)* -> ''
+            /   ('z' (%nl / %s)*) -> ''
             /   'x' X16 X16
             /   [0-9] [0-9]? [0-9]?
             /   'u{' X16^+1^-6 '}'
@@ -171,9 +176,9 @@ Boolean     <-  TRUE
 grammar 'String' [[
 String      <-  Sp ({} StringDef {})
             ->  String
-StringDef   <-  '"' {(Esc / !%nl !'"' .)*} -> ShortString '"'
-            /   "'" {(Esc / !%nl !"'" .)*} -> ShortString "'"
-            /   '[' {:eq: '='* :} '[' {(!StringClose .)*} -> LongString StringClose
+StringDef   <-  '"' {~(Esc / !%nl !'"' .)*~} -> First '"'
+            /   "'" {~(Esc / !%nl !"'" .)*~} -> First "'"
+            /   '[' {:eq: '='* :} '[' {(!StringClose .)*} -> First StringClose
 StringClose <-  ']' =eq ']'
 ]]
 
