@@ -7,6 +7,9 @@ package.path = package.path .. ';' .. root .. '\\src\\?.lua'
 require 'utility'
 require 'global_protect'
 local parser = require 'parser'
+local fs = require 'bee.filesystem'
+
+rawset(_G, 'ROOT', fs.path(root))
 
 local function main()
     local function test(name)
@@ -17,6 +20,7 @@ local function main()
     end
 
     test 'grammar'
+    test 'ast'
 
     print('测试完成')
 end
