@@ -77,28 +77,28 @@ Cut         <-  ![a-zA-Z0-9_]
 None        <-  {} -> nil
 X16         <-  [a-fA-F0-9]
 
-AND         <-  Sp               {'and'}    Cut
-BREAK       <-  Sp               'break'    Cut
-DO          <-  Sp               'do'       Cut
-ELSE        <-  Sp               'else'     Cut
-ELSEIF      <-  Sp               'elseif'   Cut
-END         <-  Sp               'end'      Cut
-FALSE       <-  Sp ({} -> FALSE) 'false'    Cut
-FOR         <-  Sp               'for'      Cut
-FUNCTION    <-  Sp               'function' Cut
-GOTO        <-  Sp               'goto'     Cut
-IF          <-  Sp               'if'       Cut
-IN          <-  Sp               'in'       Cut
-LOCAL       <-  Sp               'local'    Cut
-NIL         <-  Sp ({} -> NIL)   'nil'      Cut
-NOT         <-  Sp               {'not'}    Cut
-OR          <-  Sp               {'or'}     Cut
-REPEAT      <-  Sp               'repeat'   Cut
-RETURN      <-  Sp               'return'   Cut
-THEN        <-  Sp               'then'     Cut
-TRUE        <-  Sp ({} -> TRUE)  'true'     Cut
-UNTIL       <-  Sp               'until'    Cut
-WHILE       <-  Sp               'while'    Cut
+AND         <-  Sp {'and'}    Cut
+BREAK       <-  Sp 'break'    Cut
+DO          <-  Sp 'do'       Cut
+ELSE        <-  Sp 'else'     Cut
+ELSEIF      <-  Sp 'elseif'   Cut
+END         <-  Sp 'end'      Cut
+FALSE       <-  Sp 'false'    Cut
+FOR         <-  Sp 'for'      Cut
+FUNCTION    <-  Sp 'function' Cut
+GOTO        <-  Sp 'goto'     Cut
+IF          <-  Sp 'if'       Cut
+IN          <-  Sp 'in'       Cut
+LOCAL       <-  Sp 'local'    Cut
+NIL         <-  Sp 'nil'      Cut
+NOT         <-  Sp {'not'}    Cut
+OR          <-  Sp {'or'}     Cut
+REPEAT      <-  Sp 'repeat'   Cut
+RETURN      <-  Sp 'return'   Cut
+THEN        <-  Sp 'then'     Cut
+TRUE        <-  Sp 'true'     Cut
+UNTIL       <-  Sp 'until'    Cut
+WHILE       <-  Sp 'while'    Cut
 
 Esc         <-  '\' -> ''
                 EChar
@@ -163,12 +163,12 @@ ASSIGN      <-  Sp '='
 ]]
 
 grammar 'Nil' [[
-Nil         <-  NIL
+Nil         <-  Sp ({} -> Nil) NIL
 ]]
 
 grammar 'Boolean' [[
-Boolean     <-  TRUE
-            /   FALSE
+Boolean     <-  Sp ({} -> True)  TRUE
+            /   Sp ({} -> False) FALSE
 ]]
 
 grammar 'String' [[
@@ -265,23 +265,29 @@ Action      <-  .
 ]]
 
 grammar 'Action' [[
-Action      <-  SEMICOLON / Do / Break / Return / Label / GoTo / If / For / While / Repeat / Function / Set / Local / Call
+Action      <-  SEMICOLON / Do / Break / Return / Label / GoTo / If / For / While / Repeat / Function / Local / Set / Call
 
-ExpList     <-  Exp (COMMA Exp)*
-NameList    <-  (Name (COMMA Name)*)        -> NameList
-SimpleList  <-  (Simple (COMMA Simple)*)    -> SimpleList
+ExpList     <-  (Exp (COMMA Exp)*)
+            ->  List
+NameList    <-  (Name (COMMA Name)*)
+            ->  List
+SimpleList  <-  (Simple (COMMA Simple)*)
+            ->  List
 
-Do          <-  DO                  -> DoDef
-                    (!END Action)*  -> Do
-                END
+Do          <-  Sp ({} DO DoBody END {})
+            ->  Do
+DoBody      <-  (!END Action)*
+            ->  DoBody
 
 Break       <-  BREAK
+            ->  Break
 
 Return      <-  RETURN !END ExpList?
+            ->  Return
 
-Label       <-  LABEL Name LABEL
+Label       <-  LABEL Name -> Label LABEL
 
-GoTo        <-  GOTO Name
+GoTo        <-  GOTO Name -> GoTo
 
 If          <-  IfPart
                 ElseIfPart*
@@ -316,16 +322,12 @@ Repeat      <-  REPEAT                  -> RepeatDef
                     (!UNTIL Action)*    -> Repeat
                 (UNTIL Exp)             -> Until
 
-Set         <-  (LOCAL NameList ASSIGN ExpList)
-            ->  LocalSet
-            /   (SimpleList ASSIGN ExpList)
+Local       <-  (LOCAL NameList (ASSIGN ExpList)?)
+            ->  Local
+Set         <-  (SimpleList ASSIGN ExpList)
             ->  Set
 
-Local       <-  LOCAL NameList
-            ->  LocalVar
-
 Call        <-  Simple
-            ->  Call
 ]]
 
 grammar 'Lua' [[

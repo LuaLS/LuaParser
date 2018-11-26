@@ -3,14 +3,14 @@ local string_char = string.char
 local utf8_char = utf8.char
 
 local defs = {
-    NIL = function (pos)
+    Nil = function (pos)
         return {
             type   = 'nil',
             start  = pos,
             finish = pos + 2,
         }
     end,
-    TRUE = function (pos)
+    True = function (pos)
         return {
             type   = 'boolean',
             start  = pos,
@@ -18,7 +18,7 @@ local defs = {
             [1]    = true,
         }
     end,
-    FALSE = function (pos)
+    False = function (pos)
         return {
             type   = 'boolean',
             start  = pos,
@@ -211,6 +211,75 @@ local defs = {
             type = 'pair',
             key, value,
         }
+    end,
+    List = function (first, second, ...)
+        if second then
+            return {
+                type = 'list',
+                first, second, ...
+            }
+        else
+            return first
+        end
+    end,
+    Set = function (keys, values)
+        return {
+            type = 'set',
+            keys, values,
+        }
+    end,
+    Local = function (keys, values)
+        return {
+            type = 'local',
+            keys, values,
+        }
+    end,
+    DoBody = function (...)
+        if ... == '' then
+            return {
+                type = 'do',
+            }
+        else
+            return {
+                type = 'do',
+                ...
+            }
+        end
+    end,
+    Do = function (start, action, finish)
+        action.start  = start
+        action.finish = finish - 1
+        return action
+    end,
+    Break = function ()
+        return {
+            type = 'break',
+        }
+    end,
+    Return = function (exp)
+        if exp == '' then
+            exp = {
+                type = 'return'
+            }
+        else
+            if exp.type == 'list' then
+                exp.type = 'return'
+            else
+                exp = {
+                    type = 'return',
+                    [1] = exp,
+                }
+            end
+        end
+        return exp
+    end,
+    Label = function (name)
+        name.type = 'label'
+        return name
+    end,
+    GoTo = function (name)
+        name.type = 'goto'
+        return name
     end
 }
 
