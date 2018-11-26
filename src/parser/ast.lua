@@ -69,11 +69,15 @@ local defs = {
             [1]    = str,
         }
     end,
-    Simple = function (...)
-        return {
-            type = 'simple',
-            ...,
-        }
+    Simple = function (first, ...)
+        if ... then
+            return {
+                type = 'simple',
+                first, ...,
+            }
+        else
+            return first
+        end
     end,
     Call = function (...)
         if ... == '' then
@@ -127,7 +131,14 @@ local defs = {
             start  = start,
             finish = start + 2,
         }
-    end
+    end,
+    COLON = function (start)
+        return {
+            type   = ':',
+            start  = start,
+            finish = start,
+        }
+    end,
 }
 
 return function (self, lua, mode)

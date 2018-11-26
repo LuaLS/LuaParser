@@ -75,31 +75,28 @@ grammar 'Common' [[
 Cut         <-  ![a-zA-Z0-9_]
 X16         <-  [a-fA-F0-9]
 
-AND         <-  Sp {'and'}    Cut
-BREAK       <-  Sp 'break'    Cut
-DO          <-  Sp 'do'       Cut
-ELSE        <-  Sp 'else'     Cut
-ELSEIF      <-  Sp 'elseif'   Cut
-END         <-  Sp 'end'      Cut
-FALSE       <-  Sp {}         -> FALSE
-                'false'       Cut
-FOR         <-  Sp 'for'      Cut
-FUNCTION    <-  Sp 'function' Cut
-GOTO        <-  Sp 'goto'     Cut
-IF          <-  Sp 'if'       Cut
-IN          <-  Sp 'in'       Cut
-LOCAL       <-  Sp 'local'    Cut
-NIL         <-  Sp {}         -> NIL
-                'nil'         Cut
-NOT         <-  Sp {'not'}    Cut
-OR          <-  Sp {'or'}     Cut
-REPEAT      <-  Sp 'repeat'   Cut
-RETURN      <-  Sp 'return'   Cut
-THEN        <-  Sp 'then'     Cut
-TRUE        <-  Sp {}         -> TRUE
-                'true'        Cut
-UNTIL       <-  Sp 'until'    Cut
-WHILE       <-  Sp 'while'    Cut
+AND         <-  Sp               {'and'}    Cut
+BREAK       <-  Sp               'break'    Cut
+DO          <-  Sp               'do'       Cut
+ELSE        <-  Sp               'else'     Cut
+ELSEIF      <-  Sp               'elseif'   Cut
+END         <-  Sp               'end'      Cut
+FALSE       <-  Sp ({} -> FALSE) 'false'    Cut
+FOR         <-  Sp               'for'      Cut
+FUNCTION    <-  Sp               'function' Cut
+GOTO        <-  Sp               'goto'     Cut
+IF          <-  Sp               'if'       Cut
+IN          <-  Sp               'in'       Cut
+LOCAL       <-  Sp               'local'    Cut
+NIL         <-  Sp ({} -> NIL)   'nil'      Cut
+NOT         <-  Sp               {'not'}    Cut
+OR          <-  Sp               {'or'}     Cut
+REPEAT      <-  Sp               'repeat'   Cut
+RETURN      <-  Sp               'return'   Cut
+THEN        <-  Sp               'then'     Cut
+TRUE        <-  Sp ({} -> TRUE)  'true'     Cut
+UNTIL       <-  Sp               'until'    Cut
+WHILE       <-  Sp               'while'    Cut
 
 Esc         <-  '\' -> ''
                 EChar
@@ -156,11 +153,9 @@ TL          <-  Sp '{'
 TR          <-  Sp '}'
 COMMA       <-  Sp ','
 SEMICOLON   <-  Sp ';'
-DOTS        <-  Sp {} -> DOTS
-                '...'
+DOTS        <-  Sp ({} '...') -> DOTS
 DOT         <-  Sp '.'
-COLON       <-  Sp {} -> COLONPos
-                ':'   -> COLON
+COLON       <-  Sp ({} ':') -> COLON
 LABEL       <-  Sp '::'
 ASSIGN      <-  Sp '='
 ]]
@@ -209,7 +204,7 @@ ExpBor      <-  (ExpBxor    (BOR    ExpBxor)*)    -> Binary
 ExpBxor     <-  (ExpBand    (BXOR   ExpBand)*)    -> Binary
 ExpBand     <-  (ExpBshift  (BAND   ExpBshift)*)  -> Binary
 ExpBshift   <-  (ExpConcat  (Bshift ExpConcat)*)  -> Binary
-ExpConcat   <-  (ExpAdds    (Concat ExpAdds)*)    -> Binary
+ExpConcat   <-  (ExpAdds    (Concat ExpConcat)*)  -> Binary
 ExpAdds     <-  (ExpMuls    (Adds   ExpMuls)*)    -> Binary
 ExpMuls     <-  (ExpUnary   (Muls   ExpUnary)*)   -> Binary
 ExpUnary    <-  (           (Unary+ ExpPower))    -> Unary
@@ -228,17 +223,14 @@ Simple      <-  (Prefix (Suffix)*)
             ->  Simple
 Prefix      <-  PL Exp PR
             /   Name
-ColonName   <-  (COLON Name)
-            ->  ColonName
 Suffix      <-  DOT Name
-            /   ColonName
+            /   COLON Name
             /   Table
             /   String
             /   BL Exp BR
-            /   PL (ArgList? -> Call) PR
+            /   PL (ArgList -> Call) PR
 
-ArgList     <-  (Arg (COMMA Arg)*)?
-            ->  ArgList
+ArgList     <-  Arg? (COMMA Arg)*
 Arg         <-  DOTS
             /   Exp
 
@@ -261,7 +253,7 @@ FunctionDef <-  (FUNCTION FuncName PL ArgList PR) -> FunctionDef
 FuncName    <-  (Name (FuncSuffix)*)?
             ->  FuncName
 FuncSuffix  <-  DOT Name
-            /   ColonName
+            /   COLON Name
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
 Action      <-  !. .
