@@ -2,6 +2,10 @@ local re = require 'parser.relabel'
 local m = require 'lpeglabel'
 local calcline = require 'parser.calcline'
 
+local tonumber = tonumber
+local string_char = string.char
+local utf8_char = utf8.char
+
 local scriptBuf = ''
 local compiled = {}
 local parser
@@ -32,6 +36,25 @@ defs.ev = '\v'
 
 defs.First = function (first, ...)
     return first
+end
+defs.Char10 = function (char)
+    char = tonumber(char)
+    if not char or char < 0 or char > 255 then
+        -- TODO 记录错误
+        return ''
+    end
+    return string_char(char)
+end
+defs.Char16 = function (char)
+    return string_char(tonumber(char, 16))
+end
+defs.CharUtf8 = function (char)
+    char = tonumber(char, 16)
+    if not char or char < 0 or char > 0x10ffff then
+        -- TODO 记录错误
+        return ''
+    end
+    return utf8_char(char)
 end
 local eof = re.compile '!. / %{SYNTAX_ERROR}'
 
@@ -113,10 +136,10 @@ EChar       <-  'a' -> ea
             /   '"'
             /   "'"
             /   %nl
-            /   ('z' (%nl / %s)*) -> ''
-            /   'x' X16 X16
-            /   [0-9] [0-9]? [0-9]?
-            /   'u{' X16^+1^-6 '}'
+            /   ('z' (%nl / %s)*)     -> ''
+            /   ('x' {X16 X16})       -> Char16
+            /   ([0-9] [0-9]? [0-9]?) -> Char10
+            /   ('u{' {X16^+1^-6} '}')-> CharUtf8
 
 Comp        <-  Sp CompList
 CompList    <-  '<='
