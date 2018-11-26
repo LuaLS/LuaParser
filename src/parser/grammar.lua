@@ -30,6 +30,7 @@ defs.en = '\n'
 defs.er = '\r'
 defs.et = '\t'
 defs.ev = '\v'
+defs['nil'] = function () return nil end
 
 defs.first = function (first, ...)
     return first
@@ -73,6 +74,7 @@ Sp  <-  (Comment / %nl / %s)*
 
 grammar 'Common' [[
 Cut         <-  ![a-zA-Z0-9_]
+None        <-  {} -> nil
 X16         <-  [a-fA-F0-9]
 
 AND         <-  Sp               {'and'}    Cut
@@ -234,14 +236,16 @@ ArgList     <-  Arg? (COMMA Arg)*
 Arg         <-  DOTS
             /   Exp
 
-Table       <-  (TL TableFields? TR)
+Table       <-  Sp ({} TL (TableFields / None) TR {})
             ->  Table
-TableFields <-  TableField (TableSep TableField)* TableSep?
+TableFields <-  (TableField (TableSep TableField)* TableSep?)
+            ->  TableFields
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
 NewIndex    <-  (BL Exp BR ASSIGN Exp)
             ->  NewIndex
-NewField    <-  Name ASSIGN Exp
+NewField    <-  (Name ASSIGN Exp)
+            ->  NewField
 
 Function    <-  Sp ({} (FunctionLoc / FunctionDef) {})
             ->  Function
@@ -257,7 +261,7 @@ FuncSuffix  <-  DOT Name
             /   COLON Name
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
-Action      <-  (.+) -> ''
+Action      <-  .
 ]]
 
 grammar 'Action' [[

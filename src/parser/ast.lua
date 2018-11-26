@@ -2,8 +2,6 @@ local tonumber = tonumber
 local string_char = string.char
 local utf8_char = utf8.char
 
-local NIL = {}
-
 local defs = {
     NIL = function (pos)
         return {
@@ -143,7 +141,7 @@ local defs = {
     end,
     FuncName = function (...)
         if ... == '' then
-            return NIL
+            return nil
         else
             return ...
         end
@@ -152,12 +150,12 @@ local defs = {
         if ... then
             return name, {...}
         else
-            return name, NIL
+            return name, nil
         end
     end,
     FunctionBody = function (...)
         if ... == '' then
-            return NIL
+            return nil
         else
             return {
                 type   = 'function',
@@ -166,13 +164,12 @@ local defs = {
         end
     end,
     Function = function (start, name, arg, action, finish)
-        if name == NIL then
-            name = nil
-        end
-        if arg == NIL then
-            arg = nil
-        end
-        if action == NIL then
+        if action then
+            action.name   = name
+            action.arg    = arg
+            action.start  = start
+            action.finish = finish - 1
+        else
             action = {
                 type   = 'function',
                 name   = name,
@@ -180,13 +177,40 @@ local defs = {
                 start  = start,
                 finish = finish - 1,
             }
-        else
-            action.name   = name
-            action.arg    = arg
-            action.start  = start
-            action.finish = finish - 1
         end
         return action
+    end,
+    Table = function (start, table, finish)
+        if table then
+            table.start  = start
+            table.finish = finish - 1
+        else
+            table = {
+                type   = 'table',
+                start  = start,
+                finish = finish - 1,
+            }
+        end
+        return table
+    end,
+    TableFields = function (...)
+        return {
+            type = 'table',
+            ...,
+        }
+    end,
+    NewField = function (key, value)
+        key.type = 'string'
+        return {
+            type = 'pair',
+            key, value,
+        }
+    end,
+    NewIndex = function (key, value)
+        return {
+            type = 'pair',
+            key, value,
+        }
     end
 }
 
