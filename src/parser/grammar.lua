@@ -2,9 +2,6 @@ local re = require 'parser.relabel'
 local m = require 'lpeglabel'
 local calcline = require 'parser.calcline'
 
-local tonumber = tonumber
-local string_char = string.char
-local utf8_char = utf8.char
 
 local scriptBuf = ''
 local compiled = {}
@@ -34,27 +31,8 @@ defs.er = '\r'
 defs.et = '\t'
 defs.ev = '\v'
 
-defs.First = function (first, ...)
+defs.first = function (first, ...)
     return first
-end
-defs.Char10 = function (char)
-    char = tonumber(char)
-    if not char or char < 0 or char > 255 then
-        -- TODO 记录错误
-        return ''
-    end
-    return string_char(char)
-end
-defs.Char16 = function (char)
-    return string_char(tonumber(char, 16))
-end
-defs.CharUtf8 = function (char)
-    char = tonumber(char, 16)
-    if not char or char < 0 or char > 0x10ffff then
-        -- TODO 记录错误
-        return ''
-    end
-    return utf8_char(char)
 end
 local eof = re.compile '!. / %{SYNTAX_ERROR}'
 
@@ -199,15 +177,14 @@ Boolean     <-  TRUE
 grammar 'String' [[
 String      <-  Sp ({} StringDef {})
             ->  String
-StringDef   <-  '"' {~(Esc / !%nl !'"' .)*~} -> First '"'
-            /   "'" {~(Esc / !%nl !"'" .)*~} -> First "'"
-            /   '[' {:eq: '='* :} '[' {(!StringClose .)*} -> First StringClose
+StringDef   <-  '"' {~(Esc / !%nl !'"' .)*~} -> first '"'
+            /   "'" {~(Esc / !%nl !"'" .)*~} -> first "'"
+            /   '[' {:eq: '='* :} '[' {(!StringClose .)*} -> first StringClose
 StringClose <-  ']' =eq ']'
 ]]
 
 grammar 'Number' [[
-Number      <-  Sp {}     -> NumberPos
-                NumberDef -> Number
+Number      <-  Sp ({} {NumberDef} {}) -> Number
 NumberDef   <-  Number16 / Number10
 
 Number10    <-  Integer10 Float10

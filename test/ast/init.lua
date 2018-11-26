@@ -24,6 +24,9 @@ local function eq(a, b)
         end
         return true
     end
+    if tp1 == 'number' then
+        return ('%q'):format(a) == ('%q'):format(b)
+    end
     return a == b
 end
 
@@ -48,3 +51,4 @@ end
 test 'Nil'
 test 'Boolean'
 test 'String'
+test 'Number'
