@@ -61,6 +61,73 @@ local defs = {
             [1]    = tonumber(number),
         }
     end,
+    Name = function (start, str, finish)
+        return {
+            type   = 'name',
+            start  = start,
+            finish = finish - 1,
+            [1]    = str,
+        }
+    end,
+    Simple = function (...)
+        return {
+            type = 'simple',
+            ...,
+        }
+    end,
+    Call = function (...)
+        if ... == '' then
+            return {
+                type = 'call',
+            }
+        else
+            return {
+                type = 'call',
+                ...,
+            }
+        end
+    end,
+    Binary = function (...)
+        local e1, op = ...
+        if not op then
+            return e1
+        end
+        local args = {...}
+        local e1 = args[1]
+        local e2
+        for i = 2, #args, 2 do
+            op, e2 = args[i], args[i+1]
+            e1 = {
+                type = op,
+                [1]  = e1,
+                [2]  = e2,
+            }
+        end
+        return e1
+    end,
+    Unary = function (...)
+        local e1, op = ...
+        if not op then
+            return e1
+        end
+        local args = {...}
+        local e1 = args[#args]
+        for i = #args - 1, 1, -1 do
+            op = args[i]
+            e1 = {
+                type = op,
+                [1]  = e1,
+            }
+        end
+        return e1
+    end,
+    DOTS = function (start)
+        return {
+            type   = '...',
+            start  = start,
+            finish = start + 2,
+        }
+    end
 }
 
 return function (self, lua, mode)

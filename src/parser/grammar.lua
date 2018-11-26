@@ -75,7 +75,7 @@ grammar 'Common' [[
 Cut         <-  ![a-zA-Z0-9_]
 X16         <-  [a-fA-F0-9]
 
-AND         <-  Sp 'and'      Cut
+AND         <-  Sp {'and'}    Cut
 BREAK       <-  Sp 'break'    Cut
 DO          <-  Sp 'do'       Cut
 ELSE        <-  Sp 'else'     Cut
@@ -91,8 +91,8 @@ IN          <-  Sp 'in'       Cut
 LOCAL       <-  Sp 'local'    Cut
 NIL         <-  Sp {}         -> NIL
                 'nil'         Cut
-NOT         <-  Sp 'not'      Cut
-OR          <-  Sp 'or'       Cut
+NOT         <-  Sp {'not'}    Cut
+OR          <-  Sp {'or'}     Cut
 REPEAT      <-  Sp 'repeat'   Cut
 RETURN      <-  Sp 'return'   Cut
 THEN        <-  Sp 'then'     Cut
@@ -119,34 +119,34 @@ EChar       <-  'a' -> ea
             /   ([0-9] [0-9]? [0-9]?) -> Char10
             /   ('u{' {X16^+1^-6} '}')-> CharUtf8
 
-Comp        <-  Sp CompList
+Comp        <-  Sp {CompList}
 CompList    <-  '<='
             /   '>='
             /   '<'
             /   '>'
             /   '~='
             /   '=='
-BOR         <-  Sp '|'
-BXOR        <-  Sp '~'
-BAND        <-  Sp '&'
-Bshift      <-  Sp BshiftList
+BOR         <-  Sp {'|'}
+BXOR        <-  Sp {'~'}
+BAND        <-  Sp {'&'}
+Bshift      <-  Sp {BshiftList}
 BshiftList  <-  '<<'
             /   '>>'
-Concat      <-  Sp '..'
-Adds        <-  Sp AddsList
+Concat      <-  Sp {'..'}
+Adds        <-  Sp {AddsList}
 AddsList    <-  '+'
             /   '-'
-Muls        <-  Sp MulsList
+Muls        <-  Sp {MulsList}
 MulsList    <-  '*'
             /   '//'
             /   '/'
             /   '%'
-Unary       <-  Sp UnaryList
+Unary       <-  Sp {UnaryList}
 UnaryList   <-  'not'
             /   '#'
             /   '-'
             /   '~'
-POWER       <-  Sp '^'
+POWER       <-  Sp {'^'}
 
 PL          <-  Sp '('
 PR          <-  Sp ')'
@@ -156,8 +156,8 @@ TL          <-  Sp '{'
 TR          <-  Sp '}'
 COMMA       <-  Sp ','
 SEMICOLON   <-  Sp ';'
-DOTS        <-  Sp {} -> DOTSPos
-                '...' -> DOTS
+DOTS        <-  Sp {} -> DOTS
+                '...'
 DOT         <-  Sp '.'
 COLON       <-  Sp {} -> COLONPos
                 ':'   -> COLON
@@ -197,25 +197,24 @@ Float16     <-  ('.' X16*)? ([pP] [+-]? [1-9]? [0-9]*)?
 ]]
 
 grammar 'Name' [[
-Name        <-  Sp {} -> NamePos
-                {[a-zA-Z_] [a-zA-Z0-9_]*} -> Name
+Name        <-  Sp ({} {[a-zA-Z_] [a-zA-Z0-9_]*} {}) -> Name
 ]]
 
 grammar 'Exp' [[
 Exp         <-  ExpOr
-ExpOr       <-  ExpAnd     (OR     ExpAnd)*
-ExpAnd      <-  ExpCompare (AND    ExpCompare)*
-ExpCompare  <-  ExpBor     (Comp   ExpBor)*
-ExpBor      <-  ExpBxor    (BOR    ExpBxor)*
-ExpBxor     <-  ExpBand    (BXOR   ExpBand)*
-ExpBand     <-  ExpBshift  (BAND   ExpBshift)*
-ExpBshift   <-  ExpConcat  (Bshift ExpConcat)*
-ExpConcat   <-  ExpAdds    (Concat ExpAdds)*
-ExpAdds     <-  ExpMuls    (Adds   ExpMuls)*
-ExpMuls     <-  ExpUnary   (Muls   ExpUnary)*
-ExpUnary    <-             (Unary  ExpPower)
-            /                      ExpPower
-ExpPower    <-  ExpUnit    (POWER  ExpUnary)*
+ExpOr       <-  (ExpAnd     (OR     ExpAnd)*)     -> Binary
+ExpAnd      <-  (ExpCompare (AND    ExpCompare)*) -> Binary
+ExpCompare  <-  (ExpBor     (Comp   ExpBor)*)     -> Binary
+ExpBor      <-  (ExpBxor    (BOR    ExpBxor)*)    -> Binary
+ExpBxor     <-  (ExpBand    (BXOR   ExpBand)*)    -> Binary
+ExpBand     <-  (ExpBshift  (BAND   ExpBshift)*)  -> Binary
+ExpBshift   <-  (ExpConcat  (Bshift ExpConcat)*)  -> Binary
+ExpConcat   <-  (ExpAdds    (Concat ExpAdds)*)    -> Binary
+ExpAdds     <-  (ExpMuls    (Adds   ExpMuls)*)    -> Binary
+ExpMuls     <-  (ExpUnary   (Muls   ExpUnary)*)   -> Binary
+ExpUnary    <-  (           (Unary+ ExpPower))    -> Unary
+            /                       ExpPower
+ExpPower    <-  (ExpUnit    (POWER  ExpUnary)*)   -> Binary
 ExpUnit     <-  Nil
             /   Boolean
             /   String
@@ -236,7 +235,7 @@ Suffix      <-  DOT Name
             /   Table
             /   String
             /   BL Exp BR
-            /   PL ArgList? PR
+            /   PL (ArgList? -> Call) PR
 
 ArgList     <-  (Arg (COMMA Arg)*)?
             ->  ArgList
