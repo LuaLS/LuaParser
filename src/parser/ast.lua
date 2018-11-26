@@ -2,6 +2,8 @@ local tonumber = tonumber
 local string_char = string.char
 local utf8_char = utf8.char
 
+local NIL = {}
+
 local defs = {
     NIL = function (pos)
         return {
@@ -139,6 +141,53 @@ local defs = {
             finish = start,
         }
     end,
+    FuncName = function (...)
+        if ... == '' then
+            return NIL
+        else
+            return ...
+        end
+    end,
+    FunctionDef = function (name, ...)
+        if ... then
+            return name, {...}
+        else
+            return name, NIL
+        end
+    end,
+    FunctionBody = function (...)
+        if ... == '' then
+            return NIL
+        else
+            return {
+                type   = 'function',
+                ...
+            }
+        end
+    end,
+    Function = function (start, name, arg, action, finish)
+        if name == NIL then
+            name = nil
+        end
+        if arg == NIL then
+            arg = nil
+        end
+        if action == NIL then
+            action = {
+                type   = 'function',
+                name   = name,
+                arg    = arg,
+                start  = start,
+                finish = finish - 1,
+            }
+        else
+            action.name   = name
+            action.arg    = arg
+            action.start  = start
+            action.finish = finish - 1
+        end
+        return action
+    end
 }
 
 return function (self, lua, mode)

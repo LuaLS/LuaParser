@@ -798,3 +798,41 @@ CHECK'(...)[1]'
         [1]    = 1,
     },
 }
+CHECK'function () end'
+{
+    type   = 'function',
+    start  = 1,
+    finish = 15,
+}
+CHECK'function (...) end'
+{
+    type   = 'function',
+    start  = 1,
+    finish = 18,
+    arg    = {
+        [1] = {
+            type   = '...',
+            start  = 11,
+            finish = 13,
+        },
+    },
+}
+CHECK'function (1, ...) end'
+{
+    type   = 'function',
+    start  = 1,
+    finish = 21,
+    arg    = {
+        [1] = {
+            type   = 'number',
+            start  = 11,
+            finish = 11,
+            [1]    = 1,
+        },
+        [2] = {
+            type   = '...',
+            start  = 14,
+            finish = 16,
+        },
+    },
+}

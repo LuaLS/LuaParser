@@ -243,20 +243,21 @@ NewIndex    <-  (BL Exp BR ASSIGN Exp)
             ->  NewIndex
 NewField    <-  Name ASSIGN Exp
 
-Function    <-  FunctionLoc / FunctionDef
+Function    <-  Sp ({} (FunctionLoc / FunctionDef) {})
+            ->  Function
 FunctionLoc <-  (LOCAL FUNCTION FuncName PL ArgList PR) -> FunctionLoc
-                    (!END Action)*                      -> Function
+                    (!END Action)*                      -> FunctionBody
                 END
 FunctionDef <-  (FUNCTION FuncName PL ArgList PR) -> FunctionDef
-                    (!END Action)*                -> Function
+                    (!END Action)*                -> FunctionBody
                 END
-FuncName    <-  (Name (FuncSuffix)*)?
+FuncName    <-  (Name? (FuncSuffix)*)
             ->  FuncName
 FuncSuffix  <-  DOT Name
             /   COLON Name
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
-Action      <-  !. .
+Action      <-  (.+) -> ''
 ]]
 
 grammar 'Action' [[
