@@ -573,3 +573,147 @@ end]]
         }
     }
 }
+CHECK[[
+for i = 1, 10 do
+    return
+end]]
+{
+    type   = 'loop',
+    start  = 1,
+    finish = 31,
+    arg    = {
+        type   = 'name',
+        start  = 5,
+        finish = 5,
+        [1]    = 'i',
+    },
+    min    = {
+        type   = 'number',
+        start  = 9,
+        finish = 9,
+        [1]    = 1,
+    },
+    max    = {
+        type   = 'number',
+        start  = 12,
+        finish = 13,
+        [1]    = 10,
+    },
+    [1]    = {
+        type   = 'return'
+    }
+}
+CHECK[[
+for i = 1, 10, 1 do
+    return
+end]]
+{
+    type   = 'loop',
+    start  = 1,
+    finish = 34,
+    arg    = {
+        type   = 'name',
+        start  = 5,
+        finish = 5,
+        [1]    = 'i',
+    },
+    min    = {
+        type   = 'number',
+        start  = 9,
+        finish = 9,
+        [1]    = 1,
+    },
+    max    = {
+        type   = 'number',
+        start  = 12,
+        finish = 13,
+        [1]    = 10,
+    },
+    step   = {
+        type   = 'number',
+        start  = 16,
+        finish = 16,
+        [1]    = 1
+    },
+    [1]    = {
+        type   = 'return'
+    }
+}
+CHECK[[
+for a in a do
+    return
+end]]
+{
+    type   = 'in',
+    start  = 1,
+    finish = 28,
+    arg    = {
+        type   = 'name',
+        start  = 5,
+        finish = 5,
+        [1]    = 'a',
+    },
+    exp    = {
+        type   = 'name',
+        start  = 10,
+        finish = 10,
+        [1]    = 'a',
+    },
+    [1]    = {
+        type   = 'return',
+    }
+}
+CHECK[[
+for a, b, c in a, b, c do
+    return
+end]]
+{
+    type   = 'in',
+    start  = 1,
+    finish = 40,
+    arg    = {
+        type   = 'list',
+        [1]    = {
+            type   = 'name',
+            start  = 5,
+            finish = 5,
+            [1]    = 'a',
+        },
+        [2]    = {
+            type   = 'name',
+            start  = 8,
+            finish = 8,
+            [1]    = 'b',
+        },
+        [3]    = {
+            type   = 'name',
+            start  = 11,
+            finish = 11,
+            [1]    = 'c',
+        },
+    },
+    exp    = {
+        type   = 'list',
+        [1]    = {
+            type   = 'name',
+            start  = 16,
+            finish = 16,
+            [1]    = 'a',
+        },
+        [2]    = {
+            type   = 'name',
+            start  = 19,
+            finish = 19,
+            [1]    = 'b',
+        },
+        [3]    = {
+            type   = 'name',
+            start  = 22,
+            finish = 22,
+            [1]    = 'c',
+        },
+    },
+    [1]    = {
+        type   = 'return',
+    }
+}

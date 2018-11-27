@@ -309,6 +309,37 @@ local defs = {
         body.finish = finish - 1
         return body
     end,
+    LoopDef = function (arg, min, max, step)
+        return arg, min, max, step
+    end,
+    LoopBody = function (arg, min, max, step, ...)
+        return {
+            type = 'loop',
+            arg  = arg,
+            min  = min,
+            max  = max,
+            step = step,
+            ...
+        }
+    end,
+    Loop = function (start, body, finish)
+        body.start  = start
+        body.finish = finish - 1
+        return body
+    end,
+    InBody = function (arg, exp, ...)
+        return {
+            type = 'in',
+            arg  = arg,
+            exp  = exp,
+            ...
+        }
+    end,
+    In = function (start, body, finish)
+        body.start  = start
+        body.finish = finish - 1
+        return body
+    end,
 }
 
 return function (self, lua, mode)

@@ -304,15 +304,19 @@ ElsePart    <-  ELSE
 
 For         <-  Loop / In
 
-Loop        <-  (FOR LoopStart LoopFinish LoopStep? DO) -> LoopDef
-                    (!END Action)*                      -> Loop
+Loop        <-  Sp ({} LoopBody -> LoopBody {})
+            ->  Loop
+LoopBody    <-  (FOR LoopStart LoopFinish LoopStep? DO) -> LoopDef
+                    (!END Action)*
                 END
-LoopStart   <-  (Name ASSIGN Exp)                       -> LoopStart
+LoopStart   <-  Name ASSIGN Exp
 LoopFinish  <-  COMMA Exp
 LoopStep    <-  COMMA Exp
 
-In          <-  (FOR NameList IN ExpList DO)    -> InDef
-                    (!END Action)*              -> In
+In          <-  Sp ({} InBody -> InBody {})
+            ->  In
+InBody      <-  FOR NameList IN ExpList DO
+                    (!END Action)*
                 END
 
 While       <-  (WHILE Exp DO)      -> WhileDef
