@@ -298,59 +298,59 @@ local defs = {
             ...
         }
     end,
-    IfBody = function (...)
-        return {
-            type = 'if',
+    If = function (start, ...)
+        local obj = {
+            type  = 'if',
+            start = start,
             ...
         }
-    end,
-    If = function (start, body, finish)
-        body.start  = start
-        body.finish = finish - 1
-        return body
+        local max = #obj
+        obj.finish = obj[max] - 1
+        obj[max]   = nil
+        return obj
     end,
     LoopDef = function (arg, min, max, step)
         return arg, min, max, step
     end,
-    LoopBody = function (arg, min, max, step, ...)
-        return {
-            type = 'loop',
-            arg  = arg,
-            min  = min,
-            max  = max,
-            step = step,
+    Loop = function (start, arg, min, max, step, ...)
+        local obj = {
+            type  = 'loop',
+            start = start,
+            arg   = arg,
+            min   = min,
+            max   = max,
+            step  = step,
             ...
         }
+        local max = #obj
+        obj.finish = obj[max] - 1
+        obj[max]   = nil
+        return obj
     end,
-    Loop = function (start, body, finish)
-        body.start  = start
-        body.finish = finish - 1
-        return body
-    end,
-    InBody = function (arg, exp, ...)
-        return {
-            type = 'in',
-            arg  = arg,
-            exp  = exp,
+    In = function (start, arg, exp, ...)
+        local obj = {
+            type  = 'in',
+            start = start,
+            arg   = arg,
+            exp   = exp,
             ...
         }
+        local max = #obj
+        obj.finish = obj[max] - 1
+        obj[max]   = nil
+        return obj
     end,
-    In = function (start, body, finish)
-        body.start  = start
-        body.finish = finish - 1
-        return body
-    end,
-    WhileBody = function (filter, ...)
-        return {
+    While = function (start, filter, ...)
+        local obj = {
             type   = 'while',
+            start  = start,
             filter = filter,
             ...
         }
-    end,
-    While = function (start, body, finish)
-        body.start  = start
-        body.finish = finish - 1
-        return body
+        local max = #obj
+        obj.finish = obj[max] - 1
+        obj[max]   = nil
+        return obj
     end,
     Repeat = function (start, ...)
         local obj = {

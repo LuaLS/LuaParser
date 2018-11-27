@@ -289,7 +289,7 @@ Label       <-  LABEL Name -> Label LABEL
 
 GoTo        <-  GOTO Name -> GoTo
 
-If          <-  Sp ({} IfBody -> IfBody {})
+If          <-  Sp ({} IfBody {})
             ->  If
 IfBody      <-  (IfPart     -> IfBlock)
                 (ElseIfPart -> ElseIfBlock)*
@@ -304,7 +304,7 @@ ElsePart    <-  ELSE
 
 For         <-  Loop / In
 
-Loop        <-  Sp ({} LoopBody -> LoopBody {})
+Loop        <-  Sp ({} LoopBody {})
             ->  Loop
 LoopBody    <-  (FOR LoopStart LoopFinish LoopStep? DO) -> LoopDef
                     (!END Action)*
@@ -313,13 +313,13 @@ LoopStart   <-  Name ASSIGN Exp
 LoopFinish  <-  COMMA Exp
 LoopStep    <-  COMMA Exp
 
-In          <-  Sp ({} InBody -> InBody {})
+In          <-  Sp ({} InBody {})
             ->  In
 InBody      <-  FOR NameList IN ExpList DO
                     (!END Action)*
                 END
 
-While       <-  Sp ({} WhileBody -> WhileBody {})
+While       <-  Sp ({} WhileBody {})
             ->  While
 WhileBody   <-  WHILE Exp DO
                     (!END Action)*
@@ -345,7 +345,7 @@ Lua         <-  (Sp Action)* Sp
 
 return function (lua, mode, parser_)
     parser = parser_ or {}
-    mode = mode or 'lua'
+    mode = mode or 'Lua'
     local r, e, pos = compiled[mode]:match(lua)
     if not r then
         local err = errorpos(lua, pos, e)
