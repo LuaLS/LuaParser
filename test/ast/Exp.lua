@@ -815,7 +815,7 @@ CHECK'function (...) end'
         finish = 13,
     },
 }
-CHECK'function (1, ...) end'
+CHECK'function (a, ...) end'
 {
     type   = 'function',
     start  = 1,
@@ -823,10 +823,10 @@ CHECK'function (1, ...) end'
     arg    = {
         type = 'list',
         [1]  = {
-            type   = 'number',
+            type   = 'name',
             start  = 11,
             finish = 11,
-            [1]    = 1,
+            [1]    = 'a',
         },
         [2]  = {
             type   = '...',

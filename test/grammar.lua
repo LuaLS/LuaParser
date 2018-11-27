@@ -204,9 +204,9 @@ check 'Exp'
 
 'function () end',
 'function (...) end',
-'function (1) end',
-'function (1, 2) end',
-'function (1, ...) end',
+'function (a) end',
+'function (a, b) end',
+'function (a, ...) end',
 
 '{}',
 '{...}',

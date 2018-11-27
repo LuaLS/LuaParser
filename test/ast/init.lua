@@ -55,3 +55,13 @@ test 'Number'
 test 'Name'
 test 'Exp'
 test 'Action'
+
+collectgarbage 'stop'
+local buf = [[
+local function (a, b, c, d, e, f, g, h, i, j, k, ...)
+end
+]]
+buf = buf:rep(10000)
+local clock = os.clock()
+local ast, err = parser:ast(buf)
+print(ast ~= nil, os.clock() - clock)
