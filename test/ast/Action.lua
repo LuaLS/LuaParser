@@ -368,3 +368,208 @@ CHECK'goto CONTINUE'
     finish = 13,
     [1]    = 'CONTINUE',
 }
+CHECK[[if 1 then
+end]]
+{
+    type   = 'if',
+    start  = 1,
+    finish = 13,
+    [1]    = {
+        filter = {
+            type   = 'number',
+            start  = 4,
+            finish = 4,
+            [1]    = 1,
+        },
+    }
+}
+CHECK[[if 1 then
+    return
+end]]
+{
+    type   = 'if',
+    start  = 1,
+    finish = 24,
+    [1]    = {
+        filter = {
+            type   = 'number',
+            start  = 4,
+            finish = 4,
+            [1]    = 1,
+        },
+        [1]    = {
+            type   = 'return',
+        }
+    }
+}
+CHECK[[if 1 then
+    return
+else
+    return
+end]]
+{
+    type   = 'if',
+    start  = 1,
+    finish = 40,
+    [1]    = {
+        filter = {
+            type   = 'number',
+            start  = 4,
+            finish = 4,
+            [1]    = 1,
+        },
+        [1]    = {
+            type   = 'return',
+        }
+    },
+    [2]    = {
+        [1]    = {
+            type   = 'return',
+        }
+    }
+}
+CHECK[[if 1 then
+    return
+elseif 1 then
+    return
+end]]
+{
+    type   = 'if',
+    start  = 1,
+    finish = 49,
+    [1]    = {
+        filter = {
+            type   = 'number',
+            start  = 4,
+            finish = 4,
+            [1]    = 1,
+        },
+        [1]    = {
+            type   = 'return',
+        }
+    },
+    [2]    = {
+        filter = {
+            type   = 'number',
+            start  = 29,
+            finish = 29,
+            [1]    = 1,
+        },
+        [1]    = {
+            type   = 'return',
+        }
+    }
+}
+CHECK[[if 1 then
+    return
+elseif 1 then
+    return
+else
+    return
+end]]
+{
+    type   = 'if',
+    start  = 1,
+    finish = 65,
+    [1]    = {
+        filter = {
+            type   = 'number',
+            start  = 4,
+            finish = 4,
+            [1]    = 1,
+        },
+        [1]    = {
+            type   = 'return',
+        }
+    },
+    [2]    = {
+        filter = {
+            type   = 'number',
+            start  = 29,
+            finish = 29,
+            [1]    = 1,
+        },
+        [1]    = {
+            type   = 'return',
+        }
+    },
+    [3]    = {
+        [1]    = {
+            type   = 'return',
+        }
+    }
+}
+CHECK[[
+if 1 then
+elseif 1 then
+elseif 1 then
+elseif 1 then
+end]]
+{
+    type   = 'if',
+    start  = 1,
+    finish = 55,
+    [1]    = {
+        filter = {
+            type   = 'number',
+            start  = 4,
+            finish = 4,
+            [1]    = 1,
+        }
+    },
+    [2]    = {
+        filter = {
+            type   = 'number',
+            start  = 18,
+            finish = 18,
+            [1]    = 1,
+        }
+    },
+    [3]    = {
+        filter = {
+            type   = 'number',
+            start  = 32,
+            finish = 32,
+            [1]    = 1,
+        }
+    },
+    [4]    = {
+        filter = {
+            type   = 'number',
+            start  = 46,
+            finish = 46,
+            [1]    = 1,
+        }
+    },
+}
+CHECK[[
+if 1 then
+    if 2 then
+    end
+end]]
+{
+    type   = 'if',
+    start  = 1,
+    finish = 35,
+    [1]    = {
+        filter = {
+            type   = 'number',
+            start  = 4,
+            finish = 4,
+            [1]    = 1,
+        },
+        [1]    = {
+            type   = 'if',
+            start  = 15,
+            finish = 31,
+            [1]    = {
+                filter = {
+                    type   = 'number',
+                    start  = 18,
+                    finish = 18,
+                    [1]    = 2,
+                }
+            }
+        }
+    }
+}

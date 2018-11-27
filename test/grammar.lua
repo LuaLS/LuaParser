@@ -41,9 +41,6 @@ end
 local function check(mode)
     return function (list)
         for i, str in ipairs(list) do
-            if mode ~= 'Nl' then
-                str = str:gsub('[\r\n]+$', '')
-            end
             check_str(str, mode .. '-' .. i, mode)
         end
     end
@@ -281,8 +278,7 @@ if 1 then
 elseif 1 then
 elseif 1 then
 elseif 1 then
-end
-]],
+end]],
 
 [[for i = 1, 10 do
     x = 1

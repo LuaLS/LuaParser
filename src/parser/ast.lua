@@ -280,7 +280,35 @@ local defs = {
     GoTo = function (name)
         name.type = 'goto'
         return name
-    end
+    end,
+    IfBlock = function (exp, ...)
+        return {
+            filter = exp,
+            ...
+        }
+    end,
+    ElseIfBlock = function (exp, ...)
+        return {
+            filter = exp,
+            ...
+        }
+    end,
+    ElseBlock = function (...)
+        return {
+            ...
+        }
+    end,
+    IfBody = function (...)
+        return {
+            type = 'if',
+            ...
+        }
+    end,
+    If = function (start, body, finish)
+        body.start  = start
+        body.finish = finish - 1
+        return body
+    end,
 }
 
 return function (self, lua, mode)

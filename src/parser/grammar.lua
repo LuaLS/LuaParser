@@ -282,24 +282,25 @@ DoBody      <-  (!END Action)*
 Break       <-  BREAK
             ->  Break
 
-Return      <-  RETURN !END ExpList?
+Return      <-  RETURN (!END !ELSE !ELSEIF ExpList)?
             ->  Return
 
 Label       <-  LABEL Name -> Label LABEL
 
 GoTo        <-  GOTO Name -> GoTo
 
-If          <-  IfPart
-                ElseIfPart*
-                ElsePart?
+If          <-  Sp ({} IfBody -> IfBody {})
+            ->  If
+IfBody      <-  (IfPart     -> IfBlock)
+                (ElseIfPart -> ElseIfBlock)*
+                (ElsePart   -> ElseBlock)?
                 END
-            ->  EndIf
-IfPart      <-  (IF Exp THEN)                       -> IfDef
-                    (!ELSEIF !ELSE !END Action)*    -> If
-ElseIfPart  <-  (ELSEIF Exp THEN)                   -> ElseIfDef
-                    (!ELSE !ELSEIF !END Action)*    -> ElseIf
-ElsePart    <-  ELSE                                -> ElseDef
-                    (!END Action)*                  -> Else
+IfPart      <-  IF Exp THEN
+                    (!ELSEIF !ELSE !END Action)*
+ElseIfPart  <-  ELSEIF Exp THEN
+                    (!ELSE !ELSEIF !END Action)*
+ElsePart    <-  ELSE
+                    (!END Action)*
 
 For         <-  Loop / In
 
