@@ -282,7 +282,7 @@ DoBody      <-  (!END Action)*
 Break       <-  BREAK
             ->  Break
 
-Return      <-  RETURN (!END !ELSE !ELSEIF ExpList)?
+Return      <-  RETURN (!END !ELSE !ELSEIF !UNTIL ExpList)?
             ->  Return
 
 Label       <-  LABEL Name -> Label LABEL
@@ -319,13 +319,17 @@ InBody      <-  FOR NameList IN ExpList DO
                     (!END Action)*
                 END
 
-While       <-  (WHILE Exp DO)      -> WhileDef
-                    (!END Action)*  -> While
+While       <-  Sp ({} WhileBody -> WhileBody {})
+            ->  While
+WhileBody   <-  WHILE Exp DO
+                    (!END Action)*
                 END
 
-Repeat      <-  REPEAT                  -> RepeatDef
-                    (!UNTIL Action)*    -> Repeat
-                (UNTIL Exp)             -> Until
+Repeat      <-  Sp ({} RepeatBody {})
+            ->  Repeat
+RepeatBody  <-  REPEAT
+                    (!UNTIL Action)*
+                UNTIL Exp
 
 Local       <-  (LOCAL NameList (ASSIGN ExpList)?)
             ->  Local

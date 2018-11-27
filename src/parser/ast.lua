@@ -340,6 +340,31 @@ local defs = {
         body.finish = finish - 1
         return body
     end,
+    WhileBody = function (filter, ...)
+        return {
+            type   = 'while',
+            filter = filter,
+            ...
+        }
+    end,
+    While = function (start, body, finish)
+        body.start  = start
+        body.finish = finish - 1
+        return body
+    end,
+    Repeat = function (start, ...)
+        local obj = {
+            type  = 'repeat',
+            start = start,
+            ...
+        }
+        local max = #obj
+        obj.finish = obj[max] - 1
+        obj.filter = obj[max-1]
+        obj[max]   = nil
+        obj[max-1] = nil
+        return obj
+    end,
 }
 
 return function (self, lua, mode)

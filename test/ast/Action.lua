@@ -717,3 +717,39 @@ end]]
         type   = 'return',
     }
 }
+CHECK[[
+while true do
+    return
+end]]
+{
+    type   = 'while',
+    start  = 1,
+    finish = 28,
+    filter = {
+        type   = 'boolean',
+        start  = 7,
+        finish = 10,
+        [1]    = true,
+    },
+    [1]    = {
+        type = 'return',
+    }
+}
+CHECK[[
+repeat
+    return
+until 1]]
+{
+    type   = 'repeat',
+    start  = 1,
+    finish = 25,
+    filter = {
+        type   = 'number',
+        start  = 25,
+        finish = 25,
+        [1]    = 1,
+    },
+    [1]    = {
+        type = 'return',
+    }
+}
