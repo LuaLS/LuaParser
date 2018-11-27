@@ -753,3 +753,155 @@ until 1]]
         type = 'return',
     }
 }
+CHECK[[
+function test()
+    return
+end]]
+{
+    type   = 'function',
+    start  = 1,
+    finish = 30,
+    name   = {
+        type   = 'name',
+        start  = 10,
+        finish = 13,
+        [1]    = 'test',
+    },
+    [1]    = {
+        type = 'return',
+    }
+}
+CHECK[[
+function test(a)
+    return
+end]]
+{
+    type   = 'function',
+    start  = 1,
+    finish = 31,
+    name   = {
+        type   = 'name',
+        start  = 10,
+        finish = 13,
+        [1]    = 'test',
+    },
+    arg    = {
+        type   = 'name',
+        start  = 15,
+        finish = 15,
+        [1]    = 'a',
+    },
+    [1]    = {
+        type = 'return',
+    }
+}
+CHECK[[
+function a.b:c(a, b, c)
+    return
+end]]
+{
+    type   = 'function',
+    start  = 1,
+    finish = 38,
+    name   = {
+        type = 'simple',
+        [1]  = {
+            type   = 'name',
+            start  = 10,
+            finish = 10,
+            [1]    = 'a',
+        },
+        [2]  = {
+            type   = 'name',
+            start  = 12,
+            finish = 12,
+            [1]    = 'b',
+        },
+        [3]  = {
+            type   = ':',
+            start  = 13,
+            finish = 13,
+        },
+        [4]  = {
+            type   = 'name',
+            start  = 14,
+            finish = 14,
+            [1]    = 'c',
+        }
+    },
+    arg    = {
+        type = 'list',
+        [1]  = {
+            type   = 'name',
+            start  = 16,
+            finish = 16,
+            [1]    = 'a',
+        },
+        [2]  = {
+            type   = 'name',
+            start  = 19,
+            finish = 19,
+            [1]    = 'b',
+        },
+        [3]  = {
+            type   = 'name',
+            start  = 22,
+            finish = 22,
+            [1]    = 'c',
+        },
+    },
+    [1]    = {
+        type = 'return',
+    }
+}
+CHECK[[
+local function a()
+    return
+end]]
+{
+    type   = 'localfunction',
+    start  = 1,
+    finish = 33,
+    name   = {
+        type   = 'name',
+        start  = 16,
+        finish = 16,
+        [1]    = 'a',
+    },
+    [1]    = {
+        type = 'return',
+    }
+}
+CHECK[[
+local function a(b, c)
+    return
+end]]
+{
+    type   = 'localfunction',
+    start  = 1,
+    finish = 37,
+    name   = {
+        type   = 'name',
+        start  = 16,
+        finish = 16,
+        [1]    = 'a',
+    },
+    arg    = {
+        type = 'list',
+        [1]  = {
+            type   = 'name',
+            start  = 18,
+            finish = 18,
+            [1]    = 'b',
+        },
+        [2]  = {
+            type   = 'name',
+            start  = 21,
+            finish = 21,
+            [1]    = 'c',
+        },
+    },
+    [1]    = {
+        type = 'return',
+    }
+}

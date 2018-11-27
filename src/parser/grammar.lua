@@ -248,16 +248,13 @@ NewIndex    <-  (BL Exp BR ASSIGN Exp)
 NewField    <-  (Name ASSIGN Exp)
             ->  NewField
 
-Function    <-  Sp ({} (FunctionLoc / FunctionDef) {})
+Function    <-  Sp ({} FunctionBody {})
             ->  Function
-FunctionLoc <-  LOCAL FUNCTION FuncName PL ArgList PR
-                    (!END Action)*                      -> FunctionBody
-                END
-FunctionDef <-  FUNCTION FuncName PL ArgList PR
-                    (!END Action)*                -> FunctionBody
+FunctionBody<-  FUNCTION FuncName PL ArgList PR
+                    (!END Action)*
                 END
 FuncName    <-  (Name? (FuncSuffix)*)
-            ->  FuncName
+            ->  Simple
 FuncSuffix  <-  DOT Name
             /   COLON Name
 
@@ -266,7 +263,21 @@ Action      <-  .
 ]]
 
 grammar 'Action' [[
-Action      <-  SEMICOLON / Do / Break / Return / Label / GoTo / If / For / While / Repeat / Function / Local / Set / Call
+Action      <-  SEMICOLON
+            /   Do
+            /   Break
+            /   Return
+            /   Label
+            /   GoTo
+            /   If
+            /   For
+            /   While
+            /   Repeat
+            /   Function
+            /   LocalFunction
+            /   Local
+            /   Set
+            /   Call
 
 ExpList     <-  (Exp (COMMA Exp)*)
             ->  List
@@ -338,6 +349,10 @@ Set         <-  (SimpleList ASSIGN ExpList)
             ->  Set
 
 Call        <-  Simple
+
+LocalFunction
+            <-  Sp ({} LOCAL FunctionBody {})
+            ->  LocalFunction
 ]]
 
 grammar 'Lua' [[

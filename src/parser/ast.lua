@@ -75,6 +75,8 @@ local defs = {
                 type = 'simple',
                 first, ...,
             }
+        elseif first == '' then
+            return nil
         else
             return first
         end
@@ -143,39 +145,31 @@ local defs = {
             finish = start,
         }
     end,
-    FuncName = function (...)
-        if ... == '' then
-            return nil
-        else
-            return ...
-        end
+    Function = function (start, name, arg, ...)
+        local obj = {
+            type  = 'function',
+            start = start,
+            name  = name,
+            arg   = arg,
+            ...
+        }
+        local max = #obj
+        obj.finish = obj[max] - 1
+        obj[max]   = nil
+        return obj
     end,
-    FunctionBody = function (...)
-        if ... == '' then
-            return nil
-        else
-            return {
-                type   = 'function',
-                ...
-            }
-        end
-    end,
-    Function = function (start, name, arg, action, finish)
-        if action then
-            action.name   = name
-            action.arg    = arg
-            action.start  = start
-            action.finish = finish - 1
-        else
-            action = {
-                type   = 'function',
-                name   = name,
-                arg    = arg,
-                start  = start,
-                finish = finish - 1,
-            }
-        end
-        return action
+    LocalFunction = function (start, name, arg, ...)
+        local obj = {
+            type  = 'localfunction',
+            start = start,
+            name  = name,
+            arg   = arg,
+            ...
+        }
+        local max = #obj
+        obj.finish = obj[max] - 1
+        obj[max]   = nil
+        return obj
     end,
     Table = function (start, table, finish)
         if table then
