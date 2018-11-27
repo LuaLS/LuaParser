@@ -79,17 +79,21 @@ local defs = {
             return first
         end
     end,
-    Call = function (...)
-        if ... == '' then
+    Call = function (arg)
+        if arg == nil then
             return {
-                type = 'call',
-            }
-        else
-            return {
-                type = 'call',
-                ...,
+                type = 'call'
             }
         end
+        if arg.type == 'list' then
+            arg.type = 'call'
+            return arg
+        end
+        local obj = {
+            type = 'call',
+            [1]  = arg,
+        }
+        return obj
     end,
     Binary = function (...)
         local e1, op = ...
@@ -144,13 +148,6 @@ local defs = {
             return nil
         else
             return ...
-        end
-    end,
-    FunctionDef = function (name, ...)
-        if ... then
-            return name, {...}
-        else
-            return name, nil
         end
     end,
     FunctionBody = function (...)
@@ -218,6 +215,8 @@ local defs = {
                 type = 'list',
                 first, second, ...
             }
+        elseif first == '' then
+            return nil
         else
             return first
         end

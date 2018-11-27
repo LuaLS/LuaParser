@@ -810,11 +810,9 @@ CHECK'function (...) end'
     start  = 1,
     finish = 18,
     arg    = {
-        [1] = {
-            type   = '...',
-            start  = 11,
-            finish = 13,
-        },
+        type   = '...',
+        start  = 11,
+        finish = 13,
     },
 }
 CHECK'function (1, ...) end'
@@ -823,13 +821,14 @@ CHECK'function (1, ...) end'
     start  = 1,
     finish = 21,
     arg    = {
-        [1] = {
+        type = 'list',
+        [1]  = {
             type   = 'number',
             start  = 11,
             finish = 11,
             [1]    = 1,
         },
-        [2] = {
+        [2]  = {
             type   = '...',
             start  = 14,
             finish = 16,

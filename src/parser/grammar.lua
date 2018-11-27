@@ -232,7 +232,8 @@ Suffix      <-  DOT Name
             /   BL Exp BR
             /   PL (ArgList -> Call) PR
 
-ArgList     <-  Arg? (COMMA Arg)*
+ArgList     <-  (Arg (COMMA Arg)*)?
+            ->  List
 Arg         <-  DOTS
             /   Exp
 
@@ -249,10 +250,10 @@ NewField    <-  (Name ASSIGN Exp)
 
 Function    <-  Sp ({} (FunctionLoc / FunctionDef) {})
             ->  Function
-FunctionLoc <-  (LOCAL FUNCTION FuncName PL ArgList PR) -> FunctionLoc
+FunctionLoc <-  LOCAL FUNCTION FuncName PL ArgList PR
                     (!END Action)*                      -> FunctionBody
                 END
-FunctionDef <-  (FUNCTION FuncName PL ArgList PR) -> FunctionDef
+FunctionDef <-  FUNCTION FuncName PL ArgList PR
                     (!END Action)*                -> FunctionBody
                 END
 FuncName    <-  (Name? (FuncSuffix)*)
