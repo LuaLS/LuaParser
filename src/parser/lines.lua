@@ -1,6 +1,14 @@
 local m = require 'lpeglabel'
 
-local function Line(pos, ...)
+local function utf8_len(buf, start, finish)
+    local len, pos = utf8.len(buf, start, finish)
+    if len then
+        return len
+    end
+    return 1 + utf8_len(buf, start, pos-1) + utf8_len(buf, pos+1, finish)
+end
+
+local function Line(pos, str, ...)
     local line = {...}
     local sp = 0
     local tab = 0
@@ -20,8 +28,9 @@ end
 
 local parser = m.P{
 'Lines',
-Lines   = m.Ct((m.V'Line' * m.V'Nl')^0 * m.V'Line'),
-Line    = m.Cp() * m.V'Indent' * (1 - m.V'Nl')^0 / Line,
+Lines   = m.Ct(m.V'Line'^0 * m.V'LastLine'),
+Line    = m.Cp() * m.C(m.V'Indent' * (1 - m.V'Nl')^0 * m.V'Nl') / Line,
+LastLine= m.Cp() * m.C(m.V'Indent' * (1 - m.V'Nl')^0) / Line,
 Nl      = m.P'\r\n' + m.S'\r\n',
 Indent  = m.C(m.S' \t')^0,
 }
@@ -29,12 +38,16 @@ Indent  = m.C(m.S' \t')^0,
 local mt = {}
 mt.__index = mt
 
-function mt:position(row, col)
+function mt:position(row, col, code)
     if row < 1 then
         return 1
     end
     if row > #self then
-        return self.len + 1
+        if code == 'utf8' then
+            return utf8_len(self.buf) + 1
+        else
+            return #self.buf + 1
+        end
     end
     local line = self[row]
     local next_line = self[row+1]
@@ -43,9 +56,14 @@ function mt:position(row, col)
     if next_line then
         finish = next_line[1] - 1
     else
-        finish = self.len + 1
+        finish = #self.buf + 1
     end
-    local pos = start + col - 1
+    local pos
+    if code == 'utf8' then
+        pos = utf8.offset(self.buf, col, start) or finish
+    else
+        pos = start + col - 1
+    end
     if pos < start then
         pos = start
     elseif pos > finish then
@@ -54,12 +72,17 @@ function mt:position(row, col)
     return pos
 end
 
-function mt:rowcol(pos)
+function mt:rowcol(pos, code)
     if pos < 1 then
         return 1, 1
     end
-    if pos > self.len + 1 then
-        return #self, math.max(1, self.len - self[#self][1] + 2)
+    if pos > #self.buf + 1 then
+        local start = self[#self][1]
+        if code == 'utf8' then
+            return #self, utf8_len(self.buf, start) + 1
+        else
+            return #self, #self.buf - start + 2
+        end
     end
     local min = 1
     local max = #self
@@ -71,7 +94,11 @@ function mt:rowcol(pos)
         elseif pos > start then
             local next_start = self[row + 1][1]
             if pos < next_start then
-                return row, pos - start + 1
+                if code == 'utf8' then
+                    return row, utf8_len(self.buf, start, pos)
+                else
+                    return row, pos - start + 1
+                end
             elseif pos > next_start then
                 min = row
             else
@@ -89,7 +116,7 @@ return function (self, buf)
     if not lines then
         return nil, err
     end
-    lines.len = #buf
+    lines.buf = buf
 
     return setmetatable(lines, mt)
 end

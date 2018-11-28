@@ -13,8 +13,6 @@ assert(lines[358][3] == 0)
 assert(lines[359][2] == 0)
 assert(lines[359][3] == 1)
 
-assert(lines.len     == #buf)
-
 local row, col = lines:rowcol(618)
 assert(row == 22)
 assert(col == 19)
@@ -48,3 +46,13 @@ assert(pos == 10373)
 local row, col = lines:rowcol(10373)
 assert(row == 365)
 assert(col == 1)
+
+local pos = lines:position(9999, 1, 'utf8')
+assert(pos == 10337)
+
+local pos = lines:position(191, 16, 'utf8')
+assert(pos == 4863)
+
+local row, col = lines:rowcol(4863, 'utf8')
+assert(row == 191)
+assert(col == 16)
