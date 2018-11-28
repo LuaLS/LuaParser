@@ -36,6 +36,10 @@ local function performTest()
         if not suc then
             error(('文件解析失败：%s'):format(path:string()))
         end
+        local lines, err = parser:lines(buf)
+        if not suc then
+            error(('行号解析失败：%s'):format(path:string()))
+        end
     end
     local passed = os.clock() - clock
     print(('解析完成，总大小[%.3f]kb，速度[%.3f]mb/s，用时[%.3f]秒'):format(size / 1000, size / passed / 1000 / 1000, passed))
