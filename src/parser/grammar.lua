@@ -230,12 +230,16 @@ Suffix      <-  DOT Name
             /   Table
             /   String
             /   BL Exp BR
-            /   PL (ArgList -> Call) PR
+            /   PL (ExpList -> Call) PR
 
+ExpList     <-  (Exp (COMMA Exp)*)?
+            ->  List
+NameList    <-  (Name (COMMA Name)*)?
+            ->  List
 ArgList     <-  (Arg (COMMA Arg)*)?
             ->  List
 Arg         <-  DOTS
-            /   Exp
+            /   Name
 
 Table       <-  Sp ({} TL (TableFields / None) TR {})
             ->  Table
@@ -279,10 +283,6 @@ Action      <-  SEMICOLON
             /   Set
             /   Call
 
-ExpList     <-  (Exp (COMMA Exp)*)
-            ->  List
-NameList    <-  (Name (COMMA Name)*)
-            ->  List
 SimpleList  <-  (Simple (COMMA Simple)*)
             ->  List
 

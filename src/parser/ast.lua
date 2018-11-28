@@ -250,7 +250,7 @@ local defs = {
         }
     end,
     Return = function (exp)
-        if exp == '' then
+        if exp == nil or exp == '' then
             exp = {
                 type = 'return'
             }
