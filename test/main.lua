@@ -28,6 +28,7 @@ local function performTest()
             size = size + #buf
         end
     end
+    collectgarbage 'stop'
     local clock = os.clock()
     for path, buf in pairs(files) do
         local suc, err = parser:ast(buf)

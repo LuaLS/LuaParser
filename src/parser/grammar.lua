@@ -7,6 +7,31 @@ local scriptBuf = ''
 local compiled = {}
 local parser
 
+local RESERVED = {
+    ['and']      = true,
+    ['break']    = true,
+    ['do']       = true,
+    ['else']     = true,
+    ['elseif']   = true,
+    ['end']      = true,
+    ['false']    = true,
+    ['for']      = true,
+    ['function'] = true,
+    ['goto']     = true,
+    ['if']       = true,
+    ['in']       = true,
+    ['local']    = true,
+    ['nil']      = true,
+    ['not']      = true,
+    ['or']       = true,
+    ['repeat']   = true,
+    ['return']   = true,
+    ['then']     = true,
+    ['true']     = true,
+    ['until']    = true,
+    ['while']    = true,
+}
+
 local defs = setmetatable({}, {__index = function (self, key)
     self[key] = function (...)
         if parser[key] then
@@ -31,6 +56,12 @@ defs.er = '\r'
 defs.et = '\t'
 defs.ev = '\v'
 defs['nil'] = function () return nil end
+defs.NotReserved = function (_, _, str)
+    if RESERVED[str] then
+        return false
+    end
+    return true, str
+end
 
 defs.first = function (first, ...)
     return first
@@ -194,7 +225,10 @@ Float16     <-  ('.' X16*)? ([pP] [+-]? [1-9]? [0-9]*)?
 ]]
 
 grammar 'Name' [[
-Name        <-  Sp ({} {[a-zA-Z_] [a-zA-Z0-9_]*} {}) -> Name
+Name        <-  Sp ({} NameBody {})
+            ->  Name
+NameBody    <-  ([a-zA-Z_] [a-zA-Z0-9_]*)
+            =>  NotReserved
 ]]
 
 grammar 'Exp' [[
@@ -255,7 +289,7 @@ NewField    <-  (Name ASSIGN Exp)
 Function    <-  Sp ({} FunctionBody {})
             ->  Function
 FunctionBody<-  FUNCTION FuncName PL ArgList PR
-                    (!END Action)*
+                    Action*
                 END
 FuncName    <-  (Name? (FuncSuffix)*)
             ->  Simple
@@ -263,7 +297,7 @@ FuncSuffix  <-  DOT Name
             /   COLON Name
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
-Action      <-  .
+Action      <-  !END .
 ]]
 
 grammar 'Action' [[
@@ -288,13 +322,13 @@ SimpleList  <-  (Simple (COMMA Simple)*)
 
 Do          <-  Sp ({} DO DoBody END {})
             ->  Do
-DoBody      <-  (!END Action)*
+DoBody      <-  Action*
             ->  DoBody
 
 Break       <-  BREAK
             ->  Break
 
-Return      <-  RETURN (!END !ELSE !ELSEIF !UNTIL ExpList)?
+Return      <-  RETURN ExpList?
             ->  Return
 
 Label       <-  LABEL Name -> Label LABEL
@@ -308,18 +342,18 @@ IfBody      <-  (IfPart     -> IfBlock)
                 (ElsePart   -> ElseBlock)?
                 END
 IfPart      <-  IF Exp THEN
-                    (!ELSEIF !ELSE !END Action)*
+                    Action*
 ElseIfPart  <-  ELSEIF Exp THEN
-                    (!ELSE !ELSEIF !END Action)*
+                    Action*
 ElsePart    <-  ELSE
-                    (!END Action)*
+                    Action*
 
 For         <-  Loop / In
 
 Loop        <-  Sp ({} LoopBody {})
             ->  Loop
 LoopBody    <-  (FOR LoopStart LoopFinish LoopStep? DO) -> LoopDef
-                    (!END Action)*
+                    Action*
                 END
 LoopStart   <-  Name ASSIGN Exp
 LoopFinish  <-  COMMA Exp
@@ -328,19 +362,19 @@ LoopStep    <-  COMMA Exp
 In          <-  Sp ({} InBody {})
             ->  In
 InBody      <-  FOR NameList IN ExpList DO
-                    (!END Action)*
+                    Action*
                 END
 
 While       <-  Sp ({} WhileBody {})
             ->  While
 WhileBody   <-  WHILE Exp DO
-                    (!END Action)*
+                    Action*
                 END
 
 Repeat      <-  Sp ({} RepeatBody {})
             ->  Repeat
 RepeatBody  <-  REPEAT
-                    (!UNTIL Action)*
+                    Action*
                 UNTIL Exp
 
 Local       <-  (LOCAL NameList (ASSIGN ExpList)?)
