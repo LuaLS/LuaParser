@@ -19,9 +19,10 @@ local function unitTest(name)
 end
 
 local function performTest()
+    local targetPath = ROOT
     local files = {}
     local size = 0
-    for path in io.scan(ROOT) do
+    for path in io.scan(targetPath) do
         if path:extension():string() == '.lua' then
             local buf = io.load(path)
             files[path] = buf
