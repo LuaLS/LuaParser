@@ -26,11 +26,16 @@ Nl      = m.P'\r\n' + m.S'\r\n',
 Indent  = m.C(m.S' \t')^0,
 }
 
+local mt = {}
+mt.__index = mt
+
+
+
 return function (self, buf)
     local lines, err = parser:match(buf)
     if not lines then
         return nil, err
     end
 
-    return lines
+    return setmetatable(lines, mt)
 end

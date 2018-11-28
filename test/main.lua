@@ -49,6 +49,7 @@ local function main()
 
     unitTest 'grammar'
     unitTest 'ast'
+    unitTest 'lines'
 
     performTest()
 
