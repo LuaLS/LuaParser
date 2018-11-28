@@ -55,7 +55,6 @@ defs.en = '\n'
 defs.er = '\r'
 defs.et = '\t'
 defs.ev = '\v'
-defs['nil'] = function () return nil end
 defs.NotReserved = function (_, _, str)
     if RESERVED[str] then
         return false
@@ -105,7 +104,6 @@ Sp  <-  (Comment / %nl / %s)*
 
 grammar 'Common' [[
 Cut         <-  ![a-zA-Z0-9_]
-None        <-  {} -> nil
 X16         <-  [a-fA-F0-9]
 
 AND         <-  Sp {'and'}    Cut
@@ -275,9 +273,9 @@ ArgList     <-  (Arg (COMMA Arg)*)?
 Arg         <-  DOTS
             /   Name
 
-Table       <-  Sp ({} TL (TableFields / None) TR {})
+Table       <-  Sp ({} TL TableFields TR {})
             ->  Table
-TableFields <-  (TableField (TableSep TableField)* TableSep?)
+TableFields <-  (TableField (TableSep TableField)* TableSep?)?
             ->  TableFields
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp

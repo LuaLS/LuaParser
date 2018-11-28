@@ -185,10 +185,14 @@ local defs = {
         return table
     end,
     TableFields = function (...)
-        return {
-            type = 'table',
-            ...,
-        }
+        if ... == '' then
+            return nil
+        else
+            return {
+                type = 'table',
+                ...,
+            }
+        end
     end,
     NewField = function (key, value)
         key.type = 'string'
