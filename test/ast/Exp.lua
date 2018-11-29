@@ -737,6 +737,7 @@ CHECK'table[1]'
         type   = 'number',
         start  = 7,
         finish = 7,
+        index  = true,
         [1]    = 1,
     }
 }
@@ -795,6 +796,7 @@ CHECK'(...)[1]'
         type   = 'number',
         start  = 7,
         finish = 7,
+        index  = true,
         [1]    = 1,
     },
 }
@@ -884,7 +886,7 @@ CHECK'{x = 1, y = 2}'
     [1]    = {
         type = 'pair',
         [1]  = {
-            type   = 'string',
+            type   = 'name',
             start  = 2,
             finish = 2,
             [1]    = 'x',
@@ -899,7 +901,7 @@ CHECK'{x = 1, y = 2}'
     [2]    = {
         type = 'pair',
         [1]  = {
-            type   = 'string',
+            type   = 'name',
             start  = 9,
             finish = 9,
             [1]    = 'y',
@@ -923,6 +925,7 @@ CHECK'{["x"] = 1, ["y"] = 2}'
             type   = 'string',
             start  = 3,
             finish = 5,
+            index  = true,
             [1]    = 'x',
         },
         [2]  = {
@@ -938,6 +941,7 @@ CHECK'{["x"] = 1, ["y"] = 2}'
             type   = 'string',
             start  = 14,
             finish = 16,
+            index  = true,
             [1]    = 'y',
         },
         [2]  = {
@@ -959,6 +963,7 @@ CHECK'{[x] = 1, [y] = 2}'
             type   = 'name',
             start  = 3,
             finish = 3,
+            index  = true,
             [1]    = 'x',
         },
         [2]  = {
@@ -974,6 +979,7 @@ CHECK'{[x] = 1, [y] = 2}'
             type   = 'name',
             start  = 12,
             finish = 12,
+            index  = true,
             [1]    = 'y',
         },
         [2]  = {
@@ -1003,7 +1009,7 @@ CHECK'{ a = { b = { c = {} } } }'
     [1]    = {
         type = 'pair',
         [1]  = {
-            type   = 'string',
+            type   = 'name',
             start  = 3,
             finish = 3,
             [1]    = 'a',
@@ -1015,7 +1021,7 @@ CHECK'{ a = { b = { c = {} } } }'
             [1]    = {
                 type = 'pair',
                 [1]  = {
-                    type   = 'string',
+                    type   = 'name',
                     start  = 9,
                     finish = 9,
                     [1]    = 'b'
@@ -1027,7 +1033,7 @@ CHECK'{ a = { b = { c = {} } } }'
                     [1]    = {
                         type = 'pair',
                         [1]  = {
-                            type   = 'string',
+                            type   = 'name',
                             start  = 15,
                             finish = 15,
                             [1]    = 'c',

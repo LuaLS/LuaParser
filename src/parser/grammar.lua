@@ -261,7 +261,7 @@ Suffix      <-  DOT Name
             /   COLON Name
             /   Table
             /   String
-            /   BL Exp BR
+            /   BL Exp -> Index BR
             /   PL (ExpList -> Call) PR
 
 ExpList     <-  (Exp (COMMA Exp)*)?

@@ -81,6 +81,10 @@ local defs = {
             return first
         end
     end,
+    Index = function (exp)
+        exp.index = true
+        return exp
+    end,
     Call = function (arg)
         if arg == nil then
             return {
@@ -195,13 +199,13 @@ local defs = {
         end
     end,
     NewField = function (key, value)
-        key.type = 'string'
         return {
             type = 'pair',
             key, value,
         }
     end,
     NewIndex = function (key, value)
+        key.index = true
         return {
             type = 'pair',
             key, value,
