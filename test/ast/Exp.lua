@@ -763,6 +763,43 @@ CHECK'func(1, ...)'
         },
     },
 }
+CHECK'func ""'
+{
+    type = 'simple',
+    [1]  = {
+        type   = 'name',
+        start  = 1,
+        finish = 4,
+        [1]    = 'func',
+    },
+    [2]  = {
+        type   = 'call',
+        [1]    = {
+            type   = 'string',
+            start  = 6,
+            finish = 7,
+            [1]    = '',
+        }
+    }
+}
+CHECK'func {}'
+{
+    type = 'simple',
+    [1]  = {
+        type   = 'name',
+        start  = 1,
+        finish = 4,
+        [1]    = 'func',
+    },
+    [2]  = {
+        type   = 'call',
+        [1]    = {
+            type   = 'table',
+            start  = 6,
+            finish = 7,
+        }
+    }
+}
 CHECK'table[1]'
 {
     type = 'simple',
