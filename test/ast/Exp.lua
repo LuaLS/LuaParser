@@ -44,6 +44,8 @@ CHECK'func()'
     },
     [2]  = {
         type   = 'call',
+        start  = 5,
+        finish = 6,
     },
 }
 CHECK'a.b.c()'
@@ -69,6 +71,8 @@ CHECK'a.b.c()'
     },
     [4]  = {
         type   = 'call',
+        start  = 6,
+        finish = 7,
     },
 }
 CHECK'1 or 2'
@@ -675,6 +679,8 @@ CHECK'func()'
     },
     [2]  = {
         type   = 'call',
+        start  = 5,
+        finish = 6,
     },
 }
 CHECK'func(1)'
@@ -688,6 +694,8 @@ CHECK'func(1)'
     },
     [2]  = {
         type   = 'call',
+        start  = 5,
+        finish = 7,
         [1]    = {
             type   = 'number',
             start  = 6,
@@ -707,6 +715,8 @@ CHECK'func(1, 2)'
     },
     [2]  = {
         type   = 'call',
+        start  = 5,
+        finish = 10,
         [1]    = {
             type   = 'number',
             start  = 6,
@@ -732,6 +742,8 @@ CHECK'func(...)'
     },
     [2]  = {
         type   = 'call',
+        start  = 5,
+        finish = 9,
         [1]    = {
             type   = '...',
             start  = 6,
@@ -750,6 +762,8 @@ CHECK'func(1, ...)'
     },
     [2]  = {
         type   = 'call',
+        start  = 5,
+        finish = 12,
         [1]    = {
             type   = 'number',
             start  = 6,
@@ -774,6 +788,8 @@ CHECK'func ""'
     },
     [2]  = {
         type   = 'call',
+        start  = 6,
+        finish = 7,
         [1]    = {
             type   = 'string',
             start  = 6,
@@ -793,6 +809,8 @@ CHECK'func {}'
     },
     [2]  = {
         type   = 'call',
+        start  = 6,
+        finish = 7,
         [1]    = {
             type   = 'table',
             start  = 6,
@@ -828,6 +846,8 @@ CHECK'get_point().x'
     },
     [2]  = {
         type   = 'call',
+        start  = 10,
+        finish = 11,
     },
     [3]  = {
         type   = 'name',
@@ -858,6 +878,8 @@ CHECK'obj:remove()'
     },
     [4]  = {
         type   = 'call',
+        start  = 11,
+        finish = 12,
     },
 }
 CHECK'(...)[1]'

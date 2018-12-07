@@ -213,6 +213,8 @@ CHECK'func.x(1, 2)'
     },
     [3]  = {
         type = 'call',
+        start  = 7,
+        finish = 12,
         [1]  = {
             type   = 'number',
             start  = 8,
@@ -249,6 +251,8 @@ CHECK'func:x(1, 2)'
     },
     [4]  = {
         type = 'call',
+        start  = 7,
+        finish = 12,
         [1]  = {
             type   = 'number',
             start  = 8,
@@ -285,6 +289,8 @@ CHECK'("%s"):format(1)'
     },
     [4]  = {
         type   = 'call',
+        start  = 14,
+        finish = 16,
         [1]    = {
             type   = 'number',
             start  = 15,
