@@ -111,6 +111,20 @@ function mt:rowcol(pos, code)
     error('rowcol failed!')
 end
 
+function mt:line(i)
+    if i < 1 or i > #self then
+        return ''
+    end
+    local start = self[i]
+    local finish
+    if self[i+1] then
+        finish = self[i+1][1] - 1
+    else
+        finish = #self.buf
+    end
+    return self.buf:sub(start, finish)
+end
+
 return function (self, buf)
     local lines, err = parser:match(buf)
     if not lines then

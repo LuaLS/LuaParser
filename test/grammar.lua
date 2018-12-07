@@ -306,6 +306,8 @@ until 1]],
 'local function test() end',
 'function test() end',
 'function a.b:c() end',
+
+'local *toclose _ = 1'
 }
 
 check 'Lua'
