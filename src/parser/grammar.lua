@@ -257,7 +257,7 @@ ExpUnit     <-  Nil
 
 Simple      <-  (Prefix (Suffix)*)
             ->  Simple
-Prefix      <-  PL Exp PR
+Prefix      <-  (PL Exp PR) -> Paren
             /   Name
 Suffix      <-  DOT Name
             /   COLON Name

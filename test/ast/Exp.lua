@@ -645,19 +645,21 @@ CHECK'(1)'
     type   = 'number',
     start  = 2,
     finish = 2,
+    paren  = true,
     [1]    = 1,
 }
 CHECK'(1 + 2)'
 {
-    type = 'binary',
-    op   = '+',
-    [1]  = {
+    type  = 'binary',
+    op    = '+',
+    paren = true,
+    [1]   = {
         type   = 'number',
         start  = 2,
         finish = 2,
         [1]    = 1,
     },
-    [2]  = {
+    [2]   = {
         type   = 'number',
         start  = 6,
         finish = 6,
@@ -867,6 +869,7 @@ CHECK'(...)[1]'
         type   = '...',
         start  = 2,
         finish = 4,
+        paren  = true,
     },
     [2]  = {
         type   = 'number',
