@@ -69,10 +69,6 @@ local defs = {
             [1]    = str,
         }
     end,
-    Paren = function (exp)
-        exp.paren = true
-        return exp
-    end,
     Simple = function (first, ...)
         if ... then
             return {

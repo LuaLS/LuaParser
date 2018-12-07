@@ -270,7 +270,6 @@ CHECK'("%s"):format(1)'
         type   = 'string',
         start  = 2,
         finish = 5,
-        paren  = true,
         [1]    = '%s',
     },
     [2]  = {
