@@ -2,7 +2,7 @@
 local parser = require 'parser'
 local buf = io.load(ROOT / 'src' / 'parser' / 'relabel.lua')
 assert(buf)
-
+print(#buf)
 local lines = parser:lines(buf)
 
 assert(#lines          == 365)
