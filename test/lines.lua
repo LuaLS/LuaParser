@@ -84,3 +84,37 @@ assert(col == 9)
 local row, col = lines:rowcol(10)
 assert(row == 1)
 assert(col == 9)
+
+local buf = [[
+local xx
+local xx]]
+
+local lines = parser:lines(buf)
+
+local row, col = lines:rowcol(14)
+assert(row == 2)
+assert(col == 5)
+
+local row, col = lines:rowcol(15)
+assert(row == 2)
+assert(col == 6)
+
+local row, col = lines:rowcol(16)
+assert(row == 2)
+assert(col == 7)
+
+local row, col = lines:rowcol(17)
+assert(row == 2)
+assert(col == 8)
+
+local row, col = lines:rowcol(18)
+assert(row == 2)
+assert(col == 9)
+
+local row, col = lines:rowcol(19)
+assert(row == 2)
+assert(col == 9)
+
+local row, col = lines:rowcol(20)
+assert(row == 2)
+assert(col == 9)

@@ -115,7 +115,7 @@ function mt:rowcol(pos, code)
                     return row, pos - start + 1
                 end
             elseif pos > next_start then
-                min = row
+                min = row + 1
             else
                 return row + 1, 1
             end
