@@ -83,7 +83,7 @@ function mt:rowcol(pos, code)
         return 1, 1
     end
     code = code or self.code
-    if pos > #self.buf + 1 then
+    if pos >= #self.buf + 1 then
         local start = self[#self].start
         if code == 'utf8' then
             return #self, utf8_len(self.buf, start) + 1
@@ -94,6 +94,14 @@ function mt:rowcol(pos, code)
     local min = 1
     local max = #self
     for _ = 1, 100 do
+        if max == min then
+            local start = self[min].start
+            if code == 'utf8' then
+                return min, utf8_len(self.buf, start, pos)
+            else
+                return min, pos - start + 1
+            end
+        end
         local row = (max - min) // 2 + min
         local start = self[row].start
         if pos < start then

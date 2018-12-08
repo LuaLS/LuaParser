@@ -63,3 +63,24 @@ lines:set_code 'utf8'
 local row, col = lines:rowcol(4863)
 assert(row == 191)
 assert(col == 16)
+
+
+local buf = [[
+local xx]]
+local lines = parser:lines(buf)
+
+local row, col = lines:rowcol(7)
+assert(row == 1)
+assert(col == 7)
+
+local row, col = lines:rowcol(8)
+assert(row == 1)
+assert(col == 8)
+
+local row, col = lines:rowcol(9)
+assert(row == 1)
+assert(col == 9)
+
+local row, col = lines:rowcol(10)
+assert(row == 1)
+assert(col == 9)
