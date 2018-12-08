@@ -47,6 +47,7 @@ function mt:position(row, col, code)
     if row < 1 then
         return 1
     end
+    code = code or self.code
     if row > #self then
         if code == 'utf8' then
             return utf8_len(self.buf) + 1
@@ -81,6 +82,7 @@ function mt:rowcol(pos, code)
     if pos < 1 then
         return 1, 1
     end
+    code = code or self.code
     if pos > #self.buf + 1 then
         local start = self[#self].start
         if code == 'utf8' then
@@ -126,6 +128,10 @@ function mt:range(i)
         return 0, 0
     end
     return self[i].start, self[i].finish
+end
+
+function mt:set_code(code)
+    self.code = code
 end
 
 return function (self, buf)

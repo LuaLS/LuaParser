@@ -55,3 +55,11 @@ assert(pos == 4863)
 local row, col = lines:rowcol(4863, 'utf8')
 assert(row == 191)
 assert(col == 16)
+
+local row, col = lines:rowcol(4863)
+assert(col ~= 16)
+
+lines:set_code 'utf8'
+local row, col = lines:rowcol(4863)
+assert(row == 191)
+assert(col == 16)
