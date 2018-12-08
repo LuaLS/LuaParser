@@ -1,1 +1,1 @@
-*.lua crlf
+*.lua text eol=crlf
