@@ -2,7 +2,6 @@
 local parser = require 'parser'
 local buf = io.load(ROOT / 'src' / 'parser' / 'relabel.lua')
 assert(buf)
-
 local lines = parser:lines(buf)
 
 assert(#lines          == 365)
@@ -56,3 +55,66 @@ assert(pos == 4863)
 local row, col = lines:rowcol(4863, 'utf8')
 assert(row == 191)
 assert(col == 16)
+
+local row, col = lines:rowcol(4863)
+assert(col ~= 16)
+
+lines:set_code 'utf8'
+local row, col = lines:rowcol(4863)
+assert(row == 191)
+assert(col == 16)
+
+
+local buf = [[
+local xx]]
+local lines = parser:lines(buf)
+
+local row, col = lines:rowcol(7)
+assert(row == 1)
+assert(col == 7)
+
+local row, col = lines:rowcol(8)
+assert(row == 1)
+assert(col == 8)
+
+local row, col = lines:rowcol(9)
+assert(row == 1)
+assert(col == 9)
+
+local row, col = lines:rowcol(10)
+assert(row == 1)
+assert(col == 9)
+
+local buf = [[
+local xx
+local xx]]
+
+local lines = parser:lines(buf)
+
+local row, col = lines:rowcol(14)
+assert(row == 2)
+assert(col == 5)
+
+local row, col = lines:rowcol(15)
+assert(row == 2)
+assert(col == 6)
+
+local row, col = lines:rowcol(16)
+assert(row == 2)
+assert(col == 7)
+
+local row, col = lines:rowcol(17)
+assert(row == 2)
+assert(col == 8)
+
+local row, col = lines:rowcol(18)
+assert(row == 2)
+assert(col == 9)
+
+local row, col = lines:rowcol(19)
+assert(row == 2)
+assert(col == 9)
+
+local row, col = lines:rowcol(20)
+assert(row == 2)
+assert(col == 9)
