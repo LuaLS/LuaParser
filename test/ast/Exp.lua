@@ -1202,3 +1202,11 @@ CHECK'{1, 2, 3,}'
         [1]    = 3,
     },
 }
+
+CHECK 'notify'
+{
+    type   = 'name',
+    start  = 1,
+    finish = 6,
+    [1]    = 'notify',
+}
