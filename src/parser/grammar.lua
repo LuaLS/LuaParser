@@ -229,8 +229,8 @@ Name        <-  Sp ({} NameBody {})
             ->  Name
 NameBody    <-  ([a-zA-Z_] [a-zA-Z0-9_]*)
             =>  NotReserved
-MustName    <-  Name
-            /   {} -> DirtyName
+MustName    <-  Name / DirtyName
+DirtyName   <-  {} -> DirtyName
 ]]
 
 grammar 'Exp' [[
@@ -342,14 +342,25 @@ GoTo        <-  GOTO MustName -> GoTo
 
 If          <-  Sp ({} IfBody {})
             ->  If
-IfBody      <-  (IfPart     -> IfBlock)
+IfHead      <-  (IfPart     -> IfBlock)
+            /   (ElseIfPart -> ElseIfBlock)
+            /   (ElsePart   -> ElseBlock)
+IfBody      <-  IfHead
                 (ElseIfPart -> ElseIfBlock)*
                 (ElsePart   -> ElseBlock)?
-                END
+                END?
 IfPart      <-  IF Exp THEN
-                    {} Action* {}
+                    {} (!ELSEIF !ELSE Action)* {}
+            /   IF (Exp / DirtyName) THEN
+                    {} (!ELSEIF !ELSE Action)* {}
+            /   IF (Exp / DirtyName)
+                    {}         {}
 ElseIfPart  <-  ELSEIF Exp THEN
-                    {} Action* {}
+                    {} (!ELSE !ELSEIF Action)* {}
+            /   ELSEIF (Exp / DirtyName) THEN
+                    {} (!ELSE !ELSEIF Action)* {}
+            /   ELSEIF (Exp / DirtyName) THEN
+                    {}         {}
 ElsePart    <-  ELSE
                     {} Action* {}
 
@@ -400,8 +411,8 @@ Lua         <-  (Sp Action)* -> Lua Sp
 
 return function (lua, mode, parser_)
     parser = parser_ or {}
-    mode = mode or 'Lua'
-    local r, e, pos = compiled[mode]:match(lua)
+    local gram = compiled[mode] or compiled['Lua']
+    local r, e, pos = gram:match(lua)
     if not r then
         local err = errorpos(lua, pos, e)
         return nil, err
