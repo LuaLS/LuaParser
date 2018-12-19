@@ -185,8 +185,8 @@ TR          <-  Sp '}'
 COMMA       <-  Sp ','
 SEMICOLON   <-  Sp ';'
 DOTS        <-  Sp ({} '...') -> DOTS
-DOT         <-  Sp '.'
-COLON       <-  Sp ({} ':') -> COLON
+DOT         <-  Sp '.' !'.'
+COLON       <-  Sp ({} ':' !':') -> COLON
 LABEL       <-  Sp '::'
 ASSIGN      <-  Sp '='
 

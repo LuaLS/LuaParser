@@ -319,6 +319,23 @@ CHECK'1 .. 2'
         [1]    = 2,
     },
 }
+CHECK'a .. b'
+{
+    type = 'binary',
+    op   = '..',
+    [1]  = {
+        type   = 'name',
+        start  = 1,
+        finish = 1,
+        [1]    = 'a',
+    },
+    [2]  = {
+        type   = 'name',
+        start  = 6,
+        finish = 6,
+        [1]    = 'b',
+    },
+}
 CHECK'1 + 2'
 {
     type = 'binary',
