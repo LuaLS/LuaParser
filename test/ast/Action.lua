@@ -580,6 +580,35 @@ end]]
     }
 }
 CHECK[[
+if a then
+elseif b then
+else
+end]]
+{
+    type   = 'if',
+    start  = 1,
+    finish = 32,
+    [1]    = {
+        filter = {
+            type   = 'name',
+            start  = 4,
+            finish = 4,
+            [1]    = 'a',
+        },
+    },
+    [2]    = {
+        filter = {
+            type   = 'name',
+            start  = 18,
+            finish = 18,
+            [1]    = 'b',
+        },
+    },
+    [3]    = {
+    },
+}
+
+CHECK[[
 for i = 1, 10 do
     return
 end]]

@@ -303,6 +303,9 @@ local defs = {
         }
     end,
     ElseBlock = function (...)
+        if ... == '' then
+            return {}
+        end
         return {
             ...
         }
