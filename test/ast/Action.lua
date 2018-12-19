@@ -176,7 +176,9 @@ CHECK'x.y = function () end'
 {
     type = 'set',
     [1]  = {
-        type = 'simple',
+        type   = 'simple',
+        start  = 1,
+        finish = 3,
         [1]  = {
             type   = 'name',
             start  = 1,
@@ -198,7 +200,9 @@ CHECK'x.y = function () end'
 }
 CHECK'func.x(1, 2)'
 {
-    type = 'simple',
+    type   = 'simple',
+    start  = 1,
+    finish = 12,
     [1]  = {
         type   = 'name',
         start  = 1,
@@ -231,7 +235,9 @@ CHECK'func.x(1, 2)'
 }
 CHECK'func:x(1, 2)'
 {
-    type = 'simple',
+    type   = 'simple',
+    start  = 1,
+    finish = 12,
     [1]  = {
         type   = 'name',
         start  = 1,
@@ -269,7 +275,9 @@ CHECK'func:x(1, 2)'
 }
 CHECK'("%s"):format(1)'
 {
-    type = 'simple',
+    type   = 'simple',
+    start  = 2,
+    finish = 16,
     [1]  = {
         type   = 'string',
         start  = 2,
@@ -875,7 +883,9 @@ end]]
     start  = 1,
     finish = 38,
     name   = {
-        type = 'simple',
+        type   = 'simple',
+        start  = 10,
+        finish = 14,
         [1]  = {
             type   = 'name',
             start  = 10,

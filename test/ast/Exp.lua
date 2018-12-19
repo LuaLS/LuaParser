@@ -13,7 +13,9 @@ CHECK'a'
 }
 CHECK'a.b.c'
 {
-    type = 'simple',
+    type   = 'simple',
+    start  = 1,
+    finish = 5,
     [1]  = {
         type   = 'name',
         start  = 1,
@@ -35,7 +37,9 @@ CHECK'a.b.c'
 }
 CHECK'func()'
 {
-    type = 'simple',
+    type   = 'simple',
+    start  = 1,
+    finish = 6,
     [1]  = {
         type   = 'name',
         start  = 1,
@@ -50,7 +54,9 @@ CHECK'func()'
 }
 CHECK'a.b.c()'
 {
-    type = 'simple',
+    type   = 'simple',
+    start  = 1,
+    finish = 7,
     [1]  = {
         type   = 'name',
         start  = 1,
@@ -670,7 +676,9 @@ CHECK'(1 + 2)'
 }
 CHECK'func()'
 {
-    type = 'simple',
+    type   = 'simple',
+    start  = 1,
+    finish = 6,
     [1]  = {
         type   = 'name',
         start  = 1,
@@ -685,7 +693,9 @@ CHECK'func()'
 }
 CHECK'func(1)'
 {
-    type = 'simple',
+    type   = 'simple',
+    start  = 1,
+    finish = 7,
     [1]  = {
         type   = 'name',
         start  = 1,
@@ -706,7 +716,9 @@ CHECK'func(1)'
 }
 CHECK'func(1, 2)'
 {
-    type = 'simple',
+    type   = 'simple',
+    start  = 1,
+    finish = 10,
     [1]  = {
         type   = 'name',
         start  = 1,
@@ -733,7 +745,9 @@ CHECK'func(1, 2)'
 }
 CHECK'func(...)'
 {
-    type = 'simple',
+    type   = 'simple',
+    start  = 1,
+    finish = 9,
     [1]  = {
         type   = 'name',
         start  = 1,
@@ -753,7 +767,9 @@ CHECK'func(...)'
 }
 CHECK'func(1, ...)'
 {
-    type = 'simple',
+    type   = 'simple',
+    start  = 1,
+    finish = 12,
     [1]  = {
         type   = 'name',
         start  = 1,
@@ -779,7 +795,9 @@ CHECK'func(1, ...)'
 }
 CHECK'func ""'
 {
-    type = 'simple',
+    type   = 'simple',
+    start  = 1,
+    finish = 7,
     [1]  = {
         type   = 'name',
         start  = 1,
@@ -800,7 +818,9 @@ CHECK'func ""'
 }
 CHECK'func {}'
 {
-    type = 'simple',
+    type   = 'simple',
+    start  = 1,
+    finish = 7,
     [1]  = {
         type   = 'name',
         start  = 1,
@@ -820,7 +840,9 @@ CHECK'func {}'
 }
 CHECK'table[1]'
 {
-    type = 'simple',
+    type   = 'simple',
+    start  = 1,
+    finish = 7,
     [1]  = {
         type   = 'name',
         start  = 1,
@@ -837,7 +859,9 @@ CHECK'table[1]'
 }
 CHECK'get_point().x'
 {
-    type = 'simple',
+    type   = 'simple',
+    start  = 1,
+    finish = 13,
     [1]  = {
         type   = 'name',
         start  = 1,
@@ -858,7 +882,9 @@ CHECK'get_point().x'
 }
 CHECK'obj:remove()'
 {
-    type = 'simple',
+    type   = 'simple',
+    start  = 1,
+    finish = 12,
     [1]  = {
         type   = 'name',
         start  = 1,
@@ -884,7 +910,9 @@ CHECK'obj:remove()'
 }
 CHECK'(...)[1]'
 {
-    type = 'simple',
+    type   = 'simple',
+    start  = 2,
+    finish = 7,
     [1]  = {
         type   = '...',
         start  = 2,
