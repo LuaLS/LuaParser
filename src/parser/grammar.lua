@@ -268,11 +268,17 @@ Suffix      <-  DOT MustName
             /   BL Exp -> Index BR
             /   Sp ({} PL ExpList PR {}) -> Call
 
-ExpList     <-  (Exp (COMMA Exp)*)?
+DirtyExp    <-  Exp / DirtyName
+ExpList     <-  (COMMA DirtyExp)+
+            ->  List
+            /   (Exp (COMMA DirtyExp)*)?
             ->  List
 NameList    <-  (Name (COMMA MustName)*)?
             ->  List
-ArgList     <-  (FirstArg (COMMA AfterArg)*)?
+
+ArgList     <-  (COMMA AfterArg)+
+            ->  List
+            /   (FirstArg (COMMA AfterArg)*)?
             ->  List
 FirstArg    <-  DOTS
             /   Name
@@ -282,20 +288,21 @@ AfterArg    <-  DOTS
 
 Table       <-  Sp ({} TL TableFields TR {})
             ->  Table
-TableFields <-  (TableField (TableSep TableField)* TableSep?)?
+TableFields <-  TableSep (TableSep? TableField)+ TableSep?
+            /   (TableField (TableSep? TableField)* TableSep?)?
             ->  TableFields
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
-NewIndex    <-  (BL Exp BR ASSIGN Exp)
+NewIndex    <-  (BL DirtyExp BR ASSIGN DirtyExp)
             ->  NewIndex
-NewField    <-  (MustName ASSIGN Exp)
+NewField    <-  (MustName ASSIGN DirtyExp)
             ->  NewField
 
 Function    <-  Sp ({} FunctionBody {})
             ->  Function
 FunctionBody<-  FUNCTION FuncName PL ArgList PR
                     Action*
-                END
+                END?
 FuncName    <-  (Name? (FuncSuffix)*)
             ->  Simple
 FuncSuffix  <-  DOT MustName
@@ -321,11 +328,12 @@ Action      <-  SEMICOLON
             /   Local
             /   Set
             /   Call
+            /   Exp
 
 SimpleList  <-  (Simple (COMMA Simple)*)
             ->  List
 
-Do          <-  Sp ({} DO DoBody END {})
+Do          <-  Sp ({} DO DoBody END? {})
             ->  Do
 DoBody      <-  Action*
             ->  DoBody
@@ -370,7 +378,7 @@ Loop        <-  Sp ({} LoopBody {})
             ->  Loop
 LoopBody    <-  (FOR LoopStart LoopFinish LoopStep? DO) -> LoopDef
                     Action*
-                END
+                END?
 LoopStart   <-  MustName ASSIGN Exp
 LoopFinish  <-  COMMA Exp
 LoopStep    <-  COMMA Exp
@@ -379,13 +387,13 @@ In          <-  Sp ({} InBody {})
             ->  In
 InBody      <-  FOR NameList IN ExpList DO
                     Action*
-                END
+                END?
 
 While       <-  Sp ({} WhileBody {})
             ->  While
 WhileBody   <-  WHILE Exp DO
                     Action*
-                END
+                END?
 
 Repeat      <-  Sp ({} RepeatBody {})
             ->  Repeat

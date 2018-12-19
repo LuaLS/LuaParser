@@ -318,3 +318,25 @@ check 'Lua'
 [[return function ()
 end]]
 }
+
+-- Dirty
+check 'Lua'
+{
+'f(,1)',
+'f(1,)',
+'f(,)',
+'function (,)',
+'function (,a)',
+'function (a,)',
+[[
+t = {
+    a =
+}
+]],
+[[
+t = {
+    a = 1
+    b = 2
+}
+]]
+}

@@ -122,3 +122,38 @@ a
         },
     },
 }
+
+CEHCK [[
+x =
+]]
+{
+    [1] = {
+        type   = 'set',
+        [1]    = {
+            type   = 'name',
+            start  = 1,
+            finish = 1,
+            [1]    = 'x'
+        },
+    }
+}
+
+CHECK'1 == 2'
+{
+    [1] = {
+        type = 'binary',
+        op   = '==',
+        [1]  = {
+            type   = 'number',
+            start  = 1,
+            finish = 1,
+            [1]    = 1,
+        },
+        [2]  = {
+            type   = 'number',
+            start  = 6,
+            finish = 6,
+            [1]    = 2,
+        },
+    }
+}
