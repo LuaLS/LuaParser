@@ -381,6 +381,8 @@ end]]
     start  = 1,
     finish = 13,
     [1]    = {
+        start  = 10,
+        finish = 10,
         filter = {
             type   = 'number',
             start  = 4,
@@ -397,6 +399,8 @@ end]]
     start  = 1,
     finish = 24,
     [1]    = {
+        start  = 10,
+        finish = 21,
         filter = {
             type   = 'number',
             start  = 4,
@@ -418,6 +422,8 @@ end]]
     start  = 1,
     finish = 40,
     [1]    = {
+        start  = 10,
+        finish = 21,
         filter = {
             type   = 'number',
             start  = 4,
@@ -429,6 +435,8 @@ end]]
         }
     },
     [2]    = {
+        start  = 26,
+        finish = 37,
         [1]    = {
             type   = 'return',
         }
@@ -444,6 +452,8 @@ end]]
     start  = 1,
     finish = 49,
     [1]    = {
+        start  = 10,
+        finish = 21,
         filter = {
             type   = 'number',
             start  = 4,
@@ -455,6 +465,8 @@ end]]
         }
     },
     [2]    = {
+        start  = 35,
+        finish = 46,
         filter = {
             type   = 'number',
             start  = 29,
@@ -478,6 +490,8 @@ end]]
     start  = 1,
     finish = 65,
     [1]    = {
+        start  = 10,
+        finish = 21,
         filter = {
             type   = 'number',
             start  = 4,
@@ -489,6 +503,8 @@ end]]
         }
     },
     [2]    = {
+        start  = 35,
+        finish = 46,
         filter = {
             type   = 'number',
             start  = 29,
@@ -500,6 +516,8 @@ end]]
         }
     },
     [3]    = {
+        start  = 51,
+        finish = 62,
         [1]    = {
             type   = 'return',
         }
@@ -516,6 +534,8 @@ end]]
     start  = 1,
     finish = 55,
     [1]    = {
+        start  = 10,
+        finish = 10,
         filter = {
             type   = 'number',
             start  = 4,
@@ -524,6 +544,8 @@ end]]
         }
     },
     [2]    = {
+        start  = 24,
+        finish = 24,
         filter = {
             type   = 'number',
             start  = 18,
@@ -532,6 +554,8 @@ end]]
         }
     },
     [3]    = {
+        start  = 38,
+        finish = 38,
         filter = {
             type   = 'number',
             start  = 32,
@@ -540,6 +564,8 @@ end]]
         }
     },
     [4]    = {
+        start  = 52,
+        finish = 52,
         filter = {
             type   = 'number',
             start  = 46,
@@ -558,6 +584,8 @@ end]]
     start  = 1,
     finish = 35,
     [1]    = {
+        start  = 10,
+        finish = 32,
         filter = {
             type   = 'number',
             start  = 4,
@@ -569,6 +597,8 @@ end]]
             start  = 15,
             finish = 31,
             [1]    = {
+                start  = 24,
+                finish = 24,
                 filter = {
                     type   = 'number',
                     start  = 18,
@@ -589,6 +619,8 @@ end]]
     start  = 1,
     finish = 32,
     [1]    = {
+        start  = 10,
+        finish = 10,
         filter = {
             type   = 'name',
             start  = 4,
@@ -597,6 +629,8 @@ end]]
         },
     },
     [2]    = {
+        start  = 24,
+        finish = 24,
         filter = {
             type   = 'name',
             start  = 18,
@@ -605,6 +639,8 @@ end]]
         },
     },
     [3]    = {
+        start  = 29,
+        finish = 29,
     },
 }
 
