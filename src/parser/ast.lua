@@ -378,6 +378,9 @@ local defs = {
         return obj
     end,
     Lua = function (...)
+        if ... == '' then
+            return {}
+        end
         return {...}
     end,
 }
