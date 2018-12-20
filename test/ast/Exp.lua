@@ -83,8 +83,10 @@ CHECK'a.b.c()'
 }
 CHECK'1 or 2'
 {
-    type = 'binary',
-    op   = 'or',
+    type   = 'binary',
+    op     = 'or',
+    start  = 1,
+    finish = 6,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -100,8 +102,10 @@ CHECK'1 or 2'
 }
 CHECK'1 and 2'
 {
-    type = 'binary',
-    op   = 'and',
+    type   = 'binary',
+    op     = 'and',
+    start  = 1,
+    finish = 7,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -117,8 +121,10 @@ CHECK'1 and 2'
 }
 CHECK'1 < 2'
 {
-    type = 'binary',
-    op   = '<',
+    type   = 'binary',
+    op     = '<',
+    start  = 1,
+    finish = 5,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -134,8 +140,10 @@ CHECK'1 < 2'
 }
 CHECK'1 > 2'
 {
-    type = 'binary',
-    op   = '>',
+    type   = 'binary',
+    op     = '>',
+    start  = 1,
+    finish = 5,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -151,8 +159,10 @@ CHECK'1 > 2'
 }
 CHECK'1 <= 2'
 {
-    type = 'binary',
-    op   = '<=',
+    type   = 'binary',
+    op     = '<=',
+    start  = 1,
+    finish = 6,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -168,8 +178,10 @@ CHECK'1 <= 2'
 }
 CHECK'1 >= 2'
 {
-    type = 'binary',
-    op   = '>=',
+    type   = 'binary',
+    op     = '>=',
+    start  = 1,
+    finish = 6,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -185,8 +197,10 @@ CHECK'1 >= 2'
 }
 CHECK'1 ~= 2'
 {
-    type = 'binary',
-    op   = '~=',
+    type   = 'binary',
+    op     = '~=',
+    start  = 1,
+    finish = 6,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -202,8 +216,10 @@ CHECK'1 ~= 2'
 }
 CHECK'1 == 2'
 {
-    type = 'binary',
-    op   = '==',
+    type   = 'binary',
+    op     = '==',
+    start  = 1,
+    finish = 6,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -219,8 +235,10 @@ CHECK'1 == 2'
 }
 CHECK'1 | 2'
 {
-    type = 'binary',
-    op   = '|',
+    type   = 'binary',
+    op     = '|',
+    start  = 1,
+    finish = 5,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -236,8 +254,10 @@ CHECK'1 | 2'
 }
 CHECK'1 ~ 2'
 {
-    type = 'binary',
-    op   = '~',
+    type   = 'binary',
+    op     = '~',
+    start  = 1,
+    finish = 5,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -253,8 +273,10 @@ CHECK'1 ~ 2'
 }
 CHECK'1 & 2'
 {
-    type = 'binary',
-    op   = '&',
+    type   = 'binary',
+    op     = '&',
+    start  = 1,
+    finish = 5,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -270,8 +292,10 @@ CHECK'1 & 2'
 }
 CHECK'1 << 2'
 {
-    type = 'binary',
-    op   = '<<',
+    type   = 'binary',
+    op     = '<<',
+    start  = 1,
+    finish = 6,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -287,8 +311,10 @@ CHECK'1 << 2'
 }
 CHECK'1 >> 2'
 {
-    type = 'binary',
-    op   = '>>',
+    type   = 'binary',
+    op     = '>>',
+    start  = 1,
+    finish = 6,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -304,8 +330,10 @@ CHECK'1 >> 2'
 }
 CHECK'1 .. 2'
 {
-    type = 'binary',
-    op   = '..',
+    type   = 'binary',
+    op     = '..',
+    start  = 1,
+    finish = 6,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -321,8 +349,10 @@ CHECK'1 .. 2'
 }
 CHECK'a .. b'
 {
-    type = 'binary',
-    op   = '..',
+    type   = 'binary',
+    op     = '..',
+    start  = 1,
+    finish = 6,
     [1]  = {
         type   = 'name',
         start  = 1,
@@ -338,8 +368,10 @@ CHECK'a .. b'
 }
 CHECK'1 + 2'
 {
-    type = 'binary',
-    op   = '+',
+    type   = 'binary',
+    op     = '+',
+    start  = 1,
+    finish = 5,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -355,8 +387,10 @@ CHECK'1 + 2'
 }
 CHECK'1 - 2'
 {
-    type = 'binary',
-    op   = '-',
+    type   = 'binary',
+    op     = '-',
+    start  = 1,
+    finish = 5,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -372,8 +406,10 @@ CHECK'1 - 2'
 }
 CHECK'1 * 2'
 {
-    type = 'binary',
-    op   = '*',
+    type   = 'binary',
+    op     = '*',
+    start  = 1,
+    finish = 5,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -389,8 +425,10 @@ CHECK'1 * 2'
 }
 CHECK'1 / 2'
 {
-    type = 'binary',
-    op   = '/',
+    type   = 'binary',
+    op     = '/',
+    start  = 1,
+    finish = 5,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -406,8 +444,10 @@ CHECK'1 / 2'
 }
 CHECK'1 // 2'
 {
-    type = 'binary',
-    op   = '//',
+    type   = 'binary',
+    op     = '//',
+    start  = 1,
+    finish = 6,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -423,8 +463,10 @@ CHECK'1 // 2'
 }
 CHECK'1 % 2'
 {
-    type = 'binary',
-    op   = '%',
+    type   = 'binary',
+    op     = '%',
+    start  = 1,
+    finish = 5,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -440,8 +482,10 @@ CHECK'1 % 2'
 }
 CHECK'- 1'
 {
-    type = 'unary',
-    op   = '-',
+    type   = 'unary',
+    op     = '-',
+    start  = 3,
+    finish = 3,
     [1]  = {
         type   = 'number',
         start  = 3,
@@ -451,8 +495,10 @@ CHECK'- 1'
 }
 CHECK'~ 1'
 {
-    type = 'unary',
-    op   = '~',
+    type   = 'unary',
+    op     = '~',
+    start  = 3,
+    finish = 3,
     [1]  = {
         type   = 'number',
         start  = 3,
@@ -462,8 +508,10 @@ CHECK'~ 1'
 }
 CHECK'not 1'
 {
-    type = 'unary',
-    op   = 'not',
+    type   = 'unary',
+    op     = 'not',
+    start  = 5,
+    finish = 5,
     [1]  = {
         type   = 'number',
         start  = 5,
@@ -473,8 +521,10 @@ CHECK'not 1'
 }
 CHECK'# 1'
 {
-    type = 'unary',
-    op   = '#',
+    type   = 'unary',
+    op     = '#',
+    start  = 3,
+    finish = 3,
     [1]  = {
         type   = 'number',
         start  = 3,
@@ -484,8 +534,10 @@ CHECK'# 1'
 }
 CHECK'1 ^ 2'
 {
-    type = 'binary',
-    op   = '^',
+    type   = 'binary',
+    op     = '^',
+    start  = 1,
+    finish = 5,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -501,8 +553,10 @@ CHECK'1 ^ 2'
 }
 CHECK'1 ^ -2'
 {
-    type = 'binary',
-    op   = '^',
+    type   = 'binary',
+    op     = '^',
+    start  = 1,
+    finish = 6,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -510,8 +564,10 @@ CHECK'1 ^ -2'
         [1]    = 1,
     },
     [2]  = {
-        type = 'unary',
-        op   = '-',
+        type   = 'unary',
+        op     = '-',
+        start  = 6,
+        finish = 6,
         [1]  = {
             type   = 'number',
             start  = 6,
@@ -528,11 +584,15 @@ CHECK'...'
 }
 CHECK'1 + 2 + 3'
 {
-    type = 'binary',
-    op   = '+',
+    type   = 'binary',
+    op     = '+',
+    start  = 1,
+    finish = 9,
     [1]  = {
-        type = 'binary',
-        op   = '+',
+        type   = 'binary',
+        op     = '+',
+        start  = 1,
+        finish = 5,
         [1]  = {
             type   = 'number',
             start  = 1,
@@ -555,8 +615,10 @@ CHECK'1 + 2 + 3'
 }
 CHECK'1 + 2 * 3'
 {
-    type = 'binary',
-    op   = '+',
+    type   = 'binary',
+    op     = '+',
+    start  = 1,
+    finish = 9,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -564,8 +626,10 @@ CHECK'1 + 2 * 3'
         [1]    = 1,
     },
     [2]  = {
-        type = 'binary',
-        op   = '*',
+        type   = 'binary',
+        op     = '*',
+        start  = 5,
+        finish = 9,
         [1]  = {
             type   = 'number',
             start  = 5,
@@ -582,11 +646,15 @@ CHECK'1 + 2 * 3'
 }
 CHECK'- 1 + 2 * 3'
 {
-    type = 'binary',
-    op   = '+',
+    type   = 'binary',
+    op     = '+',
+    start  = 3,
+    finish = 11,
     [1]  = {
-        type = 'unary',
-        op   = '-',
+        type   = 'unary',
+        op     = '-',
+        start  = 3,
+        finish = 3,
         [1]  = {
             type   = 'number',
             start  = 3,
@@ -595,8 +663,10 @@ CHECK'- 1 + 2 * 3'
         }
     },
     [2]  = {
-        type = 'binary',
-        op   = '*',
+        type   = 'binary',
+        op     = '*',
+        start  = 7,
+        finish = 11,
         [1]  = {
             type   = 'number',
             start  = 7,
@@ -614,8 +684,10 @@ CHECK'- 1 + 2 * 3'
 -- 幂运算从右向左连接
 CHECK'1 ^ 2 ^ 3'
 {
-    type = 'binary',
-    op   = '^',
+    type   = 'binary',
+    op     = '^',
+    start  = 1,
+    finish = 9,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -623,8 +695,10 @@ CHECK'1 ^ 2 ^ 3'
         [1]    = 1,
     },
     [2]  = {
-        type = 'binary',
-        op   = '^',
+        type   = 'binary',
+        op     = '^',
+        start  = 5,
+        finish = 9,
         [1]  = {
             type   = 'number',
             start  = 5,
@@ -642,8 +716,10 @@ CHECK'1 ^ 2 ^ 3'
 -- 连接运算从右向左连接
 CHECK'1 .. 2 .. 3'
 {
-    type = 'binary',
-    op   = '..',
+    type   = 'binary',
+    op     = '..',
+    start  = 1,
+    finish = 11,
     [1]  = {
         type   = 'number',
         start  = 1,
@@ -651,8 +727,10 @@ CHECK'1 .. 2 .. 3'
         [1]    = 1,
     },
     [2]  = {
-        type = 'binary',
-        op   = '..',
+        type   = 'binary',
+        op     = '..',
+        start  = 6,
+        finish = 11,
         [1]  = {
             type   = 'number',
             start  = 6,
@@ -676,8 +754,10 @@ CHECK'(1)'
 }
 CHECK'(1 + 2)'
 {
-    type = 'binary',
-    op   = '+',
+    type   = 'binary',
+    op     = '+',
+    start  = 2,
+    finish = 6,
     [1]  = {
         type   = 'number',
         start  = 2,
