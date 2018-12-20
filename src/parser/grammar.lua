@@ -190,6 +190,8 @@ COLON       <-  Sp ({} ':' !':') -> COLON
 LABEL       <-  Sp '::'
 ASSIGN      <-  Sp '='
 
+Nothing     <-  {} -> Nothing
+
 TOCLOSE     <-  Sp '*toclose'
 ]]
 
@@ -301,6 +303,12 @@ NewField    <-  (MustName ASSIGN DirtyExp)
 Function    <-  Sp ({} FunctionBody {})
             ->  Function
 FunctionBody<-  FUNCTION FuncName PL ArgList PR
+                    Action*
+                END?
+            /   FUNCTION FuncName PL ArgList PR?
+                    Action*
+                END?
+            /   FUNCTION FuncName Nothing
                     Action*
                 END?
 FuncName    <-  (Name? (FuncSuffix)*)

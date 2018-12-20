@@ -46,32 +46,6 @@ CHECK'a:'
 }
 
 CHECK [[
-if
-a
-]]
-{
-    [1] = {
-        type   = 'if',
-        start  = 1,
-        finish = 3,
-        [1]    = {
-            filter = {
-                type   = 'name',
-                start  = 3,
-                finish = 3,
-                [1]    = '',
-            },
-        },
-    },
-    [2] = {
-        type   = 'name',
-        start  = 4,
-        finish = 4,
-        [1]    = 'a',
-    }
-}
-
-CHECK [[
 if true
 a
 ]]
@@ -79,8 +53,10 @@ a
     [1] = {
         type   = 'if',
         start  = 1,
-        finish = 8,
+        finish = 7,
         [1]    = {
+            start  = 8,
+            finish = 8,
             filter = {
                 type   = 'boolean',
                 start  = 4,
@@ -107,6 +83,8 @@ a
         start  = 1,
         finish = 14,
         [1]    = {
+            start  = 13,
+            finish = 15,
             filter = {
                 type   = 'boolean',
                 start  = 4,
@@ -123,7 +101,7 @@ a
     },
 }
 
-CEHCK [[
+CHECK [[
 x =
 ]]
 {
@@ -141,8 +119,10 @@ x =
 CHECK'1 == 2'
 {
     [1] = {
-        type = 'binary',
-        op   = '==',
+        type   = 'binary',
+        op     = '==',
+        start  = 1,
+        finish = 6,
         [1]  = {
             type   = 'number',
             start  = 1,
@@ -154,6 +134,134 @@ CHECK'1 == 2'
             start  = 6,
             finish = 6,
             [1]    = 2,
+        },
+    }
+}
+
+CHECK 'local function a'
+{
+    [1] = {
+        type   = 'localfunction',
+        start  = 1,
+        finish = 16,
+        name   = {
+            type   = 'name',
+            start  = 16,
+            finish = 16,
+            [1]    = 'a',
+        },
+    }
+}
+
+CHECK 'local function'
+{
+    [1] = {
+        type   = 'localfunction',
+        start  = 1,
+        finish = 14,
+    }
+}
+
+CHECK 'local function a(v'
+{
+    [1] = {
+        type   = 'localfunction',
+        start  = 1,
+        finish = 18,
+        name   = {
+            type   = 'name',
+            start  = 16,
+            finish = 16,
+            [1]    = 'a',
+        },
+        arg    = {
+            type   = 'name',
+            start  = 18,
+            finish = 18,
+            [1]    = 'v',
+        }
+    }
+}
+
+CHECK 'function a'
+{
+    [1] = {
+        type   = 'function',
+        start  = 1,
+        finish = 10,
+        name   = {
+            type   = 'name',
+            start  = 10,
+            finish = 10,
+            [1]    = 'a',
+        },
+    }
+}
+
+CHECK 'function a:'
+{
+    [1] = {
+        type   = 'function',
+        start  = 1,
+        finish = 11,
+        name   = {
+            type   = 'simple',
+            start  = 10,
+            finish = 12,
+            [1]    = {
+                type   = 'name',
+                start  = 10,
+                finish = 10,
+                [1]    = 'a',
+            },
+            [2]    = {
+                type   = ':',
+                start  = 11,
+                finish = 11,
+            },
+            [3]    = {
+                type   = 'name',
+                start  = 12,
+                finish = 12,
+                [1]    = '',
+            },
+        },
+    }
+}
+
+CHECK 'function a:b(v'
+{
+    [1] = {
+        type   = 'function',
+        start  = 1,
+        finish = 14,
+        name   = {
+            type   = 'simple',
+            start  = 10,
+            finish = 12,
+            [1]    = {
+                type   = 'name',
+                start  = 10,
+                finish = 10,
+                [1]    = 'a',
+            },
+            [2]    = {
+                type   = ':',
+                start  = 11,
+                finish = 11,
+            },
+            [3]    = {
+                type   = 'name',
+                start  = 12,
+                finish = 12,
+                [1]    = 'b',
+            },
+        },
+        arg   = {
+            type   = 'name',
+            start  = 14,
+            finish = 14,
+            [1]    = 'v'
         },
     }
 }

@@ -247,6 +247,9 @@ local defs = {
             return first
         end
     end,
+    Nothing = function ()
+        return nil
+    end,
     Set = function (keys, values)
         return {
             type = 'set',
