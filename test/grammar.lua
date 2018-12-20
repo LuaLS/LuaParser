@@ -338,5 +338,14 @@ t = {
     a = 1
     b = 2
 }
-]]
+]],
+'for',
+'for i',
+'for i = a',
+'for i = a, b',
+'for i = a, b do',
+'for i,',
+'for i, v in',
+'for i, v in a',
+'for i, v in a do',
 }

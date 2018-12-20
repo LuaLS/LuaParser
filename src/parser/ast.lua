@@ -352,9 +352,6 @@ local defs = {
         obj[max]   = nil
         return obj
     end,
-    LoopDef = function (arg, min, max, step)
-        return arg, min, max, step
-    end,
     Loop = function (start, arg, min, max, step, ...)
         local obj = {
             type  = 'loop',
