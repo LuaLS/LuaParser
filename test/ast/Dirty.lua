@@ -265,36 +265,3 @@ CHECK 'function a:b(v'
         },
     }
 }
-
-CHECK 'x(a,'
-{
-    [1] = {
-        type   = 'simple',
-        start  = 1,
-        finish = 4,
-        [1]    = {
-            type   = 'name',
-            start  = 1,
-            finish = 1,
-            [1]    = 'x',
-        },
-        [2]    = {
-            type   = 'call',
-            start  = 2,
-            finish = 4,
-            dirty  = true,
-            [1]    = {
-                type   = 'name',
-                start  = 3,
-                finish = 3,
-                [1]    = 'a',
-            },
-            [2]    = {
-                type   = 'name',
-                start  = 5,
-                finish = 5,
-                [1]    = '',
-            }
-        }
-    }
-}
