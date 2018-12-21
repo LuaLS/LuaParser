@@ -322,6 +322,9 @@ end]]
 -- Dirty
 check 'Lua'
 {
+'f',
+'f(',
+'f(a,',
 'f(,1)',
 'f(1,)',
 'f(,)',
@@ -348,4 +351,10 @@ t = {
 'for i, v in',
 'for i, v in a',
 'for i, v in a do',
+'t = {',
+'t = {a',
+'t = {a =',
+'t = {a = 1,',
+'s = "',
+'s = "123',
 }
