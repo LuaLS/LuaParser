@@ -484,7 +484,7 @@ CHECK'- 1'
 {
     type   = 'unary',
     op     = '-',
-    start  = 3,
+    start  = 1,
     finish = 3,
     [1]  = {
         type   = 'number',
@@ -497,7 +497,7 @@ CHECK'~ 1'
 {
     type   = 'unary',
     op     = '~',
-    start  = 3,
+    start  = 1,
     finish = 3,
     [1]  = {
         type   = 'number',
@@ -510,7 +510,7 @@ CHECK'not 1'
 {
     type   = 'unary',
     op     = 'not',
-    start  = 5,
+    start  = 1,
     finish = 5,
     [1]  = {
         type   = 'number',
@@ -523,7 +523,7 @@ CHECK'# 1'
 {
     type   = 'unary',
     op     = '#',
-    start  = 3,
+    start  = 1,
     finish = 3,
     [1]  = {
         type   = 'number',
@@ -531,6 +531,25 @@ CHECK'# 1'
         finish = 3,
         [1]    = 1,
     },
+}
+CHECK'not not true'
+{
+    type   = 'unary',
+    op     = 'not',
+    start  = 1,
+    finish = 12,
+    [1]    = {
+        type   = 'unary',
+        op     = 'not',
+        start  = 5,
+        finish = 12,
+        [1]    = {
+            type   = 'boolean',
+            start  = 9,
+            finish = 12,
+            [1]    = true,
+        }
+    }
 }
 CHECK'1 ^ 2'
 {
@@ -566,7 +585,7 @@ CHECK'1 ^ -2'
     [2]  = {
         type   = 'unary',
         op     = '-',
-        start  = 6,
+        start  = 5,
         finish = 6,
         [1]  = {
             type   = 'number',
@@ -648,12 +667,12 @@ CHECK'- 1 + 2 * 3'
 {
     type   = 'binary',
     op     = '+',
-    start  = 3,
+    start  = 1,
     finish = 11,
     [1]  = {
         type   = 'unary',
         op     = '-',
-        start  = 3,
+        start  = 1,
         finish = 3,
         [1]  = {
             type   = 'number',
