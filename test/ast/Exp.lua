@@ -958,7 +958,7 @@ CHECK'table[1]'
 {
     type   = 'simple',
     start  = 1,
-    finish = 7,
+    finish = 8,
     [1]  = {
         type   = 'name',
         start  = 1,
@@ -966,11 +966,15 @@ CHECK'table[1]'
         [1]    = 'table',
     },
     [2]  = {
-        type   = 'number',
-        start  = 7,
-        finish = 7,
-        index  = true,
-        [1]    = 1,
+        type   = 'index',
+        start  = 6,
+        finish = 8,
+        [1]    = {
+            type   = 'number',
+            start  = 7,
+            finish = 7,
+            [1]    = 1,
+        }
     }
 }
 CHECK'get_point().x'
@@ -1028,19 +1032,23 @@ CHECK'(...)[1]'
 {
     type   = 'simple',
     start  = 2,
-    finish = 7,
+    finish = 8,
     [1]  = {
         type   = '...',
         start  = 2,
         finish = 4,
     },
     [2]  = {
-        type   = 'number',
-        start  = 7,
-        finish = 7,
-        index  = true,
-        [1]    = 1,
-    },
+        type   = 'index',
+        start  = 6,
+        finish = 8,
+        [1]    = {
+            type   = 'number',
+            start  = 7,
+            finish = 7,
+            [1]    = 1,
+        },
+    }
 }
 CHECK'function () end'
 {
