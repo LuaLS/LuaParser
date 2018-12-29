@@ -1,35 +1,14 @@
 local parser = require 'parser'
 
 local function check_str(str, name, mode)
-    local gram, err = parser.grammar(str, mode)
+    local _, err = parser.grammar(str, mode)
     if err then
-        local spc = ''
-        for i = 1, err.pos - 1 do
-            if err.code:sub(i, i) == '\t' then
-                spc = spc .. '\t'
-            else
-                spc = spc .. ' '
-            end
-        end
-        local text = ('%s\r\n%s^'):format(err.code, spc)
-        local msg = ([[
-%s
-
-[%s] 第 %d 行：
-===========================
-%s
-===========================
-]]):format(err.err, name, err.line, text)
-
         error(([[
-%s
-
 [%s]测试失败:
 %s
 %s
 %s
 ]]):format(
-    msg,
     name,
     ('='):rep(30),
     str,

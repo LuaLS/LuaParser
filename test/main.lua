@@ -50,6 +50,7 @@ local function main()
     unitTest 'grammar'
     unitTest 'ast'
     unitTest 'lines'
+    unitTest 'syntax_check'
 
     performTest()
 

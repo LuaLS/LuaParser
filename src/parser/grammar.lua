@@ -75,10 +75,9 @@ end
 
 local function errorpos(pos, err)
     return {
-        type = 'UNKNOW',
+        type = 'UNKNOWN',
         start = pos,
         err = err,
-        level = 'error',
     }
 end
 
@@ -91,6 +90,7 @@ ShortComment    <-  (!%nl .)*
 
 grammar 'Sp' [[
 Sp  <-  (Comment / %nl / %s)*
+Sps <-  (Comment / %nl / %s)+
 ]]
 
 grammar 'Common' [[
@@ -269,7 +269,9 @@ ExpList     <-  (COMMA DirtyExp)+
             ->  List
 NameList    <-  (COMMA MustName)+
             ->  List
-            /   (Name (COMMA MustName)*)?
+            /   (Name (COMMA MustName)*)
+            ->  List
+            /   DirtyName
             ->  List
 
 ArgList     <-  (COMMA AfterArg)+
@@ -297,13 +299,13 @@ NewField    <-  (MustName ASSIGN DirtyExp)
 Function    <-  Sp ({} FunctionBody {})
             ->  Function
 FunctionBody<-  FUNCTION FuncName PL ArgList PR
-                    Action*
+                    (!END Action)*
                 END?
             /   FUNCTION FuncName PL ArgList PR?
-                    Action*
+                    (!END Action)*
                 END?
             /   FUNCTION FuncName Nothing
-                    Action*
+                    (!END Action)*
                 END?
 FuncName    <-  (Name? (FuncSuffix)*)
             ->  Simple
@@ -315,7 +317,8 @@ Action      <-  !END .
 ]]
 
 grammar 'Action' [[
-Action      <-  SEMICOLON
+Action      <-  Sp (CrtAction / UnkAction)
+CrtAction   <-  SEMICOLON
             /   Do
             /   Break
             /   Return
@@ -331,13 +334,15 @@ Action      <-  SEMICOLON
             /   Set
             /   Call
             /   Exp
+UnkAction   <-  ({} {. (!Sps !CrtAction .)*} {})
+            ->  UnknownSymbol
 
 SimpleList  <-  (Simple (COMMA Simple)*)
             ->  List
 
 Do          <-  Sp ({} DO DoBody END? {})
             ->  Do
-DoBody      <-  Action*
+DoBody      <-  (!END Action)*
             ->  DoBody
 
 Break       <-  BREAK
@@ -360,19 +365,19 @@ IfBody      <-  IfHead
                 (ElsePart   -> ElseBlock)?
                 END?
 IfPart      <-  IF Exp THEN
-                    {} (!ELSEIF !ELSE Action)* {}
+                    {} (!ELSEIF !ELSE !END Action)* {}
             /   IF DirtyExp THEN
-                    {} (!ELSEIF !ELSE Action)* {}
+                    {} (!ELSEIF !ELSE !END Action)* {}
             /   IF DirtyExp
                     {}         {}
 ElseIfPart  <-  ELSEIF Exp THEN
-                    {} (!ELSE !ELSEIF Action)* {}
+                    {} (!ELSE !ELSEIF !END Action)* {}
             /   ELSEIF DirtyExp THEN
-                    {} (!ELSE !ELSEIF Action)* {}
+                    {} (!ELSE !ELSEIF !END Action)* {}
             /   ELSEIF DirtyExp
                     {}         {}
 ElsePart    <-  ELSE
-                    {} Action* {}
+                    {} (!END Action)* {}
 
 For         <-  Loop / In
             /   FOR
@@ -380,7 +385,7 @@ For         <-  Loop / In
 Loop        <-  Sp ({} LoopBody {})
             ->  Loop
 LoopBody    <-  FOR LoopStart LoopFinish LoopStep DO?
-                    Action*
+                    (!END Action)*
                 END?
 LoopStart   <-  MustName ASSIGN DirtyExp
 LoopFinish  <-  COMMA? Exp
@@ -392,19 +397,19 @@ LoopStep    <-  COMMA  DirtyExp
 In          <-  Sp ({} InBody {})
             ->  In
 InBody      <-  FOR NameList IN? ExpList DO?
-                    Action*
+                    (!END Action)*
                 END?
 
 While       <-  Sp ({} WhileBody {})
             ->  While
 WhileBody   <-  WHILE Exp DO
-                    Action*
+                    (!END Action)*
                 END?
 
 Repeat      <-  Sp ({} RepeatBody {})
             ->  Repeat
 RepeatBody  <-  REPEAT
-                    Action*
+                    (!UNTIL Action)*
                 UNTIL Exp
 
 Local       <-  (LOCAL TOCLOSE? NameList (ASSIGN ExpList)?)
@@ -420,7 +425,7 @@ LocalFunction
 ]]
 
 grammar 'Lua' [[
-Lua         <-  (Sp Action)* -> Lua Sp
+Lua         <-  Action* -> Lua Sp
 ]]
 
 return function (lua, mode, parser_)
