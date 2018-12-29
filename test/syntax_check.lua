@@ -126,6 +126,58 @@ s = [===[a<!!>]======]
     }
 }
 
+TEST[[
+s = '<!\xzz!>zzz'
+]]
+{
+    type = 'MISS_ESC_X',
+}
+
+TEST[[
+s = '\u<!!>'
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = '{'
+    }
+}
+
+TEST[[
+s = '<!\u{}!>'
+]]
+{
+    type = 'UTF8_SMALL',
+}
+
+TEST[[
+s = '<!\u{111111111}!>'
+]]
+{
+    type = 'UTF8_LARGE',
+}
+
+TEST[[
+s = '<!\u{ffffff}!>'
+]]
+{
+    type = 'UTF8_MAX',
+    info = {
+        min = '0x000000',
+        max = '0x10ffff',
+    }
+}
+
+TEST[[
+s = '\u{aaa<!'!>
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = '}',
+    }
+}
+
 -- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua
 TEST[[
 f = 9<!e!>

@@ -64,13 +64,40 @@ local defs = {
     Char16 = function (char)
         return string_char(tonumber(char, 16))
     end,
-    CharUtf8 = function (char)
-        char = tonumber(char, 16)
-        if not char or char < 0 or char > 0x10ffff then
-            -- TODO 记录错误
+    CharUtf8 = function (pos, char)
+        if #char == 0 then
+            pushError {
+                type = 'UTF8_SMALL',
+                start = pos-3,
+                finish = pos,
+            }
             return ''
         end
-        return utf8_char(char)
+        if #char > 6 then
+            pushError {
+                type = 'UTF8_LARGE',
+                start = pos-3,
+                finish = pos+#char,
+            }
+            return ''
+        end
+        local v = tonumber(char, 16)
+        if not v then
+            return ''
+        end
+        if v < 0 or v > 0x10ffff then
+            pushError {
+                type = 'UTF8_MAX',
+                start = pos-3,
+                finish = pos+#char,
+                info = {
+                    min = '0x000000',
+                    max = '0x10ffff',
+                }
+            }
+            return ''
+        end
+        return utf8_char(v)
     end,
     Number = function (start, number, finish)
         return {
@@ -472,6 +499,33 @@ local defs = {
             finish = pos,
             info = {
                 symbol = "'"
+            }
+        }
+    end,
+    MissEscX = function (pos)
+        pushError {
+            type = 'MISS_ESC_X',
+            start = pos-2,
+            finish = pos+1,
+        }
+    end,
+    MissTL = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = '{',
+            }
+        }
+    end,
+    MissTR = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = '}',
             }
         }
     end,
