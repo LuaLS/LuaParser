@@ -37,7 +37,7 @@ local function catchTarget(script, sep)
         if not start then
             break
         end
-        list[#list+1] = { start - cut, finish - 4 - cut }
+        list[#list+1] = { start - cut, math.max(start - cut, finish - 4 - cut) }
         cur = finish + 1
         cut = cut + 4
     end
@@ -85,6 +85,44 @@ n = 1<!a!>
     type = 'UNKNOWN_SYMBOL',
     info = {
         symbol = 'a',
+    }
+}
+
+TEST[[
+s = 'a<!!>
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = "'",
+    }
+}
+
+TEST[[
+s = "a<!!>
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = '"',
+    }
+}
+
+TEST[======[
+s = [[a<!!>]======]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = ']]',
+    }
+}
+
+TEST[======[
+s = [===[a<!!>]======]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = ']===]',
     }
 }
 

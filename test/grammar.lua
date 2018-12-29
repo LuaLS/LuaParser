@@ -1,7 +1,8 @@
 local parser = require 'parser'
 
 local function check_str(str, name, mode)
-    local _, err = parser.grammar(str, mode)
+    local ast, err = parser.grammar(str, mode)
+    assert(ast)
     if err then
         error(([[
 [%s]测试失败:

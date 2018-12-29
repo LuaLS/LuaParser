@@ -40,6 +40,19 @@ local defs = {
             [1]    = str,
         }
     end,
+    LongString = function (beforeEq, afterEq, str, missPos)
+        if missPos then
+            pushError {
+                type   = 'MISS_SYMBOL',
+                start  = missPos,
+                finish = missPos,
+                info   = {
+                    symbol = ']' .. ('='):rep(afterEq-beforeEq) .. ']'
+                }
+            }
+        end
+        return str
+    end,
     Char10 = function (char)
         char = tonumber(char)
         if not char or char < 0 or char > 255 then
@@ -440,6 +453,26 @@ local defs = {
             type = 'MISS_EXPONENT',
             start = start,
             finish = finish - 1,
+        }
+    end,
+    MissQuote1 = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = '"'
+            }
+        }
+    end,
+    MissQuote2 = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = "'"
+            }
         }
     end,
 }

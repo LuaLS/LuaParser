@@ -61,9 +61,6 @@ defs.NotReserved = function (_, _, str)
     return true, str
 end
 
-defs.first = function (first, ...)
-    return first
-end
 local eof = re.compile '!. / %{SYNTAX_ERROR}'
 
 local function grammar(tag)
@@ -198,9 +195,16 @@ Boolean     <-  Sp ({} -> True)  TRUE
 grammar 'String' [[
 String      <-  Sp ({} StringDef {})
             ->  String
-StringDef   <-  '"' {~(Esc / !%nl !'"' .)*~} -> first (%nl / '"'?)
-            /   "'" {~(Esc / !%nl !"'" .)*~} -> first (%nl / "'"?)
-            /   '[' {:eq: '='* :} '[' {(!StringClose .)*} -> first StringClose
+StringDef   <-  '"'
+                {~(Esc / !%nl !'"' .)*~} -> 1
+                ('"' / {} -> MissQuote1)
+            /   "'"
+                {~(Esc / !%nl !"'" .)*~} -> 1
+                ("'" / {} -> MissQuote2)
+            /   ('[' {} {:eq: '='* :} {} '['
+                {(!StringClose .)*} -> 1
+                (StringClose / {}))
+            ->  LongString
 StringClose <-  ']' =eq ']'
 ]]
 
