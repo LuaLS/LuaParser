@@ -295,7 +295,13 @@ check 'Lua'
 [[
 ]],
 [[return function ()
-end]]
+end]],
+'#',
+'#abcd',
+[[
+#
+print(1)
+]],
 }
 
 -- Dirty

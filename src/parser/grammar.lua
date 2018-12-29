@@ -425,7 +425,8 @@ LocalFunction
 ]]
 
 grammar 'Lua' [[
-Lua         <-  Action* -> Lua Sp
+Lua         <-  Head? Action* -> Lua Sp
+Head        <-  '#' (!%nl .)*
 ]]
 
 return function (lua, mode, parser_)
