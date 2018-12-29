@@ -163,8 +163,8 @@ s = '<!\u{ffffff}!>'
 {
     type = 'UTF8_MAX',
     info = {
-        min = '0x000000',
-        max = '0x10ffff',
+        min = '000000',
+        max = '10ffff',
     }
 }
 

@@ -91,8 +91,8 @@ local defs = {
                 start = pos-3,
                 finish = pos+#char,
                 info = {
-                    min = '0x000000',
-                    max = '0x10ffff',
+                    min = '000000',
+                    max = '10ffff',
                 }
             }
             return ''
