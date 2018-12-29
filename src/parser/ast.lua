@@ -435,6 +435,13 @@ local defs = {
             [1]    = ''
         }
     end,
+    MissExponent = function (start, finish)
+        pushError {
+            type = 'MISS_EXPONENT',
+            start = start,
+            finish = finish - 1,
+        }
+    end,
 }
 
 return function (self, lua, mode)

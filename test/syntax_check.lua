@@ -77,3 +77,39 @@ TEST[[
         symbol = '？？？',
     }
 }
+
+TEST[[
+n = 1<!a!>
+]]
+{
+    type = 'UNKNOWN_SYMBOL',
+    info = {
+        symbol = 'a',
+    }
+}
+
+-- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua
+TEST[[
+f = 9<!e!>
+]]
+{
+    type = 'MISS_EXPONENT'
+}
+TEST[[
+f = 5.<!e!>
+]]
+{
+    type = 'MISS_EXPONENT'
+}
+TEST[[
+f = .9<!e-!>
+]]
+{
+    type = 'MISS_EXPONENT'
+}
+TEST[[
+f = 5.9<!e+!>
+]]
+{
+    type = 'MISS_EXPONENT'
+}

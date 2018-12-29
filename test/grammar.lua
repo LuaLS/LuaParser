@@ -114,6 +114,8 @@ check 'Number'
 '0x0.1E',
 '0xA23p-4',
 '0X1.921FB54442D18P+1',
+'.9',
+'9.'
 }
 
 check 'Name'
