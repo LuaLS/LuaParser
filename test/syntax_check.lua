@@ -178,6 +178,35 @@ s = '\u{aaa<!'!>
     }
 }
 
+TEST[[
+s = '<!\c!>'
+]]
+{
+    type = 'ERR_ESC',
+}
+
+TEST[[
+n = 0x<!!>
+]]
+{
+    type = 'MUST_X16'
+}
+
+TEST[[
+n = 0x<!zzzz!>
+]]
+{
+    type = 'MUST_X16'
+}
+
+
+TEST[[
+n = 0x.<!zzzz!>
+]]
+{
+    type = 'MUST_X16'
+}
+
 -- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua
 TEST[[
 f = 9<!e!>

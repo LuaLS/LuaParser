@@ -529,6 +529,20 @@ local defs = {
             }
         }
     end,
+    ErrEsc = function (pos)
+        pushError {
+            type = 'ERR_ESC',
+            start = pos-1,
+            finish = pos,
+        }
+    end,
+    MustX16 = function (pos, str)
+        pushError {
+            type = 'MUST_X16',
+            start = pos,
+            finish = math.max(pos + #str - 1, pos),
+        }
+    end,
 }
 
 return function (self, lua, mode)

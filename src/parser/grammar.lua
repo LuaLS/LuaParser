@@ -91,7 +91,8 @@ Sps <-  (Comment / %nl / %s)+
 ]]
 
 grammar 'Common' [[
-Cut         <-  ![a-zA-Z0-9_]
+Word        <-  [a-zA-Z0-9_]
+Cut         <-  !Word
 X16         <-  [a-fA-F0-9]
 
 AND         <-  Sp {'and'}    Cut
@@ -139,6 +140,7 @@ EChar       <-  'a' -> ea
             /   'x' {}                  -> MissEscX
             /   'u' !'{' {}             -> MissTL
             /   'u{' X16* !'}' {}       -> MissTR
+            /   {}                      -> ErrEsc
 
 Comp        <-  Sp {CompList}
 CompList    <-  '<='
@@ -220,17 +222,19 @@ NumberDef   <-  Number16 / Number10
 ErrNumber   <-  ({} {([0-9a-zA-Z] / '.')+} {})
             ->  UnknownSymbol
 
-Number10    <-  Integer10 Float10? Float10Exp?
-            /   Float10 Float10Exp?
+Number10    <-  Float10 Float10Exp?
+            /   Integer10 Float10? Float10Exp?
 Integer10   <-  '0' / [1-9] [0-9]* '.'? [0-9]*
 Float10     <-  '.' [0-9]+
 Float10Exp  <-  [eE] [+-]? [1-9] [0-9]*
             /   ({} [eE] [+-]? {}) -> MissExponent
 
-Number16    <-  '0' [xX] Integer16 Float16? Float16Exp?
-            /   '0' [xX] Float16 Float16Exp?
+Number16    <-  '0' [xX] Float16 Float16Exp?
+            /   '0' [xX] Integer16 Float16? Float16Exp?
 Integer16   <-  X16+ '.'? X16*
+            /   ({} {Word*}) -> MustX16
 Float16     <-  '.' X16+
+            /   '.' ({} {Word*}) -> MustX16
 Float16Exp  <-  [pP] [+-]? [1-9] [0-9]*
             /   ({} [pP] [+-]? {}) -> MissExponent
 ]]
