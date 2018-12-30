@@ -6,7 +6,7 @@ local Errs
 local function pushError(err)
     local last = Errs[#Errs]
     if last then
-        if last.start == err.start then
+        if last.start <= err.start and last.finish >= err.finish then
             return
         end
     end
