@@ -95,6 +95,7 @@ grammar 'Common' [[
 Word        <-  [a-zA-Z0-9_]
 Cut         <-  !Word
 X16         <-  [a-fA-F0-9]
+Rest        <-  (!%nl .)*
 
 AND         <-  Sp {'and'}    Cut
 BREAK       <-  Sp 'break'    Cut
@@ -188,6 +189,11 @@ ASSIGN      <-  Sp '='
 Nothing     <-  {} -> Nothing
 
 TOCLOSE     <-  Sp '*toclose'
+
+DirtyAssign <-  ASSIGN / {} -> MissAssign
+DirtyBR     <-  BR / {} -> MissBR
+DirtyTR     <-  TR / {} -> MissTR
+DirtyPR     <-  TR / {} -> MissPR
 ]]
 
 grammar 'Nil' [[
@@ -219,7 +225,7 @@ grammar 'Number' [[
 Number      <-  Sp ({} {NumberDef} {}) -> Number
                 ErrNumber?
 NumberDef   <-  Number16 / Number10
-ErrNumber   <-  ({} {([0-9a-zA-Z] / '.')+} {})
+ErrNumber   <-  ({} {([0-9a-zA-Z] / '.')+})
             ->  UnknownSymbol
 
 Number10    <-  Float10 Float10Exp?
@@ -284,7 +290,8 @@ Suffix      <-  DOT MustName
             /   Sp ({} BL DirtyExp (BR / Sp) {}) -> Index
             /   Sp ({} PL ExpList (PR / Sp) {}) -> Call
 
-DirtyExp    <-  Exp / DirtyName
+DirtyExp    <-  Exp
+            /   {} -> DirtyExp
 ExpList     <-  (COMMA DirtyExp)+
             ->  List
             /   (Exp (COMMA DirtyExp)*)?
@@ -312,11 +319,22 @@ Table       <-  ({} TL TR {})
             ->  Table
             /   ({} TL DirtyTR {})
             ->  Table
-DirtyTR     <-  TR / {} -> MissTR
-TableFields <-  TableField (!TR TableSep TableField)* TableSep?
+TableFields <-  TableField
+                (TableAfterF)*
+                LastTableSep?
+            /   DirtyExp
+                (TableAfterF)+
+                LastTableSep?
+TableAfterF <-  TableSep !TR TableField
+            /   DirtyInTable
 TableSep    <-  COMMA / SEMICOLON
-TableField  <-  NewIndex / NewField / Exp
-NewIndex    <-  (BL DirtyExp BR ASSIGN DirtyExp)
+            /   {}
+            ->  MissTableSep
+LastTableSep<-  COMMA / SEMICOLON
+TableField  <-  DirtyInTable? (NewIndex / NewField / Exp)
+DirtyInTable<-  Sp ({} {(!TR !COMMA !SEMICOLON !Word !BL !PL !TL !DOTS .)+})
+            ->  UnknownSymbol
+NewIndex    <-  (BL DirtyExp DirtyBR DirtyAssign DirtyExp)
             ->  NewIndex
 NewField    <-  (MustName ASSIGN DirtyExp)
             ->  NewField
@@ -359,7 +377,7 @@ CrtAction   <-  SEMICOLON
             /   Set
             /   Call
             /   Exp
-UnkAction   <-  ({} {. (!Sps !CrtAction .)*} {})
+UnkAction   <-  ({} {. (!Sps !CrtAction .)*})
             ->  UnknownSymbol
 
 SimpleList  <-  (Simple (COMMA Simple)*)

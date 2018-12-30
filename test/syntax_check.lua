@@ -48,11 +48,12 @@ end
 local function TEST(script)
     return function (expect)
         local newScript, list = catchTarget(script, '!')
-        local ast, err = parser:ast(newScript)
+        local ast, errs = parser:ast(newScript)
         assert(ast)
-        assert(err)
-        local first = err[1]
+        assert(errs)
+        local first = errs[1]
         local target = list[1]
+        assert(#errs == 1)
         assert(first)
         assert(first.type == expect.type)
         assert(first.start == target[1])
@@ -241,6 +242,91 @@ t = {1,<!!>
     type = 'MISS_SYMBOL',
     info = {
         symbol = '}',
+    }
+}
+
+TEST[[
+t = {name =<!!>}
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+t = {['name'] =<!!>}
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+t = {['name']<!!>}
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = '=',
+    }
+}
+
+TEST[[
+t = {['name'<! !>= 1}
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = ']',
+    }
+}
+
+TEST[[
+t = {[<!!>]=1}
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+t = {<!!>,}
+]]
+
+TEST[[
+t = {1<! !>2}
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = ',',
+    }
+}
+
+TEST[[
+t = {1<!？？？!>}
+]]
+{
+    type = 'UNKNOWN_SYMBOL',
+    info = {
+        symbol = '？？？'
+    }
+}
+
+TEST[[
+t = {1<!？？？!>, 2}
+]]
+{
+    type = 'UNKNOWN_SYMBOL',
+    info = {
+        symbol = '？？？'
+    }
+}
+
+TEST[[
+t = {1, <!？？？!>2}
+]]
+{
+    type = 'UNKNOWN_SYMBOL',
+    info = {
+        symbol = '？？？'
     }
 }
 

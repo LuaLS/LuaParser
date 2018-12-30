@@ -4,6 +4,12 @@ local utf8_char = utf8.char
 
 local Errs
 local function pushError(err)
+    local last = Errs[#Errs]
+    if last then
+        if last.start == err.start then
+            return
+        end
+    end
     err.level = err.level or 'error'
     Errs[#Errs+1] = err
 end
@@ -450,11 +456,11 @@ local defs = {
     end,
 
     -- 捕获错误
-    UnknownSymbol = function (start, symbol, finish)
+    UnknownSymbol = function (start, symbol)
         pushError {
             type = 'UNKNOWN_SYMBOL',
             start = start,
-            finish = finish - 1,
+            finish = start + #symbol - 1,
             info = {
                 symbol = symbol,
             }
@@ -463,6 +469,19 @@ local defs = {
     DirtyName = function (pos)
         pushError {
             type = 'MISS_NAME',
+            start = pos,
+            finish = pos,
+        }
+        return {
+            type   = 'name',
+            start  = pos,
+            finish = pos,
+            [1]    = ''
+        }
+    end,
+    DirtyExp = function (pos)
+        pushError {
+            type = 'MISS_EXP',
             start = pos,
             finish = pos,
         }
@@ -527,6 +546,26 @@ local defs = {
             }
         }
     end,
+    MissBR = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = ']',
+            }
+        }
+    end,
+    MissPR = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = ')',
+            }
+        }
+    end,
     ErrEsc = function (pos)
         pushError {
             type = 'ERR_ESC',
@@ -539,6 +578,26 @@ local defs = {
             type = 'MUST_X16',
             start = pos,
             finish = math.max(pos + #str - 1, pos),
+        }
+    end,
+    MissAssign = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = '=',
+            }
+        }
+    end,
+    MissTableSep = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = ','
+            }
         }
     end,
 }
