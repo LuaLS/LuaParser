@@ -4,7 +4,7 @@ local utf8_char = utf8.char
 
 local Errs
 local function pushError(err)
-    err.level = 'error'
+    err.level = err.level or 'error'
     Errs[#Errs+1] = err
 end
 
@@ -83,6 +83,15 @@ local defs = {
         end
         local v = tonumber(char, 16)
         if not v then
+            for i = 1, #char do
+                if not tonumber(char:sub(i, i), 16) then
+                    pushError {
+                        type = 'MUST_X16',
+                        start = pos + i - 1,
+                        finish = pos + i - 1,
+                    }
+                end
+            end
             return ''
         end
         if v < 0 or v > 0x10ffff then
@@ -238,28 +247,17 @@ local defs = {
         obj[max]   = nil
         return obj
     end,
-    Table = function (start, table, finish)
-        if table then
-            table.start  = start
-            table.finish = finish - 1
-        else
-            table = {
-                type   = 'table',
-                start  = start,
-                finish = finish - 1,
-            }
-        end
+    Table = function (start, ...)
+        local table = {
+            type   = 'table',
+            start  = start,
+            ...,
+        }
+        local max = #table
+        local finish = table[max]
+        table.finish = finish - 1
+        table[max] = nil
         return table
-    end,
-    TableFields = function (...)
-        if ... == '' then
-            return nil
-        else
-            return {
-                type = 'table',
-                ...,
-            }
-        end
     end,
     NewField = function (key, value)
         return {

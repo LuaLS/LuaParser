@@ -179,6 +179,13 @@ s = '\u{aaa<!'!>
 }
 
 TEST[[
+s = '\u{abc<!z!>}'
+]]
+{
+    type = 'MUST_X16',
+}
+
+TEST[[
 s = '<!\c!>'
 ]]
 {
@@ -205,6 +212,36 @@ n = 0x.<!zzzz!>
 ]]
 {
     type = 'MUST_X16'
+}
+
+TEST[[
+t = {<!!>
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = '}',
+    }
+}
+
+TEST[[
+t = {1<!!>
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = '}',
+    }
+}
+
+TEST[[
+t = {1,<!!>
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = '}',
+    }
 }
 
 -- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua

@@ -54,6 +54,7 @@ defs.en = '\n'
 defs.er = '\r'
 defs.et = '\t'
 defs.ev = '\v'
+defs['nil'] = m.Cp() / function () return nil end
 defs.NotReserved = function (_, _, str)
     if RESERVED[str] then
         return false
@@ -134,12 +135,11 @@ EChar       <-  'a' -> ea
             /   ('z' (%nl / %s)*)       -> ''
             /   ('x' {X16 X16})         -> Char16
             /   ([0-9] [0-9]? [0-9]?)   -> Char10
-            /   ('u{' {} {X16*} '}')
-            ->  CharUtf8
+            /   ('u{' {} {Word*} '}')   -> CharUtf8
             -- 错误处理
             /   'x' {}                  -> MissEscX
             /   'u' !'{' {}             -> MissTL
-            /   'u{' X16* !'}' {}       -> MissTR
+            /   'u{' Word* !'}' {}      -> MissTR
             /   {}                      -> ErrEsc
 
 Comp        <-  Sp {CompList}
@@ -249,7 +249,7 @@ DirtyName   <-  {} -> DirtyName
 ]]
 
 grammar 'Exp' [[
-Exp         <-  ExpOr
+Exp         <-  Sp ExpOr
 ExpOr       <-  (ExpAnd     (OR     ExpAnd)*)     -> Binary
 ExpAnd      <-  (ExpCompare (AND    ExpCompare)*) -> Binary
 ExpCompare  <-  (ExpBor     (Comp   ExpBor)*)     -> Binary
@@ -306,11 +306,14 @@ AfterArg    <-  DOTS
             /   MustName
 
 
-Table       <-  Sp ({} TL TableFields TR? {})
+Table       <-  ({} TL TR {})
             ->  Table
-TableFields <-  TableSep (TableSep? TableField)+ TableSep?
-            /   (TableField (TableSep? TableField)* TableSep?)?
-            ->  TableFields
+            /   ({} TL TableFields DirtyTR {})
+            ->  Table
+            /   ({} TL DirtyTR {})
+            ->  Table
+DirtyTR     <-  TR / {} -> MissTR
+TableFields <-  TableField (!TR TableSep TableField)* TableSep?
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
 NewIndex    <-  (BL DirtyExp BR ASSIGN DirtyExp)
