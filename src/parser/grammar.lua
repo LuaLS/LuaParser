@@ -297,9 +297,11 @@ ExpList     <-  (COMMA Exp)+
             ->  List
             /   (Exp (COMMA Exp)*)
             ->  List
-CallArgList <-  Sp ({} (COMMA {} / Exp)+ {})
+CallArgList <-  Sp ({} (COMMA {} / Exp / DirtyCallArg)+ {})
             ->  CallArgList
             /   %nil
+DirtyCallArg<-  Sp ({} {(!PR !PL !COMMA !Word .)+})
+            ->  UnknownSymbol
 NameList    <-  (COMMA MustName)+
             ->  List
             /   (Name (COMMA MustName)*)
@@ -320,7 +322,7 @@ AfterArg    <-  DOTS
 Table       <-  Sp ({} TL TableFields? DirtyTR {})
             ->  Table
 TableFields <-  (TableSep {} / TableField / DirtyField)+
-DirtyField  <-  Sp ({} {(!TR !COMMA !SEMICOLON !Word !BL .)+})
+DirtyField  <-  Sp ({} {(!TR !BL !COMMA !SEMICOLON !Word .)+})
             ->  UnknownSymbol
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp

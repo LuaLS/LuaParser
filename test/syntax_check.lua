@@ -357,6 +357,15 @@ f(1<! !>1)
     },
 }
 
+TEST[[
+f(1<!？？？!>, 2)
+]]
+{
+    type = 'UNKNOWN_SYMBOL',
+    info = {
+        symbol = '？？？'
+    }
+}
 -- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua
 TEST[[
 f = 9<!e!>
