@@ -1134,7 +1134,9 @@ CHECK'{x = 1, y = 2}'
     start  = 1,
     finish = 14,
     [1]    = {
-        type = 'pair',
+        type   = 'pair',
+        start  = 2,
+        finish = 6,
         [1]  = {
             type   = 'name',
             start  = 2,
@@ -1149,7 +1151,9 @@ CHECK'{x = 1, y = 2}'
         },
     },
     [2]    = {
-        type = 'pair',
+        type   = 'pair',
+        start  = 9,
+        finish = 13,
         [1]  = {
             type   = 'name',
             start  = 9,
@@ -1170,7 +1174,9 @@ CHECK'{["x"] = 1, ["y"] = 2}'
     start  = 1,
     finish = 22,
     [1]    = {
-        type = 'pair',
+        type   = 'pair',
+        start  =  3,
+        finish = 10,
         [1]  = {
             type   = 'string',
             start  = 3,
@@ -1186,7 +1192,9 @@ CHECK'{["x"] = 1, ["y"] = 2}'
         },
     },
     [2]    = {
-        type = 'pair',
+        type   = 'pair',
+        start  = 14,
+        finish = 21,
         [1]  = {
             type   = 'string',
             start  = 14,
@@ -1208,7 +1216,9 @@ CHECK'{[x] = 1, [y] = 2}'
     start  = 1,
     finish = 18,
     [1]    = {
-        type = 'pair',
+        type   = 'pair',
+        start  = 3,
+        finish = 8,
         [1]  = {
             type   = 'name',
             start  = 3,
@@ -1224,7 +1234,9 @@ CHECK'{[x] = 1, [y] = 2}'
         },
     },
     [2]    = {
-        type = 'pair',
+        type   = 'pair',
+        start  = 12,
+        finish = 17,
         [1]  = {
             type   = 'name',
             start  = 12,
@@ -1257,7 +1269,9 @@ CHECK'{ a = { b = { c = {} } } }'
     start  = 1,
     finish = 26,
     [1]    = {
-        type = 'pair',
+        type   = 'pair',
+        start  = 3,
+        finish = 24,
         [1]  = {
             type   = 'name',
             start  = 3,
@@ -1269,7 +1283,9 @@ CHECK'{ a = { b = { c = {} } } }'
             start  = 7,
             finish = 24,
             [1]    = {
-                type = 'pair',
+                type   = 'pair',
+                start  = 9,
+                finish = 22,
                 [1]  = {
                     type   = 'name',
                     start  = 9,
@@ -1281,7 +1297,9 @@ CHECK'{ a = { b = { c = {} } } }'
                     start  = 13,
                     finish = 22,
                     [1]    = {
-                        type = 'pair',
+                        type   = 'pair',
+                        start  = 15,
+                        finish = 20,
                         [1]  = {
                             type   = 'name',
                             start  = 15,
