@@ -40,6 +40,8 @@ CHECK'x, y, z = 1, 2, 3'
     },
     [2]  = {
         type = 'list',
+        start = 11,
+        finish = 17,
         [1]  = {
             type   = 'number',
             start  = 11,
@@ -137,6 +139,8 @@ CHECK'local x, y, z = 1, 2, 3'
     },
     [2]  = {
         type = 'list',
+        start = 17,
+        finish = 23,
         [1]  = {
             type   = 'number',
             start  = 17,
@@ -355,6 +359,8 @@ CHECK'return 1'
 CHECK'return 1, 2'
 {
     type = 'return',
+    start = 8,
+    finish = 11,
     [1]  = {
         type   = 'number',
         start  = 8,
@@ -773,6 +779,8 @@ end]]
     },
     exp    = {
         type   = 'list',
+        start  = 16,
+        finish = 22,
         [1]    = {
             type   = 'name',
             start  = 16,

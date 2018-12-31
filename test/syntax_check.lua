@@ -320,6 +320,40 @@ t = {1<!？？？!>, 2}
     }
 }
 
+TEST[[
+f(<!!>
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = ')',
+    },
+}
+
+TEST[[
+f(<!!>,1)
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+f(1,<!!>)
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+f(1<! !>1)
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = ',',
+    },
+}
+
 -- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua
 TEST[[
 f = 9<!e!>
