@@ -289,12 +289,16 @@ Suffix      <-  DOT MustName
             /   Sp ({} Table {}) -> Call
             /   Sp ({} String {}) -> Call
             /   Sp ({} BL DirtyExp (BR / Sp) {}) -> Index
-            /   Sp ({} PL ExpList DirtyPR {}) -> Call
+            /   Sp ({} PL CallArgList DirtyPR {}) -> Call
 
 DirtyExp    <-  Exp
             /   {} -> DirtyExp
-ExpList     <-  Sp ({} (!%nl (COMMA {} / Exp))+ {})
-            ->  ExpList
+ExpList     <-  (COMMA Exp)+
+            ->  List
+            /   (Exp (COMMA Exp)*)
+            ->  List
+CallArgList <-  Sp ({} (COMMA {} / Exp)+ {})
+            ->  CallArgList
             /   %nil
 NameList    <-  (COMMA MustName)+
             ->  List
@@ -313,9 +317,9 @@ AfterArg    <-  DOTS
             /   MustName
 
 
-Table       <-  Sp ({} TL TableFields DirtyTR {})
+Table       <-  Sp ({} TL TableFields? DirtyTR {})
             ->  Table
-TableFields <-  (TableSep {} / TableField / DirtyField)*
+TableFields <-  (TableSep {} / TableField / DirtyField)+
 DirtyField  <-  Sp ({} {(!TR !COMMA !SEMICOLON !Word !BL .)+})
             ->  UnknownSymbol
 TableSep    <-  COMMA / SEMICOLON
@@ -343,6 +347,7 @@ FuncSuffix  <-  DOT MustName
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
 Action      <-  !END .
+Set         <-  END
 ]]
 
 grammar 'Action' [[
@@ -443,7 +448,7 @@ RepeatBody  <-  REPEAT
 
 Local       <-  (LOCAL TOCLOSE? NameList (ASSIGN ExpList)?)
             ->  Local
-Set         <-  (SimpleList ASSIGN ExpList)
+Set         <-  (SimpleList ASSIGN ExpList?)
             ->  Set
 
 Call        <-  Simple

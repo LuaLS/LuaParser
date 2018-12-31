@@ -1073,7 +1073,9 @@ CHECK'function (a, ...) end'
     start  = 1,
     finish = 21,
     arg    = {
-        type = 'list',
+        type   = 'list',
+        start  = 11,
+        finish = 16,
         [1]  = {
             type   = 'name',
             start  = 11,

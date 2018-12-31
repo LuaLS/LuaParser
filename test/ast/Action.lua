@@ -18,7 +18,9 @@ CHECK'x, y, z = 1, 2, 3'
 {
     type = 'set',
     [1]  = {
-        type = 'list',
+        type   = 'list',
+        start  = 1,
+        finish = 7,
         [1]  = {
             type   = 'name',
             start  = 1,
@@ -76,7 +78,9 @@ CHECK'local x, y, z'
 {
     type = 'local',
     [1]  = {
-        type = 'list',
+        type   = 'list',
+        start  = 7,
+        finish = 13,
         [1]  = {
             type   = 'name',
             start  = 7,
@@ -117,7 +121,9 @@ CHECK'local x, y, z = 1, 2, 3'
 {
     type = 'local',
     [1]  = {
-        type = 'list',
+        type   = 'list',
+        start  = 7,
+        finish = 13,
         [1]  = {
             type   = 'name',
             start  = 7,
@@ -138,8 +144,8 @@ CHECK'local x, y, z = 1, 2, 3'
         },
     },
     [2]  = {
-        type = 'list',
-        start = 17,
+        type   = 'list',
+        start  = 17,
         finish = 23,
         [1]  = {
             type   = 'number',
@@ -758,6 +764,8 @@ end]]
     finish = 40,
     arg    = {
         type   = 'list',
+        start  = 5,
+        finish = 11,
         [1]    = {
             type   = 'name',
             start  = 5,
@@ -919,7 +927,9 @@ end]]
         }
     },
     arg    = {
-        type = 'list',
+        type   = 'list',
+        start  = 16,
+        finish = 22,
         [1]  = {
             type   = 'name',
             start  = 16,
@@ -976,7 +986,9 @@ end]]
         [1]    = 'a',
     },
     arg    = {
-        type = 'list',
+        type   = 'list',
+        start  = 18,
+        finish = 21,
         [1]  = {
             type   = 'name',
             start  = 18,
