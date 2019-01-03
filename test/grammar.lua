@@ -1,9 +1,9 @@
 local parser = require 'parser'
 
 local function check_str(str, name, mode)
-    local ast, err = parser.grammar(str, mode)
+    local ast, err = parser:ast(str, mode)
     assert(ast)
-    if err then
+    if #err > 0 and mode ~= 'Dirty' then
         error(([[
 [%s]测试失败:
 %s
@@ -98,13 +98,15 @@ check 'String'
 [['\u{3b1}']],
 [['\u{3B2}']],
 [['\u{0}']],
-[['\u{ffffff}']],
+[['\u{10ffff}']],
 }
 
 check 'Number'
 {
 '3',
 '345',
+'03',
+'00000003',
 '0xff',
 '0xBEBADA',
 '3.0',
@@ -112,8 +114,11 @@ check 'Number'
 '314.16e-2',
 '0.31416E1',
 '34e1',
+'34e01',
+'34e0',
 '0x0.1E',
 '0xA23p-4',
+'0xA23p01',
 '0x.1',
 '0X1.921FB54442D18P+1',
 '.9',
@@ -309,7 +314,7 @@ print(1)
 }
 
 -- Dirty
-check 'Lua'
+check 'Dirty'
 {
 'f',
 'f(',
