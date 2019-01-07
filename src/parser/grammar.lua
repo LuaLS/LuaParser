@@ -201,8 +201,10 @@ TOCLOSE     <-  Sp '*toclose'
 DirtyAssign <-  ASSIGN / {} -> MissAssign
 DirtyBR     <-  BR {} / {} -> MissBR
 DirtyTR     <-  TR {} / {} -> MissTR
-DirtyPR     <-  PR {} / {} -> MissPR
+DirtyPR     <-  PR {} / {} -> DirtyPR
 DirtyLabel  <-  LABEL / {} -> MissLabel
+MaybePR     <-  PR    / {} -> MissPR
+MaybeEnd    <-  END   / {} -> MissEnd
 ]]
 
 grammar 'Nil' [[
@@ -351,19 +353,11 @@ NewField    <-  (MustName ASSIGN DirtyExp)
 
 Function    <-  Sp ({} FunctionBody {})
             ->  Function
-FunctionBody<-  FUNCTION FuncName PL ArgList PR
+FuncArg     <-  PL ArgList MaybePR
+            /   {} -> MissPL Nothing
+FunctionBody<-  FUNCTION FuncArg
                     (!END Action)*
-                END?
-            /   FUNCTION FuncName PL ArgList PR?
-                    (!END Action)*
-                END?
-            /   FUNCTION FuncName Nothing
-                    (!END Action)*
-                END?
-FuncName    <-  (Name? (FuncSuffix)*)
-            ->  Simple
-FuncSuffix  <-  DOT MustName
-            /   COLON MustName
+                MaybeEnd
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
 Action      <-  !END .
@@ -382,7 +376,7 @@ CrtAction   <-  Semicolon
             /   For
             /   While
             /   Repeat
-            /   Function
+            /   NamedFunction
             /   LocalFunction
             /   Local
             /   Set
@@ -398,7 +392,7 @@ Semicolon   <-  SEMICOLON
 SimpleList  <-  (Simple (COMMA Simple)*)
             ->  List
 
-Do          <-  Sp ({} DO DoBody END? {})
+Do          <-  Sp ({} DO DoBody MaybeEnd {})
             ->  Do
 DoBody      <-  (!END Action)*
             ->  DoBody
@@ -421,7 +415,7 @@ IfHead      <-  (IfPart     -> IfBlock)
 IfBody      <-  IfHead
                 (ElseIfPart -> ElseIfBlock)*
                 (ElsePart   -> ElseBlock)?
-                END?
+                MaybeEnd
 IfPart      <-  IF Exp THEN
                     {} (!ELSEIF !ELSE !END Action)* {}
             /   IF DirtyExp THEN
@@ -444,7 +438,7 @@ Loop        <-  Sp ({} LoopBody {})
             ->  Loop
 LoopBody    <-  FOR LoopStart LoopFinish LoopStep DO?
                     (!END Action)*
-                END?
+                MaybeEnd
 LoopStart   <-  MustName ASSIGN DirtyExp
 LoopFinish  <-  COMMA? Exp
             /   COMMA? DirtyName
@@ -456,13 +450,13 @@ In          <-  Sp ({} InBody {})
             ->  In
 InBody      <-  FOR NameList IN? ExpList DO?
                     (!END Action)*
-                END?
+                MaybeEnd
 
 While       <-  Sp ({} WhileBody {})
             ->  While
 WhileBody   <-  WHILE Exp DO
                     (!END Action)*
-                END?
+                MaybeEnd
 
 Repeat      <-  Sp ({} RepeatBody {})
             ->  Repeat
@@ -478,8 +472,20 @@ Set         <-  (SimpleList ASSIGN ExpList?)
 Call        <-  Simple
 
 LocalFunction
-            <-  Sp ({} LOCAL FunctionBody {})
+            <-  Sp ({} LOCAL FunctionNamedBody {})
             ->  LocalFunction
+
+NamedFunction
+            <-  Sp ({} FunctionNamedBody {})
+            ->  NamedFunction
+FunctionNamedBody
+            <-  FUNCTION FuncName FuncArg
+                    (!END Action)*
+                MaybeEnd
+FuncName    <-  (MustName (FuncSuffix)*)
+            ->  Simple
+FuncSuffix  <-  DOT MustName
+            /   COLON MustName
 ]]
 
 grammar 'Lua' [[

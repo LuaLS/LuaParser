@@ -265,7 +265,19 @@ local defs = {
             finish = start,
         }
     end,
-    Function = function (start, name, arg, ...)
+    Function = function (start, arg, ...)
+        local obj = {
+            type  = 'function',
+            start = start,
+            arg   = arg,
+            ...
+        }
+        local max = #obj
+        obj.finish = obj[max] - 1
+        obj[max]   = nil
+        return obj
+    end,
+    NamedFunction = function (start, name, arg, ...)
         local obj = {
             type  = 'function',
             start = start,
@@ -709,7 +721,7 @@ local defs = {
             }
         }
     end,
-    MissPR = function (pos)
+    DirtyPR = function (pos)
         pushError {
             type = 'MISS_SYMBOL',
             start = pos,
@@ -719,6 +731,16 @@ local defs = {
             }
         }
         return pos + 1
+    end,
+    MissPR = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = ')',
+            }
+        }
     end,
     ErrEsc = function (pos)
         pushError {
@@ -775,6 +797,16 @@ local defs = {
             finish = pos,
             info = {
                 symbol = '::',
+            }
+        }
+    end,
+    MissEnd = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = 'end',
             }
         }
     end,

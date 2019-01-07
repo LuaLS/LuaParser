@@ -152,6 +152,12 @@ CHECK 'local function'
         type   = 'localfunction',
         start  = 1,
         finish = 14,
+        name   = {
+            type   = 'name',
+            start  = 15,
+            finish = 15,
+            [1]    = '',
+        }
     }
 }
 

@@ -459,6 +459,80 @@ return 1,<!!>
 }
 
 TEST[[
+local function<!!>() end
+]]
+{
+    type = 'MISS_NAME',
+}
+
+TEST[[
+function<!!>() end
+]]
+{
+    type = 'MISS_NAME',
+}
+
+TEST[[
+function f(<!!>
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = ')',
+    }
+}
+
+TEST[[
+function f<!!> end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = '(',
+    }
+}
+
+TEST[[
+f = function (<!!>
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = ')',
+    }
+}
+
+TEST[[
+f = function<!!> end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = '(',
+    }
+}
+
+TEST[[
+f = function<!!> f() end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = '(',
+    }
+}
+
+TEST[[
+function f()<!!>
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = 'end',
+    }
+}
+
+TEST[[
 for <!in!> next do
 end
 ]]
