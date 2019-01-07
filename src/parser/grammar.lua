@@ -254,10 +254,10 @@ Float16Exp  <-  [pP] [+-]? [0-9]+
 ]]
 
 grammar 'Name' [[
-Name        <-  Sp ({} NameBody {})
+Name        <-  ({} NameBody {})
             ->  Name
 NameBody    <-  {[a-zA-Z_] [a-zA-Z0-9_]*}
-FreeName    <-  Sp ({} NameBody=>NotReserved {})
+FreeName    <-  ({} NameBody=>NotReserved {})
             ->  Name
 MustName    <-  Name / DirtyName
 DirtyName   <-  {} -> DirtyName
@@ -292,8 +292,8 @@ Simple      <-  (Prefix (Sp Suffix)*)
             ->  Simple
 Prefix      <-  PL Exp PR
             /   FreeName
-Suffix      <-  DOT Name?
-            /   COLON Name?
+Suffix      <-  DOT Sp Name?
+            /   COLON Sp Name?
             /   ({} Table {}) -> Call
             /   ({} String {}) -> Call
             /   ({} BL DirtyExp (BR / Sp) {}) -> Index
@@ -308,9 +308,10 @@ ExpList     <-  (Sp COMMA Exp)+
 CallArgList <-  Sp ({} (COMMA {} / Exp)+ {})
             ->  CallArgList
             /   %nil
-NameList    <-  (Sp COMMA MustName)+
+NameList    <-  Sp NameListP
+NameListP   <-  (COMMA Sp MustName)+
             ->  List
-            /   (Name (Sp COMMA MustName)*)
+            /   (Name (Sp COMMA Sp MustName)*)
             ->  List
             /   DirtyName
             ->  List
@@ -327,10 +328,10 @@ AfterArg    <-  DOTS
 
 Table       <-  ({} TL TableFields? DirtyTR)
             ->  Table
-TableFields <-  (TableSep {} / TableField)+
-TableSep    <-  Sp (COMMA / SEMICOLON)
+TableFields <-  (Sp (TableSep {} / TableField))+
+TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
-NewIndex    <-  Sp ({} BL !BL !ASSIGN DirtyExp DirtyBR DirtyAssign DirtyExp)
+NewIndex    <-  ({} BL !BL !ASSIGN DirtyExp DirtyBR DirtyAssign DirtyExp)
             ->  NewIndex
 NewField    <-  (MustName ASSIGN DirtyExp)
             ->  NewField
@@ -346,10 +347,10 @@ FunctionBody<-  FUNCTION FuncName PL ArgList PR
             /   FUNCTION FuncName Nothing
                     (!END Action)*
                 END?
-FuncName    <-  (Name? (FuncSuffix)*)
+FuncName    <-  Sp (Name? (FuncSuffix)*)
             ->  Simple
-FuncSuffix  <-  Sp DOT MustName
-            /   Sp COLON MustName
+FuncSuffix  <-  Sp DOT Sp MustName
+            /   Sp COLON Sp MustName
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
 Action      <-  !END .
@@ -381,7 +382,7 @@ UnkAction   <-  ({} {Word+})
 
 Semicolon   <-  SEMICOLON
             ->  Skip
-SimpleList  <-  (Simple (Sp COMMA Simple)*)
+SimpleList  <-  (Sp Simple (Sp COMMA Sp Simple)*)
             ->  List
 
 Do          <-  Sp ({} DO DoBody END? {})
@@ -395,9 +396,9 @@ Break       <-  BREAK
 Return      <-  RETURN ExpList?
             ->  Return
 
-Label       <-  LABEL MustName -> Label LABEL
+Label       <-  LABEL Sp MustName -> Label LABEL
 
-GoTo        <-  GOTO MustName -> GoTo
+GoTo        <-  GOTO Sp MustName -> GoTo
 
 If          <-  Sp ({} IfBody {})
             ->  If
@@ -431,7 +432,7 @@ Loop        <-  Sp ({} LoopBody {})
 LoopBody    <-  FOR LoopStart LoopFinish LoopStep DO?
                     (!END Action)*
                 END?
-LoopStart   <-  MustName ASSIGN DirtyExp
+LoopStart   <-  Sp MustName ASSIGN DirtyExp
 LoopFinish  <-  Sp COMMA? Exp
             /   Sp COMMA? DirtyName
 LoopStep    <-  Sp COMMA  DirtyExp
