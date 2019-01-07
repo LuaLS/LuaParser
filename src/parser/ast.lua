@@ -18,6 +18,31 @@ local function pushError(err)
     Errs[#Errs+1] = err
 end
 
+local RESERVED = {
+    ['and']      = true,
+    ['break']    = true,
+    ['do']       = true,
+    ['else']     = true,
+    ['elseif']   = true,
+    ['end']      = true,
+    ['false']    = true,
+    ['for']      = true,
+    ['function'] = true,
+    ['goto']     = true,
+    ['if']       = true,
+    ['in']       = true,
+    ['local']    = true,
+    ['nil']      = true,
+    ['not']      = true,
+    ['or']       = true,
+    ['repeat']   = true,
+    ['return']   = true,
+    ['then']     = true,
+    ['true']     = true,
+    ['until']    = true,
+    ['while']    = true,
+}
+
 local defs = {
     Nil = function (pos)
         return {
@@ -119,6 +144,13 @@ local defs = {
         }
     end,
     Name = function (start, str, finish)
+        if RESERVED[str] then
+            pushError {
+                type = 'KEYWORD',
+                start = start,
+                finish = finish - 1,
+            }
+        end
         return {
             type   = 'name',
             start  = start,
@@ -734,6 +766,16 @@ local defs = {
             type = 'MISS_METHOD',
             start = pos,
             finish = pos,
+        }
+    end,
+    MissLabel = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = '::',
+            }
         }
     end,
 }

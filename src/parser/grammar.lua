@@ -202,6 +202,7 @@ DirtyAssign <-  ASSIGN / {} -> MissAssign
 DirtyBR     <-  BR {} / {} -> MissBR
 DirtyTR     <-  TR {} / {} -> MissTR
 DirtyPR     <-  PR {} / {} -> MissPR
+DirtyLabel  <-  LABEL / {} -> MissLabel
 ]]
 
 grammar 'Nil' [[
@@ -279,18 +280,18 @@ ExpUnary    <-  (           SuffixUnary)   -> Unary
             /   ExpPower
 ExpPower    <-  (ExpUnit    SuffixPower*)  -> Binary
 
-SuffixOr    <-  OR     ExpAnd     / OR     -> None {} -> MissExp
-SuffixAnd   <-  AND    ExpCompare / AND    -> None {} -> MissExp
-SuffixComp  <-  Comp   ExpBor     / Comp   -> None {} -> MissExp
-SuffixBor   <-  BOR    ExpBxor    / BOR    -> None {} -> MissExp
-SuffixBxor  <-  BXOR   ExpBand    / BXOR   -> None {} -> MissExp
-SuffixBand  <-  BAND   ExpBshift  / BAND   -> None {} -> MissExp
-SuffixBshift<-  Bshift ExpConcat  / Bshift -> None {} -> MissExp
-SuffixConcat<-  Concat ExpConcat  / Concat -> None {} -> MissExp
-SuffixAdds  <-  Adds   ExpMuls    / Adds   -> None {} -> MissExp
-SuffixMuls  <-  Muls   ExpUnary   / Muls   -> None {} -> MissExp
-SuffixUnary <-  Unary+ ExpPower   / Unary+ -> None {} -> MissExp
-SuffixPower <-  POWER  ExpUnary   / POWER  -> None {} -> MissExp
+SuffixOr    <-  OR     ExpAnd     / OR     -> None MissExp
+SuffixAnd   <-  AND    ExpCompare / AND    -> None MissExp
+SuffixComp  <-  Comp   ExpBor     / Comp   -> None MissExp
+SuffixBor   <-  BOR    ExpBxor    / BOR    -> None MissExp
+SuffixBxor  <-  BXOR   ExpBand    / BXOR   -> None MissExp
+SuffixBand  <-  BAND   ExpBshift  / BAND   -> None MissExp
+SuffixBshift<-  Bshift ExpConcat  / Bshift -> None MissExp
+SuffixConcat<-  Concat ExpConcat  / Concat -> None MissExp
+SuffixAdds  <-  Adds   ExpMuls    / Adds   -> None MissExp
+SuffixMuls  <-  Muls   ExpUnary   / Muls   -> None MissExp
+SuffixUnary <-  Unary+ ExpPower   / Unary+ -> None MissExp
+SuffixPower <-  POWER  ExpUnary   / POWER  -> None MissExp
 
 ExpUnit     <-  Nil
             /   Boolean
@@ -316,19 +317,16 @@ Method      <-  COLON Name / COLON {} -> MissMethod
 
 DirtyExp    <-  Exp
             /   {} -> DirtyExp
+MaybeExp    <-  Exp / MissExp
 MissExp     <-  {} -> MissExp
-ExpList     <-  (COMMA Exp)+
+ExpList     <-  Sp (MaybeExp (COMMA (MaybeExp))*)
             ->  List
-            /   (Exp (COMMA Exp)*)
+MustExpList <-  Sp (Exp      (COMMA (MaybeExp))*)
             ->  List
 CallArgList <-  Sp ({} (COMMA {} / Exp)+ {})
             ->  CallArgList
             /   %nil
-NameList    <-  (COMMA MustName)+
-            ->  List
-            /   (Name (COMMA MustName)*)
-            ->  List
-            /   DirtyName
+NameList    <-  (MustName (COMMA MustName)*)
             ->  List
 
 ArgList     <-  (COMMA AfterArg)+
@@ -408,10 +406,10 @@ DoBody      <-  (!END Action)*
 Break       <-  BREAK
             ->  Break
 
-Return      <-  RETURN ExpList?
+Return      <-  RETURN MustExpList?
             ->  Return
 
-Label       <-  LABEL MustName -> Label LABEL
+Label       <-  LABEL MustName -> Label DirtyLabel
 
 GoTo        <-  GOTO MustName -> GoTo
 

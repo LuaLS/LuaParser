@@ -413,6 +413,60 @@ x = #<!!>
     type = 'MISS_EXP',
 }
 
+TEST[[
+local x = 1,<!!>
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+local x,<!!> = 1, 2
+]]
+{
+    type = 'MISS_NAME',
+}
+
+TEST[[
+::<!!>
+]]
+{
+    type = 'MISS_NAME',
+}
+
+TEST[[
+::LABEL<!!>
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = '::',
+    }
+}
+
+TEST[[
+goto<!!>
+]]
+{
+    type = 'MISS_NAME',
+}
+
+TEST[[
+return 1,<!!>
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+for <!in!> next do
+end
+]]
+{
+    type = 'KEYWORD',
+}
+
+
 -- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua
 TEST[[
 f = 9<!e!>
