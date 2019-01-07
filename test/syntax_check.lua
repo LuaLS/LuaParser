@@ -53,24 +53,20 @@ local function TEST(script)
         assert(errs)
         local first = errs[1]
         local target = list[1]
-        local start = expect.start or target[1]
-        local finish = expect.finish or target[2]
         assert(#errs == 1)
         assert(first)
         assert(first.type == expect.type)
-        assert(first.start == start)
-        assert(first.finish == finish)
+        assert(first.start == target[1])
+        assert(first.finish == target[2])
         assert(eq(first.info, expect.info))
     end
 end
 
 TEST[[
-local <!!>
+local<! !>
 ]]
 {
     type = 'MISS_NAME',
-    start = 8,
-    finish = 8,
 }
 
 TEST[[
