@@ -142,6 +142,9 @@ local defs = {
             return first
         end
     end,
+    Prefix = function (start, exp, finish)
+        return exp
+    end,
     Index = function (start, exp, finish)
         return {
             type = 'index',
@@ -654,6 +657,16 @@ local defs = {
         }
         return pos + 1
     end,
+    MissPL = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = '(',
+            }
+        }
+    end,
     MissPR = function (pos)
         pushError {
             type = 'MISS_SYMBOL',
@@ -697,6 +710,20 @@ local defs = {
             info = {
                 symbol = ','
             }
+        }
+    end,
+    MissField = function (pos)
+        pushError {
+            type = 'MISS_FIELD',
+            start = pos,
+            finish = pos,
+        }
+    end,
+    MissMethod = function (pos)
+        pushError {
+            type = 'MISS_METHOD',
+            start = pos,
+            finish = pos,
         }
     end,
 }

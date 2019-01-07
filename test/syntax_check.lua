@@ -341,6 +341,64 @@ f(1<! !>1)
     },
 }
 
+TEST[[
+(<!!>).x()
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+(x<!!> = 1
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = ')',
+    }
+}
+
+TEST[[
+x.<!!>()
+]]
+{
+    type = 'MISS_FIELD',
+}
+
+TEST[[
+x:<!!>()
+]]
+{
+    type = 'MISS_METHOD',
+}
+
+TEST[[
+x[<!!>] = 1
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+x[1<!!> = 1
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = ']',
+    }
+}
+
+TEST[[
+x:m<!!>
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = '(',
+    }
+}
+
 -- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua
 TEST[[
 f = 9<!e!>

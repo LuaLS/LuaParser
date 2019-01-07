@@ -288,16 +288,18 @@ ExpUnit     <-  Nil
             /   Function
             /   Simple
 
-Simple      <-  (Prefix (Suffix)*)
+Simple      <-  (Prefix (Sp Suffix)*)
             ->  Simple
-Prefix      <-  PL Exp PR
+Prefix      <-  Sp ({} PL DirtyExp DirtyPR)
+            ->  Prefix
             /   FreeName
-Suffix      <-  DOT Name?
-            /   COLON Name?
-            /   Sp ({} Table {}) -> Call
-            /   Sp ({} String {}) -> Call
-            /   Sp ({} BL DirtyExp (BR / Sp) {}) -> Index
-            /   Sp ({} PL CallArgList DirtyPR) -> Call
+Suffix      <-  DOT   Name / DOT   {} -> MissField
+            /   Method (!PL {} -> MissPL)?
+            /   ({} Table {}) -> Call
+            /   ({} String {}) -> Call
+            /   ({} BL DirtyExp DirtyBR) -> Index
+            /   ({} PL CallArgList DirtyPR) -> Call
+Method      <-  COLON Name / COLON {} -> MissMethod
 
 DirtyExp    <-  Exp
             /   {} -> DirtyExp
