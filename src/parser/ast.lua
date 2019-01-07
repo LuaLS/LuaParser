@@ -377,6 +377,72 @@ local defs = {
             return first
         end
     end,
+    ArgList = function (...)
+        if ... == '' then
+            return nil
+        end
+        local args = table.pack(...)
+        local list = {}
+        local max = args.n
+        args.n = nil
+        local wantName = true
+        for i = 1, max do
+            local obj = args[i]
+            if type(obj) == 'number' then
+                if wantName then
+                    pushError {
+                        type = 'MISS_NAME',
+                        start = obj,
+                        finish = obj,
+                    }
+                end
+                wantName = true
+            else
+                if not wantName then
+                    pushError {
+                        type = 'MISS_SYMBOL',
+                        start = obj.start-1,
+                        finish = obj.start-1,
+                        info = {
+                            symbol = ',',
+                        }
+                    }
+                end
+                wantName = false
+                list[#list+1] = obj
+                if obj.type == '...' then
+                    if i < max then
+                        local a = args[i+1]
+                        local b = args[max]
+                        pushError {
+                            type = 'ARGS_AFTER_DOTS',
+                            start = type(a) == 'number' and a or a.start,
+                            finish = type(b) == 'number' and b or b.finish,
+                        }
+                    end
+                    break
+                end
+            end
+        end
+        if wantName then
+            local last = args[max]
+            pushError {
+                type = 'MISS_NAME',
+                start = last+1,
+                finish = last+1,
+            }
+        end
+        if #list == 0 then
+            return nil
+        elseif #list == 1 then
+            return list[1]
+        else
+            list.type = 'list'
+            list.start = list[1].start
+            list.finish = list[#list].finish
+            return list
+        end
+    end,
     CallArgList = function (start, ...)
         local args = {...}
         local max = #args

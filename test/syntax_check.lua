@@ -533,6 +533,44 @@ function f()<!!>
 }
 
 TEST[[
+function f:<!!>() end
+]]
+{
+    type = 'MISS_METHOD',
+}
+
+TEST[[
+function f:x<!.!>y() end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = '(',
+    }
+}
+
+TEST[[
+function f(a,<!!>) end
+]]
+{
+    type = 'MISS_NAME',
+}
+
+TEST[[
+function f(<!!>,a) end
+]]
+{
+    type = 'MISS_NAME',
+}
+
+TEST[[
+function f(...<!, a!>) end
+]]
+{
+    type = 'ARGS_AFTER_DOTS',
+}
+
+TEST[[
 for <!in!> next do
 end
 ]]

@@ -206,7 +206,7 @@ CHECK 'function a:'
         name   = {
             type   = 'simple',
             start  = 10,
-            finish = 12,
+            finish = 11,
             [1]    = {
                 type   = 'name',
                 start  = 10,
@@ -217,12 +217,6 @@ CHECK 'function a:'
                 type   = ':',
                 start  = 11,
                 finish = 11,
-            },
-            [3]    = {
-                type   = 'name',
-                start  = 12,
-                finish = 12,
-                [1]    = '',
             },
         },
     }

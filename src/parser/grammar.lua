@@ -331,15 +331,8 @@ CallArgList <-  Sp ({} (COMMA {} / Exp)+ {})
 NameList    <-  (MustName (COMMA MustName)*)
             ->  List
 
-ArgList     <-  (COMMA AfterArg)+
-            ->  List
-            /   (FirstArg (COMMA AfterArg)*)?
-            ->  List
-FirstArg    <-  DOTS
-            /   Name
-AfterArg    <-  DOTS
-            /   MustName
-
+ArgList     <-  (DOTS / Name / Sp {} COMMA)*
+            ->  ArgList
 
 Table       <-  Sp ({} TL TableFields? DirtyTR)
             ->  Table
@@ -482,10 +475,9 @@ FunctionNamedBody
             <-  FUNCTION FuncName FuncArg
                     (!END Action)*
                 MaybeEnd
-FuncName    <-  (MustName (FuncSuffix)*)
+FuncName    <-  (MustName (DOT MustName)* FuncMethod?)
             ->  Simple
-FuncSuffix  <-  DOT MustName
-            /   COLON MustName
+FuncMethod  <-  COLON Name / COLON {} -> MissMethod
 ]]
 
 grammar 'Lua' [[
