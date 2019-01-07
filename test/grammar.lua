@@ -211,8 +211,6 @@ check 'Exp'
 
 check 'Action'
 {
-';',
-
 'x = 1',
 'x, y, z = 1, 2, 3',
 'local x = 1',
