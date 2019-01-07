@@ -196,6 +196,11 @@ CHECK'x.y = function () end'
             [1]    = 'x',
         },
         [2]  = {
+            type   = '.',
+            start  = 2,
+            finish = 2,
+        },
+        [3]  = {
             type   = 'name',
             start  = 3,
             finish = 3,
@@ -220,12 +225,17 @@ CHECK'func.x(1, 2)'
         [1]    = 'func',
     },
     [2]  = {
+        type   = '.',
+        start  = 5,
+        finish = 5,
+    },
+    [3]  = {
         type   = 'name',
         start  = 6,
         finish = 6,
         [1]    = 'x',
     },
-    [3]  = {
+    [4]  = {
         type = 'call',
         start  = 7,
         finish = 12,
@@ -909,17 +919,22 @@ end]]
             [1]    = 'a',
         },
         [2]  = {
+            type   = '.',
+            start  = 11,
+            finish = 11,
+        },
+        [3]  = {
             type   = 'name',
             start  = 12,
             finish = 12,
             [1]    = 'b',
         },
-        [3]  = {
+        [4]  = {
             type   = ':',
             start  = 13,
             finish = 13,
         },
-        [4]  = {
+        [5]  = {
             type   = 'name',
             start  = 14,
             finish = 14,

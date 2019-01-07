@@ -3,7 +3,7 @@ CHECK'a.'
     [1] = {
         type   = 'simple',
         start  = 1,
-        finish = 3,
+        finish = 2,
         [1]  = {
             type   = 'name',
             start  = 1,
@@ -11,10 +11,9 @@ CHECK'a.'
             [1]    = 'a',
         },
         [2]  = {
-            type   = 'name',
-            start  = 3,
-            finish = 3,
-            [1]    = '',
+            type   = '.',
+            start  = 2,
+            finish = 2,
         },
     }
 }
@@ -24,7 +23,7 @@ CHECK'a:'
     [1] = {
         type   = 'simple',
         start  = 1,
-        finish = 3,
+        finish = 2,
         [1]  = {
             type   = 'name',
             start  = 1,
@@ -35,12 +34,6 @@ CHECK'a:'
             type   = ':',
             start  = 2,
             finish = 2,
-        },
-        [3]  = {
-            type   = 'name',
-            start  = 3,
-            finish = 3,
-            [1]    = '',
         },
     }
 }

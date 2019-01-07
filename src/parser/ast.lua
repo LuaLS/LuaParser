@@ -223,6 +223,13 @@ local defs = {
             finish = start,
         }
     end,
+    DOT = function (start)
+        return {
+            type   = '.',
+            start  = start,
+            finish = start,
+        }
+    end,
     Function = function (start, name, arg, ...)
         local obj = {
             type  = 'function',

@@ -23,12 +23,22 @@ CHECK'a.b.c'
         [1]    = 'a',
     },
     [2]  = {
+        type   = '.',
+        start  = 2,
+        finish = 2,
+    },
+    [3]  = {
         type   = 'name',
         start  = 3,
         finish = 3,
         [1]    = 'b',
     },
-    [3]  = {
+    [4]  = {
+        type   = '.',
+        start  = 4,
+        finish = 4,
+    },
+    [5]  = {
         type   = 'name',
         start  = 5,
         finish = 5,
@@ -64,18 +74,28 @@ CHECK'a.b.c()'
         [1]    = 'a',
     },
     [2]  = {
+        type   = '.',
+        start  = 2,
+        finish = 2,
+    },
+    [3]  = {
         type   = 'name',
         start  = 3,
         finish = 3,
         [1]    = 'b',
     },
-    [3]  = {
+    [4]  = {
+        type   = '.',
+        start  = 4,
+        finish = 4,
+    },
+    [5]  = {
         type   = 'name',
         start  = 5,
         finish = 5,
         [1]    = 'c',
     },
-    [4]  = {
+    [6]  = {
         type   = 'call',
         start  = 6,
         finish = 7,
@@ -994,6 +1014,11 @@ CHECK'get_point().x'
         finish = 11,
     },
     [3]  = {
+        type   = '.',
+        start  = 12,
+        finish = 12,
+    },
+    [4]  = {
         type   = 'name',
         start  = 13,
         finish = 13,
