@@ -155,7 +155,11 @@ TEST[[
 s = '<!\u{111111111}!>'
 ]]
 {
-    type = 'UTF8_LARGE',
+    type = 'UTF8_MAX',
+    info = {
+        min = '000000',
+        max = '10ffff',
+    }
 }
 
 TEST[[

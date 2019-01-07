@@ -99,6 +99,7 @@ check 'String'
 [['\u{3B2}']],
 [['\u{0}']],
 [['\u{10ffff}']],
+[['\u{0010ffff}']],
 }
 
 check 'Number'
