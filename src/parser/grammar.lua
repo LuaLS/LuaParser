@@ -285,9 +285,8 @@ Simple      <-  (Prefix (Suffix)*)
             ->  Simple
 Prefix      <-  PL Exp PR
             /   Name
-Suffix      <-  DOT
-            /   COLON
-            /   Name
+Suffix      <-  DOT Name?
+            /   COLON Name?
             /   Sp ({} Table {}) -> Call
             /   Sp ({} String {}) -> Call
             /   Sp ({} BL DirtyExp (BR / Sp) {}) -> Index
