@@ -282,18 +282,18 @@ ExpUnary    <-  (           SuffixUnary)   -> Unary
             /   ExpPower
 ExpPower    <-  (ExpUnit    SuffixPower*)  -> Binary
 
-SuffixOr    <-  OR     ExpAnd     / OR     -> None MissExp
-SuffixAnd   <-  AND    ExpCompare / AND    -> None MissExp
-SuffixComp  <-  Comp   ExpBor     / Comp   -> None MissExp
-SuffixBor   <-  BOR    ExpBxor    / BOR    -> None MissExp
-SuffixBxor  <-  BXOR   ExpBand    / BXOR   -> None MissExp
-SuffixBand  <-  BAND   ExpBshift  / BAND   -> None MissExp
-SuffixBshift<-  Bshift ExpConcat  / Bshift -> None MissExp
-SuffixConcat<-  Concat ExpConcat  / Concat -> None MissExp
-SuffixAdds  <-  Adds   ExpMuls    / Adds   -> None MissExp
-SuffixMuls  <-  Muls   ExpUnary   / Muls   -> None MissExp
-SuffixUnary <-  Unary+ ExpPower   / Unary+ -> None MissExp
-SuffixPower <-  POWER  ExpUnary   / POWER  -> None MissExp
+SuffixOr    <-  OR     (ExpAnd     / {} -> DirtyExp)
+SuffixAnd   <-  AND    (ExpCompare / {} -> DirtyExp)
+SuffixComp  <-  Comp   (ExpBor     / {} -> DirtyExp)
+SuffixBor   <-  BOR    (ExpBxor    / {} -> DirtyExp)
+SuffixBxor  <-  BXOR   (ExpBand    / {} -> DirtyExp)
+SuffixBand  <-  BAND   (ExpBshift  / {} -> DirtyExp)
+SuffixBshift<-  Bshift (ExpConcat  / {} -> DirtyExp)
+SuffixConcat<-  Concat (ExpConcat  / {} -> DirtyExp)
+SuffixAdds  <-  Adds   (ExpMuls    / {} -> DirtyExp)
+SuffixMuls  <-  Muls   (ExpUnary   / {} -> DirtyExp)
+SuffixUnary <-  Unary+ (ExpPower   / {} -> DirtyExp)
+SuffixPower <-  POWER  (ExpUnary   / {} -> DirtyExp)
 
 ExpUnit     <-  Nil
             /   Boolean
