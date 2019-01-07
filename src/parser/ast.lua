@@ -389,6 +389,9 @@ local defs = {
     Nothing = function ()
         return nil
     end,
+    None = function()
+        return
+    end,
     Skip = function ()
         return false
     end,
@@ -589,6 +592,13 @@ local defs = {
             start  = pos,
             finish = pos,
             [1]    = ''
+        }
+    end,
+    MissExp = function (pos)
+        pushError {
+            type = 'MISS_EXP',
+            start = pos,
+            finish = pos,
         }
     end,
     MissExponent = function (start, finish)

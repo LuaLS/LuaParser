@@ -159,7 +159,7 @@ CompList    <-  '<='
             /   '~='
             /   '=='
 BOR         <-  Sp {'|'}
-BXOR        <-  Sp {'~'}
+BXOR        <-  Sp {'~'} !'='
 BAND        <-  Sp {'&'}
 Bshift      <-  Sp {BshiftList}
 BshiftList  <-  '<<'
@@ -177,7 +177,7 @@ Unary       <-  Sp {} {UnaryList}
 UnaryList   <-  NOT
             /   '#'
             /   '-'
-            /   '~'
+            /   '~' !'='
 POWER       <-  Sp {'^'}
 
 PL          <-  Sp '('
@@ -265,20 +265,33 @@ DirtyName   <-  {} -> DirtyName
 
 grammar 'Exp' [[
 Exp         <-  Sp ExpOr
-ExpOr       <-  (ExpAnd     (OR     ExpAnd)*)     -> Binary
-ExpAnd      <-  (ExpCompare (AND    ExpCompare)*) -> Binary
-ExpCompare  <-  (ExpBor     (Comp   ExpBor)*)     -> Binary
-ExpBor      <-  (ExpBxor    (BOR    ExpBxor)*)    -> Binary
-ExpBxor     <-  (ExpBand    (BXOR   ExpBand)*)    -> Binary
-ExpBand     <-  (ExpBshift  (BAND   ExpBshift)*)  -> Binary
-ExpBshift   <-  (ExpConcat  (Bshift ExpConcat)*)  -> Binary
-ExpConcat   <-  (ExpAdds    (Concat ExpConcat)*)  -> Binary
-ExpAdds     <-  (ExpMuls    (Adds   ExpMuls)*)    -> Binary
-ExpMuls     <-  (ExpUnary   (Muls   ExpUnary)*)   -> Binary
-ExpUnary    <-  (           (Unary+ (ExpPower / DirtyName)))
-            ->  Unary
+ExpOr       <-  (ExpAnd     SuffixOr*)     -> Binary
+ExpAnd      <-  (ExpCompare SuffixAnd*)    -> Binary
+ExpCompare  <-  (ExpBor     SuffixComp*)   -> Binary
+ExpBor      <-  (ExpBxor    SuffixBor*)    -> Binary
+ExpBxor     <-  (ExpBand    SuffixBxor*)   -> Binary
+ExpBand     <-  (ExpBshift  SuffixBand*)   -> Binary
+ExpBshift   <-  (ExpConcat  SuffixBshift*) -> Binary
+ExpConcat   <-  (ExpAdds    SuffixConcat*) -> Binary
+ExpAdds     <-  (ExpMuls    SuffixAdds*)   -> Binary
+ExpMuls     <-  (ExpUnary   SuffixMuls*)   -> Binary
+ExpUnary    <-  (           SuffixUnary)   -> Unary
             /   ExpPower
-ExpPower    <-  (ExpUnit    (POWER  ExpUnary)*)   -> Binary
+ExpPower    <-  (ExpUnit    SuffixPower*)  -> Binary
+
+SuffixOr    <-  OR     ExpAnd     / OR     -> None {} -> MissExp
+SuffixAnd   <-  AND    ExpCompare / AND    -> None {} -> MissExp
+SuffixComp  <-  Comp   ExpBor     / Comp   -> None {} -> MissExp
+SuffixBor   <-  BOR    ExpBxor    / BOR    -> None {} -> MissExp
+SuffixBxor  <-  BXOR   ExpBand    / BXOR   -> None {} -> MissExp
+SuffixBand  <-  BAND   ExpBshift  / BAND   -> None {} -> MissExp
+SuffixBshift<-  Bshift ExpConcat  / Bshift -> None {} -> MissExp
+SuffixConcat<-  Concat ExpConcat  / Concat -> None {} -> MissExp
+SuffixAdds  <-  Adds   ExpMuls    / Adds   -> None {} -> MissExp
+SuffixMuls  <-  Muls   ExpUnary   / Muls   -> None {} -> MissExp
+SuffixUnary <-  Unary+ ExpPower   / Unary+ -> None {} -> MissExp
+SuffixPower <-  POWER  ExpUnary   / POWER  -> None {} -> MissExp
+
 ExpUnit     <-  Nil
             /   Boolean
             /   String
@@ -303,6 +316,7 @@ Method      <-  COLON Name / COLON {} -> MissMethod
 
 DirtyExp    <-  Exp
             /   {} -> DirtyExp
+MissExp     <-  {} -> MissExp
 ExpList     <-  (COMMA Exp)+
             ->  List
             /   (Exp (COMMA Exp)*)
