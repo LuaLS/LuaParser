@@ -183,17 +183,17 @@ UnaryList   <-  NOT
             /   '~' !'='
 POWER       <-  Sp {'^'}
 
-Op          <-  {'or'} CUT
-            /   {'and'} CUT
+Op          <-  {'or'} Cut
+            /   {'and'} Cut
             /   {'<=' / '>=' / '<'!'<' / '>'!'>' / '~=' / '=='}
             /   {'|'}
             /   {'~'}
             /   {'&'}
             /   {'<<' / '>>'}
-            /   {'..'}
+            /   {'..'} !'.'
             /   {'+' / '-'}
-            /   {'*' / '//', '/', '%'}
-            /   {'not' CUT / '#'}
+            /   {'*' / '//' / '/' / '%'}
+            /   {'not' Cut / '#'}
             /   {'^'}
 
 PL          <-  Sp '('
@@ -287,7 +287,7 @@ DirtyName   <-  {} -> DirtyName
 ]]
 
 grammar 'Exp' [[
-Exp         <-  (Sp (Op / ExpUnit))*
+Exp         <-  (Sp (Op / ExpUnit))+
             ->  Exp
 ExpOr       <-  (ExpAnd     SuffixOr*)     -> Binary
 ExpAnd      <-  (ExpCompare SuffixAnd*)    -> Binary
