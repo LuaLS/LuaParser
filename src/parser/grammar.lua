@@ -413,17 +413,13 @@ IfBody      <-  IfHead
                 (ElseIfPart -> ElseIfBlock)*
                 (ElsePart   -> ElseBlock)?
                 NeedEnd
-IfPart      <-  IF Exp THEN
+IfPart      <-  IF DirtyExp THEN
                     {} (!ELSEIF !ELSE !END Action)* {}
-            /   IF DirtyExp THEN
-                    {} (!ELSEIF !ELSE !END Action)* {}
-            /   IF DirtyExp
-                    {}         {}
-ElseIfPart  <-  ELSEIF Exp THEN
+            /   IF DirtyExp {}->MissThen
+                    {}        {}
+ElseIfPart  <-  ELSEIF DirtyExp THEN
                     {} (!ELSE !ELSEIF !END Action)* {}
-            /   ELSEIF DirtyExp THEN
-                    {} (!ELSE !ELSEIF !END Action)* {}
-            /   ELSEIF DirtyExp
+            /   ELSEIF DirtyExp {}->MissThen
                     {}         {}
 ElsePart    <-  ELSE
                     {} (!END Action)* {}

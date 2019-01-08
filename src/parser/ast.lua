@@ -916,6 +916,16 @@ local defs = {
             }
         }
     end,
+    MissThen = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = 'then',
+            }
+        }
+    end,
 }
 
 return function (self, lua, mode)

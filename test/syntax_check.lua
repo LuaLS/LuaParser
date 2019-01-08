@@ -752,6 +752,67 @@ repeat<!!>
     }
 }
 
+TEST[[
+if<!!> then
+end
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+if true<!!>
+end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = 'then',
+    }
+}
+
+TEST[[
+if true then<!!>
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = 'end',
+    }
+}
+
+TEST[[
+if true then
+else<!!>
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = 'end',
+    }
+}
+
+TEST[[
+if true then
+elseif<!!>
+end
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+if true then
+elseif true<!!>
+end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = 'then',
+    }
+}
+
 -- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua
 TEST[[
 f = 9<!e!>
