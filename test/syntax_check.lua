@@ -1118,3 +1118,67 @@ do do do goto <!label!> end end end
         label = 'label',
     }
 }
+
+TEST[[
+if a then<!!>
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = 'end',
+    }
+}
+
+TEST[[
+if a then else<!!>
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = 'end',
+    }
+}
+
+TEST[[
+if a then
+    return a
+elseif b then
+    return b
+elseif<!!>
+    
+end
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+if a:any<!!> then else end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = '(',
+    }
+}
+
+TEST[[
+:: blah ::
+:: <!not!> ::
+]]
+{
+    type = 'KEYWORD',
+}
+
+TEST[[
+::label::
+::other_label::
+::<!label!>::
+]]
+{
+    type = 'REDEFINE_LABEL',
+    info = {
+        label = 'label',
+        related = {3, 7},
+    }
+}

@@ -600,23 +600,41 @@ local defs = {
     end,
     Label = function (name)
         name.type = 'label'
-        local lables = State.Label[#State.Label]
-        lables[name[1]] = true
+        local labels = State.Label[#State.Label]
+        local str = name[1]
+        if labels[str] then
+            pushError {
+                type = 'REDEFINE_LABEL',
+                start = name.start,
+                finish = name.finish,
+                info = {
+                    label = str,
+                    related = {labels[str].start, labels[str].finish},
+                }
+            }
+        else
+            labels[str] = name
+        end
         return name
     end,
     GoTo = function (name)
         name.type = 'goto'
-        local lables = State.Label[#State.Label]
-        lables[#lables+1] = name
+        local labels = State.Label[#State.Label]
+        labels[#labels+1] = name
         return name
     end,
+    -- TODO 这里的检查不完整，但是完整的检查比较复杂，开销比较高
+    -- 不能jump到另一个局部变量的作用域
+    -- 函数会切断goto与label
+    -- 不能从block外jump到block内，但是可以从block内jump到block外
     LabelStart = function ()
         State.Label[#State.Label+1] = {}
     end,
     LabelEnd = function ()
         local labels = State.Label[#State.Label]
         State.Label[#State.Label] = nil
-        for _, name in ipairs(labels) do
+        for i = 1, #labels do
+            local name = labels[i]
             local str = name[1]
             if not labels[str] then
                 pushError {
