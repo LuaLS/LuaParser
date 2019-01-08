@@ -290,33 +290,6 @@ grammar 'Exp' [[
 Exp         <-  ((Sp (Op / ExpUnit Sp Op))+ (Sp ExpUnit / {}->DirtyExp))
             ->  Exp
             /   Sp ExpUnit
-ExpOr       <-  (ExpAnd     SuffixOr*)     -> Binary
-ExpAnd      <-  (ExpCompare SuffixAnd*)    -> Binary
-ExpCompare  <-  (ExpBor     SuffixComp*)   -> Binary
-ExpBor      <-  (ExpBxor    SuffixBor*)    -> Binary
-ExpBxor     <-  (ExpBand    SuffixBxor*)   -> Binary
-ExpBand     <-  (ExpBshift  SuffixBand*)   -> Binary
-ExpBshift   <-  (ExpConcat  SuffixBshift*) -> Binary
-ExpConcat   <-  (ExpAdds    SuffixConcat*) -> Binary
-ExpAdds     <-  (ExpMuls    SuffixAdds*)   -> Binary
-ExpMuls     <-  (ExpUnary   SuffixMuls*)   -> Binary
-ExpUnary    <-  (           SuffixUnary)   -> Unary
-            /   ExpPower
-ExpPower    <-  (ExpUnit    SuffixPower*)  -> Binary
-
-SuffixOr    <-  OR     (ExpAnd     / {} -> DirtyExp)
-SuffixAnd   <-  AND    (ExpCompare / {} -> DirtyExp)
-SuffixComp  <-  Comp   (ExpBor     / {} -> DirtyExp)
-SuffixBor   <-  BOR    (ExpBxor    / {} -> DirtyExp)
-SuffixBxor  <-  BXOR   (ExpBand    / {} -> DirtyExp)
-SuffixBand  <-  BAND   (ExpBshift  / {} -> DirtyExp)
-SuffixBshift<-  Bshift (ExpConcat  / {} -> DirtyExp)
-SuffixConcat<-  Concat (ExpConcat  / {} -> DirtyExp)
-SuffixAdds  <-  Adds   (ExpMuls    / {} -> DirtyExp)
-SuffixMuls  <-  Muls   (ExpUnary   / {} -> DirtyExp)
-SuffixUnary <-  Unary+ (ExpPower   / {} -> DirtyExp)
-SuffixPower <-  POWER  (ExpUnary   / {} -> DirtyExp)
-
 ExpUnit     <-  Nil
             /   Boolean
             /   String
