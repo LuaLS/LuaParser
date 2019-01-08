@@ -225,6 +225,11 @@ check 'Action'
 'func:x()',
 'func:x(1, 2)',
 '("%s"):format(1)',
+'func:x "a"',
+"func:x 'a'",
+'func:x {a}',
+'func:x [[a]]',
+'func:x [=[a]=]',
 
 'do x = 1 end',
 

@@ -317,12 +317,17 @@ Prefix      <-  Sp ({} PL DirtyExp DirtyPR)
             ->  Prefix
             /   FreeName
 Suffix      <-  DOT   Name / DOT   {} -> MissField
-            /   Method (!PL {} -> MissPL)?
+            /   Method (!(Sp CallStart) {} -> MissPL)?
             /   ({} Table {}) -> Call
             /   ({} String {}) -> Call
             /   ({} BL DirtyExp DirtyBR) -> Index
             /   ({} PL CallArgList DirtyPR) -> Call
 Method      <-  COLON Name / COLON {} -> MissMethod
+CallStart   <-  PL
+            /   TL
+            /   '"'
+            /   "'"
+            /   '[' '='* '['
 
 DirtyExp    <-  Exp
             /   {} -> DirtyExp
