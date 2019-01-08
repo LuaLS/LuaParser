@@ -53,7 +53,11 @@ local function TEST(script)
         assert(errs)
         local first = errs[1]
         local target = list[1]
-        assert(#errs == 1)
+        if expect.multi then
+            assert(#errs > 1)
+        else
+            assert(#errs == 1)
+        end
         assert(first)
         assert(first.type == expect.type)
         assert(first.start == target[1])
@@ -827,21 +831,96 @@ f = 9<!e!>
 {
     type = 'MISS_EXPONENT'
 }
+
 TEST[[
 f = 5.<!e!>
 ]]
 {
     type = 'MISS_EXPONENT'
 }
+
 TEST[[
 f = .9<!e-!>
 ]]
 {
     type = 'MISS_EXPONENT'
 }
+
 TEST[[
 f = 5.9<!e+!>
 ]]
 {
     type = 'MISS_EXPONENT'
+}
+
+TEST[[
+hex = 0x<!G!>
+]]
+{
+    type = 'MUST_X16'
+}
+
+TEST[=============[
+--[==[
+testing long string3 begin
+]==]
+
+ls3 = [===[
+testing
+unfinised
+long string
+]==]
+
+--[==[
+[[ testing long string3 end ]]
+]==]
+<!!>]=============]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = ']===]',
+    }
+}
+
+TEST[[
+-- short string test begin
+
+ss6 = "testing unfinished string<!!>
+
+-- short string test end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = '"'
+    }
+}
+
+TEST[[
+-- short string test begin
+
+ss7 = 'testing \\<!!>
+unfinished \\
+string'
+
+-- short string test end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = "'",
+    },
+    multi = true,
+}
+
+TEST[[
+--[[ testing
+unfinished
+comment
+<!!>]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = ']]',
+    }
 }

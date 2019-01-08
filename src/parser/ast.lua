@@ -67,6 +67,18 @@ local defs = {
             [1]    = false,
         }
     end,
+    LongComment = function (beforeEq, afterEq, missPos)
+        if missPos then
+            pushError {
+                type   = 'MISS_SYMBOL',
+                start  = missPos,
+                finish = missPos,
+                info   = {
+                    symbol = ']' .. ('='):rep(afterEq-beforeEq) .. ']'
+                }
+            }
+        end
+    end,
     String = function (start, str, finish)
         return {
             type   = 'string',
