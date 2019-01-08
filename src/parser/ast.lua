@@ -104,7 +104,6 @@ local defs = {
     Char10 = function (char)
         char = tonumber(char)
         if not char or char < 0 or char > 255 then
-            -- TODO 记录错误
             return ''
         end
         return string_char(char)
@@ -601,11 +600,35 @@ local defs = {
     end,
     Label = function (name)
         name.type = 'label'
+        local lables = State.Label[#State.Label]
+        lables[name[1]] = true
         return name
     end,
     GoTo = function (name)
         name.type = 'goto'
+        local lables = State.Label[#State.Label]
+        lables[#lables+1] = name
         return name
+    end,
+    LabelStart = function ()
+        State.Label[#State.Label+1] = {}
+    end,
+    LabelEnd = function ()
+        local labels = State.Label[#State.Label]
+        State.Label[#State.Label] = nil
+        for _, name in ipairs(labels) do
+            local str = name[1]
+            if not labels[str] then
+                pushError {
+                    type = 'NO_VISIBLE_LABEL',
+                    start = name.start,
+                    finish = name.finish,
+                    info = {
+                        label = str,
+                    }
+                }
+            end
+        end
     end,
     IfBlock = function (exp, start, ...)
         local obj = {
@@ -977,12 +1000,28 @@ local defs = {
         }
         return exp
     end,
+    ActionAfterReturn = function (start, ...)
+        if not start or start == '' then
+            return
+        end
+        local actions = table.pack(...)
+        local max = actions.n
+        local finish = actions[max]
+        actions[max] = nil
+        pushError {
+            type = 'ACTION_AFTER_RETURN',
+            start = start,
+            finish = finish - 1,
+        }
+        return table.unpack(actions)
+    end,
 }
 
 return function (self, lua, mode)
     Errs = {}
     State= {
         Break = 0,
+        Label = {{}},
     }
     local suc, res, err = pcall(self.grammar, lua, mode, defs)
     if not suc then

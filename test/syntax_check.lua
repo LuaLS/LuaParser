@@ -1072,3 +1072,49 @@ function func(a,b,c,<!!>) end
 {
     type = 'MISS_NAME',
 }
+
+TEST[[
+function func(...<!,a!>) end
+]]
+{
+    type = 'ARGS_AFTER_DOTS'
+}
+
+TEST[[
+function a.b:c<!!>:d () end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = '(',
+    }
+}
+
+TEST[[
+:: label :: return
+<!goto label!>
+]]
+{
+    type = 'ACTION_AFTER_RETURN',
+}
+
+TEST[[
+goto <!label!>
+]]
+{
+    type = 'NO_VISIBLE_LABEL',
+    info = {
+        label = 'label',
+    }
+}
+
+TEST[[
+::other_label::
+do do do goto <!label!> end end end
+]]
+{
+    type = 'NO_VISIBLE_LABEL',
+    info = {
+        label = 'label',
+    }
+}

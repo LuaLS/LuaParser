@@ -356,8 +356,13 @@ Function    <-  Sp ({} FunctionBody {})
 FuncArg     <-  PL ArgList NeedPR
             /   {} -> MissPL Nothing
 FunctionBody<-  FUNCTION FuncArg
+                    LabelStart
                     (!END Action)*
+                    LabelEnd
                 NeedEnd
+
+LabelStart  <-  {} -> LabelStart
+LabelEnd    <-  {} -> LabelEnd
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
 Action      <-  !END .
@@ -405,6 +410,8 @@ BreakEnd    <-  {} -> BreakEnd
 
 Return      <-  RETURN MustExpList?
             ->  Return
+                (Sp {} (!END !UNTIL !ELSEIF !ELSE Action)+ {})?
+            ->  ActionAfterReturn
 
 Label       <-  LABEL MustName -> Label DirtyLabel
 
@@ -488,7 +495,9 @@ NamedFunction
             ->  NamedFunction
 FunctionNamedBody
             <-  FUNCTION FuncName FuncArg
+                    LabelStart
                     (!END Action)*
+                    LabelEnd
                 NeedEnd
 FuncName    <-  (MustName (DOT MustName)* FuncMethod?)
             ->  Simple
@@ -496,7 +505,11 @@ FuncMethod  <-  COLON Name / COLON {} -> MissMethod
 ]]
 
 grammar 'Lua' [[
-Lua         <-  Head? Action* -> Lua Sp
+Lua         <-  Head?
+                LabelStart
+                Action* -> Lua
+                LabelEnd
+                Sp
 Head        <-  '#' (!%nl .)*
 ]]
 
