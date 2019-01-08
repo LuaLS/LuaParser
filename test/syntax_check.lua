@@ -813,6 +813,13 @@ end
     }
 }
 
+TEST[[
+<!1 == 2!>
+]]
+{
+    type = 'EXP_IN_ACTION',
+}
+
 -- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua
 TEST[[
 f = 9<!e!>

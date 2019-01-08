@@ -926,6 +926,14 @@ local defs = {
             }
         }
     end,
+    ExpInAction = function (start, exp, finish)
+        pushError {
+            type = 'EXP_IN_ACTION',
+            start = start,
+            finish = finish - 1,
+        }
+        return exp
+    end,
 }
 
 return function (self, lua, mode)

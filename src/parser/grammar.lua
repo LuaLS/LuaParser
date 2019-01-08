@@ -378,11 +378,13 @@ CrtAction   <-  Semicolon
             /   Local
             /   Set
             /   Call
-            /   Exp
+            /   ExpInAction
 UnkAction   <-  ({} {Word+})
             ->  UnknownSymbol
             /   ({} {. (!Sps !CrtAction .)*})
             ->  UnknownSymbol
+ExpInAction <-  Sp ({} Exp {})
+            ->  ExpInAction
 
 Semicolon   <-  SEMICOLON
             ->  Skip
