@@ -149,12 +149,27 @@ local defs = {
         return utf8_char(v)
     end,
     Number = function (start, number, finish)
-        return {
-            type   = 'number',
-            start  = start,
-            finish = finish - 1,
-            [1]    = tonumber(number),
-        }
+        local n = tonumber(number)
+        if n then
+            return {
+                type   = 'number',
+                start  = start,
+                finish = finish - 1,
+                [1]    = n,
+            }
+        else
+            pushError {
+                type   = 'MALFORMED_NUMBER',
+                start  = start,
+                finish = finish - 1,
+            }
+            return {
+                type   = 'number',
+                start  = start,
+                finish = finish - 1,
+                [1]    = 0,
+            }
+        end
     end,
     Name = function (start, str, finish)
         if RESERVED[str] then

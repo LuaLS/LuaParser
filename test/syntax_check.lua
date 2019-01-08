@@ -205,14 +205,16 @@ TEST[[
 n = 0x<!!>
 ]]
 {
-    type = 'MUST_X16'
+    type = 'MUST_X16',
+    multi = true,
 }
 
 TEST[[
 n = 0x<!zzzz!>
 ]]
 {
-    type = 'MUST_X16'
+    type = 'MUST_X16',
+    multi = true,
 }
 
 
@@ -220,7 +222,8 @@ TEST[[
 n = 0x.<!zzzz!>
 ]]
 {
-    type = 'MUST_X16'
+    type = 'MUST_X16',
+    multi = true,
 }
 
 TEST[[
@@ -829,35 +832,40 @@ TEST[[
 f = 9<!e!>
 ]]
 {
-    type = 'MISS_EXPONENT'
+    type = 'MISS_EXPONENT',
+    multi = true,
 }
 
 TEST[[
 f = 5.<!e!>
 ]]
 {
-    type = 'MISS_EXPONENT'
+    type = 'MISS_EXPONENT',
+    multi = true,
 }
 
 TEST[[
 f = .9<!e-!>
 ]]
 {
-    type = 'MISS_EXPONENT'
+    type = 'MISS_EXPONENT',
+    multi = true,
 }
 
 TEST[[
 f = 5.9<!e+!>
 ]]
 {
-    type = 'MISS_EXPONENT'
+    type = 'MISS_EXPONENT',
+    multi = true,
 }
 
 TEST[[
 hex = 0x<!G!>
 ]]
 {
-    type = 'MUST_X16'
+    type = 'MUST_X16',
+    multi = true,
 }
 
 TEST[=============[
@@ -993,4 +1001,74 @@ TEST[[
 ]]
 {
     type = 'BREAK_OUTSIDE',
+}
+
+TEST[[
+function f (x)
+    if 1 then <!break!> end
+end
+]]
+{
+    type = 'BREAK_OUTSIDE',
+}
+
+TEST[[
+while 1 do
+end
+<!break!>
+]]
+{
+    type = 'BREAK_OUTSIDE',
+}
+
+TEST[[
+concat2 = 2^<!3..1!>
+]]
+{
+    type = 'MALFORMED_NUMBER',
+}
+
+TEST[[
+for k<!!>;v in pairs(t) do end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = 'in',
+    },
+    multi = true,
+}
+
+TEST[[
+for k,v in pairs(t:any<!!>) do end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = '(',
+    },
+}
+
+TEST[[
+for i=1,10,<!!> do end
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+for i=1,n:number<!!> do end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = '(',
+    },
+}
+
+TEST[[
+function func(a,b,c,<!!>) end
+]]
+{
+    type = 'MISS_NAME',
 }

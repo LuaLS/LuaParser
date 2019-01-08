@@ -248,14 +248,14 @@ ErrNumber   <-  ({} {([0-9a-zA-Z] / '.')+})
 
 Number10    <-  Float10 Float10Exp?
             /   Integer10 Float10? Float10Exp?
-Integer10   <-  [0-9]+ '.'? [0-9]*
+Integer10   <-  [0-9]+ ('.' [0-9]*)?
 Float10     <-  '.' [0-9]+
 Float10Exp  <-  [eE] [+-]? [0-9]+
             /   ({} [eE] [+-]? {}) -> MissExponent
 
 Number16    <-  '0' [xX] Float16 Float16Exp?
             /   '0' [xX] Integer16 Float16? Float16Exp?
-Integer16   <-  X16+ '.'? X16*
+Integer16   <-  X16+ ('.' X16*)?
             /   ({} {Word*}) -> MustX16
 Float16     <-  '.' X16+
             /   '.' ({} {Word*}) -> MustX16
