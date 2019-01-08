@@ -973,6 +973,7 @@ a = 3 /<!!> / 2
 ]]
 {
     type = 'MISS_EXP',
+    multi = true,
 }
 
 TEST[[
@@ -980,6 +981,7 @@ b = 1 &<!!>& 1
 ]]
 {
     type = 'MISS_EXP',
+    multi = true,
 }
 
 TEST[[
@@ -987,6 +989,7 @@ b = 1 <<!!>> 0
 ]]
 {
     type = 'MISS_EXP',
+    multi = true,
 }
 
 TEST[[
@@ -994,6 +997,7 @@ b = 1 <<!!> < 0
 ]]
 {
     type = 'MISS_EXP',
+    multi = true,
 }
 
 TEST[[
