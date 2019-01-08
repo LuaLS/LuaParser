@@ -5,6 +5,7 @@ local type = type
 
 local Errs
 local State
+local Defs
 local function pushError(err)
     if err.finish < err.start then
         err.finish = err.start
@@ -52,7 +53,7 @@ local function expSplit(list, start, finish, level)
     end
     local info = Exp[level]
     if not info then
-        return nil
+        return
     end
     local func = info[1]
     return func(list, start, finish, level)
@@ -60,14 +61,17 @@ end
 
 local function binaryForward(list, start, finish, level)
     local info = Exp[level]
-    for i = start+1, finish-1 do
+    for i = finish-1, start+2, -1 do
         local op = list[i]
         if info[op] then
-            local e1 = expSplit(list, start, i-1, level+1)
+            local e1 = expSplit(list, start, i-2, level)
             if not e1 then
                 goto CONTINUE
             end
-            local e2 = expSplit(list, i+1, finish, level)
+            local e2 = expSplit(list, i+1, finish, level+1)
+            if not e2 then
+                e2 = Defs.DirtyExp(#op + list[i-1])
+            end
             return {
                 type   = 'binary',
                 op     = op,
@@ -84,11 +88,17 @@ end
 
 local function binaryBackward(list, start, finish, level)
     local info = Exp[level]
-    for i = finish-1, start+1, -1 do
+    for i = start+2, finish-1 do
         local op = list[i]
         if info[op] then
-            local e1 = expSplit(list, start, i-1, level+1)
+            local e1 = expSplit(list, start, i-2, level+1)
+            if not e1 then
+                goto CONTINUE
+            end
             local e2 = expSplit(list, i+1, finish, level)
+            if not e2 then
+                e2 = Defs.DirtyExp(#op + list[i-1])
+            end
             return {
                 type   = 'binary',
                 op     = op,
@@ -98,19 +108,20 @@ local function binaryBackward(list, start, finish, level)
                 [2]    = e2,
             }
         end
+        ::CONTINUE::
     end
     return expSplit(list, start, finish, level+1)
 end
 
 local function unary(list, start, finish, level)
     local info = Exp[level]
-    local op = list[start]
+    local op = list[start+1]
     if info[op] then
-        local e1 = expSplit(list, start+1, finish, level)
+        local e1 = expSplit(list, start+2, finish, level)
         return {
             type   = 'unary',
             op     = op,
-            start  = start,
+            start  = list[start],
             finish = e1.finish,
             [1]    = e1,
         }
@@ -182,7 +193,7 @@ Exp = {
     },
 }
 
-local defs = {
+Defs = {
     Nil = function (pos)
         return {
             type   = 'nil',
@@ -1186,7 +1197,7 @@ return function (self, lua, mode)
         Break = 0,
         Label = {{}},
     }
-    local suc, res, err = pcall(self.grammar, lua, mode, defs)
+    local suc, res, err = pcall(self.grammar, lua, mode, Defs)
     if not suc then
         return nil, res
     end
