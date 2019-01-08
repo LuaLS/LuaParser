@@ -118,13 +118,15 @@ local function unary(list, start, finish, level)
     local op = list[start+1]
     if info[op] then
         local e1 = expSplit(list, start+2, finish, level)
-        return {
-            type   = 'unary',
-            op     = op,
-            start  = list[start],
-            finish = e1.finish,
-            [1]    = e1,
-        }
+        if e1 then
+            return {
+                type   = 'unary',
+                op     = op,
+                start  = list[start],
+                finish = e1.finish,
+                [1]    = e1,
+            }
+        end
     end
     return expSplit(list, start, finish, level+1)
 end
