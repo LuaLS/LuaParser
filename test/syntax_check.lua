@@ -583,11 +583,22 @@ x = <!!>]]
 }
 
 TEST[[
-for <!in!> next do
+for<!!> in next do
 end
 ]]
 {
-    type = 'KEYWORD',
+    type = 'MISS_NAME',
+}
+
+TEST[[
+for k, v<!!> next do
+end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = 'in',
+    }
 }
 
 TEST[[
@@ -694,6 +705,52 @@ for i = 1, 2 do<!!>
     }
 }
 
+TEST[[
+while<!!> do
+end
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+while true<!!>
+end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = 'do',
+    }
+}
+
+TEST[[
+while true do<!!>
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = 'end',
+    }
+}
+
+TEST[[
+repeat
+until<!!>
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+repeat<!!>
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = 'until',
+    }
+}
 
 -- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua
 TEST[[

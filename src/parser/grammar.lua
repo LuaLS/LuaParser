@@ -198,15 +198,17 @@ Nothing     <-  {} -> Nothing
 
 TOCLOSE     <-  Sp '*toclose'
 
-DirtyBR    <-  BR {}  / {} -> MissBR
-DirtyTR    <-  TR {}  / {} -> MissTR
-DirtyPR    <-  PR {}  / {} -> DirtyPR
-DirtyLabel <-  LABEL  / {} -> MissLabel
-NeedPR     <-  PR     / {} -> MissPR
-NeedEnd    <-  END    / {} -> MissEnd
-NeedDo     <-  DO     / {} -> MissDo
-NeedAssign <-  ASSIGN / {} -> MissAssign
-NeedComma  <-  COMMA  / {} -> MissComma
+DirtyBR     <-  BR {}  / {} -> MissBR
+DirtyTR     <-  TR {}  / {} -> MissTR
+DirtyPR     <-  PR {}  / {} -> DirtyPR
+DirtyLabel  <-  LABEL  / {} -> MissLabel
+NeedPR      <-  PR     / {} -> MissPR
+NeedEnd     <-  END    / {} -> MissEnd
+NeedDo      <-  DO     / {} -> MissDo
+NeedAssign  <-  ASSIGN / {} -> MissAssign
+NeedComma   <-  COMMA  / {} -> MissComma
+NeedIn      <-  IN     / {} -> MissIn
+NeedUntil   <-  UNTIL  / {} -> MissUntil
 ]]
 
 grammar 'Nil' [[
@@ -442,13 +444,15 @@ LoopStep    <-  COMMA DirtyExp
 
 In          <-  Sp ({} InBody {})
             ->  In
-InBody      <-  FOR NameList IN? ExpList NeedDo
+InBody      <-  FOR InNameList NeedIn ExpList NeedDo
                     (!END Action)*
                 NeedEnd
+InNameList  <-  &IN DirtyName
+            /   NameList
 
 While       <-  Sp ({} WhileBody {})
             ->  While
-WhileBody   <-  WHILE Exp DO
+WhileBody   <-  WHILE DirtyExp NeedDo
                     (!END Action)*
                 NeedEnd
 
@@ -456,7 +460,7 @@ Repeat      <-  Sp ({} RepeatBody {})
             ->  Repeat
 RepeatBody  <-  REPEAT
                     (!UNTIL Action)*
-                UNTIL Exp
+                NeedUntil DirtyExp
 
 Local       <-  (LOCAL TOCLOSE? NameList (ASSIGN ExpList)?)
             ->  Local

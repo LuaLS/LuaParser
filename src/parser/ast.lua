@@ -896,6 +896,26 @@ local defs = {
             }
         }
     end,
+    MissIn = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = 'in',
+            }
+        }
+    end,
+    MissUntil = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = 'until',
+            }
+        }
+    end,
 }
 
 return function (self, lua, mode)
