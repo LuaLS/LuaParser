@@ -399,8 +399,9 @@ Do          <-  Sp ({} DO DoBody NeedEnd {})
 DoBody      <-  (!END Action)*
             ->  DoBody
 
-Break       <-  BREAK
-            ->  Break
+Break       <-  BREAK {} -> Break
+BreakStart  <-  {} -> BreakStart
+BreakEnd    <-  {} -> BreakEnd
 
 Return      <-  RETURN MustExpList?
             ->  Return
@@ -435,7 +436,9 @@ For         <-  Loop / In
 Loop        <-  Sp ({} LoopBody {})
             ->  Loop
 LoopBody    <-  FOR LoopStart LoopFinish LoopStep NeedDo
+                    BreakStart
                     (!END Action)*
+                    BreakEnd
                 NeedEnd
 LoopStart   <-  MustName ASSIGN DirtyExp
 LoopFinish  <-  NeedComma DirtyExp
@@ -446,7 +449,9 @@ LoopStep    <-  COMMA DirtyExp
 In          <-  Sp ({} InBody {})
             ->  In
 InBody      <-  FOR InNameList NeedIn ExpList NeedDo
+                    BreakStart
                     (!END Action)*
+                    BreakEnd
                 NeedEnd
 InNameList  <-  &IN DirtyName
             /   NameList
@@ -454,13 +459,17 @@ InNameList  <-  &IN DirtyName
 While       <-  Sp ({} WhileBody {})
             ->  While
 WhileBody   <-  WHILE DirtyExp NeedDo
+                    BreakStart
                     (!END Action)*
+                    BreakEnd
                 NeedEnd
 
 Repeat      <-  Sp ({} RepeatBody {})
             ->  Repeat
 RepeatBody  <-  REPEAT
+                    BreakStart
                     (!UNTIL Action)*
+                    BreakEnd
                 NeedUntil DirtyExp
 
 Local       <-  (LOCAL TOCLOSE? NameList (ASSIGN ExpList)?)

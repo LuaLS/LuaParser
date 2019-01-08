@@ -354,10 +354,6 @@ CHECK'do x = 1 end'
         }
     }
 }
-CHECK'break'
-{
-    type = 'break',
-}
 CHECK'return'
 {
     type = 'return'
@@ -842,20 +838,20 @@ end]]
 }
 CHECK[[
 repeat
-    return
+    break
 until 1]]
 {
     type   = 'repeat',
     start  = 1,
-    finish = 25,
+    finish = 24,
     filter = {
         type   = 'number',
-        start  = 25,
-        finish = 25,
+        start  = 24,
+        finish = 24,
         [1]    = 1,
     },
     [1]    = {
-        type = 'return',
+        type = 'break',
     }
 }
 CHECK[[

@@ -228,8 +228,6 @@ check 'Action'
 
 'do x = 1 end',
 
-'break',
-
 'return',
 'return 1',
 'return 1, 2',
@@ -294,7 +292,10 @@ until 1]],
 'function test() end',
 'function a.b:c() end',
 
-'local *toclose _ = 1'
+[[while true do
+    break
+end]],
+'local *toclose _ = 1',
 }
 
 check 'Lua'

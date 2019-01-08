@@ -4,6 +4,7 @@ local utf8_char = utf8.char
 local type = type
 
 local Errs
+local State
 local function pushError(err)
     if err.finish < err.start then
         err.finish = err.start
@@ -546,10 +547,25 @@ local defs = {
         action.finish = finish - 1
         return action
     end,
-    Break = function ()
-        return {
-            type = 'break',
-        }
+    Break = function (finish)
+        if State.Break > 0 then
+            return {
+                type = 'break',
+            }
+        else
+            pushError {
+                type = 'BREAK_OUTSIDE',
+                start = finish - #'break',
+                finish = finish - 1,
+            }
+            return false
+        end
+    end,
+    BreakStart = function ()
+        State.Break = State.Break + 1
+    end,
+    BreakEnd = function ()
+        State.Break = State.Break - 1
     end,
     Return = function (exp)
         if exp == nil or exp == '' then
@@ -950,6 +966,9 @@ local defs = {
 
 return function (self, lua, mode)
     Errs = {}
+    State= {
+        Break = 0,
+    }
     local suc, res, err = pcall(self.grammar, lua, mode, defs)
     if not suc then
         return nil, res

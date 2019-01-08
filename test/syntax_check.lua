@@ -924,3 +924,73 @@ comment
         symbol = ']]',
     }
 }
+
+TEST[[
+a = function (a,b,<!!>) end
+]]
+{
+    type = 'MISS_NAME',
+}
+
+TEST[[
+a = function (...<!,a!>) end
+]]
+{
+    type = 'ARGS_AFTER_DOTS',
+}
+
+TEST[[
+local a = function (<!!>1) end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = ')',
+    },
+    multi = true,
+}
+
+TEST[[
+local test = function ( a , b , c , ... )<!!>
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = 'end',
+    }
+}
+
+TEST[[
+a = 3 /<!!> / 2
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+b = 1 &<!!>& 1
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+b = 1 <<!!>> 0
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+b = 1 <<!!> < 0
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+<!break!>
+]]
+{
+    type = 'BREAK_OUTSIDE',
+}
