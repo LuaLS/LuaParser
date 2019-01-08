@@ -571,11 +571,127 @@ function f(...<!, a!>) end
 }
 
 TEST[[
+local x = <!!>]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+x = <!!>]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
 for <!in!> next do
 end
 ]]
 {
     type = 'KEYWORD',
+}
+
+TEST[[
+for k, v in <!!>do
+end
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+for k, v in next<!!>
+end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = 'do',
+    }
+}
+
+TEST[[
+for k, v in next do<!!>
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = 'end',
+    }
+}
+
+TEST[[
+for i =<!!>, 2 do
+end
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+for<!!> = 1, 2 do
+end
+]]
+{
+    type = 'MISS_NAME',
+}
+
+TEST[[
+for i = 1<!!> do
+end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = ',',
+    }
+}
+
+TEST[[
+for i = 1,<!!> do
+end
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+for i = 1, 2,<!!> do
+end
+]]
+{
+    type = 'MISS_EXP',
+}
+
+TEST[[
+for i = 1, 2<!!> 3 do
+end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = ',',
+    }
+}
+
+TEST[[
+for i = 1, 2<!!>
+end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = 'do',
+    }
+}
+
+TEST[[
+for i = 1, 2 do<!!>
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = 'end',
+    }
 }
 
 

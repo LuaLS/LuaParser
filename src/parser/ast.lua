@@ -876,6 +876,26 @@ local defs = {
             }
         }
     end,
+    MissDo = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = 'do',
+            }
+        }
+    end,
+    MissComma = function (pos)
+        pushError {
+            type = 'MISS_SYMBOL',
+            start = pos,
+            finish = pos,
+            info = {
+                symbol = ',',
+            }
+        }
+    end,
 }
 
 return function (self, lua, mode)

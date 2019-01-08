@@ -198,13 +198,15 @@ Nothing     <-  {} -> Nothing
 
 TOCLOSE     <-  Sp '*toclose'
 
-DirtyAssign <-  ASSIGN / {} -> MissAssign
-DirtyBR     <-  BR {} / {} -> MissBR
-DirtyTR     <-  TR {} / {} -> MissTR
-DirtyPR     <-  PR {} / {} -> DirtyPR
-DirtyLabel  <-  LABEL / {} -> MissLabel
-MaybePR     <-  PR    / {} -> MissPR
-MaybeEnd    <-  END   / {} -> MissEnd
+DirtyBR    <-  BR {}  / {} -> MissBR
+DirtyTR    <-  TR {}  / {} -> MissTR
+DirtyPR    <-  PR {}  / {} -> DirtyPR
+DirtyLabel <-  LABEL  / {} -> MissLabel
+NeedPR     <-  PR     / {} -> MissPR
+NeedEnd    <-  END    / {} -> MissEnd
+NeedDo     <-  DO     / {} -> MissDo
+NeedAssign <-  ASSIGN / {} -> MissAssign
+NeedComma  <-  COMMA  / {} -> MissComma
 ]]
 
 grammar 'Nil' [[
@@ -339,18 +341,18 @@ Table       <-  Sp ({} TL TableFields? DirtyTR)
 TableFields <-  (TableSep {} / TableField)+
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
-NewIndex    <-  Sp ({} BL !BL !ASSIGN DirtyExp DirtyBR DirtyAssign DirtyExp)
+NewIndex    <-  Sp ({} BL !BL !ASSIGN DirtyExp DirtyBR NeedAssign DirtyExp)
             ->  NewIndex
 NewField    <-  (MustName ASSIGN DirtyExp)
             ->  NewField
 
 Function    <-  Sp ({} FunctionBody {})
             ->  Function
-FuncArg     <-  PL ArgList MaybePR
+FuncArg     <-  PL ArgList NeedPR
             /   {} -> MissPL Nothing
 FunctionBody<-  FUNCTION FuncArg
                     (!END Action)*
-                MaybeEnd
+                NeedEnd
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
 Action      <-  !END .
@@ -385,7 +387,7 @@ Semicolon   <-  SEMICOLON
 SimpleList  <-  (Simple (COMMA Simple)*)
             ->  List
 
-Do          <-  Sp ({} DO DoBody MaybeEnd {})
+Do          <-  Sp ({} DO DoBody NeedEnd {})
             ->  Do
 DoBody      <-  (!END Action)*
             ->  DoBody
@@ -408,7 +410,7 @@ IfHead      <-  (IfPart     -> IfBlock)
 IfBody      <-  IfHead
                 (ElseIfPart -> ElseIfBlock)*
                 (ElsePart   -> ElseBlock)?
-                MaybeEnd
+                NeedEnd
 IfPart      <-  IF Exp THEN
                     {} (!ELSEIF !ELSE !END Action)* {}
             /   IF DirtyExp THEN
@@ -429,27 +431,26 @@ For         <-  Loop / In
 
 Loop        <-  Sp ({} LoopBody {})
             ->  Loop
-LoopBody    <-  FOR LoopStart LoopFinish LoopStep DO?
+LoopBody    <-  FOR LoopStart LoopFinish LoopStep NeedDo
                     (!END Action)*
-                MaybeEnd
+                NeedEnd
 LoopStart   <-  MustName ASSIGN DirtyExp
-LoopFinish  <-  COMMA? Exp
-            /   COMMA? DirtyName
-LoopStep    <-  COMMA  DirtyExp
-            /   COMMA? Exp
+LoopFinish  <-  NeedComma DirtyExp
+LoopStep    <-  COMMA DirtyExp
+            /   NeedComma Exp
             /   Nothing
 
 In          <-  Sp ({} InBody {})
             ->  In
-InBody      <-  FOR NameList IN? ExpList DO?
+InBody      <-  FOR NameList IN? ExpList NeedDo
                     (!END Action)*
-                MaybeEnd
+                NeedEnd
 
 While       <-  Sp ({} WhileBody {})
             ->  While
 WhileBody   <-  WHILE Exp DO
                     (!END Action)*
-                MaybeEnd
+                NeedEnd
 
 Repeat      <-  Sp ({} RepeatBody {})
             ->  Repeat
@@ -474,7 +475,7 @@ NamedFunction
 FunctionNamedBody
             <-  FUNCTION FuncName FuncArg
                     (!END Action)*
-                MaybeEnd
+                NeedEnd
 FuncName    <-  (MustName (DOT MustName)* FuncMethod?)
             ->  Simple
 FuncMethod  <-  COLON Name / COLON {} -> MissMethod
