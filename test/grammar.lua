@@ -317,6 +317,9 @@ end]],
 #
 print(1)
 ]],
+[[
+return 1;
+]]
 }
 
 -- Dirty
