@@ -827,6 +827,27 @@ TEST[[
     type = 'EXP_IN_ACTION',
 }
 
+TEST[[
+<!a!>
+]]
+{
+    type = 'EXP_IN_ACTION',
+}
+
+TEST[[
+<!a.b!>
+]]
+{
+    type = 'EXP_IN_ACTION',
+}
+
+TEST[[
+<!a.b[1]!>
+]]
+{
+    type = 'EXP_IN_ACTION',
+}
+
 -- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua
 TEST[[
 f = 9<!e!>
