@@ -1116,8 +1116,8 @@ function a.b:c<!!>:d () end
 }
 
 TEST[[
-:: label :: return
-<!goto label!>
+:: label :: <!return!>
+goto label
 ]]
 {
     type = 'ACTION_AFTER_RETURN',

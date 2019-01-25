@@ -356,11 +356,15 @@ CHECK'do x = 1 end'
 }
 CHECK'return'
 {
-    type = 'return'
+    type   = 'return',
+    start  = 1,
+    finish = 6,
 }
 CHECK'return 1'
 {
-    type = 'return',
+    type   = 'return',
+    start  = 1,
+    finish = 8,
     [1]  = {
         type   = 'number',
         start  = 8,
@@ -370,8 +374,8 @@ CHECK'return 1'
 }
 CHECK'return 1, 2'
 {
-    type = 'return',
-    start = 8,
+    type   = 'return',
+    start  = 1,
     finish = 11,
     [1]  = {
         type   = 'number',
@@ -435,6 +439,8 @@ end]]
         },
         [1]    = {
             type   = 'return',
+            start  = 15,
+            finish = 20,
         }
     }
 }
@@ -458,6 +464,8 @@ end]]
         },
         [1]    = {
             type   = 'return',
+            start  = 15,
+            finish = 20,
         }
     },
     [2]    = {
@@ -465,6 +473,8 @@ end]]
         finish = 37,
         [1]    = {
             type   = 'return',
+            start  = 31,
+            finish = 36,
         }
     }
 }
@@ -488,6 +498,8 @@ end]]
         },
         [1]    = {
             type   = 'return',
+            start  = 15,
+            finish = 20,
         }
     },
     [2]    = {
@@ -501,6 +513,8 @@ end]]
         },
         [1]    = {
             type   = 'return',
+            start  = 40,
+            finish = 45,
         }
     }
 }
@@ -526,6 +540,8 @@ end]]
         },
         [1]    = {
             type   = 'return',
+            start  = 15,
+            finish = 20,
         }
     },
     [2]    = {
@@ -539,6 +555,8 @@ end]]
         },
         [1]    = {
             type   = 'return',
+            start  = 40,
+            finish = 45,
         }
     },
     [3]    = {
@@ -546,6 +564,8 @@ end]]
         finish = 62,
         [1]    = {
             type   = 'return',
+            start  = 56,
+            finish = 61,
         }
     }
 }
@@ -697,7 +717,9 @@ end]]
         [1]    = 10,
     },
     [1]    = {
-        type   = 'return'
+        type   = 'return',
+        start  = 22,
+        finish = 27,
     }
 }
 CHECK[[
@@ -733,7 +755,9 @@ end]]
         [1]    = 1
     },
     [1]    = {
-        type   = 'return'
+        type   = 'return',
+        start  = 25,
+        finish = 30,
     }
 }
 CHECK[[
@@ -758,6 +782,8 @@ end]]
     },
     [1]    = {
         type   = 'return',
+        start  = 19,
+        finish = 24,
     }
 }
 CHECK[[
@@ -816,6 +842,8 @@ end]]
     },
     [1]    = {
         type   = 'return',
+        start  = 31,
+        finish = 36,
     }
 }
 CHECK[[
@@ -833,7 +861,9 @@ end]]
         [1]    = true,
     },
     [1]    = {
-        type = 'return',
+        type   = 'return',
+        start  = 19,
+        finish = 24,
     }
 }
 CHECK[[
@@ -869,7 +899,9 @@ end]]
         [1]    = 'test',
     },
     [1]    = {
-        type = 'return',
+        type   = 'return',
+        start  = 21,
+        finish = 26,
     }
 }
 CHECK[[
@@ -893,7 +925,9 @@ end]]
         [1]    = 'a',
     },
     [1]    = {
-        type = 'return',
+        type   = 'return',
+        start  = 22,
+        finish = 27,
     }
 }
 CHECK[[
@@ -961,7 +995,9 @@ end]]
         },
     },
     [1]    = {
-        type = 'return',
+        type   = 'return',
+        start  = 29,
+        finish = 34,
     }
 }
 CHECK[[
@@ -979,7 +1015,9 @@ end]]
         [1]    = 'a',
     },
     [1]    = {
-        type = 'return',
+        type   = 'return',
+        start  = 24,
+        finish = 29,
     }
 }
 CHECK[[
@@ -1015,5 +1053,7 @@ end]]
     },
     [1]    = {
         type = 'return',
+        start  = 28,
+        finish = 33,
     }
 }
