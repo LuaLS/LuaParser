@@ -405,7 +405,7 @@ Return      <-  (ReturnBody Semicolon* AfterReturn?)
             ->  AfterReturn
 ReturnBody  <-  Sp ({} RETURN MustExpList? {})
             ->  Return
-AfterReturn <-  Sp {} (!END !UNTIL !ELSEIF !ELSE Action) {}
+AfterReturn <-  Sp !END !UNTIL !ELSEIF !ELSE Action
 
 Label       <-  LABEL MustName -> Label DirtyLabel
 

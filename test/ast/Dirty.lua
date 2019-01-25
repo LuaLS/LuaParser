@@ -258,3 +258,21 @@ CHECK 'function a:b(v'
         },
     }
 }
+
+CHECK 'return local a'
+{
+    [1] = {
+        type   = 'return',
+        start  = 1,
+        finish = 6,
+    },
+    [2] = {
+        type   = 'local',
+        [1]    = {
+            type   = 'name',
+            start  = 14,
+            finish = 14,
+            [1]    = 'a',
+        }
+    }
+}

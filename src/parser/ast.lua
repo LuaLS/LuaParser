@@ -1173,8 +1173,12 @@ local Defs = {
         }
         return exp
     end,
-    AfterReturn = function (rtn, action)
-        if not action or action == '' then
+    AfterReturn = function (rtn, ...)
+        if not ... then
+            return rtn
+        end
+        local action = select(-1, ...)
+        if not action then
             return rtn
         end
         pushError {

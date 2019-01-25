@@ -1195,15 +1195,15 @@ TEST[[
     type = 'KEYWORD',
 }
 
-TEST[[
-::label::
-::other_label::
-::<!label!>::
-]]
-{
-    type = 'REDEFINE_LABEL',
-    info = {
-        label = 'label',
-        related = {3, 7},
-    }
-}
+--TEST[[
+--::label::
+--::other_label::
+--::<!label!>::
+--]]
+--{
+--    type = 'REDEFINE_LABEL',
+--    info = {
+--        label = 'label',
+--        related = {3, 7},
+--    }
+--}
