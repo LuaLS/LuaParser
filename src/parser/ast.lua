@@ -283,19 +283,36 @@ local Defs = {
             end
             return ''
         end
-        if v < 0 or v > 0x10ffff then
-            pushError {
-                type = 'UTF8_MAX',
-                start = pos-3,
-                finish = pos+#char,
-                info = {
-                    min = '000000',
-                    max = '10ffff',
+        if State.Version == 'Lua 5.4' then
+            if v < 0 or v > 0x7FFFFFFF then
+                pushError {
+                    type = 'UTF8_MAX',
+                    start = pos-3,
+                    finish = pos+#char,
+                    info = {
+                        min = '00000000',
+                        max = '7FFFFFFF',
+                    }
                 }
-            }
-            return ''
+                return ''
+            end
+        else
+            if v < 0 or v > 0x10FFFF then
+                pushError {
+                    type = 'UTF8_MAX',
+                    start = pos-3,
+                    finish = pos+#char,
+                    version = v <= 0x7FFFFFFF and 'Lua 5.4' or nil,
+                    info = {
+                        min = '000000',
+                        max = '10FFFF',
+                    }
+                }
+                return ''
+            end
+            return utf8_char(v)
         end
-        return utf8_char(v)
+        return ''
     end,
     Number = function (start, number, finish)
         local n = tonumber(number)

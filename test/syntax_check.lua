@@ -171,7 +171,7 @@ s = '<!\u{111111111}!>'
     type = 'UTF8_MAX',
     info = {
         min = '000000',
-        max = '10ffff',
+        max = '10FFFF',
     }
 }
 
@@ -180,9 +180,10 @@ s = '<!\u{ffffff}!>'
 ]]
 {
     type = 'UTF8_MAX',
+    version = 'Lua 5.4',
     info = {
         min = '000000',
-        max = '10ffff',
+        max = '10FFFF',
     }
 }
 
@@ -1227,9 +1228,27 @@ local <!*toclose!> x = 1
     version = 'Lua 5.4',
 }
 
+
 Version = 'Lua 5.4'
 
 TEST[[
 local <!*toclose!> x = 1
 ]]
 (nil)
+
+TEST[[
+s = '<!\u{1FFFFF}!>'
+]]
+(nil)
+
+
+TEST[[
+s = '<!\u{111111111}!>'
+]]
+{
+    type = 'UTF8_MAX',
+    info = {
+        min = '00000000',
+        max = '7FFFFFFF',
+    }
+}
