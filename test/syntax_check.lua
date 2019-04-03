@@ -1226,6 +1226,9 @@ local <!*toclose!> x = 1
 {
     type = 'TOCLOSE',
     version = 'Lua 5.4',
+    info = {
+        version = 'Lua 5.3',
+    }
 }
 
 
