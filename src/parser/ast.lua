@@ -1188,13 +1188,25 @@ local Defs = {
         }
         return rtn, action
     end,
+    ToClose = function (start)
+        if State.Version == 'Lua 5.4' then
+            return
+        end
+        pushError {
+            type = 'TOCLOSE',
+            start = start,
+            finish = start + #'*toclose' - 1,
+            version = 'Lua 5.4',
+        }
+    end
 }
 
-return function (self, lua, mode)
+return function (self, lua, mode, version)
     Errs = {}
     State= {
         Break = 0,
         Label = {{}},
+        Version = version,
     }
     local suc, res, err = pcall(self.grammar, lua, mode, Defs)
     if not suc then

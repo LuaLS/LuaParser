@@ -45,14 +45,20 @@ local function catchTarget(script, sep)
     return new_script, list
 end
 
+local Version
+
 local function TEST(script)
     return function (expect)
         local newScript, list = catchTarget(script, '!')
-        local ast, errs = parser:ast(newScript)
+        local ast, errs = parser:ast(newScript, 'lua', Version)
         assert(ast)
         assert(errs)
         local first = errs[1]
         local target = list[1]
+        if not expect then
+            assert(#errs == 0)
+            return
+        end
         if expect.multi then
             assert(#errs > 1)
         else
@@ -62,9 +68,12 @@ local function TEST(script)
         assert(first.type == expect.type)
         assert(first.start == target[1])
         assert(first.finish == target[2])
+        assert(first.version == expect.version)
         assert(eq(first.info, expect.info))
     end
 end
+
+Version = 'Lua 5.3'
 
 TEST[[
 local<! !>
@@ -1207,3 +1216,20 @@ TEST[[
 --        related = {3, 7},
 --    }
 --}
+
+Version = 'Lua 5.3'
+
+TEST[[
+local <!*toclose!> x = 1
+]]
+{
+    type = 'TOCLOSE',
+    version = 'Lua 5.4',
+}
+
+Version = 'Lua 5.4'
+
+TEST[[
+local <!*toclose!> x = 1
+]]
+(nil)
