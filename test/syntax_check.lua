@@ -68,7 +68,7 @@ local function TEST(script)
         assert(first.type == expect.type)
         assert(first.start == target[1])
         assert(first.finish == target[2])
-        assert(first.version == expect.version)
+        assert(eq(first.version, expect.version))
         assert(eq(first.info, expect.info))
     end
 end
@@ -1218,13 +1218,36 @@ TEST[[
 --    }
 --}
 
+Version = 'Lua 5.2'
+TEST[[
+local x = 1 <!//!> 2
+]]
+{
+    type = 'UNSUPPORT_SYMBOL',
+    version = {'Lua 5.3', 'Lua 5.4'},
+    info = {
+        version = 'Lua 5.2',
+    }
+}
+
+TEST[[
+local x = 1 <!<<!> 2
+]]
+{
+    type = 'UNSUPPORT_SYMBOL',
+    version = {'Lua 5.3', 'Lua 5.4'},
+    info = {
+        version = 'Lua 5.2',
+    }
+}
+
 Version = 'Lua 5.3'
 
 TEST[[
 local <!*toclose!> x = 1
 ]]
 {
-    type = 'TOCLOSE',
+    type = 'UNSUPPORT_SYMBOL',
     version = 'Lua 5.4',
     info = {
         version = 'Lua 5.3',

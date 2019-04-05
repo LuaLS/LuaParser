@@ -43,6 +43,6 @@ local function test(path)
 end
 
 collectgarbage 'stop'
-test[[test\perform\1.lua]]
+test[[test\perform\1.txt]]
 performTest()
 collectgarbage 'restart'
