@@ -167,6 +167,27 @@ CHECK'local x, y, z = 1, 2, 3'
         },
     },
 }
+CHECK'local *toclose x = 1'
+{
+    type = 'local',
+    [1]  = {
+        type   = 'name',
+        start  = 16,
+        finish = 16,
+        [1]    = 'x',
+    },
+    [2]  = {
+        type   = 'number',
+        start  = 20,
+        finish = 20,
+        [1]    = 1,
+    },
+    [3]  = {
+        type   = 'toclose',
+        start  = 7,
+        finish = 14,
+    }
+}
 CHECK'x = function () end'
 {
     type = 'set',
