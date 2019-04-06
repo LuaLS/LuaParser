@@ -1241,6 +1241,13 @@ local x = 1 <!<<!> 2
     }
 }
 
+TEST[[
+local x = '<!\u!>{1000}'
+]]
+{
+    type = 'ERR_ESC',
+}
+
 Version = 'Lua 5.3'
 
 TEST[[
