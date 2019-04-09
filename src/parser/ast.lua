@@ -19,6 +19,7 @@ local function pushError(err)
     Errs[#Errs+1] = err
 end
 
+-- goto 单独处理
 local RESERVED = {
     ['and']      = true,
     ['break']    = true,
@@ -29,7 +30,6 @@ local RESERVED = {
     ['false']    = true,
     ['for']      = true,
     ['function'] = true,
-    ['goto']     = true,
     ['if']       = true,
     ['in']       = true,
     ['local']    = true,
@@ -379,7 +379,15 @@ local Defs = {
         end
     end,
     Name = function (start, str, finish)
+        local isKeyWord
         if RESERVED[str] then
+            isKeyWord = true
+        elseif str == 'goto' then
+            if State.Version ~= 'Lua 5.1' and State.Version ~= 'LuaJIT' then
+                isKeyWord = true
+            end
+        end
+        if isKeyWord then
             pushError {
                 type = 'KEYWORD',
                 start = start,
@@ -830,7 +838,19 @@ local Defs = {
         end
         return exp
     end,
-    Label = function (name)
+    Label = function (start, name, finish)
+        if State.Version == 'Lua 5.1' then
+            pushError {
+                type = 'UNSUPPORT_SYMBOL',
+                start = start,
+                finish = finish - 1,
+                version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+                info = {
+                    version = State.Version,
+                }
+            }
+            return false
+        end
         name.type = 'label'
         local labels = State.Label[#State.Label]
         local str = name[1]
@@ -849,7 +869,19 @@ local Defs = {
         end
         return name
     end,
-    GoTo = function (name)
+    GoTo = function (start, name, finish)
+        if State.Version == 'Lua 5.1' then
+            pushError {
+                type = 'UNSUPPORT_SYMBOL',
+                start = start,
+                finish = finish - 1,
+                version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+                info = {
+                    version = State.Version,
+                }
+            }
+            return false
+        end
         name.type = 'goto'
         local labels = State.Label[#State.Label]
         labels[#labels+1] = name

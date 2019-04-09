@@ -6,6 +6,7 @@ local scriptBuf = ''
 local compiled = {}
 local parser
 
+-- goto 可以作为名字，合法性之后处理
 local RESERVED = {
     ['and']      = true,
     ['break']    = true,
@@ -16,7 +17,6 @@ local RESERVED = {
     ['false']    = true,
     ['for']      = true,
     ['function'] = true,
-    ['goto']     = true,
     ['if']       = true,
     ['in']       = true,
     ['local']    = true,
@@ -407,9 +407,9 @@ ReturnBody  <-  Sp ({} RETURN MustExpList? {})
             ->  Return
 AfterReturn <-  Sp !END !UNTIL !ELSEIF !ELSE Action
 
-Label       <-  LABEL MustName -> Label DirtyLabel
+Label       <-  Sp ({} LABEL MustName DirtyLabel {}) -> Label 
 
-GoTo        <-  GOTO MustName -> GoTo
+GoTo        <-  Sp ({} GOTO MustName {}) -> GoTo
 
 If          <-  Sp ({} IfBody {})
             ->  If

@@ -61,6 +61,7 @@ local function TEST(script)
         end
         if expect.multi then
             assert(#errs > 1)
+            first = errs[expect.multi]
         else
             assert(#errs == 1)
         end
@@ -216,7 +217,7 @@ n = 0x<!!>
 ]]
 {
     type = 'MUST_X16',
-    multi = true,
+    multi = 1,
 }
 
 TEST[[
@@ -224,7 +225,7 @@ n = 0x<!zzzz!>
 ]]
 {
     type = 'MUST_X16',
-    multi = true,
+    multi = 1,
 }
 
 
@@ -233,7 +234,7 @@ n = 0x.<!zzzz!>
 ]]
 {
     type = 'MUST_X16',
-    multi = true,
+    multi = 1,
 }
 
 TEST[[
@@ -864,7 +865,7 @@ f = 9<!e!>
 ]]
 {
     type = 'MISS_EXPONENT',
-    multi = true,
+    multi = 1,
 }
 
 TEST[[
@@ -872,7 +873,7 @@ f = 5.<!e!>
 ]]
 {
     type = 'MISS_EXPONENT',
-    multi = true,
+    multi = 1,
 }
 
 TEST[[
@@ -880,7 +881,7 @@ f = .9<!e-!>
 ]]
 {
     type = 'MISS_EXPONENT',
-    multi = true,
+    multi = 1,
 }
 
 TEST[[
@@ -888,7 +889,7 @@ f = 5.9<!e+!>
 ]]
 {
     type = 'MISS_EXPONENT',
-    multi = true,
+    multi = 1,
 }
 
 TEST[[
@@ -896,7 +897,7 @@ hex = 0x<!G!>
 ]]
 {
     type = 'MUST_X16',
-    multi = true,
+    multi = 1,
 }
 
 TEST[=============[
@@ -949,7 +950,7 @@ string'
     info = {
         symbol = "'",
     },
-    multi = true,
+    multi = 1,
 }
 
 TEST[[
@@ -986,7 +987,7 @@ local a = function (<!!>1) end
     info = {
         symbol = ')',
     },
-    multi = true,
+    multi = 1,
 }
 
 TEST[[
@@ -1004,7 +1005,7 @@ a = 3 /<!!> / 2
 ]]
 {
     type = 'MISS_EXP',
-    multi = true,
+    multi = 1,
 }
 
 TEST[[
@@ -1012,7 +1013,7 @@ b = 1 &<!!>& 1
 ]]
 {
     type = 'MISS_EXP',
-    multi = true,
+    multi = 1,
 }
 
 TEST[[
@@ -1020,7 +1021,7 @@ b = 1 <<!!>> 0
 ]]
 {
     type = 'MISS_EXP',
-    multi = true,
+    multi = 1,
 }
 
 TEST[[
@@ -1028,7 +1029,7 @@ b = 1 <<!!> < 0
 ]]
 {
     type = 'MISS_EXP',
-    multi = true,
+    multi = 1,
 }
 
 TEST[[
@@ -1071,7 +1072,7 @@ for k<!!>;v in pairs(t) do end
     info = {
         symbol = 'in',
     },
-    multi = true,
+    multi = 1,
 }
 
 TEST[[
@@ -1126,11 +1127,12 @@ function a.b:c<!!>:d () end
 }
 
 TEST[[
-:: label :: <!return!>
-goto label
+:: label :: <!return
+goto!> label
 ]]
 {
     type = 'ACTION_AFTER_RETURN',
+    multi = 3,
 }
 
 TEST[[
@@ -1217,6 +1219,23 @@ TEST[[
 --        related = {3, 7},
 --    }
 --}
+
+Version = 'Lua 5.1'
+TEST[[
+<!::xx::!>
+]]
+{
+    type = 'UNSUPPORT_SYMBOL',
+    version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+    info = {
+        version = 'Lua 5.1',
+    }
+}
+
+TEST[[
+local goto = 1
+]]
+(nil)
 
 Version = 'Lua 5.2'
 TEST[[
