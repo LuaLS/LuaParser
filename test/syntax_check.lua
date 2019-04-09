@@ -1336,3 +1336,57 @@ s = '<!\u{111111111}!>'
         max = '7FFFFFFF',
     }
 }
+
+TEST[[
+x = 42<!LL!>
+]]
+{
+    type = 'UNSUPPORT_SYMBOL',
+    version = 'LuaJIT',
+    info = {
+        version = 'Lua 5.4',
+    }
+}
+
+TEST[[
+x = 12.5<!i!>
+]]
+{
+    type = 'UNSUPPORT_SYMBOL',
+    version = 'LuaJIT',
+    info = {
+        version = 'Lua 5.4',
+    }
+}
+
+TEST[[
+x = 1.23<!LL!>
+]]
+{
+    type = 'UNKNOWN_SYMBOL',
+    info = {
+        symbol = 'LL'
+    }
+}
+
+Version = 'LuaJIT'
+
+TEST[[
+x = 42LL
+x = 42ULl
+x = 0x2aLL
+x = 0x2All
+x = 12.5i
+x = 1I
+]]
+(nil)
+
+TEST[[
+x = 1.23<!LL!>
+]]
+{
+    type = 'UNKNOWN_SYMBOL',
+    info = {
+        symbol = 'LL'
+    }
+}
