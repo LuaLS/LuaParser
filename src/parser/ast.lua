@@ -291,7 +291,15 @@ local Defs = {
         end
         return string_char(char)
     end,
-    Char16 = function (char)
+    Char16 = function (pos, char)
+        if State.Version == 'Lua 5.1' then
+            pushError {
+                type = 'ERR_ESC',
+                start = pos-1,
+                finish = pos,
+            }
+            return ''
+        end
         return string_char(tonumber(char, 16))
     end,
     CharUtf8 = function (pos, char)
@@ -794,18 +802,40 @@ local Defs = {
         action.finish = finish - 1
         return action
     end,
-    Break = function (finish)
+    Break = function (finish, ...)
         if State.Break > 0 then
-            return {
+            local breakChunk = {
                 type = 'break',
             }
+            if not ... then
+                return breakChunk
+            end
+            local action = select(-1, ...)
+            if not action then
+                return breakChunk
+            end
+            if State.Version == 'Lua 5.1' or State.Version == 'LuaJIT' then
+                pushError {
+                    type = 'ACTION_AFTER_BREAK',
+                    start = finish - #'break',
+                    finish = finish - 1,
+                }
+            end
+            return breakChunk, action
         else
             pushError {
                 type = 'BREAK_OUTSIDE',
                 start = finish - #'break',
                 finish = finish - 1,
             }
-            return false
+            if not ... then
+                return false
+            end
+            local action = select(-1, ...)
+            if not action then
+                return false
+            end
+            return action
         end
     end,
     BreakStart = function ()

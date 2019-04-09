@@ -145,7 +145,7 @@ EChar       <-  'a' -> ea
             /   "'"
             /   %nl
             /   ('z' (%nl / %s)*)       -> ''
-            /   ('x' {X16 X16})         -> Char16
+            /   ({} 'x' {X16 X16})      -> Char16
             /   ([0-9] [0-9]? [0-9]?)   -> Char10
             /   ('u{' {} {Word*} '}')   -> CharUtf8
             -- 错误处理
@@ -397,7 +397,9 @@ Do          <-  Sp ({} DO DoBody NeedEnd {})
 DoBody      <-  (!END Action)*
             ->  DoBody
 
-Break       <-  BREAK {} -> Break
+Break       <-  BREAK ({} Semicolon* AfterBreak?)
+            ->  Break
+AfterBreak  <-  Sp !END !UNTIL !ELSEIF !ELSE Action
 BreakStart  <-  {} -> BreakStart
 BreakEnd    <-  {} -> BreakEnd
 

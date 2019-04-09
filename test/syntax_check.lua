@@ -1237,6 +1237,30 @@ local goto = 1
 ]]
 (nil)
 
+TEST[[
+local x = '<!\u!>{1000}'
+]]
+{
+    type = 'ERR_ESC',
+}
+
+TEST[[
+local x = '<!\x!>ff'
+]]
+{
+    type = 'ERR_ESC',
+}
+
+TEST[[
+while true do
+    <!break!>
+    x = 1
+end
+]]
+{
+    type = 'ACTION_AFTER_BREAK',
+}
+
 Version = 'Lua 5.2'
 TEST[[
 local x = 1 <!//!> 2
@@ -1266,6 +1290,14 @@ local x = '<!\u!>{1000}'
 {
     type = 'ERR_ESC',
 }
+
+TEST[[
+while true do
+    break
+    x = 1
+end
+]]
+(nil)
 
 Version = 'Lua 5.3'
 
