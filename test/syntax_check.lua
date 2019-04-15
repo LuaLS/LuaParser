@@ -1220,6 +1220,36 @@ TEST[[
 --    }
 --}
 
+-- EmmyLua
+
+TEST[[
+---@class <!!>
+]]
+{
+    type = 'MISS_NAME',
+}
+
+TEST[[
+---@class Class :<!!>
+]]
+{
+    type = 'MISS_NAME',
+}
+
+TEST[[
+---@type <!!>
+]]
+{
+    type = 'MISS_NAME',
+}
+
+TEST[[
+---@type Type1|<!!>
+]]
+{
+    type = 'MISS_NAME',
+}
+
 Version = 'Lua 5.1'
 TEST[[
 <!::xx::!>

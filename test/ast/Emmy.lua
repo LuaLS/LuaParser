@@ -6,6 +6,7 @@ local x = 1
     [1] = {
         type = 'local',
         emmy = {
+            type = 'class',
             class = {
                 type   = 'name',
                 start  = 11,
@@ -36,6 +37,7 @@ local x = 1
     [1] = {
         type = 'local',
         emmy = {
+            type = 'class',
             class = {
                 type   = 'name',
                 start  = 11,
@@ -72,6 +74,7 @@ x = 1
     [1] = {
         type = 'set',
         emmy = {
+            type = 'class',
             class = {
                 type   = 'name',
                 start  = 11,
@@ -89,6 +92,80 @@ x = 1
             type   = 'number',
             start  = 21,
             finish = 21,
+            [1]    = 1,
+        }
+    }
+}
+
+CHECK [[
+---@type Type
+x = 1
+]]
+{
+    [1] = {
+        type = 'set',
+        emmy = {
+            type = 'type',
+            [1] = {
+                type   = 'name',
+                start  = 10,
+                finish = 13,
+                [1]    = 'Type',
+            },
+        },
+        [1]  = {
+            type   = 'name',
+            start  = 15,
+            finish = 15,
+            [1]    = 'x',
+        },
+        [2]  = {
+            type   = 'number',
+            start  = 19,
+            finish = 19,
+            [1]    = 1,
+        }
+    }
+}
+
+CHECK [[
+---@type Type1|Type2|Type3
+x = 1
+]]
+{
+    [1] = {
+        type = 'set',
+        emmy = {
+            type = 'type',
+            [1] = {
+                type   = 'name',
+                start  = 10,
+                finish = 14,
+                [1]    = 'Type1',
+            },
+            [2] = {
+                type   = 'name',
+                start  = 16,
+                finish = 20,
+                [1]    = 'Type2',
+            },
+            [3] = {
+                type   = 'name',
+                start  = 22,
+                finish = 26,
+                [1]    = 'Type3',
+            },
+        },
+        [1]  = {
+            type   = 'name',
+            start  = 28,
+            finish = 28,
+            [1]    = 'x',
+        },
+        [2]  = {
+            type   = 'number',
+            start  = 32,
+            finish = 32,
             [1]    = 1,
         }
     }

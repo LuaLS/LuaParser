@@ -800,9 +800,10 @@ local Defs = {
         return false
     end,
     Set = function (keys, values)
+        local emmy = State.Emmy
         return {
             type = 'set',
-            emmy = State.Emmy,
+            emmy = emmy,
             keys, values,
         }
     end,
@@ -1098,8 +1099,15 @@ local Defs = {
     end,
     EmmyClass = function (class, extends)
         State.Emmy = {
+            type = 'class',
             class = class,
             extends = extends,
+        }
+    end,
+    EmmyType = function (...)
+        State.Emmy = {
+            type = 'type',
+            ...
         }
     end,
 

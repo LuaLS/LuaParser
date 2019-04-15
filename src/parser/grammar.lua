@@ -511,9 +511,15 @@ ClearEmmy   <-  {} -> ClearEmmy
 
 grammar 'Emmy' [[
 EmmyBody        <-  EmmyClass
+                /   EmmyType
+
 EmmyClass       <-  'class' %s+ (MustName EmmyParentClass?)
                 ->  EmmyClass
 EmmyParentClass <-  %s* ':' %s* MustName
+
+EmmyType        <-  'type' %s+ EmmyTypeNames
+                ->  EmmyType
+EmmyTypeNames   <-  MustName ('|' MustName)*
 ]]
 
 grammar 'Lua' [[
