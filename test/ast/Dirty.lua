@@ -276,3 +276,8 @@ CHECK 'return local a'
         }
     }
 }
+
+CHECK 'end'
+{
+    [1] = false,
+}
