@@ -802,6 +802,7 @@ local Defs = {
     Set = function (keys, values)
         return {
             type = 'set',
+            emmy = State.Emmy,
             keys, values,
         }
     end,
@@ -827,6 +828,7 @@ local Defs = {
     Local = function (toclose, keys, values)
         return {
             type = 'local',
+            emmy = State.Emmy,
             keys, values, toclose
         }
     end,
@@ -1088,6 +1090,17 @@ local Defs = {
             return {}
         end
         return {...}
+    end,
+
+    -- EmmyLua 支持
+    ClearEmmy = function ()
+        State.Emmy = nil
+    end,
+    EmmyClass = function (class, extends)
+        State.Emmy = {
+            class = class,
+            extends = extends,
+        }
     end,
 
     -- 捕获错误
