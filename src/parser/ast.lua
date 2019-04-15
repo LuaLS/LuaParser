@@ -655,16 +655,21 @@ local Defs = {
             key, value,
         }
     end,
-    List = function (...)
-        if ... == '' then
+    List = function (first, second, ...)
+        if second then
+            local list = {
+                type = 'list',
+                start = first.start,
+                first, second, ...
+            }
+            local last = list[#list]
+            list.finish = last.finish
+            return list
+        elseif first == '' then
             return nil
+        else
+            return first
         end
-        local list = {...}
-        local start = list[1]
-        local last = list[#list]
-        list.start = start.start
-        list.finish = last.finish
-        return list
     end,
     ArgList = function (...)
         if ... == '' then
@@ -896,9 +901,18 @@ local Defs = {
                 finish = finish - 1,
             }
         else
-            exp.type = 'return'
-            exp.start = start
-            exp.finish = finish - 1
+            if exp.type == 'list' then
+                exp.type = 'return'
+                exp.start = start
+                exp.finish = finish - 1
+            else
+                exp = {
+                    type = 'return',
+                    start = start,
+                    finish = finish - 1,
+                    [1] = exp,
+                }
+            end
         end
         return exp
     end,
@@ -1107,6 +1121,7 @@ local Defs = {
                 symbol = symbol,
             }
         }
+        return false
     end,
     DirtyName = function (pos)
         pushError {

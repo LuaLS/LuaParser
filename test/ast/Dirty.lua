@@ -101,14 +101,10 @@ x =
     [1] = {
         type   = 'set',
         [1]    = {
+            type   = 'name',
             start  = 1,
             finish = 1,
-            [1]    = {
-                type   = 'name',
-                start  = 1,
-                finish = 1,
-                [1]    = 'x'
-            }
+            [1]    = 'x'
         },
     }
 }
@@ -273,14 +269,10 @@ CHECK 'return local a'
     [2] = {
         type   = 'local',
         [1]    = {
+            type   = 'name',
             start  = 14,
             finish = 14,
-            [1]    = {
-                type   = 'name',
-                start  = 14,
-                finish = 14,
-                [1]    = 'a',
-            }
+            [1]    = 'a',
         }
     }
 }

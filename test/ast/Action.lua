@@ -2,30 +2,23 @@ CHECK'x = 1'
 {
     type = 'set',
     [1]  = {
+        type   = 'name',
         start  = 1,
         finish = 1,
-        [1]    = {
-            type   = 'name',
-            start  = 1,
-            finish = 1,
-            [1]    = 'x',
-        }
+        [1]    = 'x',
     },
     [2]  = {
+        type   = 'number',
         start  = 5,
         finish = 5,
-        [1]    = {
-            type   = 'number',
-            start  = 5,
-            finish = 5,
-            [1]    = 1,
-        }
+        [1]    = 1,
     }
 }
 CHECK'x, y, z = 1, 2, 3'
 {
     type = 'set',
     [1]  = {
+        type   = 'list',
         start  = 1,
         finish = 7,
         [1]  = {
@@ -48,6 +41,7 @@ CHECK'x, y, z = 1, 2, 3'
         },
     },
     [2]  = {
+        type = 'list',
         start = 11,
         finish = 17,
         [1]  = {
@@ -74,20 +68,17 @@ CHECK'local x'
 {
     type = 'local',
     [1]  = {
+        type   = 'name',
         start  = 7,
         finish = 7,
-        [1]    = {
-            type   = 'name',
-            start  = 7,
-            finish = 7,
-            [1]    = 'x',
-        }
+        [1]    = 'x',
     },
 }
 CHECK'local x, y, z'
 {
     type = 'local',
     [1]  = {
+        type   = 'list',
         start  = 7,
         finish = 13,
         [1]  = {
@@ -114,30 +105,23 @@ CHECK'local x = 1'
 {
     type = 'local',
     [1]  = {
+        type   = 'name',
         start  = 7,
         finish = 7,
-        [1]    = {
-            type   = 'name',
-            start  = 7,
-            finish = 7,
-            [1]    = 'x',
-        }
+        [1]    = 'x',
     },
     [2]  = {
+        type   = 'number',
         start  = 11,
         finish = 11,
-        [1]    = {
-            type   = 'number',
-            start  = 11,
-            finish = 11,
-            [1]    = 1,
-        }
+        [1]    = 1,
     }
 }
 CHECK'local x, y, z = 1, 2, 3'
 {
     type = 'local',
     [1]  = {
+        type   = 'list',
         start  = 7,
         finish = 13,
         [1]  = {
@@ -160,6 +144,7 @@ CHECK'local x, y, z = 1, 2, 3'
         },
     },
     [2]  = {
+        type   = 'list',
         start  = 17,
         finish = 23,
         [1]  = {
@@ -186,24 +171,16 @@ CHECK'local *toclose x = 1'
 {
     type = 'local',
     [1]  = {
+        type   = 'name',
         start  = 16,
         finish = 16,
-        [1]    = {
-            type   = 'name',
-            start  = 16,
-            finish = 16,
-            [1]    = 'x',
-        }
+        [1]    = 'x',
     },
     [2]  = {
+        type   = 'number',
         start  = 20,
         finish = 20,
-        [1]    = {
-            type   = 'number',
-            start  = 20,
-            finish = 20,
-            [1]    = 1,
-        }
+        [1]    = 1,
     },
     [3]  = {
         type   = 'toclose',
@@ -215,62 +192,46 @@ CHECK'x = function () end'
 {
     type = 'set',
     [1]  = {
+        type   = 'name',
         start  = 1,
         finish = 1,
-        [1]    = {
-            type   = 'name',
-            start  = 1,
-            finish = 1,
-            [1]    = 'x',
-        }
+        [1]    = 'x',
     },
     [2]  = {
+        type   = 'function',
         start  = 5,
         finish = 19,
-        [1]    = {
-            type   = 'function',
-            start  = 5,
-            finish = 19,
-        }
     }
 }
 CHECK'x.y = function () end'
 {
     type = 'set',
     [1]  = {
+        type   = 'simple',
         start  = 1,
         finish = 3,
-        [1]    = {
-            type   = 'simple',
+        [1]  = {
+            type   = 'name',
             start  = 1,
+            finish = 1,
+            [1]    = 'x',
+        },
+        [2]  = {
+            type   = '.',
+            start  = 2,
+            finish = 2,
+        },
+        [3]  = {
+            type   = 'name',
+            start  = 3,
             finish = 3,
-            [1]  = {
-                type   = 'name',
-                start  = 1,
-                finish = 1,
-                [1]    = 'x',
-            },
-            [2]  = {
-                type   = '.',
-                start  = 2,
-                finish = 2,
-            },
-            [3]  = {
-                type   = 'name',
-                start  = 3,
-                finish = 3,
-                [1]    = 'y',
-            },
-        }
+            [1]    = 'y',
+        },
     },
     [2]  = {
+        type   = 'function',
         start  = 7,
         finish = 21,
-        [1]    = {
-            type   = 'function',
-            start  = 7,
-            finish = 21,
-        }
     }
 }
 CHECK'func.x(1, 2)'
@@ -401,24 +362,16 @@ CHECK'do x = 1 end'
     [1]    = {
         type = 'set',
         [1]  = {
+            type   = 'name',
             start  = 4,
             finish = 4,
-            [1]    = {
-                type   = 'name',
-                start  = 4,
-                finish = 4,
-                [1]    = 'x',
-            }
+            [1]    = 'x',
         },
         [2]  = {
+            type   = 'number',
             start  = 8,
             finish = 8,
-            [1]    = {
-                type   = 'number',
-                start  = 8,
-                finish = 8,
-                [1]    = 1,
-            }
+            [1]    = 1,
         }
     }
 }
@@ -837,24 +790,16 @@ end]]
     start  = 1,
     finish = 28,
     arg    = {
+        type   = 'name',
         start  = 5,
         finish = 5,
-        [1]    = {
-            type   = 'name',
-            start  = 5,
-            finish = 5,
-            [1]    = 'a',
-        }
+        [1]    = 'a',
     },
     exp    = {
+        type   = 'name',
         start  = 10,
         finish = 10,
-        [1]    = {
-            type   = 'name',
-            start  = 10,
-            finish = 10,
-            [1]    = 'a',
-        }
+        [1]    = 'a',
     },
     [1]    = {
         type   = 'return',
@@ -871,6 +816,7 @@ end]]
     start  = 1,
     finish = 40,
     arg    = {
+        type   = 'list',
         start  = 5,
         finish = 11,
         [1]    = {
@@ -893,6 +839,7 @@ end]]
         },
     },
     exp    = {
+        type   = 'list',
         start  = 16,
         finish = 22,
         [1]    = {
