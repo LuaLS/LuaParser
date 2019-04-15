@@ -388,8 +388,10 @@ CrtAction   <-  Semicolon
             /   ExpInAction
 UnkAction   <-  ({} {Word+})
             ->  UnknownSymbol
+            ->  Skip
             /   ({} {. (!Sps !CrtAction .)*})
             ->  UnknownSymbol
+            ->  Skip
 ExpInAction <-  Sp ({} Exp {})
             ->  ExpInAction
 

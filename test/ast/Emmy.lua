@@ -15,16 +15,24 @@ local x = 1
             },
         },
         [1]  = {
-            type   = 'name',
             start  = 23,
             finish = 23,
-            [1]    = 'x',
+            [1]    = {
+                type   = 'name',
+                start  = 23,
+                finish = 23,
+                [1]    = 'x',
+            }
         },
         [2]  = {
-            type   = 'number',
             start  = 27,
             finish = 27,
-            [1]    = 1,
+            [1]    = {
+                type   = 'number',
+                start  = 27,
+                finish = 27,
+                [1]    = 1,
+            }
         }
     }
 }
@@ -52,16 +60,24 @@ local x = 1
             },
         },
         [1]  = {
-            type   = 'name',
             start  = 36,
             finish = 36,
-            [1]    = 'x',
+            [1]    = {
+                type   = 'name',
+                start  = 36,
+                finish = 36,
+                [1]    = 'x',
+            }
         },
         [2]  = {
-            type   = 'number',
             start  = 40,
             finish = 40,
-            [1]    = 1,
+            [1]    = {
+                type   = 'number',
+                start  = 40,
+                finish = 40,
+                [1]    = 1,
+            }
         }
     }
 }
@@ -83,16 +99,24 @@ x = 1
             },
         },
         [1]  = {
-            type   = 'name',
             start  = 17,
             finish = 17,
-            [1]    = 'x',
+            [1]    = {
+                type   = 'name',
+                start  = 17,
+                finish = 17,
+                [1]    = 'x',
+            }
         },
         [2]  = {
-            type   = 'number',
             start  = 21,
             finish = 21,
-            [1]    = 1,
+            [1]    = {
+                type   = 'number',
+                start  = 21,
+                finish = 21,
+                [1]    = 1,
+            }
         }
     }
 }
@@ -114,16 +138,24 @@ x = 1
             },
         },
         [1]  = {
-            type   = 'name',
             start  = 15,
             finish = 15,
-            [1]    = 'x',
+            [1]    = {
+                type   = 'name',
+                start  = 15,
+                finish = 15,
+                [1]    = 'x',
+            }
         },
         [2]  = {
-            type   = 'number',
             start  = 19,
             finish = 19,
-            [1]    = 1,
+            [1]    = {
+                type   = 'number',
+                start  = 19,
+                finish = 19,
+                [1]    = 1,
+            }
         }
     }
 }
@@ -157,16 +189,24 @@ x = 1
             },
         },
         [1]  = {
-            type   = 'name',
             start  = 28,
             finish = 28,
-            [1]    = 'x',
+            [1]    = {
+                type   = 'name',
+                start  = 28,
+                finish = 28,
+                [1]    = 'x',
+            }
         },
         [2]  = {
-            type   = 'number',
             start  = 32,
             finish = 32,
-            [1]    = 1,
+            [1]    = {
+                type   = 'number',
+                start  = 32,
+                finish = 32,
+                [1]    = 1,
+            }
         }
     }
 }
