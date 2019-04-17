@@ -484,12 +484,9 @@ CHECK [[
 {
     [1] = {
         type = 'emmyArrayType',
-        [1]  = {
-            type   = 'emmyName',
-            start  = 10,
-            finish = 13,
-            [1]    = 'Type',
-        }
+        start  = 10,
+        finish = 13,
+        [1]    = 'Type',
     }
 }
 
@@ -499,13 +496,10 @@ CHECK [[
 {
     [1] = {
         type = 'emmyTableType',
-        [1]  = {
-            type   = 'emmyName',
-            start  = 10,
-            finish = 14,
-            [1]    = 'table',
-        },
-        [2]  = {
+        start  = 10,
+        finish = 14,
+        [1]    = 'table',
+        [2]    = {
             type = 'emmyType',
             [1]  = {
                 type   = 'emmyName',
@@ -514,13 +508,82 @@ CHECK [[
                 [1]    = 'key',
             }
         },
-        [3]  = {
+        [3]    = {
             type = 'emmyType',
             [1]  = {
                 type   = 'emmyName',
                 start  = 21,
                 finish = 25,
                 [1]    = 'value',
+            }
+        }
+    }
+}
+
+CHECK [[
+---@type fun(key1:t1|t2[], key2:t3):t4<t5, t6>
+]]
+{
+    [1] = {
+        type = 'emmyFunctionType',
+        [1]  = {
+            type   = 'emmyName',
+            start  = 14,
+            finish = 17,
+            [1]    = 'key1',
+        },
+        [2]  = {
+            type   = 'emmyType',
+            [1]    = {
+                type   = 'emmyName',
+                start  = 19,
+                finish = 20,
+                [1]    = 't1',
+            },
+            [2]    = {
+                type   = 'emmyArrayType',
+                start  = 22,
+                finish = 23,
+                [1]    = 't2',
+            }
+        },
+        [3]  = {
+            type   = 'emmyName',
+            start  = 28,
+            finish = 31,
+            [1]    = 'key2',
+        },
+        [4]  = {
+            type   = 'emmyType',
+            [1]    = {
+                type   = 'emmyName',
+                start  = 33,
+                finish = 34,
+                [1]    = 't3',
+            }
+        },
+        [5]  = {
+            type   = 'emmyTableType',
+            start  = 37,
+            finish = 38,
+            [1]    = 't4',
+            [2]    = {
+                type = 'emmyType',
+                [1] = {
+                    type   = 'emmyName',
+                    start  = 40,
+                    finish = 41,
+                    [1]    = 't5',
+                },
+            },
+            [3]    = {
+                type = 'emmyType',
+                [1] = {
+                    type   = 'emmyName',
+                    start  = 44,
+                    finish = 45,
+                    [1]    = 't6',
+                }
             }
         }
     }
