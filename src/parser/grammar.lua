@@ -88,7 +88,7 @@ local function errorpos(pos, err)
 end
 
 grammar 'Comment' [[
-Comment         <-  !Emmy '--' (LongComment / ShortComment)
+Comment         <-  '--' (Emmy / LongComment / ShortComment)
 LongComment     <-  ('[' {} {:eq: '='* :} {} '[' 
                     (!CommentClose .)*
                     (CommentClose / {}))
@@ -96,7 +96,7 @@ LongComment     <-  ('[' {} {:eq: '='* :} {} '['
 CommentClose    <-  ']' =eq ']'
 ShortComment    <-  (!%nl .)*
 -- 占位
-Emmy            <-  '--@'
+Emmy            <-  '-@'
 ]]
 
 grammar 'Sp' [[
@@ -368,7 +368,7 @@ Set         <-  END
 
 grammar 'Action' [[
 Action      <-  Emmy
-            /   Sp (CrtAction / UnkAction) ClearEmmy
+            /   Sp (CrtAction / UnkAction)
 CrtAction   <-  Semicolon
             /   Do
             /   Break
@@ -509,12 +509,13 @@ ClearEmmy   <-  {} -> ClearEmmy
 ]]
 
 grammar 'Emmy' [[
-Emmy            <-  '---@' EmmyBody ShortComment
+Emmy            <-  '-@' EmmyBody ShortComment
 EmmyBody        <-  EmmyClass
                 /   EmmyType
                 /   EmmyAlias
+                /   EmmyParam
 
-EmmyName        <-  ({} {(!%nl !'@' !'|' .)+})
+EmmyName        <-  ({} {(!%nl .)+})
                 ->  EmmyName
 MustEmmyName    <-  EmmyName / DirtyEmmyName
 DirtyEmmyName   <-  {}
@@ -526,18 +527,20 @@ EmmyParentClass <-  %s* ':' %s* MustName
 
 EmmyType        <-  'type' %s+ EmmyTypeNames
                 ->  EmmyType
-EmmyTypeNames   <-  MustEmmyName ('|' MustEmmyName)*
+EmmyTypeNames   <-  MustName ('|' MustName)*
 
 EmmyAlias       <-  'alias' %s+ (MustName %s+ MustEmmyName)
                 ->  EmmyAlias
+
+EmmyParam       <-  'param' %s+ (MustName %s+ MustName)
+                ->  EmmyParam
 ]]
 
 grammar 'Lua' [[
 Lua         <-  Head?
                 LabelStart
-                Action* -> Lua
+                (Action* Sp) -> Lua
                 LabelEnd
-                Sp
 Head        <-  '#' (!%nl .)*
 ]]
 

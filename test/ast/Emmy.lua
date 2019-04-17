@@ -4,16 +4,16 @@ local x = 1
 ]]
 {
     [1] = {
-        type = 'local',
-        emmy = {
-            type = 'class',
-            class = {
-                type   = 'name',
-                start  = 11,
-                finish = 15,
-                [1]    = 'Class',
-            },
+        type = 'emmyClass',
+        [1]  = {
+            type   = 'name',
+            start  = 11,
+            finish = 15,
+            [1]    = 'Class',
         },
+    },
+    [2] = {
+        type = 'local',
         [1]  = {
             type   = 'name',
             start  = 23,
@@ -35,22 +35,22 @@ local x = 1
 ]]
 {
     [1] = {
-        type = 'local',
-        emmy = {
-            type = 'class',
-            class = {
-                type   = 'name',
-                start  = 11,
-                finish = 15,
-                [1]    = 'Class',
-            },
-            extends = {
-                type   = 'name',
-                start  = 19,
-                finish = 28,
-                [1]    = 'SuperClass',
-            },
+        type = 'emmyClass',
+        [1]  = {
+            type   = 'name',
+            start  = 11,
+            finish = 15,
+            [1]    = 'Class',
         },
+        [2]  = {
+            type   = 'name',
+            start  = 19,
+            finish = 28,
+            [1]    = 'SuperClass',
+        },
+    },
+    [2] = {
+        type = 'local',
         [1]  = {
             type   = 'name',
             start  = 36,
@@ -72,16 +72,16 @@ x = 1
 ]]
 {
     [1] = {
-        type = 'set',
-        emmy = {
-            type = 'class',
-            class = {
-                type   = 'name',
-                start  = 11,
-                finish = 15,
-                [1]    = 'Class',
-            },
+        type = 'emmyClass',
+        [1]  = {
+            type   = 'name',
+            start  = 11,
+            finish = 15,
+            [1]    = 'Class',
         },
+    },
+    [2] = {
+        type = 'set',
         [1]  = {
             type   = 'name',
             start  = 17,
@@ -103,16 +103,16 @@ x = 1
 ]]
 {
     [1] = {
-        type = 'set',
-        emmy = {
-            type = 'type',
-            [1] = {
-                type   = 'emmyName',
-                start  = 10,
-                finish = 13,
-                [1]    = 'Type',
-            },
+        type = 'emmyType',
+        [1] = {
+            type   = 'name',
+            start  = 10,
+            finish = 13,
+            [1]    = 'Type',
         },
+    },
+    [2] = {
+        type = 'set',
         [1]  = {
             type   = 'name',
             start  = 15,
@@ -134,28 +134,28 @@ x = 1
 ]]
 {
     [1] = {
-        type = 'set',
-        emmy = {
-            type = 'type',
-            [1] = {
-                type   = 'emmyName',
-                start  = 10,
-                finish = 14,
-                [1]    = 'Type1',
-            },
-            [2] = {
-                type   = 'emmyName',
-                start  = 16,
-                finish = 20,
-                [1]    = 'Type2',
-            },
-            [3] = {
-                type   = 'emmyName',
-                start  = 22,
-                finish = 26,
-                [1]    = 'Type3',
-            },
+        type = 'emmyType',
+        [1] = {
+            type   = 'name',
+            start  = 10,
+            finish = 14,
+            [1]    = 'Type1',
         },
+        [2] = {
+            type   = 'name',
+            start  = 16,
+            finish = 20,
+            [1]    = 'Type2',
+        },
+        [3] = {
+            type   = 'name',
+            start  = 22,
+            finish = 26,
+            [1]    = 'Type3',
+        },
+    },
+    [2] = {
+        type = 'set',
         [1]  = {
             type   = 'name',
             start  = 28,
@@ -206,4 +206,57 @@ x = 1
             [1]    = 1,
         }
     }
+}
+
+CHECK [[
+---@param a1 t1
+---@param a2 t2
+---@param a3 t3
+]]
+{
+    [1]  = {
+        type = 'emmyParam',
+        [1]  = {
+            type   = 'name',
+            start  = 11,
+            finish = 12,
+            [1]    = 'a1',
+        },
+        [2] = {
+            type   = 'name',
+            start  = 14,
+            finish = 15,
+            [1]    = 't1',
+        }
+    },
+    [2]  = {
+        type = 'emmyParam',
+        [1]  = {
+            type   = 'name',
+            start  = 27,
+            finish = 28,
+            [1]    = 'a2',
+        },
+        [2] = {
+            type   = 'name',
+            start  = 30,
+            finish = 31,
+            [1]    = 't2',
+        }
+    },
+    [3]  = {
+        type = 'emmyParam',
+        [1]  = {
+            type   = 'name',
+            start  = 43,
+            finish = 44,
+            [1]    = 'a3',
+        },
+        [2] = {
+            type   = 'name',
+            start  = 46,
+            finish = 47,
+            [1]    = 't3',
+        }
+    },
 }
