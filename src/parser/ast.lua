@@ -1139,6 +1139,19 @@ local Defs = {
             [2]  = emmyName,
         }
     end,
+    EmmyReturn = function (...)
+        return {
+            type = 'emmyReturn',
+            ...
+        }
+    end,
+    EmmyField = function (access, fieldName, ...)
+        return {
+            type = 'emmyField',
+            access, fieldName,
+            ...
+        }
+    end,
 
     -- 捕获错误
     UnknownSymbol = function (start, symbol)

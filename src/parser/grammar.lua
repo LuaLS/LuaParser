@@ -514,26 +514,42 @@ EmmyBody        <-  EmmyClass
                 /   EmmyType
                 /   EmmyAlias
                 /   EmmyParam
+                /   EmmyReturn
+                /   EmmyField
 
-EmmyName        <-  ({} {(!%nl .)+})
+EmmyName        <-  ({} {[a-zA-Z_] [a-zA-Z0-9_]*})
                 ->  EmmyName
 MustEmmyName    <-  EmmyName / DirtyEmmyName
-DirtyEmmyName   <-  {}
-                ->  DirtyEmmyName
+DirtyEmmyName   <-  {} ->  DirtyEmmyName
+EmmyLongName    <-  ({} {(!%nl .)+})
+                ->  EmmyName
+MustEmmyLongName<-  EmmyLongName / DirtyEmmyLongName
+DirtyEmmyLongName
+                <-  {} -> DirtyEmmyName
 
-EmmyClass       <-  'class' %s+ (MustName EmmyParentClass?)
+EmmyClass       <-  'class' %s+ (MustEmmyName EmmyParentClass?)
                 ->  EmmyClass
-EmmyParentClass <-  %s* ':' %s* MustName
+EmmyParentClass <-  %s* ':' %s* MustEmmyName
 
 EmmyType        <-  'type' %s+ EmmyTypeNames
                 ->  EmmyType
-EmmyTypeNames   <-  MustName ('|' MustName)*
+EmmyTypeNames   <-  MustEmmyName ('|' MustEmmyName)*
 
-EmmyAlias       <-  'alias' %s+ (MustName %s+ MustEmmyName)
+EmmyAlias       <-  'alias' %s+ (MustEmmyName %s+ MustEmmyLongName)
                 ->  EmmyAlias
 
-EmmyParam       <-  'param' %s+ (MustName %s+ MustName)
+EmmyParam       <-  'param' %s+ (MustEmmyName %s+ MustEmmyName)
                 ->  EmmyParam
+
+EmmyReturn      <-  'return' %s+ EmmyTypeNames
+                ->  EmmyReturn
+
+EmmyField       <-  'field' %s+ (EmmyFieldAccess MustEmmyName %s+ EmmyTypeNames)
+                ->  EmmyField
+EmmyFieldAccess <-  ({'public'}    %s+)
+                /   ({'protected'} %s+)
+                /   ({'private'}   %s+)
+                /   {} -> 'public'
 ]]
 
 grammar 'Lua' [[
