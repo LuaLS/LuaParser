@@ -88,15 +88,13 @@ local function errorpos(pos, err)
 end
 
 grammar 'Comment' [[
-Comment         <-  '--' (Emmy / LongComment / ShortComment)
+Comment         <-  '--' (LongComment / ShortComment)
 LongComment     <-  ('[' {} {:eq: '='* :} {} '[' 
                     (!CommentClose .)*
                     (CommentClose / {}))
                 ->  LongComment
 CommentClose    <-  ']' =eq ']'
 ShortComment    <-  (!%nl .)*
--- 占位
-Emmy            <-  '-@'
 ]]
 
 grammar 'Sp' [[
@@ -505,11 +503,13 @@ FunctionNamedBody
 FuncName    <-  (MustName (DOT MustName)* FuncMethod?)
             ->  Simple
 FuncMethod  <-  COLON Name / COLON {} -> MissMethod
-ClearEmmy   <-  {} -> ClearEmmy
+
+-- 占位
+Emmy        <-  '---@'
 ]]
 
 grammar 'Emmy' [[
-Emmy            <-  '-@' EmmyBody ShortComment
+Emmy            <-  '---@' EmmyBody ShortComment %nl*
 EmmyBody        <-  'class'    %s+ EmmyClass    -> EmmyClass
                 /   'type'     %s+ EmmyType     -> EmmyType
                 /   'alias'    %s+ EmmyAlias    -> EmmyAlias
