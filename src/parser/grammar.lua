@@ -585,8 +585,9 @@ EmmySee         <-  MustEmmyName '#' MustEmmyName
 grammar 'Lua' [[
 Lua         <-  Head?
                 LabelStart
-                (Action* Sp) -> Lua
+                Action* -> Lua
                 LabelEnd
+                Sp
 Head        <-  '#' (!%nl .)*
 ]]
 
