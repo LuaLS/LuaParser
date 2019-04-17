@@ -107,7 +107,7 @@ x = 1
         emmy = {
             type = 'type',
             [1] = {
-                type   = 'name',
+                type   = 'emmyName',
                 start  = 10,
                 finish = 13,
                 [1]    = 'Type',
@@ -138,19 +138,19 @@ x = 1
         emmy = {
             type = 'type',
             [1] = {
-                type   = 'name',
+                type   = 'emmyName',
                 start  = 10,
                 finish = 14,
                 [1]    = 'Type1',
             },
             [2] = {
-                type   = 'name',
+                type   = 'emmyName',
                 start  = 16,
                 finish = 20,
                 [1]    = 'Type2',
             },
             [3] = {
-                type   = 'name',
+                type   = 'emmyName',
                 start  = 22,
                 finish = 26,
                 [1]    = 'Type3',
@@ -166,6 +166,43 @@ x = 1
             type   = 'number',
             start  = 32,
             finish = 32,
+            [1]    = 1,
+        }
+    }
+}
+
+CHECK [[
+---@alias Handler fun(type: string, data: any):void
+x = 1
+]]
+{
+    [1] = {
+        type = 'emmyAlias',
+        [1]  = {
+            type   = 'name',
+            start  = 11,
+            finish = 17,
+            [1]    = 'Handler',
+        },
+        [2]  = {
+            type   = 'emmyName',
+            start  = 19,
+            finish = 51,
+            [1]    = 'fun(type: string, data: any):void'
+        },
+    },
+    [2] = {
+        type = 'set',
+        [1]  = {
+            type   = 'name',
+            start  = 53,
+            finish = 53,
+            [1]    = 'x',
+        },
+        [2]  = {
+            type   = 'number',
+            start  = 57,
+            finish = 57,
             [1]    = 1,
         }
     }

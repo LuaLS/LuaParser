@@ -1097,6 +1097,27 @@ local Defs = {
     ClearEmmy = function ()
         State.Emmy = nil
     end,
+    EmmyName = function (start, str)
+        return {
+            type   = 'emmyName',
+            start  = start,
+            finish = start + #str - 1,
+            [1]    = str,
+        }
+    end,
+    DirtyEmmyName = function (pos)
+        pushError {
+            type = 'MISS_NAME',
+            start = pos,
+            finish = pos,
+        }
+        return {
+            type   = 'emmyName',
+            start  = pos,
+            finish = pos,
+            [1]    = ''
+        }
+    end,
     EmmyClass = function (class, extends)
         State.Emmy = {
             type = 'class',
@@ -1108,6 +1129,13 @@ local Defs = {
         State.Emmy = {
             type = 'type',
             ...
+        }
+    end,
+    EmmyAlias = function (name, emmyName)
+        return {
+            type = 'emmyAlias',
+            [1]  = name,
+            [2]  = emmyName,
         }
     end,
 
