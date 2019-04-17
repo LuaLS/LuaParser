@@ -1,6 +1,6 @@
 
 local parser = require 'parser'
-local buf = io.load(ROOT / 'src' / 'parser' / 'relabel.lua')
+local buf = io.load(ROOT / 'test' / 'perform' / 'relabel.txt')
 assert(buf)
 local lines = parser:lines(buf)
 

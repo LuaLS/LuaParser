@@ -1152,6 +1152,27 @@ local Defs = {
             ...
         }
     end,
+    EmmyGenericBlock = function (genericName, parentName)
+        return { genericName, parentName }
+    end,
+    EmmyGeneric = function (...)
+        return {
+            type = 'emmyGeneric',
+            ...
+        }
+    end,
+    EmmyVararg = function (typeName)
+        return {
+            type = 'emmyVararg',
+            typeName,
+        }
+    end,
+    EmmyLanguage = function (language)
+        return {
+            type = 'emmyLanguage',
+            language,
+        }
+    end,
 
     -- 捕获错误
     UnknownSymbol = function (start, symbol)

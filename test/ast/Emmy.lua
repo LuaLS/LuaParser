@@ -337,3 +337,110 @@ CHECK [[
         }
     },
 }
+
+CHECK [[
+---@generic T
+]]
+{
+    [1] = {
+        type = 'emmyGeneric',
+        [1]  = {
+            [1] = {
+                type   = 'emmyName',
+                start  = 13,
+                finish = 13,
+                [1]    = 'T',
+            }
+        }
+    }
+}
+
+CHECK [[
+---@generic T : handle
+]]
+{
+    [1] = {
+        type = 'emmyGeneric',
+        [1]  = {
+            [1] = {
+                type   = 'emmyName',
+                start  = 13,
+                finish = 13,
+                [1]    = 'T',
+            },
+            [2] = {
+                type   = 'emmyName',
+                start  = 17,
+                finish = 22,
+                [1]    = 'handle',
+            }
+        }
+    }
+}
+
+CHECK [[
+---@generic T : handle, K : handle
+]]
+{
+    [1] = {
+        type = 'emmyGeneric',
+        [1]  = {
+            [1] = {
+                type   = 'emmyName',
+                start  = 13,
+                finish = 13,
+                [1]    = 'T',
+            },
+            [2] = {
+                type   = 'emmyName',
+                start  = 17,
+                finish = 22,
+                [1]    = 'handle',
+            }
+        },
+        [2]  = {
+            [1] = {
+                type   = 'emmyName',
+                start  = 25,
+                finish = 25,
+                [1]    = 'K',
+            },
+            [2] = {
+                type   = 'emmyName',
+                start  = 29,
+                finish = 34,
+                [1]    = 'handle',
+            }
+        },
+    }
+}
+
+CHECK [[
+---@vararg string
+]]
+{
+    [1] = {
+        type = 'emmyVararg',
+        [1]  = {
+            type   = 'emmyName',
+            start  = 12,
+            finish = 17,
+            [1]    = 'string',
+        }
+    }
+}
+
+CHECK [[
+---@language JSON
+]]
+{
+    [1] = {
+        type = 'emmyLanguage',
+        [1]  = {
+            type   = 'emmyName',
+            start  = 14,
+            finish = 17,
+            [1]    = 'JSON',
+        }
+    }
+}

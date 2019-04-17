@@ -510,12 +510,15 @@ ClearEmmy   <-  {} -> ClearEmmy
 
 grammar 'Emmy' [[
 Emmy            <-  '-@' EmmyBody ShortComment
-EmmyBody        <-  EmmyClass
-                /   EmmyType
-                /   EmmyAlias
-                /   EmmyParam
-                /   EmmyReturn
-                /   EmmyField
+EmmyBody        <-  EmmyClass   -> EmmyClass
+                /   EmmyType    -> EmmyType
+                /   EmmyAlias   -> EmmyAlias
+                /   EmmyParam   -> EmmyParam
+                /   EmmyReturn  -> EmmyReturn
+                /   EmmyField   -> EmmyField
+                /   EmmyGeneric -> EmmyGeneric
+                /   EmmyVararg  -> EmmyVararg
+                /   EmmyLanguage-> EmmyLanguage
 
 EmmyName        <-  ({} {[a-zA-Z_] [a-zA-Z0-9_]*})
                 ->  EmmyName
@@ -528,28 +531,32 @@ DirtyEmmyLongName
                 <-  {} -> DirtyEmmyName
 
 EmmyClass       <-  'class' %s+ (MustEmmyName EmmyParentClass?)
-                ->  EmmyClass
 EmmyParentClass <-  %s* ':' %s* MustEmmyName
 
 EmmyType        <-  'type' %s+ EmmyTypeNames
-                ->  EmmyType
 EmmyTypeNames   <-  MustEmmyName ('|' MustEmmyName)*
 
 EmmyAlias       <-  'alias' %s+ (MustEmmyName %s+ MustEmmyLongName)
-                ->  EmmyAlias
 
 EmmyParam       <-  'param' %s+ (MustEmmyName %s+ MustEmmyName)
-                ->  EmmyParam
 
 EmmyReturn      <-  'return' %s+ EmmyTypeNames
-                ->  EmmyReturn
 
 EmmyField       <-  'field' %s+ (EmmyFieldAccess MustEmmyName %s+ EmmyTypeNames)
-                ->  EmmyField
 EmmyFieldAccess <-  ({'public'}    %s+)
                 /   ({'protected'} %s+)
                 /   ({'private'}   %s+)
                 /   {} -> 'public'
+
+EmmyGeneric     <-  'generic' %s+
+                    EmmyGenericBlock
+                    (%s* ',' %s* EmmyGenericBlock)*
+EmmyGenericBlock<-  (MustEmmyName %s* (':' %s* MustEmmyName)*)
+                ->  EmmyGenericBlock
+
+EmmyVararg      <-  'vararg' %s+ MustEmmyName
+
+EmmyLanguage    <-  'language' %s+ MustEmmyName
 ]]
 
 grammar 'Lua' [[
