@@ -172,7 +172,7 @@ x = 1
 }
 
 CHECK [[
----@alias Handler fun(type: string, data: any):void
+---@alias Handler LongType
 x = 1
 ]]
 {
@@ -185,24 +185,27 @@ x = 1
             [1]    = 'Handler',
         },
         [2]  = {
-            type   = 'emmyName',
-            start  = 19,
-            finish = 51,
-            [1]    = 'fun(type: string, data: any):void'
+            type   = 'emmyType',
+            [1]    = {
+                type   = 'emmyName',
+                start  = 19,
+                finish = 26,
+                [1]    = 'LongType'
+            },
         },
     },
     [2] = {
         type = 'set',
         [1]  = {
             type   = 'name',
-            start  = 53,
-            finish = 53,
+            start  = 28,
+            finish = 28,
             [1]    = 'x',
         },
         [2]  = {
             type   = 'number',
-            start  = 57,
-            finish = 57,
+            start  = 32,
+            finish = 32,
             [1]    = 1,
         }
     }
@@ -223,10 +226,13 @@ CHECK [[
             [1]    = 'a1',
         },
         [2] = {
-            type   = 'emmyName',
-            start  = 14,
-            finish = 15,
-            [1]    = 't1',
+            type   = 'emmyType',
+            [1]    = {
+                type   = 'emmyName',
+                start  = 14,
+                finish = 15,
+                [1]    = 't1',
+            }
         }
     },
     [2]  = {
@@ -238,10 +244,13 @@ CHECK [[
             [1]    = 'a2',
         },
         [2] = {
-            type   = 'emmyName',
-            start  = 30,
-            finish = 31,
-            [1]    = 't2',
+            type   = 'emmyType',
+            [1]    = {
+                type   = 'emmyName',
+                start  = 30,
+                finish = 31,
+                [1]    = 't2',
+            }
         }
     },
     [3]  = {
@@ -253,10 +262,13 @@ CHECK [[
             [1]    = 'a3',
         },
         [2] = {
-            type   = 'emmyName',
-            start  = 46,
-            finish = 47,
-            [1]    = 't3',
+            type   = 'emmyType',
+            [1]    = {
+                type   = 'emmyName',
+                start  = 46,
+                finish = 47,
+                [1]    = 't3',
+            }
         }
     },
 }
@@ -267,24 +279,27 @@ CHECK [[
 {
     [1] = {
         type = 'emmyReturn',
-        [1] = {
-            type   = 'emmyName',
-            start  = 12,
-            finish = 16,
-            [1]    = 'Type1',
-        },
-        [2] = {
-            type   = 'emmyName',
-            start  = 18,
-            finish = 22,
-            [1]    = 'Type2',
-        },
-        [3] = {
-            type   = 'emmyName',
-            start  = 24,
-            finish = 28,
-            [1]    = 'Type3',
-        },
+        [1]  = {
+            type = 'emmyType',
+            [1]  = {
+                type   = 'emmyName',
+                start  = 12,
+                finish = 16,
+                [1]    = 'Type1',
+            },
+            [2]  = {
+                type   = 'emmyName',
+                start  = 18,
+                finish = 22,
+                [1]    = 'Type2',
+            },
+            [3]  = {
+                type   = 'emmyName',
+                start  = 24,
+                finish = 28,
+                [1]    = 'Type3',
+            },
+        }
     },
 }
 
@@ -302,10 +317,13 @@ CHECK [[
             [1]    = 'open',
         },
         [3]  = {
-            type   = 'emmyName',
-            start  = 16,
-            finish = 23,
-            [1]    = 'function',
+            type = 'emmyType',
+            [1]  = {
+                type   = 'emmyName',
+                start  = 16,
+                finish = 23,
+                [1]    = 'function',
+            }
         }
     },
 }
@@ -324,16 +342,19 @@ CHECK [[
             [1]    = 'open',
         },
         [3]  = {
-            type   = 'emmyName',
-            start  = 24,
-            finish = 31,
-            [1]    = 'function',
-        },
-        [4]  = {
-            type   = 'emmyName',
-            start  = 33,
-            finish = 38,
-            [1]    = 'string',
+            type = 'emmyType',
+            [1]  = {
+                type   = 'emmyName',
+                start  = 24,
+                finish = 31,
+                [1]    = 'function',
+            },
+            [2]  = {
+                type   = 'emmyName',
+                start  = 33,
+                finish = 38,
+                [1]    = 'string',
+            }
         }
     },
 }
@@ -369,10 +390,13 @@ CHECK [[
                 [1]    = 'T',
             },
             [2] = {
-                type   = 'emmyName',
-                start  = 17,
-                finish = 22,
-                [1]    = 'handle',
+                type = 'emmyType',
+                [1]  = {
+                    type   = 'emmyName',
+                    start  = 17,
+                    finish = 22,
+                    [1]    = 'handle',
+                }
             }
         }
     }
@@ -392,10 +416,13 @@ CHECK [[
                 [1]    = 'T',
             },
             [2] = {
-                type   = 'emmyName',
-                start  = 17,
-                finish = 22,
-                [1]    = 'handle',
+                type = 'emmyType',
+                [1] = {
+                    type   = 'emmyName',
+                    start  = 17,
+                    finish = 22,
+                    [1]    = 'handle',
+                }
             }
         },
         [2]  = {
@@ -406,10 +433,13 @@ CHECK [[
                 [1]    = 'K',
             },
             [2] = {
-                type   = 'emmyName',
-                start  = 29,
-                finish = 34,
-                [1]    = 'handle',
+                type = 'emmyType',
+                [1]  = {
+                    type   = 'emmyName',
+                    start  = 29,
+                    finish = 34,
+                    [1]    = 'handle',
+                }
             }
         },
     }
@@ -422,10 +452,13 @@ CHECK [[
     [1] = {
         type = 'emmyVararg',
         [1]  = {
-            type   = 'emmyName',
-            start  = 12,
-            finish = 17,
-            [1]    = 'string',
+            type = 'emmyType',
+            [1]  = {
+                type   = 'emmyName',
+                start  = 12,
+                finish = 17,
+                [1]    = 'string',
+            }
         }
     }
 }
@@ -441,6 +474,54 @@ CHECK [[
             start  = 14,
             finish = 17,
             [1]    = 'JSON',
+        }
+    }
+}
+
+CHECK [[
+---@type Type[]
+]]
+{
+    [1] = {
+        type = 'emmyArrayType',
+        [1]  = {
+            type   = 'emmyName',
+            start  = 10,
+            finish = 13,
+            [1]    = 'Type',
+        }
+    }
+}
+
+CHECK [[
+---@type table<key, value>
+]]
+{
+    [1] = {
+        type = 'emmyTableType',
+        [1]  = {
+            type   = 'emmyName',
+            start  = 10,
+            finish = 14,
+            [1]    = 'table',
+        },
+        [2]  = {
+            type = 'emmyType',
+            [1]  = {
+                type   = 'emmyName',
+                start  = 16,
+                finish = 18,
+                [1]    = 'key',
+            }
+        },
+        [3]  = {
+            type = 'emmyType',
+            [1]  = {
+                type   = 'emmyName',
+                start  = 21,
+                finish = 25,
+                [1]    = 'value',
+            }
         }
     }
 }

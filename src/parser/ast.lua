@@ -1120,9 +1120,24 @@ local Defs = {
         }
     end,
     EmmyType = function (...)
+        return ...
+    end,
+    EmmyCommonType = function (...)
         return {
             type = 'emmyType',
             ...
+        }
+    end,
+    EmmyArrayType = function (typeName)
+        return {
+            type = 'emmyArrayType',
+            typeName,
+        }
+    end,
+    EmmyTableType = function (typeName, keyType, valueType)
+        return {
+            type = 'emmyTableType',
+            typeName, keyType, valueType
         }
     end,
     EmmyAlias = function (name, emmyName)
