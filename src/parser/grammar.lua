@@ -519,6 +519,7 @@ EmmyBody        <-  'class'    %s+ EmmyClass    -> EmmyClass
                 /   'generic'  %s+ EmmyGeneric  -> EmmyGeneric
                 /   'vararg'   %s+ EmmyVararg   -> EmmyVararg
                 /   'language' %s+ EmmyLanguage -> EmmyLanguage
+                /   'see'      %s+ EmmySee      -> EmmySee 
 
 EmmyName        <-  ({} {[a-zA-Z_] [a-zA-Z0-9_]*})
                 ->  EmmyName
@@ -530,7 +531,9 @@ EmmyLongName    <-  ({} {(!%nl .)+})
 EmmyClass       <-  (MustEmmyName EmmyParentClass?)
 EmmyParentClass <-  %s* ':' %s* MustEmmyName
 
-EmmyType        <-  EmmyFunctionType
+EmmyType        <-  (EmmyTypeDef EmmyTypeEnums*)
+                ->  EmmyType
+EmmyTypeDef     <-  EmmyFunctionType
                 /   EmmyArrayType
                 /   EmmyTableType
                 /   EmmyCommonType
@@ -541,10 +544,11 @@ EmmyTypeName    <-  EmmyFunctionType
                 /   EmmyArrayType
                 /   EmmyTableType
                 /   MustEmmyName
+EmmyTypeEnums   <-  %s+ '|' %s+ String
 
-EmmyAlias       <-  (MustEmmyName %s+ EmmyType)
+EmmyAlias       <-  MustEmmyName %s+ EmmyType
 
-EmmyParam       <-  (MustEmmyName %s+ EmmyType)
+EmmyParam       <-  MustEmmyName %s+ EmmyType
 
 EmmyReturn      <-  EmmyType
 
@@ -574,6 +578,8 @@ EmmyFunctionType<-  ('fun' Cut %s* EmmyFunctionArgs? %s* EmmyFunctionRtn?)
 EmmyFunctionArgs<-  '(' %s* EmmyFunctionArg %s* (',' %s* EmmyFunctionArg %s*)* ')'
 EmmyFunctionRtn <-  ':' %s* EmmyType
 EmmyFunctionArg <-  MustEmmyName %s* ':' %s* EmmyType
+
+EmmySee         <-  MustEmmyName '#' MustEmmyName
 ]]
 
 grammar 'Lua' [[

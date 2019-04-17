@@ -1119,8 +1119,11 @@ local Defs = {
             [2] = extends,
         }
     end,
-    EmmyType = function (...)
-        return ...
+    EmmyType = function (typeDef, ...)
+        if ... then
+            typeDef.enum = {...}
+        end
+        return typeDef
     end,
     EmmyCommonType = function (...)
         return {
@@ -1190,6 +1193,12 @@ local Defs = {
         return {
             type = 'emmyLanguage',
             language,
+        }
+    end,
+    EmmySee = function (className, methodName)
+        return {
+            type = 'emmySee',
+            className, methodName
         }
     end,
 

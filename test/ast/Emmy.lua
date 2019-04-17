@@ -588,3 +588,62 @@ CHECK [[
         }
     }
 }
+
+CHECK [[
+---@param event string | "'onClosed'" | "'onData'"
+]]
+{
+    [1]  = {
+        type = 'emmyParam',
+        [1]  = {
+            type   = 'emmyName',
+            start  = 11,
+            finish = 15,
+            [1]    = 'event',
+        },
+        [2] = {
+            type   = 'emmyType',
+            [1]    = {
+                type   = 'emmyName',
+                start  = 17,
+                finish = 22,
+                [1]    = 'string',
+            },
+            enum   = {
+                [1] = {
+                    [1] = "'onClosed'",
+                    finish = 37,
+                    start = 26,
+                    type = "string",
+                },
+                [2] = {
+                    [1] = "'onData'",
+                    finish = 50,
+                    start = 41,
+                    type = "string",
+                },
+            }
+        }
+    },
+}
+
+CHECK [[
+---@see loli#pants
+]]
+{
+    [1] = {
+        type = 'emmySee',
+        [1]  = {
+            type   = 'emmyName',
+            start  = 9,
+            finish = 12,
+            [1]    = 'loli',
+        },
+        [2]  = {
+            type   = 'emmyName',
+            start  = 14,
+            finish = 18,
+            [1]    = 'pants',
+        }
+    }
+}
