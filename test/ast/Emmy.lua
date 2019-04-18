@@ -4,8 +4,10 @@ local x = 1
 ]]
 {
     [1] = {
-        type = 'emmyClass',
-        [1]  = {
+        type   = 'emmyClass',
+        start  = 11,
+        finish = 15,
+        [1]    = {
             type   = 'emmyName',
             start  = 11,
             finish = 15,
@@ -35,14 +37,16 @@ local x = 1
 ]]
 {
     [1] = {
-        type = 'emmyClass',
-        [1]  = {
+        type   = 'emmyClass',
+        start  = 11,
+        finish = 28,
+        [1]    = {
             type   = 'emmyName',
             start  = 11,
             finish = 15,
             [1]    = 'Class',
         },
-        [2]  = {
+        [2]    = {
             type   = 'emmyName',
             start  = 19,
             finish = 28,
@@ -72,8 +76,10 @@ x = 1
 ]]
 {
     [1] = {
-        type = 'emmyClass',
-        [1]  = {
+        type   = 'emmyClass',
+        start  = 11,
+        finish = 15,
+        [1]    = {
             type   = 'emmyName',
             start  = 11,
             finish = 15,
@@ -654,8 +660,10 @@ CHECK [[
 ]]
 {
     [1] = {
-        type = 'emmyClass',
-        [1]  = {
+        type   = 'emmyClass',
+        start  = 12,
+        finish = 16,
+        [1]    = {
             type   = 'emmyName',
             start  = 12,
             finish = 16,
