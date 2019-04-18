@@ -690,3 +690,52 @@ CHECK [[
         [1]    = 'cl',
     },
 }
+
+CHECK [[
+local t = {
+    ---@type string
+    x = 1,
+}
+]]
+{
+    [1] = {
+        type = "local",
+        [1] = {
+            type   = "name",
+            start  = 7,
+            finish = 7,
+            [1]    = "t",
+        },
+        [2] = {
+            type   = "table",
+            start  = 11,
+            finish = 44,
+            [1]    = {
+                type = "emmyType",
+                [1]  = {
+                    type   = "emmyName",
+                    start  = 26,
+                    finish = 31,
+                    [1]    = "string",
+                },
+            },
+            [2]    = {
+                type   = "pair",
+                start  = 37,
+                finish = 41,
+                [1] = {
+                    type   = "name",
+                    start  = 37,
+                    finish = 37,
+                    [1]    = "x",
+                },
+                [2] = {
+                    type   = "number",
+                    start  = 41,
+                    finish = 41,
+                    [1]    = 1,
+                },
+            },
+        },
+    },
+}
