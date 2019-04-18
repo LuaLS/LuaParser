@@ -663,3 +663,22 @@ CHECK [[
         },
     },
 }
+
+CHECK [[
+---@
+---@cl
+]]
+{
+    [1] = {
+        type   = 'emmyIncomplete',
+        start  = 5,
+        finish = 5,
+        [1]    = '',
+    },
+    [2] = {
+        type   = 'emmyIncomplete',
+        start  = 10,
+        finish = 11,
+        [1]    = 'cl',
+    },
+}
