@@ -647,3 +647,19 @@ CHECK [[
         }
     }
 }
+
+CHECK [[
+
+---@class Class
+]]
+{
+    [1] = {
+        type = 'emmyClass',
+        [1]  = {
+            type   = 'emmyName',
+            start  = 12,
+            finish = 16,
+            [1]    = 'Class',
+        },
+    },
+}
