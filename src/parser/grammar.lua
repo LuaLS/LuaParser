@@ -542,7 +542,7 @@ EmmyType        <-  EmmyFunctionType
                 /   EmmyCommonType
 EmmyCommonType  <-  EmmyTypeNames
                 ->  EmmyCommonType
-EmmyTypeNames   <-  EmmyTypeName ('|' EmmyTypeName)*
+EmmyTypeNames   <-  EmmyTypeName (%s* '|' %s* !String EmmyTypeName)*
 EmmyTypeName    <-  EmmyFunctionType
                 /   EmmyArrayType
                 /   EmmyTableType
