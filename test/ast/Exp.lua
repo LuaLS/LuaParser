@@ -1202,14 +1202,18 @@ CHECK'{["x"] = 1, ["y"] = 2}'
     finish = 22,
     [1]    = {
         type   = 'pair',
-        start  =  3,
+        start  = 2,
         finish = 10,
         [1]  = {
-            type   = 'string',
-            start  = 3,
-            finish = 5,
-            index  = true,
-            [1]    = 'x',
+            type   = 'index',
+            start  = 2,
+            finish = 6,
+            [1]    = {
+                type   = 'string',
+                start  = 3,
+                finish = 5,
+                [1]    = 'x',
+            }
         },
         [2]  = {
             type   = 'number',
@@ -1220,14 +1224,18 @@ CHECK'{["x"] = 1, ["y"] = 2}'
     },
     [2]    = {
         type   = 'pair',
-        start  = 14,
+        start  = 13,
         finish = 21,
         [1]  = {
-            type   = 'string',
-            start  = 14,
-            finish = 16,
-            index  = true,
-            [1]    = 'y',
+            type   = 'index',
+            start  = 13,
+            finish = 17,
+            [1]    = {
+                type   = 'string',
+                start  = 14,
+                finish = 16,
+                [1]    = 'y',
+            }
         },
         [2]  = {
             type   = 'number',
@@ -1244,14 +1252,18 @@ CHECK'{[x] = 1, [y] = 2}'
     finish = 18,
     [1]    = {
         type   = 'pair',
-        start  = 3,
+        start  = 2,
         finish = 8,
         [1]  = {
-            type   = 'name',
-            start  = 3,
-            finish = 3,
-            index  = true,
-            [1]    = 'x',
+            type   = 'index',
+            start  = 2,
+            finish = 4,
+            [1]    = {
+                type   = 'name',
+                start  = 3,
+                finish = 3,
+                [1]    = 'x',
+            }
         },
         [2]  = {
             type   = 'number',
@@ -1262,14 +1274,18 @@ CHECK'{[x] = 1, [y] = 2}'
     },
     [2]    = {
         type   = 'pair',
-        start  = 12,
+        start  = 11,
         finish = 17,
         [1]  = {
-            type   = 'name',
-            start  = 12,
-            finish = 12,
-            index  = true,
-            [1]    = 'y',
+            type   = 'index',
+            start  = 11,
+            finish = 13,
+            [1]    = {
+                type   = 'name',
+                start  = 12,
+                finish = 12,
+                [1]    = 'y',
+            }
         },
         [2]  = {
             type   = 'number',
