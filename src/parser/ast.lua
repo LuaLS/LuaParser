@@ -1104,13 +1104,13 @@ local Defs = {
         pushError {
             type = 'MISS_NAME',
             level = 'warning',
-            start = pos,
-            finish = pos,
+            start = pos-1,
+            finish = pos-1,
         }
         return {
             type   = 'emmyName',
-            start  = pos,
-            finish = pos,
+            start  = pos-1,
+            finish = pos-1,
             [1]    = ''
         }
     end,
