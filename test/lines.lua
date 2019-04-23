@@ -2,6 +2,7 @@
 local parser = require 'parser'
 local buf = io.load(ROOT / 'test' / 'perform' / 'lines.txt')
 assert(buf)
+buf = buf:gsub('\r\n', '\n'):gsub('[\r\n]', '\r\n')
 local lines = parser:lines(buf)
 
 assert(#lines          == 365)
