@@ -11,7 +11,7 @@
             "env": {
                 "PATH": "${workspaceRoot}\\bin\\"
             },
-            "luaexe": "${workspaceRoot}\\bin\\lua.exe",
+            "luaexe": "${workspaceRoot}\\bin\\lua-language-server.exe",
             "luadll": "${workspaceRoot}\\bin\\lua54.dll",
             "path": "${workspaceRoot}/bin/?.lua",
             "cpath": "${workspaceRoot}/bin/?.dll;",

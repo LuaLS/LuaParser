@@ -45,5 +45,6 @@ end
 collectgarbage 'stop'
 test[[test\perform\1.txt]]
 test[[test\perform\2.txt]]
+test[[test\perform\3.txt]]
 performTest()
 collectgarbage 'restart'
