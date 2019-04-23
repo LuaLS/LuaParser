@@ -1,0 +1,339 @@
+local mt = {}
+local api = {}
+mt.__index = mt
+mt.__name = 'writer'
+
+local function enum(key)
+    local show = '<' .. key .. '>'
+    return setmetatable({}, { __debugger_tostring = function () return show end})
+end
+
+local NEWLINE    = enum 'NEWLINE'
+local TAB        = enum 'TAB'
+local OPTIONAL_L = enum 'OPTIONAL_L'
+local OPTIONAL_R = enum 'OPTIONAL_R'
+local VALUE      = enum 'VALUE'
+local SPACE      = enum 'SPACE'
+
+function mt:newline()
+    self[#self+1] = NEWLINE
+end
+
+local function simplifyOptional(self)
+    local opindex = 0
+    local has_value = {}
+    local optl_pos  = {}
+    for i = 1, #self do
+        if self[i] == OPTIONAL_L then
+            opindex = opindex + 1
+            optl_pos[opindex] = i
+            self[i] = ''
+            has_value[opindex] = false
+        elseif self[i] == OPTIONAL_R then
+            if not has_value[opindex] then
+                for i = optl_pos[opindex] + 1, i - 1 do
+                    self[i] = ''
+                end
+            end
+            self[i] = ''
+            opindex = opindex -1
+            has_value[opindex] = has_value[opindex] or has_value[opindex+1]
+        elseif self[i] == VALUE then
+            has_value[opindex] = true
+            self[i] = ''
+        end
+    end
+end
+
+local function simplifyScan(self)
+    simplifyOptional(self)
+
+    local has_word = false
+    local last_newline = true
+    local line_pos = #self
+    local i = #self
+    while true do
+        if i == 0 then
+            if not has_word then
+                for i = i+1, line_pos do
+                    self[i] = ''
+                end
+            end
+            break
+        elseif self[i] == NEWLINE then
+            if not has_word then
+                for i = i+1, line_pos do
+                    self[i] = ''
+                end
+                if last_newline then
+                    self[i] = ''
+                end
+            end
+            has_word = false
+            last_newline = false
+            line_pos = i
+        elseif self[i-1] == TAB then
+            if not has_word then
+                self[i] = ''
+            end
+            i = i - 1
+        elseif type(self[i]) == 'table' then
+            if simplifyScan(self[i]) then
+                has_word = true
+            end
+        elseif self[i] ~= '' then
+            has_word = true
+        end
+        i = i - 1
+    end
+
+    return has_word
+end
+
+function mt:simplify()
+    simplifyScan(self)
+end
+
+function mt:value(str)
+    if str and str ~= 'nil' then
+        self[#self+1] = VALUE
+    end
+    self:add(str)
+end
+
+function mt:add(str)
+    if type(str) ~= 'string' then
+        self[#self+1] = str
+        return
+    end
+
+    if str == '' then
+        self[#self+1] = SPACE
+    end
+
+    local function add(str)
+        local tab = 0
+        local start = 1
+        if #self == 0 or self[#self] == NEWLINE then
+            while true do
+                if str:sub(start, start) == '\t' then
+                    start = start + 1
+                    tab = tab + 1
+                elseif str:sub(start, start) == ' ' then
+                    start = start + 1
+                    for _ = 1, 3 do
+                        if str:sub(start, start) ~= ' ' then
+                            break
+                        end
+                        start = start + 1
+                    end
+                    tab = tab + 1
+                else
+                    break
+                end
+            end
+        end
+        if tab > 0 then
+            self[#self+1] = TAB
+            self[#self+1] = tab
+            if start <= #str then
+                self[#self+1] = str:sub(start)
+            end
+        else
+            if #str > 0 then
+                self[#self+1] = str
+            end
+        end
+    end
+
+    local start = 1
+    local last = 1
+    while true do
+        local a, _, c = str:find('([\r\n%<%?])', start)
+        if not a then
+            add(str:sub(last))
+            break
+        end
+        if c == '\r' then
+            add(str:sub(last, a-1))
+            self[#self+1] = NEWLINE
+            if str:sub(a, a+1) == '\r\n' then
+                start = a + 2
+                last = a + 2
+            else
+                start = a + 1
+                last = a + 1
+            end
+        elseif c == '\n' then
+            add(str:sub(last, a-1))
+            self[#self+1] = NEWLINE
+            start = a + 1
+            last = a + 1
+        elseif c == '<' and str:sub(a, a+1) == '<?' then
+            add(str:sub(last, a-1))
+            self[#self+1] = OPTIONAL_L
+            start = a + 2
+            last = a + 2
+        elseif c == '?' and str:sub(a, a+1) == '?>' then
+            add(str:sub(last, a-1))
+            self[#self+1] = OPTIONAL_R
+            start = a + 2
+            last = a + 2
+        else
+            start = a + 1
+        end
+    end
+end
+
+function mt:format(fmt, ...)
+    self[#self+1] = api.format(fmt, ...)
+end
+
+function mt:concat(char)
+    local new = setmetatable({}, mt)
+
+    for i, arg in ipairs(self) do
+        new[#new+1] = arg
+        if i < #self then
+            new:add(char)
+        end
+    end
+
+    return new
+end
+
+function mt:position(id)
+    self.id = id
+    return self
+end
+
+function mt:write()
+    local chars = {}
+    local symbol = {}
+    local line_count = 1
+    local is_newline = true
+
+    local function push(tbl, tab)
+        if tbl.id then
+            symbol[#symbol+1] = {
+                id = tbl.id,
+                line = line_count,
+            }
+        end
+        local new_tab = 0
+        local i = 1
+        while tbl[i] do
+            local v = tbl[i]
+            if v == NEWLINE then
+                chars[#chars+1] = '\r\n'
+                is_newline = true
+                new_tab = 0
+                line_count = line_count + 1
+            elseif v == TAB then
+                new_tab = new_tab + tbl[i+1]
+                i = i + 1
+            elseif v == SPACE then
+                chars[#chars+1] = ''
+            elseif type(v) == 'table' then
+                push(v, tab + new_tab)
+            elseif v ~= '' then
+                if is_newline and tab + new_tab > 0 then
+                    chars[#chars+1] = (' '):rep((tab + new_tab)*4)
+                end
+                if type(v) == 'string' then
+                    chars[#chars+1] = v
+                else
+                    chars[#chars+1] = tostring(v)
+                end
+                is_newline = false
+            end
+            i = i + 1
+        end
+    end
+
+    push(self, 0)
+
+    return table.concat(chars), symbol
+end
+
+api.NEWLINE = NEWLINE
+api.TAB = TAB
+
+function api.create()
+    return setmetatable({}, mt)
+end
+
+function api.format(fmt, ...)
+    local self = setmetatable({}, mt)
+
+    local args = {...}
+    local start = 1
+    local index = 1
+
+    while true do
+        local a = fmt:find('[%%%{]', start)
+        if not a then
+            self:add(fmt:sub(start))
+            break
+        end
+        local char = fmt:sub(a, a)
+        if char == '%' then
+            self:add(fmt:sub(start, a-1))
+            if type(args[index]) == 'table' then
+                self[#self+1] = args[index]
+            else
+                self[#self+1] = (fmt:sub(a, a+1)):format(args[index])
+            end
+            start = a + 2
+            index = index + 1
+            goto continue
+        end
+        if char == '{' then
+            local b = fmt:find('}', a+1, true)
+            if not b then
+                start = a + 1
+                goto continue
+            end
+            local index = math.tointeger(fmt:sub(a+1, b-1))
+            if not index then
+                start = a + 1
+                goto continue
+            end
+            self:add(fmt:sub(start, a-1))
+            if type(args[index]) == 'table' then
+                self[#self+1] = args[index]
+            else
+                self[#self+1] = ('%s'):format(args[index])
+            end
+            start = b + 1
+            goto continue
+        end
+        ::continue::
+    end
+
+    return self
+end
+
+function api.formatList(fmt, actions)
+    fmt = fmt:gsub('%[(.+)%]', function(str)
+        return str:rep(#actions-1)
+    end)
+    local i = 0
+    local buf = api.create()
+    local start = 1
+    while true do
+        local a = fmt:find('%s', start, true)
+        if not a then
+            buf:add(fmt:sub(start))
+            break
+        end
+        buf:add(fmt:sub(start, a-1))
+        start = a + 2
+        i = i + 1
+        buf:value(actions[i])
+    end
+    buf:simplify()
+    return buf:concat()
+end
+
+return api

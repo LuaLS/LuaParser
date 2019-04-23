@@ -677,8 +677,8 @@ CHECK [[
 {
     [1] = {
         type   = 'emmyIncomplete',
-        start  = 5,
-        finish = 5,
+        start  = 4,
+        finish = 4,
         [1]    = '',
     },
     [2] = {
