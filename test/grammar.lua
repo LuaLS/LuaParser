@@ -323,7 +323,14 @@ return 1;
 local t = {
     [ [[A]] ] = '',
 }
-]=]
+]=],
+[[
+return {
+    a = 1,
+    ---@type a
+    b = 2,
+}
+]]
 }
 
 -- Dirty

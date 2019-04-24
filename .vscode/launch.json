@@ -11,8 +11,8 @@
             "env": {
                 "PATH": "${workspaceRoot}\\bin\\"
             },
-            "luaexe": "${workspaceRoot}\\bin\\lua-language-server.exe",
-            "luadll": "${workspaceRoot}\\bin\\lua54.dll",
+            //"luaexe": "${workspaceRoot}\\bin\\lua-language-server.exe",
+            //"luadll": "${workspaceRoot}\\bin\\lua54.dll",
             "path": "${workspaceRoot}/bin/?.lua",
             "cpath": "${workspaceRoot}/bin/?.dll;",
             "arg0": [
@@ -23,7 +23,9 @@
             "arg": [
             ],
             "consoleCoding": "utf8",
-            "sourceCoding": "utf8"
+            "sourceCoding": "utf8",
+            "experimentalServer": true,
+            "luaRuntime": "5.4 64bit"
         },
     ]
 }
