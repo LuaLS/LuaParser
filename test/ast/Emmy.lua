@@ -109,7 +109,9 @@ x = 1
 ]]
 {
     [1] = {
-        type = 'emmyType',
+        type   = 'emmyType',
+        start  = 10,
+        finish = 13,
         [1] = {
             type   = 'emmyName',
             start  = 10,
@@ -140,7 +142,9 @@ x = 1
 ]]
 {
     [1] = {
-        type = 'emmyType',
+        type   = 'emmyType',
+        start  = 10,
+        finish = 26,
         [1] = {
             type   = 'emmyName',
             start  = 10,
@@ -183,7 +187,9 @@ x = 1
 ]]
 {
     [1] = {
-        type = 'emmyAlias',
+        type   = 'emmyAlias',
+        start  = 11,
+        finish = 26,
         [1]  = {
             type   = 'emmyName',
             start  = 11,
@@ -192,6 +198,8 @@ x = 1
         },
         [2]  = {
             type   = 'emmyType',
+            start  = 19,
+            finish = 26,
             [1]    = {
                 type   = 'emmyName',
                 start  = 19,
@@ -233,6 +241,8 @@ CHECK [[
         },
         [2] = {
             type   = 'emmyType',
+            start  = 14,
+            finish = 15,
             [1]    = {
                 type   = 'emmyName',
                 start  = 14,
@@ -251,6 +261,8 @@ CHECK [[
         },
         [2] = {
             type   = 'emmyType',
+            start  = 30,
+            finish = 31,
             [1]    = {
                 type   = 'emmyName',
                 start  = 30,
@@ -269,6 +281,8 @@ CHECK [[
         },
         [2] = {
             type   = 'emmyType',
+            start  = 46,
+            finish = 47,
             [1]    = {
                 type   = 'emmyName',
                 start  = 46,
@@ -286,7 +300,9 @@ CHECK [[
     [1] = {
         type = 'emmyReturn',
         [1]  = {
-            type = 'emmyType',
+            type   = 'emmyType',
+            start  = 12,
+            finish = 28,
             [1]  = {
                 type   = 'emmyName',
                 start  = 12,
@@ -323,7 +339,9 @@ CHECK [[
             [1]    = 'open',
         },
         [3]  = {
-            type = 'emmyType',
+            type   = 'emmyType',
+            start  = 16,
+            finish = 23,
             [1]  = {
                 type   = 'emmyName',
                 start  = 16,
@@ -348,7 +366,9 @@ CHECK [[
             [1]    = 'open',
         },
         [3]  = {
-            type = 'emmyType',
+            type   = 'emmyType',
+            start  = 24,
+            finish = 38,
             [1]  = {
                 type   = 'emmyName',
                 start  = 24,
@@ -396,7 +416,9 @@ CHECK [[
                 [1]    = 'T',
             },
             [2] = {
-                type = 'emmyType',
+                type   = 'emmyType',
+                start  = 17,
+                finish = 22,
                 [1]  = {
                     type   = 'emmyName',
                     start  = 17,
@@ -422,7 +444,9 @@ CHECK [[
                 [1]    = 'T',
             },
             [2] = {
-                type = 'emmyType',
+                type   = 'emmyType',
+                start  = 17,
+                finish = 22,
                 [1] = {
                     type   = 'emmyName',
                     start  = 17,
@@ -439,7 +463,9 @@ CHECK [[
                 [1]    = 'K',
             },
             [2] = {
-                type = 'emmyType',
+                type   = 'emmyType',
+                start  = 29,
+                finish = 34,
                 [1]  = {
                     type   = 'emmyName',
                     start  = 29,
@@ -458,7 +484,9 @@ CHECK [[
     [1] = {
         type = 'emmyVararg',
         [1]  = {
-            type = 'emmyType',
+            type   = 'emmyType',
+            start  = 12,
+            finish = 17,
             [1]  = {
                 type   = 'emmyName',
                 start  = 12,
@@ -506,7 +534,9 @@ CHECK [[
         finish = 14,
         [1]    = 'table',
         [2]    = {
-            type = 'emmyType',
+            type   = 'emmyType',
+            start  = 16,
+            finish = 18,
             [1]  = {
                 type   = 'emmyName',
                 start  = 16,
@@ -515,7 +545,9 @@ CHECK [[
             }
         },
         [3]    = {
-            type = 'emmyType',
+            type   = 'emmyType',
+            start  = 21,
+            finish = 25,
             [1]  = {
                 type   = 'emmyName',
                 start  = 21,
@@ -540,6 +572,8 @@ CHECK [[
         },
         [2]  = {
             type   = 'emmyType',
+            start  = 19,
+            finish = 23,
             [1]    = {
                 type   = 'emmyName',
                 start  = 19,
@@ -561,6 +595,8 @@ CHECK [[
         },
         [4]  = {
             type   = 'emmyType',
+            start  = 33,
+            finish = 34,
             [1]    = {
                 type   = 'emmyName',
                 start  = 33,
@@ -574,7 +610,9 @@ CHECK [[
             finish = 38,
             [1]    = 't4',
             [2]    = {
-                type = 'emmyType',
+                type   = 'emmyType',
+                start  = 40,
+                finish = 41,
                 [1] = {
                     type   = 'emmyName',
                     start  = 40,
@@ -583,7 +621,9 @@ CHECK [[
                 },
             },
             [3]    = {
-                type = 'emmyType',
+                type   = 'emmyType',
+                start  = 44,
+                finish = 45,
                 [1] = {
                     type   = 'emmyName',
                     start  = 44,
@@ -609,6 +649,8 @@ CHECK [[
         },
         [2] = {
             type   = 'emmyType',
+            start  = 17,
+            finish = 22,
             [1]    = {
                 type   = 'emmyName',
                 start  = 17,
@@ -710,6 +752,8 @@ local t = {
             finish = 44,
             [1]    = {
                 type = "emmyType",
+                start  = 26,
+                finish = 31,
                 [1]  = {
                     type   = "emmyName",
                     start  = 26,

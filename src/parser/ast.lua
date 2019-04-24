@@ -1145,6 +1145,8 @@ local Defs = {
         for i = #result // 2 + 2, #result do
             result[i] = nil
         end
+        result.start = result[1].start
+        result.finish = result[#result].finish
         return result
     end,
     EmmyArrayType = function (typeName)
@@ -1167,6 +1169,8 @@ local Defs = {
     EmmyAlias = function (name, emmyName, ...)
         return {
             type = 'emmyAlias',
+            start = name.start,
+            finish = emmyName.finish,
             name,
             emmyName,
             ...
