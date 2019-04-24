@@ -1528,7 +1528,7 @@ return function (self, lua, mode, version)
         Label = {{}},
         Version = version,
     }
-    local suc, res, err = xpcall(self.grammar, debug.traceback, lua, mode, Defs)
+    local suc, res, err = xpcall(self.grammar, debug.traceback, self, lua, mode, Defs)
     if not suc then
         return nil, res
     end
