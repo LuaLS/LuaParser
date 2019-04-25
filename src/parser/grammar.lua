@@ -554,16 +554,16 @@ EmmyTypeName    <-  EmmyFunctionType
                 /   MustEmmyName
 EmmyTypeEnums   <-  %s* '|' %s* String
 
-EmmyAlias       <-  MustEmmyName %s+ EmmyType EmmyTypeEnums*
+EmmyAlias       <-  MustEmmyName %s* EmmyType EmmyTypeEnums*
 
-EmmyParam       <-  MustEmmyName %s+ EmmyType EmmyTypeEnums*
+EmmyParam       <-  MustEmmyName %s* EmmyType EmmyTypeEnums*
 
 EmmyReturn      <-  EmmyType
 
-EmmyField       <-  (EmmyFieldAccess MustEmmyName %s+ EmmyType)
-EmmyFieldAccess <-  ({'public'}    %s+)
-                /   ({'protected'} %s+)
-                /   ({'private'}   %s+)
+EmmyField       <-  (EmmyFieldAccess MustEmmyName %s* EmmyType)
+EmmyFieldAccess <-  ({'public'}    Cut %s*)
+                /   ({'protected'} Cut %s*)
+                /   ({'private'}   Cut %s*)
                 /   {} -> 'public'
 
 EmmyGeneric     <-  EmmyGenericBlock
