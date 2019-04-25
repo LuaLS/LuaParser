@@ -571,6 +571,9 @@ local Defs = {
         local max = #obj
         obj.finish = obj[max] - 1
         obj[max]   = nil
+        if obj.argFinish > obj.finish then
+            obj.argFinish = obj.finish
+        end
         return obj
     end,
     NamedFunction = function (start, name, argStart, arg, argFinish, ...)
@@ -586,6 +589,9 @@ local Defs = {
         local max = #obj
         obj.finish = obj[max] - 1
         obj[max]   = nil
+        if obj.argFinish > obj.finish then
+            obj.argFinish = obj.finish
+        end
         return obj
     end,
     LocalFunction = function (start, name, argStart, arg, argFinish, ...)
@@ -601,6 +607,9 @@ local Defs = {
         local max = #obj
         obj.finish = obj[max] - 1
         obj[max]   = nil
+        if obj.argFinish > obj.finish then
+            obj.argFinish = obj.finish
+        end
         return obj
     end,
     Table = function (start, ...)

@@ -138,7 +138,7 @@ CHECK 'local function a'
         start     = 1,
         finish    = 16,
         argStart  = 16,
-        argFinish = 17,
+        argFinish = 16,
         name      = {
             type   = 'name',
             start  = 16,
@@ -155,7 +155,7 @@ CHECK 'local function'
         start     = 1,
         finish    = 14,
         argStart  = 14,
-        argFinish = 15,
+        argFinish = 14,
         name      = {
             type   = 'name',
             start  = 15,
@@ -172,7 +172,7 @@ CHECK 'local function a(v'
         start     = 1,
         finish    = 18,
         argStart  = 17,
-        argFinish = 19,
+        argFinish = 18,
         name      = {
             type   = 'name',
             start  = 16,
@@ -195,7 +195,7 @@ CHECK 'function a'
         start     = 1,
         finish    = 10,
         argStart  = 10,
-        argFinish = 11,
+        argFinish = 10,
         name      = {
             type   = 'name',
             start  = 10,
@@ -212,7 +212,7 @@ CHECK 'function a:'
         start     = 1,
         finish    = 11,
         argStart  = 11,
-        argFinish = 12,
+        argFinish = 11,
         name   = {
             type   = 'simple',
             start  = 10,
@@ -239,7 +239,7 @@ CHECK 'function a:b(v'
         start     = 1,
         finish    = 14,
         argStart  = 13,
-        argFinish = 15,
+        argFinish = 14,
         name      = {
             type   = 'simple',
             start  = 10,
