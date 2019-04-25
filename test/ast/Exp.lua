@@ -1077,16 +1077,20 @@ CHECK'(...)[1]'
 }
 CHECK'function () end'
 {
-    type   = 'function',
-    start  = 1,
-    finish = 15,
+    type      = 'function',
+    start     = 1,
+    finish    = 15,
+    argStart  = 10,
+    argFinish = 11,
 }
 CHECK'function (...) end'
 {
-    type   = 'function',
-    start  = 1,
-    finish = 18,
-    arg    = {
+    type      = 'function',
+    start     = 1,
+    finish    = 18,
+    argStart  = 10,
+    argFinish = 14,
+    arg       = {
         type   = '...',
         start  = 11,
         finish = 13,
@@ -1094,10 +1098,12 @@ CHECK'function (...) end'
 }
 CHECK'function (a, ...) end'
 {
-    type   = 'function',
-    start  = 1,
-    finish = 21,
-    arg    = {
+    type      = 'function',
+    start     = 1,
+    finish    = 21,
+    argStart  = 10,
+    argFinish = 17,
+    arg       = {
         type   = 'list',
         start  = 11,
         finish = 16,

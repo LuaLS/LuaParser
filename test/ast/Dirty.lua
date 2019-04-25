@@ -134,10 +134,12 @@ CHECK'1 == 2'
 CHECK 'local function a'
 {
     [1] = {
-        type   = 'localfunction',
-        start  = 1,
-        finish = 16,
-        name   = {
+        type      = 'localfunction',
+        start     = 1,
+        finish    = 16,
+        argStart  = 16,
+        argFinish = 17,
+        name      = {
             type   = 'name',
             start  = 16,
             finish = 16,
@@ -149,10 +151,12 @@ CHECK 'local function a'
 CHECK 'local function'
 {
     [1] = {
-        type   = 'localfunction',
-        start  = 1,
-        finish = 14,
-        name   = {
+        type      = 'localfunction',
+        start     = 1,
+        finish    = 14,
+        argStart  = 14,
+        argFinish = 15,
+        name      = {
             type   = 'name',
             start  = 15,
             finish = 15,
@@ -164,16 +168,18 @@ CHECK 'local function'
 CHECK 'local function a(v'
 {
     [1] = {
-        type   = 'localfunction',
-        start  = 1,
-        finish = 18,
-        name   = {
+        type      = 'localfunction',
+        start     = 1,
+        finish    = 18,
+        argStart  = 17,
+        argFinish = 19,
+        name      = {
             type   = 'name',
             start  = 16,
             finish = 16,
             [1]    = 'a',
         },
-        arg    = {
+        arg       = {
             type   = 'name',
             start  = 18,
             finish = 18,
@@ -185,10 +191,12 @@ CHECK 'local function a(v'
 CHECK 'function a'
 {
     [1] = {
-        type   = 'function',
-        start  = 1,
-        finish = 10,
-        name   = {
+        type      = 'function',
+        start     = 1,
+        finish    = 10,
+        argStart  = 10,
+        argFinish = 11,
+        name      = {
             type   = 'name',
             start  = 10,
             finish = 10,
@@ -200,9 +208,11 @@ CHECK 'function a'
 CHECK 'function a:'
 {
     [1] = {
-        type   = 'function',
-        start  = 1,
-        finish = 11,
+        type      = 'function',
+        start     = 1,
+        finish    = 11,
+        argStart  = 11,
+        argFinish = 12,
         name   = {
             type   = 'simple',
             start  = 10,
@@ -225,10 +235,12 @@ CHECK 'function a:'
 CHECK 'function a:b(v'
 {
     [1] = {
-        type   = 'function',
-        start  = 1,
-        finish = 14,
-        name   = {
+        type      = 'function',
+        start     = 1,
+        finish    = 14,
+        argStart  = 13,
+        argFinish = 15,
+        name      = {
             type   = 'simple',
             start  = 10,
             finish = 12,

@@ -198,9 +198,11 @@ CHECK'x = function () end'
         [1]    = 'x',
     },
     [2]  = {
-        type   = 'function',
-        start  = 5,
-        finish = 19,
+        type      = 'function',
+        start     = 5,
+        finish    = 19,
+        argStart  = 14,
+        argFinish = 15,
     }
 }
 CHECK'x.y = function () end'
@@ -229,9 +231,11 @@ CHECK'x.y = function () end'
         },
     },
     [2]  = {
-        type   = 'function',
-        start  = 7,
-        finish = 21,
+        type      = 'function',
+        start     = 7,
+        finish    = 21,
+        argStart  = 16,
+        argFinish = 17,
     }
 }
 CHECK'func.x(1, 2)'
@@ -910,16 +914,18 @@ function test()
     return
 end]]
 {
-    type   = 'function',
-    start  = 1,
-    finish = 30,
-    name   = {
+    type      = 'function',
+    start     = 1,
+    finish    = 30,
+    argStart  = 14,
+    argFinish = 15,
+    name      = {
         type   = 'name',
         start  = 10,
         finish = 13,
         [1]    = 'test',
     },
-    [1]    = {
+    [1]       = {
         type   = 'return',
         start  = 21,
         finish = 26,
@@ -930,22 +936,24 @@ function test(a)
     return
 end]]
 {
-    type   = 'function',
-    start  = 1,
-    finish = 31,
-    name   = {
+    type      = 'function',
+    start     = 1,
+    finish    = 31,
+    argStart  = 14,
+    argFinish = 16,
+    name      = {
         type   = 'name',
         start  = 10,
         finish = 13,
         [1]    = 'test',
     },
-    arg    = {
+    arg       = {
         type   = 'name',
         start  = 15,
         finish = 15,
         [1]    = 'a',
     },
-    [1]    = {
+    [1]       = {
         type   = 'return',
         start  = 22,
         finish = 27,
@@ -956,10 +964,12 @@ function a.b:c(a, b, c)
     return
 end]]
 {
-    type   = 'function',
-    start  = 1,
-    finish = 38,
-    name   = {
+    type      = 'function',
+    start     = 1,
+    finish    = 38,
+    argStart  = 15,
+    argFinish = 23,
+    name      = {
         type   = 'simple',
         start  = 10,
         finish = 14,
@@ -992,7 +1002,7 @@ end]]
             [1]    = 'c',
         }
     },
-    arg    = {
+    arg       = {
         type   = 'list',
         start  = 16,
         finish = 22,
@@ -1015,7 +1025,7 @@ end]]
             [1]    = 'c',
         },
     },
-    [1]    = {
+    [1]       = {
         type   = 'return',
         start  = 29,
         finish = 34,
@@ -1026,9 +1036,11 @@ local function a()
     return
 end]]
 {
-    type   = 'localfunction',
-    start  = 1,
-    finish = 33,
+    type      = 'localfunction',
+    start     = 1,
+    finish    = 33,
+    argStart  = 17,
+    argFinish = 18,
     name   = {
         type   = 'name',
         start  = 16,
@@ -1046,9 +1058,11 @@ local function a(b, c)
     return
 end]]
 {
-    type   = 'localfunction',
-    start  = 1,
-    finish = 37,
+    type      = 'localfunction',
+    start     = 1,
+    finish    = 37,
+    argStart  = 17,
+    argFinish = 22,
     name   = {
         type   = 'name',
         start  = 16,

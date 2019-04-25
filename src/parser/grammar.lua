@@ -353,8 +353,8 @@ NewField    <-  (MustName ASSIGN DirtyExp)
 
 Function    <-  Sp ({} FunctionBody {})
             ->  Function
-FuncArg     <-  PL ArgList NeedPR
-            /   {} -> MissPL Nothing
+FuncArg     <-  PL {} ArgList {} NeedPR
+            /   {} {} -> MissPL Nothing {}
 FunctionBody<-  FUNCTION FuncArg
                     LabelStart
                     (!END Action)*
