@@ -781,3 +781,30 @@ local t = {
         },
     },
 }
+
+CHECK [[
+local function f()
+    ---@
+end
+]]
+{
+    [1] = {
+        type      = "localfunction",
+        start     = 1,
+        finish    = 31,
+        argStart  = 17,
+        argFinish = 18,
+        name      = {
+            [1]    = "f",
+            finish = 16,
+            start  = 16,
+            type   = "name",
+        },
+        [1]       = {
+            type   = "emmyIncomplete",
+            start  = 27,
+            finish = 27,
+            [1]    = "",
+        },
+    },
+}
