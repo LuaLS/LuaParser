@@ -330,7 +330,9 @@ CHECK [[
 ]]
 {
     [1] = {
-        type = 'emmyField',
+        type   = 'emmyField',
+        start  = 11,
+        finish = 23,
         [1]  = 'public',
         [2]  = {
             type   = 'emmyName',
@@ -357,7 +359,9 @@ CHECK [[
 ]]
 {
     [1] = {
-        type = 'emmyField',
+        type   = 'emmyField',
+        start  = 19,
+        finish = 38,
         [1]  = 'private',
         [2]  = {
             type   = 'emmyName',
