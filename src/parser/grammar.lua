@@ -541,15 +541,15 @@ EmmyClass       <-  (MustEmmyName EmmyParentClass?)
 EmmyParentClass <-  %s* {} ':' %s* MustEmmyName
 
 EmmyType        <-  EmmyFunctionType
-                /   EmmyArrayType
                 /   EmmyTableType
+                /   EmmyArrayType
                 /   EmmyCommonType
 EmmyCommonType  <-  EmmyTypeNames
                 ->  EmmyCommonType
 EmmyTypeNames   <-  EmmyTypeName (%s* {} '|' %s* !String EmmyTypeName)*
 EmmyTypeName    <-  EmmyFunctionType
-                /   EmmyArrayType
                 /   EmmyTableType
+                /   EmmyArrayType
                 /   MustEmmyName
 EmmyTypeEnums   <-  %s* '|' %s* String
 
@@ -577,7 +577,7 @@ EmmyLanguage    <-  MustEmmyName
 EmmyArrayType   <-  (MustEmmyName '[]')
                 ->  EmmyArrayType
 
-EmmyTableType   <-  (MustEmmyName '<' %s* EmmyType %s* ',' %s* EmmyType %s* '>')
+EmmyTableType   <-  ({} 'table' Cut '<' %s* EmmyType %s* ',' %s* EmmyType %s* '>' {})
                 ->  EmmyTableType
 
 EmmyFunctionType<-  ('fun' Cut %s* EmmyFunctionArgs? %s* EmmyFunctionRtn?)

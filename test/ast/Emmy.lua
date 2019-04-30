@@ -535,9 +535,8 @@ CHECK [[
     [1] = {
         type = 'emmyTableType',
         start  = 10,
-        finish = 14,
-        [1]    = 'table',
-        [2]    = {
+        finish = 26,
+        [1]    = {
             type   = 'emmyType',
             start  = 16,
             finish = 18,
@@ -548,7 +547,7 @@ CHECK [[
                 [1]    = 'key',
             }
         },
-        [3]    = {
+        [2]    = {
             type   = 'emmyType',
             start  = 21,
             finish = 25,
@@ -563,7 +562,7 @@ CHECK [[
 }
 
 CHECK [[
----@type fun(key1:t1|t2[], key2:t3):t4<t5, t6>
+---@type fun(key1:t1|t2[], key2:t3):table<t5, t6>
 ]]
 {
     [1] = {
@@ -611,27 +610,26 @@ CHECK [[
         [5]  = {
             type   = 'emmyTableType',
             start  = 37,
-            finish = 38,
-            [1]    = 't4',
-            [2]    = {
+            finish = 49,
+            [1]    = {
                 type   = 'emmyType',
-                start  = 40,
-                finish = 41,
+                start  = 43,
+                finish = 44,
                 [1] = {
                     type   = 'emmyName',
-                    start  = 40,
-                    finish = 41,
+                    start  = 43,
+                    finish = 44,
                     [1]    = 't5',
                 },
             },
-            [3]    = {
+            [2]    = {
                 type   = 'emmyType',
-                start  = 44,
-                finish = 45,
+                start  = 47,
+                finish = 48,
                 [1] = {
                     type   = 'emmyName',
-                    start  = 44,
-                    finish = 45,
+                    start  = 47,
+                    finish = 48,
                     [1]    = 't6',
                 }
             }
