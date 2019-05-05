@@ -467,6 +467,7 @@ goto<!!>
 ]]
 {
     type = 'MISS_NAME',
+    multi = 1,
 }
 
 TEST[[
@@ -1219,28 +1220,28 @@ TEST[[
 -- EmmyLua
 
 TEST[[
----@class<!!> 
+---@class <!!>
 ]]
 {
     type = 'MISS_NAME',
 }
 
 TEST[[
----@class Class <!:!>
+---@class Class :<!!>
 ]]
 {
     type = 'MISS_NAME',
 }
 
 TEST[[
----@type<!!> 
+---@type <!!>
 ]]
 {
     type = 'MISS_NAME',
 }
 
 TEST[[
----@type Type1<!|!>
+---@type Type1|<!!>
 ]]
 {
     type = 'MISS_NAME',

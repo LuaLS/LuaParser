@@ -566,7 +566,9 @@ CHECK [[
 ]]
 {
     [1] = {
-        type = 'emmyFunctionType',
+        type   = 'emmyFunctionType',
+        start  = 10,
+        finish = 49,
         [1]  = {
             type   = 'emmyName',
             start  = 14,
@@ -809,4 +811,13 @@ end
             [1]    = "",
         },
     },
+}
+
+CHECK '---@type fun'
+{
+	[1] = {
+		type   = "emmyFunctionType",
+		start  = 10,
+		finish = 12,
+	},
 }

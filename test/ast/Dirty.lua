@@ -158,8 +158,8 @@ CHECK 'local function'
         argFinish = 14,
         name      = {
             type   = 'name',
-            start  = 15,
-            finish = 15,
+            start  = 14,
+            finish = 14,
             [1]    = '',
         }
     }

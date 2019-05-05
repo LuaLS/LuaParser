@@ -1,5 +1,4 @@
 local parser = require 'parser'
-local table_writer = require 'table_writer'
 local fs = require 'bee.filesystem'
 
 rawset(_G, 'CHECK', false)
@@ -39,8 +38,8 @@ local function test(type)
             end
             if not eq(my_ast, target_ast) then
                 fs.create_directory(ROOT / 'test' / 'log')
-                io.save(ROOT / 'test' / 'log' / 'my_ast.ast', table_writer(my_ast))
-                io.save(ROOT / 'test' / 'log' / 'target_ast.ast', table_writer(target_ast))
+                io.save(ROOT / 'test' / 'log' / 'my_ast.ast', table.dump(my_ast))
+                io.save(ROOT / 'test' / 'log' / 'target_ast.ast', table.dump(target_ast))
                 error(('语法树不相等：%s\n%s'):format(type, buf))
             end
         end
