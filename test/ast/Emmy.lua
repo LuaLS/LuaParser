@@ -682,7 +682,9 @@ CHECK [[
 ]]
 {
     [1] = {
-        type = 'emmySee',
+        type   = 'emmySee',
+        start  = 9,
+        finish = 18,
         [1]  = {
             type   = 'emmyName',
             start  = 9,
