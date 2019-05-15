@@ -24,7 +24,6 @@
             ],
             "consoleCoding": "utf8",
             "sourceCoding": "utf8",
-            "experimentalServer": true,
             "luaRuntime": "5.4 64bit"
         },
     ]

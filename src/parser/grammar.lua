@@ -424,8 +424,10 @@ GoTo        <-  Sp ({} GOTO MustName {}) -> GoTo
 If          <-  Sp ({} IfBody {})
             ->  If
 IfHead      <-  (IfPart     -> IfBlock)
-            /   (ElseIfPart -> ElseIfBlock)
-            /   (ElsePart   -> ElseBlock)
+            /   ({} ElseIfPart -> ElseIfBlock)
+            ->  MissIf
+            /   ({} ElsePart   -> ElseBlock)
+            ->  MissIf
 IfBody      <-  IfHead
                 (ElseIfPart -> ElseIfBlock)*
                 (ElsePart   -> ElseBlock)?
@@ -586,7 +588,7 @@ EmmyFunctionArgs<-  '(' %s* EmmyFunctionArg %s* (',' %s* EmmyFunctionArg %s*)* '
 EmmyFunctionRtn <-  ':' %s* EmmyType
 EmmyFunctionArg <-  MustEmmyName %s* ':' %s* EmmyType
 
-EmmySee         <-  {} MustEmmyName '#' MustEmmyName {}
+EmmySee         <-  {} MustEmmyName %s* '#' %s* MustEmmyName {}
 ]]
 
 grammar 'Lua' [[

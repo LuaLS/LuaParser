@@ -860,6 +860,28 @@ TEST[[
     type = 'EXP_IN_ACTION',
 }
 
+TEST[[
+<!!>else
+end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = 'if',
+    }
+}
+
+TEST[[
+<!!>elseif true then
+end
+]]
+{
+    type = 'MISS_SYMBOL',
+    info = {
+        symbol = 'if',
+    }
+}
+
 -- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua
 TEST[[
 f = 9<!e!>
