@@ -882,6 +882,26 @@ end
     }
 }
 
+TEST[[
+function f()
+    return <!...!>
+end
+]]
+{
+    type = 'UNEXPECT_DOTS',
+}
+
+TEST[[
+function f(...)
+    return function ()
+        return <!...!>
+    end
+end
+]]
+{
+    type = 'UNEXPECT_DOTS',
+}
+
 -- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua
 TEST[[
 f = 9<!e!>
