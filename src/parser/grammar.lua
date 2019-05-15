@@ -355,8 +355,7 @@ Function    <-  Sp ({} FunctionBody {})
             ->  Function
 FuncArg     <-  PL {} ArgList {} NeedPR
             /   {} {} -> MissPL Nothing {}
-FunctionBody<-  FUNCTION FuncArg
-                    BlockStart
+FunctionBody<-  FUNCTION BlockStart FuncArg
                     (Emmy / !END Action)*
                     BlockEnd
                 NeedEnd
@@ -502,8 +501,7 @@ NamedFunction
             <-  Sp ({} FunctionNamedBody {})
             ->  NamedFunction
 FunctionNamedBody
-            <-  FUNCTION FuncName FuncArg
-                    BlockStart
+            <-  FUNCTION FuncName BlockStart FuncArg
                     (Emmy / !END Action)*
                     BlockEnd
                 NeedEnd
@@ -593,7 +591,6 @@ EmmySee         <-  {} MustEmmyName %s* '#' %s* MustEmmyName {}
 
 grammar 'Lua' [[
 Lua         <-  Head?
-                BlockStart
                 (Emmy / Action)* -> Lua
                 BlockEnd
                 Sp

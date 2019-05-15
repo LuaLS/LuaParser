@@ -998,10 +998,11 @@ local Defs = {
     -- 不能从block外jump到block内，但是可以从block内jump到block外
     BlockStart = function ()
         State.Label[#State.Label+1] = {}
-        State.Dots[#State.Label+1] = false
+        State.Dots[#State.Dots+1] = false
     end,
     BlockEnd = function ()
         local labels = State.Label[#State.Label]
+        State.Label[#State.Label] = nil
         State.Dots[#State.Dots] = nil
         for i = 1, #labels do
             local name = labels[i]
