@@ -667,12 +667,14 @@ CHECK [[
             start  = 26,
             finish = 37,
             [1]    = "'onClosed'",
+            [2]    = [=["]=],
         },
         [4] = {
             type   = "string",
             start  = 41,
             finish = 50,
             [1]    = "'onData'",
+            [2]    = [=["]=],
         },
     },
 }
