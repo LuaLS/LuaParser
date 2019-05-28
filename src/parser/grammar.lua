@@ -91,13 +91,15 @@ local function errorpos(pos, err)
 end
 
 grammar 'Comment' [[
-Comment         <-  '--' (LongComment / ShortComment)
+Comment         <-  '--' (Emmy / LongComment / ShortComment)
 LongComment     <-  ('[' {} {:eq: '='* :} {} '[' 
                     (!CommentClose .)*
                     (CommentClose / {}))
                 ->  LongComment
 CommentClose    <-  ']' =eq ']'
 ShortComment    <-  (!%nl .)*
+-- 占位
+Emmy            <-  !.
 ]]
 
 grammar 'Sp' [[
@@ -343,7 +345,7 @@ ArgList     <-  (DOTS -> DotsAsArg / Name / Sp {} COMMA)*
 
 Table       <-  Sp ({} TL TableFields? DirtyTR)
             ->  Table
-TableFields <-  (Emmy / TableSep {} / TableField)+
+TableFields <-  (TableSep {} / TableField)+
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
 NewIndex    <-  Sp (Index NeedAssign DirtyExp)
@@ -356,7 +358,7 @@ Function    <-  Sp ({} FunctionBody {})
 FuncArg     <-  PL {} ArgList {} NeedPR
             /   {} {} -> MissPL Nothing {}
 FunctionBody<-  FUNCTION BlockStart FuncArg
-                    (Emmy / !END Action)*
+                    (!END Action)*
                     BlockEnd
                 NeedEnd
 
@@ -366,7 +368,6 @@ BlockEnd    <-  {} -> BlockEnd
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
 Action      <-  !END .
 Set         <-  END
-Emmy        <-  '---@'
 ]]
 
 grammar 'Action' [[
@@ -401,7 +402,7 @@ SimpleList  <-  (Simple (COMMA Simple)*)
 
 Do          <-  Sp ({} DO DoBody NeedEnd {})
             ->  Do
-DoBody      <-  (Emmy / !END Action)*
+DoBody      <-  (!END Action)*
             ->  DoBody
 
 Break       <-  BREAK ({} Semicolon* AfterBreak?)
@@ -432,15 +433,15 @@ IfBody      <-  IfHead
                 (ElsePart   -> ElseBlock)?
                 NeedEnd
 IfPart      <-  IF DirtyExp THEN
-                    {} (Emmy / !ELSEIF !ELSE !END Action)* {}
+                    {} (!ELSEIF !ELSE !END Action)* {}
             /   IF DirtyExp {}->MissThen
                     {}        {}
 ElseIfPart  <-  ELSEIF DirtyExp THEN
-                    {} (Emmy / !ELSE !ELSEIF !END Action)* {}
+                    {} (!ELSE !ELSEIF !END Action)* {}
             /   ELSEIF DirtyExp {}->MissThen
                     {}         {}
 ElsePart    <-  ELSE
-                    {} (Emmy / !END Action)* {}
+                    {} (!END Action)* {}
 
 For         <-  Loop / In
             /   FOR
@@ -449,7 +450,7 @@ Loop        <-  Sp ({} LoopBody {})
             ->  Loop
 LoopBody    <-  FOR LoopStart LoopFinish LoopStep NeedDo
                     BreakStart
-                    (Emmy / !END Action)*
+                    (!END Action)*
                     BreakEnd
                 NeedEnd
 LoopStart   <-  MustName ASSIGN DirtyExp
@@ -462,7 +463,7 @@ In          <-  Sp ({} InBody {})
             ->  In
 InBody      <-  FOR InNameList NeedIn ExpList NeedDo
                     BreakStart
-                    (Emmy / !END Action)*
+                    (!END Action)*
                     BreakEnd
                 NeedEnd
 InNameList  <-  &IN DirtyName
@@ -472,7 +473,7 @@ While       <-  Sp ({} WhileBody {})
             ->  While
 WhileBody   <-  WHILE DirtyExp NeedDo
                     BreakStart
-                    (Emmy / !END Action)*
+                    (!END Action)*
                     BreakEnd
                 NeedEnd
 
@@ -480,7 +481,7 @@ Repeat      <-  Sp ({} RepeatBody {})
             ->  Repeat
 RepeatBody  <-  REPEAT
                     BreakStart
-                    (Emmy / !UNTIL Action)*
+                    (!UNTIL Action)*
                     BreakEnd
                 NeedUntil DirtyExp
 
@@ -502,20 +503,17 @@ NamedFunction
             ->  NamedFunction
 FunctionNamedBody
             <-  FUNCTION FuncName BlockStart FuncArg
-                    (Emmy / !END Action)*
+                    (!END Action)*
                     BlockEnd
                 NeedEnd
 FuncName    <-  (MustName (DOT MustName)* FuncMethod?)
             ->  Simple
 FuncMethod  <-  COLON Name / COLON {} -> MissMethod
-
--- 占位
-Emmy        <-  '---@'
 ]]
 
 grammar 'Emmy' [[
-Emmy            <-  EmmySp '---@' EmmyBody ShortComment
-EmmySp          <-  (!'---@' Comment / %s / %nl)*
+Emmy            <-  ('-@' EmmyBody ShortComment)
+                ->  Emmy
 EmmyBody        <-  'class'    %s+ EmmyClass    -> EmmyClass
                 /   'type'     %s+ EmmyType     -> EmmyType
                 /   'alias'    %s+ EmmyAlias    -> EmmyAlias
@@ -591,7 +589,7 @@ EmmySee         <-  {} MustEmmyName %s* '#' %s* MustEmmyName {}
 
 grammar 'Lua' [[
 Lua         <-  Head?
-                (Emmy / Action)* -> Lua
+                Action* -> Lua
                 BlockEnd
                 Sp
 Head        <-  '#' (!%nl .)*

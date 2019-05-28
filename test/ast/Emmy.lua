@@ -1,4 +1,4 @@
-CHECK [[
+CHECK_EMMY [[
 ---@class Class
 local x = 1
 ]]
@@ -14,24 +14,9 @@ local x = 1
             [1]    = 'Class',
         },
     },
-    [2] = {
-        type = 'local',
-        [1]  = {
-            type   = 'name',
-            start  = 23,
-            finish = 23,
-            [1]    = 'x',
-        },
-        [2]  = {
-            type   = 'number',
-            start  = 27,
-            finish = 27,
-            [1]    = 1,
-        }
-    }
 }
 
-CHECK [[
+CHECK_EMMY [[
 ---@class Class : SuperClass
 local x = 1
 ]]
@@ -53,24 +38,9 @@ local x = 1
             [1]    = 'SuperClass',
         },
     },
-    [2] = {
-        type = 'local',
-        [1]  = {
-            type   = 'name',
-            start  = 36,
-            finish = 36,
-            [1]    = 'x',
-        },
-        [2]  = {
-            type   = 'number',
-            start  = 40,
-            finish = 40,
-            [1]    = 1,
-        }
-    }
 }
 
-CHECK [[
+CHECK_EMMY [[
 ---@class Class
 x = 1
 ]]
@@ -86,24 +56,9 @@ x = 1
             [1]    = 'Class',
         },
     },
-    [2] = {
-        type = 'set',
-        [1]  = {
-            type   = 'name',
-            start  = 17,
-            finish = 17,
-            [1]    = 'x',
-        },
-        [2]  = {
-            type   = 'number',
-            start  = 21,
-            finish = 21,
-            [1]    = 1,
-        }
-    }
 }
 
-CHECK [[
+CHECK_EMMY [[
 ---@type Type
 x = 1
 ]]
@@ -119,24 +74,9 @@ x = 1
             [1]    = 'Type',
         },
     },
-    [2] = {
-        type = 'set',
-        [1]  = {
-            type   = 'name',
-            start  = 15,
-            finish = 15,
-            [1]    = 'x',
-        },
-        [2]  = {
-            type   = 'number',
-            start  = 19,
-            finish = 19,
-            [1]    = 1,
-        }
-    }
 }
 
-CHECK [[
+CHECK_EMMY [[
 ---@type Type1|Type2|Type3
 x = 1
 ]]
@@ -164,24 +104,9 @@ x = 1
             [1]    = 'Type3',
         },
     },
-    [2] = {
-        type = 'set',
-        [1]  = {
-            type   = 'name',
-            start  = 28,
-            finish = 28,
-            [1]    = 'x',
-        },
-        [2]  = {
-            type   = 'number',
-            start  = 32,
-            finish = 32,
-            [1]    = 1,
-        }
-    }
 }
 
-CHECK [[
+CHECK_EMMY [[
 ---@alias Handler LongType
 x = 1
 ]]
@@ -208,24 +133,9 @@ x = 1
             },
         },
     },
-    [2] = {
-        type = 'set',
-        [1]  = {
-            type   = 'name',
-            start  = 28,
-            finish = 28,
-            [1]    = 'x',
-        },
-        [2]  = {
-            type   = 'number',
-            start  = 32,
-            finish = 32,
-            [1]    = 1,
-        }
-    }
 }
 
-CHECK [[
+CHECK_EMMY [[
 ---@param a1 t1
 ---@param a2 t2
 ---@param a3 t3
@@ -293,7 +203,7 @@ CHECK [[
     },
 }
 
-CHECK [[
+CHECK_EMMY [[
 ---@return Type1|Type2|Type3
 ]]
 {
@@ -325,7 +235,7 @@ CHECK [[
     },
 }
 
-CHECK [[
+CHECK_EMMY [[
 ---@field open function
 ]]
 {
@@ -354,7 +264,7 @@ CHECK [[
     },
 }
 
-CHECK [[
+CHECK_EMMY [[
 ---@field private open function|string
 ]]
 {
@@ -389,7 +299,7 @@ CHECK [[
     },
 }
 
-CHECK [[
+CHECK_EMMY [[
 ---@generic T
 ]]
 {
@@ -406,7 +316,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+CHECK_EMMY [[
 ---@generic T : handle
 ]]
 {
@@ -434,7 +344,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+CHECK_EMMY [[
 ---@generic T : handle, K : handle
 ]]
 {
@@ -481,7 +391,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+CHECK_EMMY [[
 ---@vararg string
 ]]
 {
@@ -501,7 +411,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+CHECK_EMMY [[
 ---@language JSON
 ]]
 {
@@ -516,7 +426,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+CHECK_EMMY [[
 ---@type Type[]
 ]]
 {
@@ -528,7 +438,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+CHECK_EMMY [[
 ---@type table<key, value>
 ]]
 {
@@ -561,7 +471,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+CHECK_EMMY [[
 ---@type fun(key1:t1|t2[], key2:t3):table<t5, t6>
 ]]
 {
@@ -639,7 +549,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+CHECK_EMMY [[
 ---@param event string | "'onClosed'" | "'onData'"
 ]]
 {
@@ -679,7 +589,7 @@ CHECK [[
     },
 }
 
-CHECK [[
+CHECK_EMMY [[
 ---@see loli#pants
 ]]
 {
@@ -702,7 +612,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+CHECK_EMMY [[
 
 ---@class Class
 ]]
@@ -720,7 +630,7 @@ CHECK [[
     },
 }
 
-CHECK [[
+CHECK_EMMY [[
 ---@
 ---@cl
 ]]
@@ -739,85 +649,41 @@ CHECK [[
     },
 }
 
-CHECK [[
+CHECK_EMMY [[
 local t = {
     ---@type string
     x = 1,
 }
 ]]
 {
-    [1] = {
-        type = "local",
-        [1] = {
-            type   = "name",
-            start  = 7,
-            finish = 7,
-            [1]    = "t",
-        },
-        [2] = {
-            type   = "table",
-            start  = 11,
-            finish = 44,
-            [1]    = {
-                type = "emmyType",
-                start  = 26,
-                finish = 31,
-                [1]  = {
-                    type   = "emmyName",
-                    start  = 26,
-                    finish = 31,
-                    [1]    = "string",
-                },
-            },
-            [2]    = {
-                type   = "pair",
-                start  = 37,
-                finish = 41,
-                [1] = {
-                    type   = "name",
-                    start  = 37,
-                    finish = 37,
-                    [1]    = "x",
-                },
-                [2] = {
-                    type   = "number",
-                    start  = 41,
-                    finish = 41,
-                    [1]    = 1,
-                },
-            },
+    [1]    = {
+        type = "emmyType",
+        start  = 26,
+        finish = 31,
+        [1]  = {
+            type   = "emmyName",
+            start  = 26,
+            finish = 31,
+            [1]    = "string",
         },
     },
 }
 
-CHECK [[
+CHECK_EMMY [[
 local function f()
     ---@
 end
 ]]
 {
-    [1] = {
-        type      = "localfunction",
-        start     = 1,
-        finish    = 31,
-        argStart  = 17,
-        argFinish = 18,
-        name      = {
-            [1]    = "f",
-            finish = 16,
-            start  = 16,
-            type   = "name",
-        },
-        [1]       = {
-            type   = "emmyIncomplete",
-            start  = 27,
-            finish = 27,
-            [1]    = "",
-        },
+    [1]       = {
+        type   = "emmyIncomplete",
+        start  = 27,
+        finish = 27,
+        [1]    = "",
     },
 }
 
-CHECK '---@type fun'
+CHECK_EMMY '---@type fun'
 {
 	[1] = {
 		type   = "emmyFunctionType",

@@ -2,6 +2,7 @@ local parser = require 'parser'
 local fs = require 'bee.filesystem'
 
 rawset(_G, 'CHECK', false)
+rawset(_G, 'CHECK_EMMY', false)
 
 local function eq(a, b)
     local tp1, tp2 = type(a), type(b)
@@ -40,6 +41,20 @@ local function test(type)
                 fs.create_directory(ROOT / 'test' / 'log')
                 io.save(ROOT / 'test' / 'log' / 'my_ast.ast', table.dump(my_ast))
                 io.save(ROOT / 'test' / 'log' / 'target_ast.ast', table.dump(target_ast))
+                error(('语法树不相等：%s\n%s'):format(type, buf))
+            end
+        end
+    end
+    CHECK_EMMY = function (buf)
+        return function (target_emmy)
+            local my_ast, err, state = parser:ast(buf, type, 'Lua 5.4')
+            if not my_ast then
+                error(('语法树生成失败：%s'):format(err))
+            end
+            if not eq(state.emmy, target_emmy) then
+                fs.create_directory(ROOT / 'test' / 'log')
+                io.save(ROOT / 'test' / 'log' / 'my_emmy.ast', table.dump(state.emmy))
+                io.save(ROOT / 'test' / 'log' / 'target_emmy.ast', table.dump(target_emmy))
                 error(('语法树不相等：%s\n%s'):format(type, buf))
             end
         end

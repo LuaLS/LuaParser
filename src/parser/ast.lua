@@ -1124,6 +1124,9 @@ local Defs = {
     end,
 
     -- EmmyLua 支持
+    Emmy = function (emmy)
+        State.emmy[#State.emmy+1] = emmy
+    end,
     EmmyName = function (start, str)
         return {
             type   = 'emmyName',
@@ -1586,6 +1589,7 @@ return function (self, lua, mode, version)
         Label = {{}},
         Dots = {true},
         Version = version,
+        emmy = {},
     }
     local suc, res, err = xpcall(self.grammar, debug.traceback, self, lua, mode, Defs)
     if not suc then
@@ -1593,7 +1597,7 @@ return function (self, lua, mode, version)
     end
     if not res then
         pushError(err)
-        return nil, Errs
+        return nil, Errs, State
     end
-    return res, Errs
+    return res, Errs, State
 end
