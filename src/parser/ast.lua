@@ -836,20 +836,23 @@ local Defs = {
             keys, values,
         }
     end,
-    Local = function (tag, keys, values)
-        if tag and State.Version ~= 'Lua 5.4' then
-            pushError {
-                type = 'UNSUPPORT_SYMBOL',
-                start = tag.start,
-                finish = tag.finish,
-                version = 'Lua 5.4',
-                info = {
-                    version = State.Version,
-                }
-            }
+    LocalTag = function (...)
+        if not ... or ... == '' then
+            return nil
         end
-        if tag then
-            if tag[1] ~= 'const' and tag[1] ~= 'toclose' then
+        local tags = {...}
+        for _, tag in ipairs(tags) do
+            if State.Version ~= 'Lua 5.4' then
+                pushError {
+                    type = 'UNSUPPORT_SYMBOL',
+                    start = tag.start,
+                    finish = tag.finish,
+                    version = 'Lua 5.4',
+                    info = {
+                        version = State.Version,
+                    }
+                }
+            elseif tag[1] ~= 'const' and tag[1] ~= 'toclose' then
                 pushError {
                     type = 'UNKNOWN_TAG',
                     start = tag.start,
@@ -860,9 +863,12 @@ local Defs = {
                 }
             end
         end
+        return tags
+    end,
+    Local = function (tags, keys, values)
         return {
             type = 'local',
-            keys, values, tag
+            keys, values, tags
         }
     end,
     DoBody = function (...)

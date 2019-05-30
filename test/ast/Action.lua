@@ -167,26 +167,34 @@ CHECK'local x, y, z = 1, 2, 3'
         },
     },
 }
-CHECK'local <toclose> x = 1'
+CHECK'local <toclose> <const> x = 1'
 {
     type = 'local',
     [1]  = {
         type   = 'name',
-        start  = 17,
-        finish = 17,
+        start  = 25,
+        finish = 25,
         [1]    = 'x',
     },
     [2]  = {
         type   = 'number',
-        start  = 21,
-        finish = 21,
+        start  = 29,
+        finish = 29,
         [1]    = 1,
     },
     [3]  = {
-        type   = 'name',
-        start  = 8,
-        finish = 14,
-        [1]    = 'toclose',
+        [1] = {
+            type   = 'name',
+            start  = 8,
+            finish = 14,
+            [1]    = 'toclose',
+        },
+        [2] = {
+            type   = 'name',
+            start  = 18,
+            finish = 22,
+            [1]    = 'const',
+        },
     }
 }
 CHECK'x = function () end'
