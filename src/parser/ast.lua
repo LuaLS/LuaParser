@@ -848,6 +848,18 @@ local Defs = {
                 }
             }
         end
+        if tag then
+            if tag[1] ~= 'const' and tag[1] ~= 'toclose' then
+                pushError {
+                    type = 'UNKNOWN_TAG',
+                    start = tag.start,
+                    finish = tag.finish,
+                    info = {
+                        tag = tag[1],
+                    }
+                }
+            end
+        end
         return {
             type = 'local',
             keys, values, tag
