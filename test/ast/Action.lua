@@ -197,6 +197,30 @@ CHECK'local <toclose> <const> x = 1'
         },
     }
 }
+CHECK'local < const > x = 1'
+{
+    type = 'local',
+    [1]  = {
+        type   = 'name',
+        start  = 17,
+        finish = 17,
+        [1]    = 'x',
+    },
+    [2] = {
+        type   = 'number',
+        start  = 21,
+        finish = 21,
+        [1]    = 1,
+    },
+    [3] = {
+        [1] = {
+            type   = 'name',
+            start  = 9,
+            finish = 13,
+            [1]    = 'const',
+        }
+    }
+}
 CHECK'x = function () end'
 {
     type = 'set',
