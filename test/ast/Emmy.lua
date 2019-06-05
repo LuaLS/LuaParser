@@ -232,7 +232,9 @@ CHECK [[
 ]]
 {
     [1]  = {
-        type = 'emmyParam',
+        type   = 'emmyParam',
+        start  = 11,
+        finish = 15,
         [1]  = {
             type   = 'emmyName',
             start  = 11,
@@ -252,7 +254,9 @@ CHECK [[
         }
     },
     [2]  = {
-        type = 'emmyParam',
+        type   = 'emmyParam',
+        start  = 27,
+        finish = 31,
         [1]  = {
             type   = 'emmyName',
             start  = 27,
@@ -272,7 +276,9 @@ CHECK [[
         }
     },
     [3]  = {
-        type = 'emmyParam',
+        type   = 'emmyParam',
+        start  = 43,
+        finish = 47,
         [1]  = {
             type   = 'emmyName',
             start  = 43,
@@ -299,6 +305,8 @@ CHECK [[
 {
     [1] = {
         type = 'emmyReturn',
+        start  = 12,
+        finish = 28,
         [1]  = {
             type   = 'emmyType',
             start  = 12,
@@ -395,7 +403,11 @@ CHECK [[
 {
     [1] = {
         type = 'emmyGeneric',
+        start  = 13,
+        finish = 13,
         [1]  = {
+            start  = 13,
+            finish = 13,
             [1] = {
                 type   = 'emmyName',
                 start  = 13,
@@ -412,7 +424,11 @@ CHECK [[
 {
     [1] = {
         type = 'emmyGeneric',
+        start  = 13,
+        finish = 22,
         [1]  = {
+            start  = 13,
+            finish = 22,
             [1] = {
                 type   = 'emmyName',
                 start  = 13,
@@ -440,7 +456,11 @@ CHECK [[
 {
     [1] = {
         type = 'emmyGeneric',
+        start  = 13,
+        finish = 34,
         [1]  = {
+            start  = 13,
+            finish = 22,
             [1] = {
                 type   = 'emmyName',
                 start  = 13,
@@ -460,6 +480,8 @@ CHECK [[
             }
         },
         [2]  = {
+            start  = 25,
+            finish = 34,
             [1] = {
                 type   = 'emmyName',
                 start  = 25,
@@ -487,6 +509,8 @@ CHECK [[
 {
     [1] = {
         type = 'emmyVararg',
+        start  = 12,
+        finish = 17,
         [1]  = {
             type   = 'emmyType',
             start  = 12,
@@ -507,6 +531,8 @@ CHECK [[
 {
     [1] = {
         type = 'emmyLanguage',
+        start  = 14,
+        finish = 17,
         [1]  = {
             type   = 'emmyName',
             start  = 14,
@@ -645,6 +671,8 @@ CHECK [[
 {
     [1]  = {
         type = 'emmyParam',
+        start  = 11,
+        finish = 50,
         [1]  = {
             type   = 'emmyName',
             start  = 11,

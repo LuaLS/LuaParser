@@ -381,5 +381,12 @@ end
 't[#',
 't[#]',
 '<root>',
-'table.02X'
+'table.02X',
+[[
+return {
+    a
+    ---@param 
+    b
+}
+]]
 }
