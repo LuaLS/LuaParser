@@ -107,3 +107,12 @@ CHECK[['\u{ffffff}']]
     [1]    = '',
     [2]    = [=[']=],
 }
+CHECK[=[[[
+abcdef]]]=]
+{
+    type   = 'string',
+    start  = 1,
+    finish = 11,
+    [1]    = 'abcdef',
+    [2]    = '[[',
+}
