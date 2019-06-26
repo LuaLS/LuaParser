@@ -906,17 +906,17 @@ CHECK [[
 }
 
 CHECK [[
----@param x string {} | "fff"
+---@param x string {xx = 1, yy = "zz", zz = false} | "fff"
 ]]
 {
     [1] = {
         type   = "emmyParam",
         start  = 11,
-        finish = 29,
+        finish = 58,
         option = {
-            type   = "table",
-            start  = 20,
-            finish = 21,
+            xx = 1,
+            yy = 'zz',
+            zz = false,
         },
         [1] = {
             type   = "emmyName",
@@ -937,8 +937,8 @@ CHECK [[
         },
         [3] = {
             type   = "string",
-            start  = 25,
-            finish = 29,
+            start  = 54,
+            finish = 58,
             [1]    = "fff",
             [2]    = "\"",
         },

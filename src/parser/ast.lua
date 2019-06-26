@@ -1234,9 +1234,22 @@ local Defs = {
         }
     end,
     EmmyParam = function (argName, emmyName, options, ...)
+        local option
+        if options then
+            option = {}
+            for _, pair in ipairs(options) do
+                if pair.type == 'pair' then
+                    local key = pair[1]
+                    local value = pair[2]
+                    if key.type == 'name' then
+                        option[key[1]] = value[1]
+                    end
+                end
+            end
+        end
         local emmy = {
             type = 'emmyParam',
-            option = options,
+            option = option,
             argName,
             emmyName,
             ...
