@@ -847,11 +847,11 @@ end
 
 CHECK '---@type fun'
 {
-	[1] = {
-		type   = "emmyFunctionType",
-		start  = 10,
-		finish = 12,
-	},
+    [1] = {
+        type   = "emmyFunctionType",
+        start  = 10,
+        finish = 12,
+    },
 }
 
 CHECK [[
@@ -864,4 +864,43 @@ CHECK [[
         type   = 'emmyComment',
         [1]    = '123 456 789',
     }
+}
+
+CHECK [[
+---@overload fun(a:number):number
+]]
+{
+    [1] = {
+        type   = "emmyOverLoad",
+        start  = 14,
+        finish = 33,
+        [1] = {
+            type   = "emmyName",
+            start  = 18,
+            finish = 18,
+            [1]    = "a",
+        },
+        [2] = {
+            type   = "emmyType",
+            start  = 20,
+            finish = 25,
+            [1] = {
+                type   = "emmyName",
+                start  = 20,
+                finish = 25,
+                [1]    = "number",
+            },
+        },
+        [3] = {
+            type   = "emmyType",
+            start  = 28,
+            finish = 33,
+            [1] = {
+                type   = "emmyName",
+                start  = 28,
+                finish = 33,
+                [1]    = "number",
+            },
+        },
+    },
 }
