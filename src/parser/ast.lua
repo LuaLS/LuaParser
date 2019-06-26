@@ -1233,9 +1233,10 @@ local Defs = {
             ...
         }
     end,
-    EmmyParam = function (argName, emmyName, ...)
+    EmmyParam = function (argName, emmyName, options, ...)
         local emmy = {
             type = 'emmyParam',
+            option = options,
             argName,
             emmyName,
             ...

@@ -904,3 +904,43 @@ CHECK [[
         },
     },
 }
+
+CHECK [[
+---@param x string {} | "fff"
+]]
+{
+    [1] = {
+        type   = "emmyParam",
+        start  = 11,
+        finish = 29,
+        option = {
+            type   = "table",
+            start  = 20,
+            finish = 21,
+        },
+        [1] = {
+            type   = "emmyName",
+            start  = 11,
+            finish = 11,
+            [1]    = "x",
+        },
+        [2] = {
+            type   = "emmyType",
+            start  = 13,
+            finish = 18,
+            [1] = {
+                type   = "emmyName",
+                start  = 13,
+                finish = 18,
+                [1]    = "string",
+            },
+        },
+        [3] = {
+            type   = "string",
+            start  = 25,
+            finish = 29,
+            [1]    = "fff",
+            [2]    = "\"",
+        },
+    },
+}
