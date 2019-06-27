@@ -691,18 +691,28 @@ CHECK [[
             },
         },
         [3] = {
-            type   = "string",
+            type   = 'emmyEnum',
             start  = 26,
             finish = 37,
-            [1]    = "'onClosed'",
-            [2]    = [=["]=],
+            [1]    = {
+                type   = "string",
+                start  = 26,
+                finish = 37,
+                [1]    = "'onClosed'",
+                [2]    = [=["]=],
+            },
         },
         [4] = {
-            type   = "string",
+            type   = 'emmyEnum',
             start  = 41,
             finish = 50,
-            [1]    = "'onData'",
-            [2]    = [=["]=],
+            [1]    = {
+                type   = "string",
+                start  = 41,
+                finish = 50,
+                [1]    = "'onData'",
+                [2]    = [=["]=],
+            }
         },
     },
 }
@@ -936,11 +946,76 @@ CHECK [[
             },
         },
         [3] = {
-            type   = "string",
+            type   = 'emmyEnum',
             start  = 54,
             finish = 58,
-            [1]    = "fff",
-            [2]    = "\"",
+            [1]    = {
+                type   = "string",
+                start  = 54,
+                finish = 58,
+                [1]    = "fff",
+                [2]    = "\"",
+            }
+        },
+    },
+}
+
+CHECK [[
+---@param event string
+---| "'onClosed'" {comment = "12345"}
+---| "'onData'"   {comment = "22222"}
+]]
+{
+    [1]  = {
+        type = 'emmyParam',
+        start  = 11,
+        finish = 76,
+        [1]  = {
+            type   = 'emmyName',
+            start  = 11,
+            finish = 15,
+            [1]    = 'event',
+        },
+        [2] = {
+            type   = 'emmyType',
+            start  = 17,
+            finish = 22,
+            [1]    = {
+                type   = 'emmyName',
+                start  = 17,
+                finish = 22,
+                [1]    = 'string',
+            },
+        },
+        [3] = {
+            type   = 'emmyEnum',
+            start  = 29,
+            finish = 40,
+            option = {
+                comment = "12345",
+            },
+            [1]    = {
+                type   = "string",
+                start  = 29,
+                finish = 40,
+                [1]    = "'onClosed'",
+                [2]    = [=["]=],
+            },
+        },
+        [4] = {
+            type   = 'emmyEnum',
+            start  = 67,
+            finish = 76,
+            option = {
+                comment = "22222",
+            },
+            [1]    = {
+                type   = "string",
+                start  = 67,
+                finish = 76,
+                [1]    = "'onData'",
+                [2]    = [=["]=],
+            }
         },
     },
 }
