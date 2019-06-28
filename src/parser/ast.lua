@@ -1336,14 +1336,12 @@ local Defs = {
         return option
     end,
     EmmyTypeEnum = function (default, enum, comment)
-        return {
-            type = 'emmyEnum',
-            default = default ~= '' and true or nil,
-            comment = comment,
-            start = enum.start,
-            finish = enum.finish,
-            [1] = enum,
-        }
+        enum.type = 'emmyEnum'
+        if default ~= '' then
+            enum.default = true
+        end
+        enum.comment = comment
+        return enum
     end,
 
     -- 捕获错误
