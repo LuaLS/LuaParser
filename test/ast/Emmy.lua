@@ -1003,3 +1003,28 @@ CHECK [[
         [1]    = '123\n 456\n  789',
     }
 }
+
+CHECK [[
+---@return string {name = 'key'}
+]]
+{
+    [1] = {
+        type   = 'emmyReturn',
+        start  = 12,
+        finish = 17,
+        option = {
+            name = 'key'
+        },
+        [1]    = {
+            type   = 'emmyType',
+            start  = 12,
+            finish = 17,
+            [1] = {
+                type   = 'emmyName',
+                start  = 12,
+                finish = 17,
+                [1]    = 'string',
+            },
+        }
+    }
+}
