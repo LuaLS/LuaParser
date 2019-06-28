@@ -1251,7 +1251,7 @@ local Defs = {
             option = option,
             start = start,
             finish = finish - 1,
-            [1] = type ~= '' and type or nil,
+            [1] = type,
         }
         return emmy
     end,
