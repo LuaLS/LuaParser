@@ -962,14 +962,14 @@ CHECK [[
 
 CHECK [[
 ---@param event string
----| "'onClosed'" {comment = "12345"}
----| "'onData'"   {comment = "22222"}
+---|   "'onClosed'" # 12345
+---| > "'onData'"   # 22222
 ]]
 {
     [1]  = {
         type = 'emmyParam',
         start  = 11,
-        finish = 76,
+        finish = 68,
         [1]  = {
             type   = 'emmyName',
             start  = 11,
@@ -989,30 +989,27 @@ CHECK [[
         },
         [3] = {
             type   = 'emmyEnum',
-            start  = 29,
-            finish = 40,
-            option = {
-                comment = "12345",
-            },
+            start  = 31,
+            finish = 42,
+            comment = "12345",
             [1]    = {
                 type   = "string",
-                start  = 29,
-                finish = 40,
+                start  = 31,
+                finish = 42,
                 [1]    = "'onClosed'",
                 [2]    = [=["]=],
             },
         },
         [4] = {
             type   = 'emmyEnum',
-            start  = 67,
-            finish = 76,
-            option = {
-                comment = "22222",
-            },
+            start  = 59,
+            finish = 68,
+            comment = "22222",
+            default = true,
             [1]    = {
                 type   = "string",
-                start  = 67,
-                finish = 76,
+                start  = 59,
+                finish = 68,
                 [1]    = "'onData'",
                 [2]    = [=["]=],
             }

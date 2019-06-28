@@ -1335,10 +1335,11 @@ local Defs = {
         end
         return option
     end,
-    EmmyTypeEnum = function (enum, option)
+    EmmyTypeEnum = function (default, enum, comment)
         return {
             type = 'emmyEnum',
-            option = option,
+            default = default ~= '' and true or nil,
+            comment = comment,
             start = enum.start,
             finish = enum.finish,
             [1] = enum,
