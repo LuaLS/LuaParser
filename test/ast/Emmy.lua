@@ -595,70 +595,74 @@ CHECK [[
         type   = 'emmyFunctionType',
         start  = 10,
         finish = 49,
-        [1]  = {
-            type   = 'emmyName',
-            start  = 14,
-            finish = 17,
-            [1]    = 'key1',
-        },
-        [2]  = {
-            type   = 'emmyType',
-            start  = 19,
-            finish = 23,
-            [1]    = {
+        args   = {
+            [1]  = {
                 type   = 'emmyName',
-                start  = 19,
-                finish = 20,
-                [1]    = 't1',
+                start  = 14,
+                finish = 17,
+                [1]    = 'key1',
             },
-            [2]    = {
-                type   = 'emmyArrayType',
-                start  = 22,
+            [2]  = {
+                type   = 'emmyType',
+                start  = 19,
                 finish = 23,
-                [1]    = 't2',
-            }
-        },
-        [3]  = {
-            type   = 'emmyName',
-            start  = 28,
-            finish = 31,
-            [1]    = 'key2',
-        },
-        [4]  = {
-            type   = 'emmyType',
-            start  = 33,
-            finish = 34,
-            [1]    = {
+                [1]    = {
+                    type   = 'emmyName',
+                    start  = 19,
+                    finish = 20,
+                    [1]    = 't1',
+                },
+                [2]    = {
+                    type   = 'emmyArrayType',
+                    start  = 22,
+                    finish = 23,
+                    [1]    = 't2',
+                }
+            },
+            [3]  = {
                 type   = 'emmyName',
+                start  = 28,
+                finish = 31,
+                [1]    = 'key2',
+            },
+            [4]  = {
+                type   = 'emmyType',
                 start  = 33,
                 finish = 34,
-                [1]    = 't3',
-            }
-        },
-        [5]  = {
-            type   = 'emmyTableType',
-            start  = 37,
-            finish = 49,
-            [1]    = {
-                type   = 'emmyType',
-                start  = 43,
-                finish = 44,
-                [1] = {
+                [1]    = {
                     type   = 'emmyName',
+                    start  = 33,
+                    finish = 34,
+                    [1]    = 't3',
+                }
+            },
+        },
+        returns = {
+            [1]  = {
+                type   = 'emmyTableType',
+                start  = 37,
+                finish = 49,
+                [1]    = {
+                    type   = 'emmyType',
                     start  = 43,
                     finish = 44,
-                    [1]    = 't5',
+                    [1] = {
+                        type   = 'emmyName',
+                        start  = 43,
+                        finish = 44,
+                        [1]    = 't5',
+                    },
                 },
-            },
-            [2]    = {
-                type   = 'emmyType',
-                start  = 47,
-                finish = 48,
-                [1] = {
-                    type   = 'emmyName',
+                [2]    = {
+                    type   = 'emmyType',
                     start  = 47,
                     finish = 48,
-                    [1]    = 't6',
+                    [1] = {
+                        type   = 'emmyName',
+                        start  = 47,
+                        finish = 48,
+                        [1]    = 't6',
+                    }
                 }
             }
         }
@@ -874,34 +878,38 @@ CHECK [[
         type   = "emmyOverLoad",
         start  = 14,
         finish = 33,
-        [1] = {
-            type   = "emmyName",
-            start  = 18,
-            finish = 18,
-            [1]    = "a",
-        },
-        [2] = {
-            type   = "emmyType",
-            start  = 20,
-            finish = 25,
+        args   = {
             [1] = {
                 type   = "emmyName",
+                start  = 18,
+                finish = 18,
+                [1]    = "a",
+            },
+            [2] = {
+                type   = "emmyType",
                 start  = 20,
                 finish = 25,
-                [1]    = "number",
+                [1] = {
+                    type   = "emmyName",
+                    start  = 20,
+                    finish = 25,
+                    [1]    = "number",
+                },
             },
         },
-        [3] = {
-            type   = "emmyType",
-            start  = 28,
-            finish = 33,
+        returns = {
             [1] = {
-                type   = "emmyName",
+                type   = "emmyType",
                 start  = 28,
                 finish = 33,
-                [1]    = "number",
+                [1] = {
+                    type   = "emmyName",
+                    start  = 28,
+                    finish = 33,
+                    [1]    = "number",
+                },
             },
-        },
+        }
     },
 }
 
@@ -1027,4 +1035,39 @@ CHECK [[
             },
         }
     }
+}
+
+CHECK [[
+---@overload fun():number,boolean
+]]
+{
+    [1] = {
+        type   = "emmyOverLoad",
+        start  = 14,
+        finish = 33,
+        returns = {
+            [1] = {
+                type   = "emmyType",
+                start  = 20,
+                finish = 25,
+                [1] = {
+                    type   = "emmyName",
+                    start  = 20,
+                    finish = 25,
+                    [1]    = "number",
+                },
+            },
+            [2] = {
+                type   = "emmyType",
+                start  = 27,
+                finish = 33,
+                [1] = {
+                    type   = "emmyName",
+                    start  = 27,
+                    finish = 33,
+                    [1]    = "boolean",
+                },
+            },
+        }
+    },
 }
