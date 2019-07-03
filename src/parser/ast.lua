@@ -626,6 +626,15 @@ local Defs = {
         if obj.argFinish > obj.finish then
             obj.argFinish = obj.finish
         end
+
+        if name.type ~= 'name' then
+            pushError {
+                type = 'UNEXPECT_LFUNC_NAME',
+                start = name.start,
+                finish = name.finish,
+            }
+        end
+
         return obj
     end,
     Table = function (start, ...)

@@ -1289,6 +1289,14 @@ TEST[[
     type = 'MISS_NAME',
 }
 
+TEST[[
+local function <!a.b!>()
+end
+]]
+{
+    type = 'UNEXPECT_LFUNC_NAME'
+}
+
 Version = 'Lua 5.1'
 TEST[[
 <!::xx::!>
