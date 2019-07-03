@@ -293,3 +293,16 @@ CHECK 'end'
 {
     [1] = false,
 }
+
+CHECK 'local x = ,'
+{
+    [1] = {
+        type = "local",
+        [1] = {
+            type   = "name",
+            start  = 7,
+            finish = 7,
+            [1]    = "x",
+        },
+    },
+}

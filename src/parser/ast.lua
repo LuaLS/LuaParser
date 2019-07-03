@@ -2,6 +2,7 @@ local tonumber = tonumber
 local string_char = string.char
 local utf8_char = utf8.char
 local type = type
+local table = table
 
 local Errs
 local State
@@ -696,10 +697,10 @@ local Defs = {
             local last = list[#list]
             list.finish = last.finish
             return list
-        elseif first == '' then
-            return nil
-        else
+        elseif type(first) == 'table' then
             return first
+        else
+            return nil
         end
     end,
     ArgList = function (...)
