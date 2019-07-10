@@ -547,10 +547,38 @@ CHECK [[
 ]]
 {
     [1] = {
-        type = 'emmyArrayType',
+        type   = 'emmyArrayType',
         start  = 10,
-        finish = 13,
-        [1]    = 'Type',
+        finish = 15,
+        [1]    = {
+            type   = 'emmyName',
+            start  = 10,
+            finish = 13,
+            [1]    = 'Type'
+        },
+    }
+}
+
+CHECK [[
+---@type (Type1|Type2)[]
+]]
+{
+    [1] = {
+        type   = 'emmyArrayType',
+        start  = 10,
+        finish = 24,
+        [1]    = {
+            type   = 'emmyName',
+            start  = 11,
+            finish = 15,
+            [1]    = 'Type1'
+        },
+        [2]    = {
+            type   = 'emmyName',
+            start  = 17,
+            finish = 21,
+            [1]    = 'Type2'
+        },
     }
 }
 
@@ -605,7 +633,7 @@ CHECK [[
             [2]  = {
                 type   = 'emmyType',
                 start  = 19,
-                finish = 23,
+                finish = 25,
                 [1]    = {
                     type   = 'emmyName',
                     start  = 19,
@@ -615,8 +643,13 @@ CHECK [[
                 [2]    = {
                     type   = 'emmyArrayType',
                     start  = 22,
-                    finish = 23,
-                    [1]    = 't2',
+                    finish = 25,
+                    [1]    = {
+                        type   = 'emmyName',
+                        start  = 22,
+                        finish = 23,
+                        [1]    = 't2'
+                    },
                 }
             },
             [3]  = {
