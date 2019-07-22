@@ -907,6 +907,12 @@ TEST[[
     fix  = EXISTS,
 }
 
+TEST[[
+<!/*!>
+adadasd
+<!*/!>
+]]
+
 -- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua
 TEST[[
 f = 9<!e!>

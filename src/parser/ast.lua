@@ -264,6 +264,26 @@ local Defs = {
             }
         end
     end,
+    CLongComment = function (start1, finish1, start2, finish2)
+        pushError {
+            type   = 'ERR_LONG_COMMENT',
+            start  = start1,
+            finish = finish2 - 1,
+            fix    = {
+                title = 'FIX_LONG_COMMENT',
+                {
+                    start  = start1,
+                    finish = finish1 - 1,
+                    text   = '--[[',
+                },
+                {
+                    start  = start2,
+                    finish = finish2 - 1,
+                    text   =  '--]]'
+                },
+            }
+        }
+    end,
     CCommentPrefix = function (start, finish)
         pushError {
             type   = 'ERR_COMMENT_PREFIX',
@@ -273,11 +293,12 @@ local Defs = {
                 title = 'FIX_COMMENT_PREFIX',
                 {
                     start  = start,
-                    finish = finish,
+                    finish = finish - 1,
                     text   = '--',
                 },
             }
         }
+        return false
     end,
     String = function (start, quote, str, finish)
         return {
