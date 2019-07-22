@@ -319,10 +319,7 @@ TEST[[
 t = {1<! !>2}
 ]]
 {
-    type = 'MISS_SYMBOL',
-    info = {
-        symbol = ',',
-    }
+    type = 'MISS_SEP_IN_TABLE',
 }
 
 TEST[[
@@ -900,6 +897,14 @@ end
 ]]
 {
     type = 'UNEXPECT_DOTS',
+}
+
+TEST[[
+<!//!>xxxx
+]]
+{
+    type = 'ERR_COMMENT_PREFIX',
+    fix  = EXISTS,
 }
 
 -- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua

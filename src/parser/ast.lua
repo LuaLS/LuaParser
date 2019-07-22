@@ -264,6 +264,21 @@ local Defs = {
             }
         end
     end,
+    CCommentPrefix = function (start, finish)
+        pushError {
+            type   = 'ERR_COMMENT_PREFIX',
+            start  = start,
+            finish = finish - 1,
+            fix    = {
+                title = 'FIX_COMMENT_PREFIX',
+                {
+                    start  = start,
+                    finish = finish,
+                    text   = '--',
+                },
+            }
+        }
+    end,
     String = function (start, quote, str, finish)
         return {
             type   = 'string',
@@ -660,12 +675,9 @@ local Defs = {
                 }
             elseif not wantField and isField and not isEmmy then
                 pushError {
-                    type = 'MISS_SYMBOL',
+                    type = 'MISS_SEP_IN_TABLE',
                     start = start,
                     finish = arg.start-1,
-                    info = {
-                        symbol = ',',
-                    }
                 }
             end
             if isField then
