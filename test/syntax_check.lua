@@ -943,6 +943,14 @@ return a <!=!> b
     fix  = EXISTS,
 }
 
+TEST[[
+return a <!!=!> b
+]]
+{
+    type = 'ERR_UEQ',
+    fix  = EXISTS,
+}
+
 -- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua
 TEST[[
 f = 9<!e!>

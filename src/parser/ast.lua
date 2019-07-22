@@ -1801,6 +1801,22 @@ local Defs = {
         }
         return '=='
     end,
+    ErrUEQ = function (start, finish)
+        pushError {
+            type   = 'ERR_UEQ',
+            start  = start,
+            finish = finish - 1,
+            fix = {
+                title = 'FIX_UEQ',
+                {
+                    start  = start,
+                    finish = finish - 1,
+                    text   = '~=',
+                }
+            }
+        }
+        return '=='
+    end,
 }
 
 return function (self, lua, mode, version)
