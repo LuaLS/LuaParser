@@ -1020,6 +1020,18 @@ comment
 }
 
 TEST[[
+--[=[xxx<!]==]!>
+]]
+{
+    multi = 1,
+    type = 'ERR_LCOMMENT_END',
+    info = {
+        symbol = ']=]',
+    },
+    fix  = EXISTS,
+}
+
+TEST[[
 a = function (a,b,<!!>) end
 ]]
 {

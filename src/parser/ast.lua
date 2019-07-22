@@ -252,25 +252,53 @@ local Defs = {
             [1]    = false,
         }
     end,
-    LongComment = function (beforeEq, afterEq, missPos)
+    LongComment = function (beforeEq, afterEq, comment, missPos)
         if missPos then
+            local endSymbol = ']' .. ('='):rep(afterEq-beforeEq) .. ']'
+            local s, e = comment:find('(%])[%=]*(%])[%c%s]*')
+            if s then
+                pushError {
+                    type   = 'ERR_LCOMMENT_END',
+                    start  = missPos - #comment + s - 1,
+                    finish = missPos - #comment + e - 2,
+                    info   = {
+                        symbol = endSymbol,
+                    },
+                    fix    = {
+                        title = 'FIX_LCOMMENT_END',
+                        {
+                            start  = missPos - #comment + s - 1,
+                            finish = missPos - #comment + e - 2,
+                            text   = endSymbol,
+                        }
+                    },
+                }
+            end
             pushError {
                 type   = 'MISS_SYMBOL',
                 start  = missPos,
                 finish = missPos,
                 info   = {
-                    symbol = ']' .. ('='):rep(afterEq-beforeEq) .. ']'
-                }
+                    symbol = endSymbol,
+                },
+                fix    = {
+                    title = 'ADD_LCOMMENT_END',
+                    {
+                        start  = missPos,
+                        finish = missPos,
+                        text   = endSymbol,
+                    }
+                },
             }
         end
     end,
     CLongComment = function (start1, finish1, start2, finish2)
         pushError {
-            type   = 'ERR_LONG_COMMENT',
+            type   = 'ERR_C_LONG_COMMENT',
             start  = start1,
             finish = finish2 - 1,
             fix    = {
-                title = 'FIX_LONG_COMMENT',
+                title = 'FIX_C_LONG_COMMENT',
                 {
                     start  = start1,
                     finish = finish1 - 1,
