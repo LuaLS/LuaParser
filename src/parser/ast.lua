@@ -252,23 +252,23 @@ local Defs = {
             [1]    = false,
         }
     end,
-    LongComment = function (beforeEq, afterEq, comment, missPos)
+    LongComment = function (beforeEq, afterEq, str, missPos)
         if missPos then
             local endSymbol = ']' .. ('='):rep(afterEq-beforeEq) .. ']'
-            local s, e = comment:find('(%])[%=]*(%])[%c%s]*')
+            local s, _, w = str:find('(%][%=]*%])[%c%s]*$')
             if s then
                 pushError {
                     type   = 'ERR_LCOMMENT_END',
-                    start  = missPos - #comment + s - 1,
-                    finish = missPos - #comment + e - 2,
+                    start  = missPos - #str + s - 1,
+                    finish = missPos - #str + s + #w - 2,
                     info   = {
                         symbol = endSymbol,
                     },
                     fix    = {
                         title = 'FIX_LCOMMENT_END',
                         {
-                            start  = missPos - #comment + s - 1,
-                            finish = missPos - #comment + e - 2,
+                            start  = missPos - #str + s - 1,
+                            finish = missPos - #str + s + #w - 2,
                             text   = endSymbol,
                         }
                     },
@@ -339,13 +339,41 @@ local Defs = {
     end,
     LongString = function (beforeEq, afterEq, str, missPos)
         if missPos then
+            local endSymbol = ']' .. ('='):rep(afterEq-beforeEq) .. ']'
+            local s, _, w = str:find('(%][%=]*%])[%c%s]*$')
+            if s then
+                pushError {
+                    type   = 'ERR_LSTRING_END',
+                    start  = missPos - #str + s - 1,
+                    finish = missPos - #str + s + #w - 2,
+                    info   = {
+                        symbol = endSymbol,
+                    },
+                    fix    = {
+                        title = 'FIX_LSTRING_END',
+                        {
+                            start  = missPos - #str + s - 1,
+                            finish = missPos - #str + s + #w - 2,
+                            text   = endSymbol,
+                        }
+                    },
+                }
+            end
             pushError {
                 type   = 'MISS_SYMBOL',
                 start  = missPos,
                 finish = missPos,
                 info   = {
-                    symbol = ']' .. ('='):rep(afterEq-beforeEq) .. ']'
-                }
+                    symbol = endSymbol,
+                },
+                fix    = {
+                    title = 'ADD_LSTRING_END',
+                    {
+                        start  = missPos,
+                        finish = missPos,
+                        text   = endSymbol,
+                    }
+                },
             }
         end
         return '[' .. ('='):rep(afterEq-beforeEq) .. '[', str

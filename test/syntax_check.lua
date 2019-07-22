@@ -141,6 +141,16 @@ s = [===[a<!!>]======]
     }
 }
 
+TEST[======[
+s = [===[a<!]=]!>]======]
+{
+    multi = 1,
+    type = 'ERR_LSTRING_END',
+    info = {
+        symbol = ']===]',
+    }
+}
+
 TEST[[
 s = '<!\xzz!>zzz'
 ]]
@@ -970,6 +980,7 @@ long string
 ]==]
 <!!>]=============]
 {
+    multi = 2,
     type = 'MISS_SYMBOL',
     info = {
         symbol = ']===]',
