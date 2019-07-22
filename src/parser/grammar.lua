@@ -164,13 +164,6 @@ EChar       <-  'a' -> ea
             /   'u{' Word* !'}' {}      -> MissTR
             /   {}                      -> ErrEsc
 
-Comp        <-  Sp {CompList}
-CompList    <-  '<='
-            /   '>='
-            /   '<'
-            /   '>'
-            /   '~='
-            /   '=='
 BOR         <-  Sp {'|'}
 BXOR        <-  Sp {'~'} !'='
 BAND        <-  Sp {'&'}
@@ -196,6 +189,7 @@ POWER       <-  Sp {'^'}
 BinaryOp    <-  Sp {} {'or'} Cut
             /   Sp {} {'and'} Cut
             /   Sp {} {'<=' / '>=' / '<'!'<' / '>'!'>' / '~=' / '=='}
+            /   Sp {} ({} '=' {}) -> ErrEQ
             /   Sp {} {'|'}
             /   Sp {} {'~'}
             /   Sp {} {'&'}
@@ -218,7 +212,8 @@ DOTS        <-  Sp ({} '...') -> DOTS
 DOT         <-  Sp ({} '.' !'.') -> DOT
 COLON       <-  Sp ({} ':' !':') -> COLON
 LABEL       <-  Sp '::'
-ASSIGN      <-  Sp '='
+ASSIGN      <-  Sp ({} '==' {}) -> ErrAssign
+            /   Sp '='
 
 Nothing     <-  {} -> Nothing
 

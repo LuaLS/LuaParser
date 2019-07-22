@@ -1769,7 +1769,38 @@ local Defs = {
                 symbol = '>'
             }
         }
-    end
+    end,
+    ErrAssign = function (start, finish)
+        pushError {
+            type = 'ERR_ASSIGN_AS_EQ',
+            start = start,
+            finish = finish - 1,
+            fix = {
+                title = 'FIX_ASSIGN_AS_EQ',
+                {
+                    start   = start,
+                    finish  = finish - 1,
+                    text    = '=',
+                }
+            }
+        }
+    end,
+    ErrEQ = function (start, finish)
+        pushError {
+            type   = 'ERR_EQ_AS_ASSIGN',
+            start  = start,
+            finish = finish - 1,
+            fix = {
+                title = 'FIX_EQ_AS_ASSIGN',
+                {
+                    start  = start,
+                    finish = finish - 1,
+                    text   = '==',
+                }
+            }
+        }
+        return '=='
+    end,
 }
 
 return function (self, lua, mode, version)

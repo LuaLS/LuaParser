@@ -302,16 +302,6 @@ t = {['name']<!!>}
 }
 
 TEST[[
-t = {['name'<! !>= 1}
-]]
-{
-    type = 'MISS_SYMBOL',
-    info = {
-        symbol = ']',
-    }
-}
-
-TEST[[
 t = {[<!!>]=1}
 ]]
 {
@@ -374,7 +364,7 @@ TEST[[
 }
 
 TEST[[
-(x<!!> = 1
+print(x<!!>
 ]]
 {
     type = 'MISS_SYMBOL',
@@ -405,7 +395,7 @@ x[<!!>] = 1
 }
 
 TEST[[
-x[1<!!> = 1
+y = x[1<!!>
 ]]
 {
     type = 'MISS_SYMBOL',
@@ -918,10 +908,40 @@ TEST[[
 }
 
 TEST[[
-<!/*!>
+<!/*
 adadasd
-<!*/!>
+*/!>
 ]]
+{
+    type = 'ERR_C_LONG_COMMENT',
+    fix  = EXISTS,
+}
+
+TEST[[
+a <!==!> b
+]]
+{
+    type = 'ERR_ASSIGN_AS_EQ',
+    fix  = EXISTS,
+}
+
+TEST[[
+return {
+    a <!==!> b,
+}
+]]
+{
+    type = 'ERR_ASSIGN_AS_EQ',
+    fix  = EXISTS,
+}
+
+TEST[[
+return a <!=!> b
+]]
+{
+    type = 'ERR_EQ_AS_ASSIGN',
+    fix  = EXISTS,
+}
 
 -- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua
 TEST[[
