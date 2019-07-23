@@ -1817,6 +1817,36 @@ local Defs = {
         }
         return '=='
     end,
+    ErrThen = function (start, finish)
+        pushError {
+            type = 'ERR_THEN_AS_DO',
+            start = start,
+            finish = finish - 1,
+            fix = {
+                title = 'FIX_THEN_AS_DO',
+                {
+                    start   = start,
+                    finish  = finish - 1,
+                    text    = 'then',
+                }
+            }
+        }
+    end,
+    ErrDo = function (start, finish)
+        pushError {
+            type = 'ERR_DO_AS_THEN',
+            start = start,
+            finish = finish - 1,
+            fix = {
+                title = 'ERR_DO_AS_THEN',
+                {
+                    start   = start,
+                    finish  = finish - 1,
+                    text    = 'do',
+                }
+            }
+        }
+    end,
 }
 
 return function (self, lua, mode, version)

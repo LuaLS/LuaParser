@@ -121,6 +121,7 @@ Rest        <-  (!%nl .)*
 AND         <-  Sp {'and'}    Cut
 BREAK       <-  Sp 'break'    Cut
 DO          <-  Sp 'do'       Cut
+            /   Sp ({} 'then' Cut {}) -> ErrDo
 ELSE        <-  Sp 'else'     Cut
 ELSEIF      <-  Sp 'elseif'   Cut
 END         <-  Sp 'end'      Cut
@@ -137,6 +138,7 @@ OR          <-  Sp {'or'}     Cut
 REPEAT      <-  Sp 'repeat'   Cut
 RETURN      <-  Sp 'return'   Cut
 THEN        <-  Sp 'then'     Cut
+            /   Sp ({} 'do' Cut {}) -> ErrThen
 TRUE        <-  Sp 'true'     Cut
 UNTIL       <-  Sp 'until'    Cut
 WHILE       <-  Sp 'while'    Cut
@@ -402,7 +404,7 @@ Semicolon   <-  SEMICOLON
 SimpleList  <-  (Simple (COMMA Simple)*)
             ->  List
 
-Do          <-  Sp ({} DO DoBody NeedEnd {})
+Do          <-  Sp ({} 'do' DoBody NeedEnd {})
             ->  Do
 DoBody      <-  (Emmy / !END Action)*
             ->  DoBody

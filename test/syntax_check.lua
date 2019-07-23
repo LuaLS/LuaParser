@@ -951,6 +951,22 @@ return a <!!=!> b
     fix  = EXISTS,
 }
 
+TEST[[
+if a <!do!> end
+]]
+{
+    type = 'ERR_THEN_AS_DO',
+    fix  = EXISTS,
+}
+
+TEST[[
+while true <!then!> end
+]]
+{
+    type = 'ERR_DO_AS_THEN',
+    fix  = EXISTS,
+}
+
 -- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua
 TEST[[
 f = 9<!e!>
