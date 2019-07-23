@@ -542,10 +542,20 @@ TEST[[
 function f()<!!>
 ]]
 {
+    multi = 1,
     type = 'MISS_SYMBOL',
     info = {
         symbol = 'end',
+        related = {1, 8},
     }
+}
+
+TEST[[
+<!function!> f()
+]]
+{
+    multi = 2,
+    type = 'MISS_END',
 }
 
 TEST[[
@@ -640,10 +650,20 @@ TEST[[
 for k, v in next do<!!>
 ]]
 {
+    multi = 1,
     type = 'MISS_SYMBOL',
     info = {
         symbol = 'end',
+        related = {1, 3},
     }
+}
+
+TEST[[
+<!for!> k, v in next do
+]]
+{
+    multi = 2,
+    type = 'MISS_END',
 }
 
 TEST[[
@@ -715,10 +735,20 @@ TEST[[
 for i = 1, 2 do<!!>
 ]]
 {
+    multi = 1,
     type = 'MISS_SYMBOL',
     info = {
         symbol = 'end',
+        related = {1, 3},
     }
+}
+
+TEST[[
+<!for!> i = 1, 2 do
+]]
+{
+    multi = 2,
+    type = 'MISS_END',
 }
 
 TEST[[
@@ -744,10 +774,20 @@ TEST[[
 while true do<!!>
 ]]
 {
+    multi = 1,
     type = 'MISS_SYMBOL',
     info = {
         symbol = 'end',
+        related = {1, 5},
     }
+}
+
+TEST[[
+<!while!> true do
+]]
+{
+    multi = 2,
+    type = 'MISS_END',
 }
 
 TEST[[
@@ -791,10 +831,20 @@ TEST[[
 if true then<!!>
 ]]
 {
+    multi = 1,
     type = 'MISS_SYMBOL',
     info = {
         symbol = 'end',
+        related = {1, 2},
     }
+}
+
+TEST[[
+<!if!> true then
+]]
+{
+    multi = 2,
+    type = 'MISS_END',
 }
 
 TEST[[
@@ -802,9 +852,11 @@ if true then
 else<!!>
 ]]
 {
+    multi = 1,
     type = 'MISS_SYMBOL',
     info = {
         symbol = 'end',
+        related = {1, 2},
     }
 }
 
@@ -1115,10 +1167,20 @@ TEST[[
 local test = function ( a , b , c , ... )<!!>
 ]]
 {
+    multi = 1,
     type = 'MISS_SYMBOL',
     info = {
         symbol = 'end',
+        related = {14, 21},
     }
+}
+
+TEST[[
+local test = <!function!> ( a , b , c , ... )
+]]
+{
+    multi = 2,
+    type = 'MISS_END',
 }
 
 TEST[[
@@ -1277,20 +1339,40 @@ TEST[[
 if a then<!!>
 ]]
 {
+    multi = 1,
     type = 'MISS_SYMBOL',
     info = {
         symbol = 'end',
+        related = {1, 2},
     }
+}
+
+TEST[[
+<!if!> a then
+]]
+{
+    multi = 2,
+    type = 'MISS_END',
 }
 
 TEST[[
 if a then else<!!>
 ]]
 {
+    multi = 1,
     type = 'MISS_SYMBOL',
     info = {
         symbol = 'end',
+        related = {1, 2},
     }
+}
+
+TEST[[
+<!if!> a then else
+]]
+{
+    multi = 2,
+    type = 'MISS_END',
 }
 
 TEST[[
