@@ -978,9 +978,7 @@ a <!==!> b
 }
 
 TEST[[
-return {
-    a <!==!> b,
-}
+_VERSION <!==!> 1
 ]]
 {
     type = 'ERR_ASSIGN_AS_EQ',
@@ -1018,6 +1016,20 @@ while true <!then!> end
     type = 'ERR_DO_AS_THEN',
     fix  = EXISTS,
 }
+
+TEST[[
+return {
+    _VERSION = '',
+}
+]]
+(nil)
+
+TEST[[
+return {
+    _VERSION == '',
+}
+]]
+(nil)
 
 -- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua
 TEST[[
