@@ -6,9 +6,6 @@ local table = table
 
 local Errs
 local State
-local Exp
-local Defs
-
 local function pushError(err)
     if err.finish < err.start then
         err.finish = err.start
@@ -78,6 +75,8 @@ local function checkOpVersion(op, start)
         }
     }
 end
+
+local Exp
 
 local function expSplit(list, start, finish, level)
     if start == finish then
@@ -184,144 +183,6 @@ local function checkMissEnd(start)
     }
 end
 
-local ESCMap = {
-    ['a'] = '\a',
-    ['b'] = '\b',
-    ['f'] = '\f',
-    ['n'] = '\n',
-    ['r'] = '\r',
-    ['t'] = '\t',
-    ['v'] = '\v',
-    ['\\'] = '\\',
-    ['"'] = '"',
-    ["'"] = "'",
-}
-
-local NUM = {
-    ['0'] = 0,
-    ['1'] = 1,
-    ['2'] = 2,
-    ['3'] = 3,
-    ['4'] = 4,
-    ['5'] = 5,
-    ['6'] = 6,
-    ['7'] = 7,
-    ['8'] = 8,
-    ['9'] = 9,
-}
-
-local ESCFunc = {
-    ['\n'] = function (text, pos)
-        return pos + 2, '\n'
-    end,
-    ['\r'] = function (text, pos)
-        if text:sub(pos+2, pos+2) == '\n' then
-            return pos + 3, '\n'
-        else
-            return pos + 2, '\n'
-        end
-    end,
-    ['z'] = function (text, pos)
-        return text:find('[^\r\n\t ]', pos+2), nil
-    end,
-    ['x'] = function (text, pos, init)
-        local char = text:sub(pos+2, pos+3)
-        if char:match '[a-fA-F0-9_][a-fA-F0-9_]' then
-            if State.Version == 'Lua 5.1' then
-                pushError {
-                    type = 'ERR_ESC',
-                    start = init + pos - 1,
-                    finish = init + pos,
-                }
-                return pos + 2, nil
-            end
-            return pos + 4, string_char(tonumber(char, 16))
-        else
-            pushError {
-                type = 'MISS_ESC_X',
-                start = init + pos - 1,
-                finish = init + pos + 2,
-            }
-            return pos + 2, nil
-        end
-    end,
-    ['u'] = function (text, pos, init)
-        if  State.Version ~= 'Lua 5.3'
-        and State.Version ~= 'Lua 5.4'
-        and State.Version ~= 'LuaJIT'
-        then
-            pushError {
-                type = 'ERR_ESC',
-                start = init + pos - 1,
-                finish = init + pos,
-            }
-            return pos + 2, nil
-        end
-        if text:sub(pos+2, pos+2) ~= '{' then
-            Defs.MissTL(init + pos + 1)
-            return pos + 2, nil
-        end
-        local _, finish, char = text:find('([a-zA-Z0-9_]*)', pos+3)
-        if #char == 0 then
-            pushError {
-                type = 'UTF8_SMALL',
-                start = init + pos - 1,
-                finish = init + pos + 2,
-            }
-            return pos + 3, nil
-        end
-        local tr = finish + 1
-        if text:sub(tr, tr) == '}' then
-            tr = tr + 1
-        else
-            Defs.MissTR(init + tr - 1)
-        end
-        local v = tonumber(char, 16)
-        if not v then
-            for i = 1, #char do
-                if not tonumber(char:sub(i, i), 16) then
-                    pushError {
-                        type = 'MUST_X16',
-                        start = init + pos + i + 1,
-                        finish = init + pos + i + 1,
-                    }
-                end
-            end
-            return tr, nil
-        end
-        if State.Version == 'Lua 5.4' then
-            if v < 0 or v > 0x7FFFFFFF then
-                pushError {
-                    type = 'UTF8_MAX',
-                    start = init + pos - 1,
-                    finish = init + tr - 2,
-                    info = {
-                        min = '00000000',
-                        max = '7FFFFFFF',
-                    }
-                }
-            end
-        else
-            if v < 0 or v > 0x10FFFF then
-                pushError {
-                    type = 'UTF8_MAX',
-                    start = init + pos - 1,
-                    finish = init + tr - 2,
-                    version = v <= 0x7FFFFFFF and 'Lua 5.4' or nil,
-                    info = {
-                        min = '000000',
-                        max = '10FFFF',
-                    }
-                }
-            end
-        end
-        if v >= 0 and v <= 0x10FFFF then
-            return tr, utf8_char(v)
-        end
-        return tr, nil
-    end,
-}
-
 Exp = {
     {
         ['or'] = true,
@@ -386,7 +247,7 @@ Exp = {
     },
 }
 
-Defs = {
+local Defs = {
     Nil = function (pos)
         return {
             type   = 'nil',
@@ -485,77 +346,6 @@ Defs = {
             }
         }
         return false
-    end,
-    RTString = function (text, init, quote)
-        local pattern = '([%' .. quote .. '%\\%\r%\n])'
-        local current = init
-        while true do
-            local pos, _, char = text:find(pattern, current)
-            if not pos then
-                return #text + 1, text:sub(init), init
-            end
-            if char == '\\' then
-                if text:sub(pos+1, pos+2) == '\r\n' then
-                    current = pos + 3
-                elseif text:sub(pos+1, pos+1) == 'z' then
-                    current = text:find('[^\r\n\t ]', pos+2)
-                else
-                    current = pos + 2
-                end
-            else
-                return pos, text:sub(init, pos-1), init
-            end
-        end
-    end,
-    RTString1 = function (text, current)
-        return Defs.RTString(text, current, '"')
-    end,
-    RTString2 = function (text, current)
-        return Defs.RTString(text, current, "'")
-    end,
-    StringF = function (text, init)
-        local current = 1
-        local buf
-        while true do
-            local pos = text:find('\\', current, true)
-            if not pos then
-                if buf then
-                    buf[#buf+1] = text:sub(current)
-                    break
-                else
-                    return text
-                end
-            end
-            if not buf then
-                buf = {}
-            end
-            buf[#buf+1] = text:sub(current, pos - 1)
-            local c = text:sub(pos+1, pos+1)
-            if ESCMap[c] then
-                -- 普通转义符
-                buf[#buf+1] = ESCMap[c]
-                current = pos + 2
-            elseif ESCFunc[c] then
-                -- 特殊转义符
-                current, buf[#buf+1] = ESCFunc[c](text, pos, init)
-            elseif NUM[c] then
-                local char = text:match('[0-9][0-9]?[0-9]?', current+1)
-                local byte = tonumber(char)
-                if byte and byte >= 0 and byte <= 255 then
-                    buf[#buf+1] = string_char(byte)
-                end
-                current = pos + #char + 1
-            else
-                -- 非法转义符
-                pushError {
-                    type = 'ERR_ESC',
-                    start = init + pos - 1,
-                    finish = init + pos,
-                }
-                current = pos + 2
-            end
-        end
-        return table.concat(buf)
     end,
     String = function (start, quote, str, finish)
         return {
