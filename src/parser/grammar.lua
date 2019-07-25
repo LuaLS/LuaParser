@@ -247,10 +247,10 @@ grammar 'String' [[
 String      <-  Sp ({} StringDef {})
             ->  String
 StringDef   <-  {'"'}
-                {~(Esc / !%nl !'"' .)*~} -> 1
+                {} => RTString1 -> StringF
                 ('"' / {} -> MissQuote1)
             /   {"'"}
-                {~(Esc / !%nl !"'" .)*~} -> 1
+                {} => RTString2 -> StringF
                 ("'" / {} -> MissQuote2)
             /   ('[' {} {:eq: '='* :} {} '[' %nl?
                 {(!StringClose .)*} -> 1

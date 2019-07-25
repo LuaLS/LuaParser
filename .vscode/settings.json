@@ -1,5 +1,6 @@
 {
     "Lua.diagnostics.globals": [
         "root"
-    ]
+    ],
+    "Lua.runtime.version": "Lua 5.4"
 }
