@@ -32,13 +32,16 @@ local function test(path)
     if not buf then
         return
     end
+    local testTimes = 10
     local clock = os.clock()
-    local suc, err = parser:ast(buf, 'lua', 'Lua 5.4')
-    if not suc then
-        error(('文件解析失败：%s'):format(path:string()))
+    for _ = 1, testTimes do
+        local suc, err = parser:ast(buf, 'lua', 'Lua 5.4')
+        if not suc then
+            error(('文件解析失败：%s'):format(path:string()))
+        end
     end
     local passed = os.clock() - clock
-    local size = #buf
+    local size = #buf * testTimes
     print(('[%s]测试完成，大小[%.3f]kb，速度[%.3f]mb/s，用时[%.3f]秒'):format(path, size / 1000, size / passed / 1000 / 1000, passed))
 end
 
