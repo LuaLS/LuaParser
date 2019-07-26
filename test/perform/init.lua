@@ -50,5 +50,6 @@ test[[test\perform\1.txt]]
 test[[test\perform\2.txt]]
 test[[test\perform\3.txt]]
 --test[[test\perform\4.txt]]
+test[[test\perform\5.txt]]
 performTest()
 collectgarbage 'restart'
