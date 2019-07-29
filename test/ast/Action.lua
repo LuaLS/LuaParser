@@ -174,6 +174,20 @@ CHECK'local <toclose> <const> x = 1'
         type   = 'name',
         start  = 25,
         finish = 25,
+        tags   = {
+            [1] = {
+                type   = 'name',
+                start  = 8,
+                finish = 14,
+                [1]    = 'toclose',
+            },
+            [2] = {
+                type   = 'name',
+                start  = 18,
+                finish = 22,
+                [1]    = 'const',
+            },
+        },
         [1]    = 'x',
     },
     [2]  = {
@@ -182,20 +196,6 @@ CHECK'local <toclose> <const> x = 1'
         finish = 29,
         [1]    = 1,
     },
-    [3]  = {
-        [1] = {
-            type   = 'name',
-            start  = 8,
-            finish = 14,
-            [1]    = 'toclose',
-        },
-        [2] = {
-            type   = 'name',
-            start  = 18,
-            finish = 22,
-            [1]    = 'const',
-        },
-    }
 }
 CHECK'local < const > x = 1'
 {
@@ -204,6 +204,14 @@ CHECK'local < const > x = 1'
         type   = 'name',
         start  = 17,
         finish = 17,
+        tags   = {
+            [1] = {
+                type   = 'name',
+                start  = 9,
+                finish = 13,
+                [1]    = 'const',
+            }
+        },
         [1]    = 'x',
     },
     [2] = {
@@ -212,14 +220,49 @@ CHECK'local < const > x = 1'
         finish = 21,
         [1]    = 1,
     },
-    [3] = {
-        [1] = {
+}
+CHECK'local <const> x, <toclose> y = 1'
+{
+    type = 'local',
+    [1]  = {
+        type   = "list",
+        finish = 28,
+        start  = 15,
+        [1]    = {
             type   = 'name',
-            start  = 9,
-            finish = 13,
-            [1]    = 'const',
-        }
-    }
+            start  = 15,
+            finish = 15,
+            tags   = {
+                [1] = {
+                    type   = 'name',
+                    start  = 8,
+                    finish = 12,
+                    [1]    = 'const',
+                }
+            },
+            [1]    = 'x',
+        },
+        [2]    = {
+            type   = 'name',
+            start  = 28,
+            finish = 28,
+            tags   = {
+                [1] = {
+                    type   = 'name',
+                    start  = 19,
+                    finish = 25,
+                    [1]    = 'toclose',
+                }
+            },
+            [1]    = 'y',
+        },
+    },
+    [2] = {
+        type   = 'number',
+        start  = 32,
+        finish = 32,
+        [1]    = 1,
+    },
 }
 CHECK'x = function () end'
 {
