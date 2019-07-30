@@ -65,31 +65,18 @@ x = 1
 ]]
 {
     [1] = {
-        type   = 'emmyType',
-        start  = 10,
+        type   = 'type',
+        start  = 1,
         finish = 13,
-        [1] = {
-            type   = 'emmyName',
-            start  = 10,
-            finish = 13,
-            [1]    = 'Type',
+        types  = {
+            {
+                type   = 'name',
+                start  = 10,
+                finish = 13,
+                [1]    = 'Type',
+            }
         },
     },
-    [2] = {
-        type = 'set',
-        [1]  = {
-            type   = 'name',
-            start  = 15,
-            finish = 15,
-            [1]    = 'x',
-        },
-        [2]  = {
-            type   = 'number',
-            start  = 19,
-            finish = 19,
-            [1]    = 1,
-        }
-    }
 }
 
 EMMY [[
@@ -135,6 +122,20 @@ x = 1
             [1]    = 1,
         }
     }
+}
+
+EMMY [[
+---@type x "'a'" | "'b'"
+]]
+{
+
+}
+
+EMMY [[
+---@type "'a'" | "'b'" | "'c'"
+]]
+{
+
 }
 
 EMMY [[

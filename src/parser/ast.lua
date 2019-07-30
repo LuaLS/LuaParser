@@ -1,3 +1,5 @@
+local emmy = require 'parser.emmy'
+
 local tonumber = tonumber
 local string_char = string.char
 local utf8_char = utf8.char
@@ -1273,222 +1275,6 @@ local Defs = {
         return {...}
     end,
 
-    -- EmmyLua 支持
-    EmmyLua = function (start, emmy, finish)
-        emmy.start = start
-        emmy.finish = finish - 1
-        State.Emmy[#State.Emmy+1] = emmy
-    end,
-    EmmyName = function (start, str)
-        return {
-            type   = 'name',
-            start  = start,
-            finish = start + #str - 1,
-            [1]    = str,
-        }
-    end,
-    DirtyEmmyName = function (pos)
-        pushError {
-            type = 'MISS_NAME',
-            level = 'warning',
-            start = pos,
-            finish = pos,
-        }
-        return {
-            type   = 'emmyName',
-            start  = pos-1,
-            finish = pos-1,
-            [1]    = ''
-        }
-    end,
-    EmmyClass = function (class, startPos, extends)
-        if extends and extends[1] == '' then
-            extends.start = startPos
-        end
-        return {
-            type    = 'class',
-            class   = class,
-            extends = extends,
-        }
-    end,
-    EmmyType = function (typeDef)
-        return typeDef
-    end,
-    EmmyCommonType = function (...)
-        local result = {
-            type = 'emmyType',
-            ...
-        }
-        for i = 1, #result // 2 do
-            local startPos = result[i * 2]
-            local emmyName = result[i * 2 + 1]
-            if emmyName[1] == '' then
-                emmyName.start = startPos
-            end
-            result[i + 1] = emmyName
-        end
-        for i = #result // 2 + 2, #result do
-            result[i] = nil
-        end
-        result.start = result[1].start
-        result.finish = result[#result].finish
-        return result
-    end,
-    EmmyArrayType = function (start, emmy, _, finish)
-        emmy.type = 'emmyArrayType'
-        emmy.start = start
-        emmy.finish = finish - 1
-        return emmy
-    end,
-    EmmyTableType = function (start, keyType, valueType, finish)
-        return {
-            type = 'emmyTableType',
-            start = start,
-            finish = finish - 1,
-            [1] = keyType,
-            [2] = valueType,
-        }
-    end,
-    EmmyFunctionType = function (start, args, returns, finish)
-        local result = {
-            start = start,
-            finish = finish - 1,
-            type = 'emmyFunctionType',
-            args = args,
-            returns = returns,
-        }
-        return result
-    end,
-    EmmyFunctionRtns = function (...)
-        return {...}
-    end,
-    EmmyFunctionArgs = function (...)
-        local args = {...}
-        args[#args] = nil
-        return args
-    end,
-    EmmyAlias = function (name, emmyName, ...)
-        return {
-            type = 'emmyAlias',
-            start = name.start,
-            finish = emmyName.finish,
-            name,
-            emmyName,
-            ...
-        }
-    end,
-    EmmyParam = function (argName, emmyName, option, ...)
-        local emmy = {
-            type = 'emmyParam',
-            option = option,
-            argName,
-            emmyName,
-            ...
-        }
-        emmy.start = emmy[1].start
-        emmy.finish = emmy[#emmy].finish
-        return emmy
-    end,
-    EmmyReturn = function (start, type, finish, option)
-        local emmy = {
-            type = 'emmyReturn',
-            option = option,
-            start = start,
-            finish = finish - 1,
-            [1] = type,
-        }
-        return emmy
-    end,
-    EmmyField = function (access, fieldName, ...)
-        local obj = {
-            type = 'emmyField',
-            access, fieldName,
-            ...
-        }
-        obj.start = obj[2].start
-        obj.finish = obj[3].finish
-        return obj
-    end,
-    EmmyGenericBlock = function (genericName, parentName)
-        return {
-            start = genericName.start,
-            finish = parentName and parentName.finish or genericName.finish,
-            genericName,
-            parentName,
-        }
-    end,
-    EmmyGeneric = function (...)
-        local emmy = {
-            type = 'emmyGeneric',
-            ...
-        }
-        emmy.start = emmy[1].start
-        emmy.finish = emmy[#emmy].finish
-        return emmy
-    end,
-    EmmyVararg = function (typeName)
-        return {
-            type = 'emmyVararg',
-            start = typeName.start,
-            finish = typeName.finish,
-            typeName,
-        }
-    end,
-    EmmyLanguage = function (language)
-        return {
-            type = 'emmyLanguage',
-            start = language.start,
-            finish = language.finish,
-            language,
-        }
-    end,
-    EmmySee = function (start, className, methodName, finish)
-        return {
-            type = 'emmySee',
-            start = start,
-            finish = finish - 1,
-            className, methodName
-        }
-    end,
-    EmmyOverLoad = function (EmmyFunctionType)
-        EmmyFunctionType.type = 'emmyOverLoad'
-        return EmmyFunctionType
-    end,
-    EmmyIncomplete = function (emmyName)
-        emmyName.type = 'emmyIncomplete'
-        return emmyName
-    end,
-    EmmyComment = function (...)
-        return {
-            type = 'emmyComment',
-            [1] = table.concat({...}),
-        }
-    end,
-    EmmyOption = function (options)
-        if not options or options == '' then
-            return nil
-        end
-        local option = {}
-        for _, pair in ipairs(options) do
-            if pair.type == 'pair' then
-                local key = pair[1]
-                local value = pair[2]
-                if key.type == 'name' then
-                    option[key[1]] = value[1]
-                end
-            end
-        end
-        return option
-    end,
-    EmmyTypeEnum = function (default, enum, comment)
-        enum.type = 'emmyEnum'
-        if default ~= '' then
-            enum.default = true
-        end
-        enum.comment = comment
-        return enum
-    end,
-
     -- 捕获错误
     UnknownSymbol = function (start, symbol)
         pushError {
@@ -1883,6 +1669,10 @@ local Defs = {
     end,
 }
 
+for k, v in pairs(emmy.ast) do
+    Defs[k] = v
+end
+
 return function (self, lua, mode, version)
     Errs = {}
     State= {
@@ -1892,7 +1682,9 @@ return function (self, lua, mode, version)
         Version = version,
         Emmy = {},
         Lua = lua,
+        pushError = pushError,
     }
+    emmy.init(State)
     local suc, res, err = xpcall(self.grammar, debug.traceback, self, lua, mode, Defs)
     if not suc then
         return nil, res
