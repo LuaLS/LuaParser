@@ -1887,6 +1887,7 @@ return function (self, lua, mode, version)
         Label = {{}},
         Dots = {true},
         Version = version,
+        Emmy = {},
         Lua = lua,
     }
     local suc, res, err = xpcall(self.grammar, debug.traceback, self, lua, mode, Defs)
