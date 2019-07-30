@@ -34,10 +34,14 @@ local function test(path)
     end
     local testTimes = 10
     local clock = os.clock()
-    for _ = 1, testTimes do
+    for i = 1, testTimes do
         local suc, err = parser:ast(buf, 'lua', 'Lua 5.4')
         if not suc then
             error(('文件解析失败：%s'):format(path:string()))
+        end
+        if os.clock() - clock > 1.0 then
+            testTimes = i
+            break
         end
     end
     local passed = os.clock() - clock

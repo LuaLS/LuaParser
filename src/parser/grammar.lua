@@ -527,8 +527,7 @@ FuncMethod  <-  COLON Name / COLON {} -> MissMethod
 ]]
 
 grammar 'EmmyLua' [[
-EmmyLua         <-  ('---' EmmyBody ShortComment)
-                ->  EmmyLua
+EmmyLua         <-  ({} '---' EmmyBody {} ShortComment)
                 ->  EmmyLua
 EmmySp          <-  (!'---@' !'---' Comment / %s / %nl)*
 EmmyComments    <-  (EmmyComment (%nl EmmyComMulti / %nl EmmyComSingle)*)

@@ -1274,12 +1274,14 @@ local Defs = {
     end,
 
     -- EmmyLua 支持
-    EmmyLua = function (emmy, comment)
+    EmmyLua = function (start, emmy, finish)
+        emmy.start = start
+        emmy.finish = finish - 1
         State.Emmy[#State.Emmy+1] = emmy
     end,
     EmmyName = function (start, str)
         return {
-            type   = 'emmyName',
+            type   = 'name',
             start  = start,
             finish = start + #str - 1,
             [1]    = str,
@@ -1304,11 +1306,9 @@ local Defs = {
             extends.start = startPos
         end
         return {
-            type = 'emmyClass',
-            start = class.start,
-            finish = (extends or class).finish,
-            [1] = class,
-            [2] = extends,
+            type    = 'class',
+            class   = class,
+            extends = extends,
         }
     end,
     EmmyType = function (typeDef)
