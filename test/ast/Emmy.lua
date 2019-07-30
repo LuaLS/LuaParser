@@ -1,4 +1,4 @@
-CHECK [[
+EMMY [[
 ---@class Class
 local x = 1
 ]]
@@ -31,7 +31,7 @@ local x = 1
     }
 }
 
-CHECK [[
+EMMY [[
 ---@class Class : SuperClass
 local x = 1
 ]]
@@ -70,7 +70,7 @@ local x = 1
     }
 }
 
-CHECK [[
+EMMY [[
 ---@class Class
 x = 1
 ]]
@@ -103,7 +103,7 @@ x = 1
     }
 }
 
-CHECK [[
+EMMY [[
 ---@type Type
 x = 1
 ]]
@@ -136,7 +136,7 @@ x = 1
     }
 }
 
-CHECK [[
+EMMY [[
 ---@type Type1|Type2|Type3
 x = 1
 ]]
@@ -181,7 +181,7 @@ x = 1
     }
 }
 
-CHECK [[
+EMMY [[
 ---@alias Handler LongType
 x = 1
 ]]
@@ -225,7 +225,7 @@ x = 1
     }
 }
 
-CHECK [[
+EMMY [[
 ---@param a1 t1
 ---@param a2 t2
 ---@param a3 t3
@@ -299,7 +299,7 @@ CHECK [[
     },
 }
 
-CHECK [[
+EMMY [[
 ---@return Type1|Type2|Type3
 ]]
 {
@@ -333,7 +333,7 @@ CHECK [[
     },
 }
 
-CHECK [[
+EMMY [[
 ---@field open function
 ]]
 {
@@ -362,7 +362,7 @@ CHECK [[
     },
 }
 
-CHECK [[
+EMMY [[
 ---@field private open function|string
 ]]
 {
@@ -397,7 +397,7 @@ CHECK [[
     },
 }
 
-CHECK [[
+EMMY [[
 ---@generic T
 ]]
 {
@@ -418,7 +418,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+EMMY [[
 ---@generic T : handle
 ]]
 {
@@ -450,7 +450,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+EMMY [[
 ---@generic T : handle, K : handle
 ]]
 {
@@ -503,7 +503,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+EMMY [[
 ---@vararg string
 ]]
 {
@@ -525,7 +525,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+EMMY [[
 ---@language JSON
 ]]
 {
@@ -542,7 +542,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+EMMY [[
 ---@type Type[]
 ]]
 {
@@ -559,7 +559,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+EMMY [[
 ---@type (Type1|Type2)[]
 ]]
 {
@@ -582,7 +582,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+EMMY [[
 ---@type table<key, value>
 ]]
 {
@@ -615,7 +615,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+EMMY [[
 ---@type fun(key1:t1|t2[], key2:t3):table<t5, t6>
 ]]
 {
@@ -702,7 +702,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+EMMY [[
 ---@param event string | "'onClosed'" | "'onData'"
 ]]
 {
@@ -744,7 +744,7 @@ CHECK [[
     },
 }
 
-CHECK [[
+EMMY [[
 ---@see loli#pants
 ]]
 {
@@ -767,7 +767,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+EMMY [[
 
 ---@class Class
 ]]
@@ -785,7 +785,7 @@ CHECK [[
     },
 }
 
-CHECK [[
+EMMY [[
 ---@
 ---@cl
 ]]
@@ -804,7 +804,7 @@ CHECK [[
     },
 }
 
-CHECK [[
+EMMY [[
 local t = {
     ---@type string
     x = 1,
@@ -855,7 +855,7 @@ local t = {
     },
 }
 
-CHECK [[
+EMMY [[
 local function f()
     ---@
 end
@@ -882,7 +882,7 @@ end
     },
 }
 
-CHECK '---@type fun'
+EMMY '---@type fun'
 {
     [1] = {
         type   = "emmyFunctionType",
@@ -891,7 +891,7 @@ CHECK '---@type fun'
     },
 }
 
-CHECK [[
+EMMY [[
 ---123
 --- 456
 ---  789
@@ -903,7 +903,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+EMMY [[
 ---@overload fun(a:number):number
 ]]
 {
@@ -946,7 +946,7 @@ CHECK [[
     },
 }
 
-CHECK [[
+EMMY [[
 ---@param x string {xx = 1, yy = "zz", zz = false} | "fff"
 ]]
 {
@@ -986,7 +986,7 @@ CHECK [[
     },
 }
 
-CHECK [[
+EMMY [[
 ---@param event string
 ---|   "'onClosed'" # 12345
 ---| > "'onData'"   # 22222
@@ -1033,7 +1033,7 @@ CHECK [[
     },
 }
 
-CHECK [[
+EMMY [[
 ---123
 ---| 456
 ---|  789
@@ -1045,7 +1045,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+EMMY [[
 ---@return string {name = 'key'}
 ]]
 {
@@ -1070,7 +1070,7 @@ CHECK [[
     }
 }
 
-CHECK [[
+EMMY [[
 ---@overload fun():number,boolean
 ]]
 {

@@ -1274,6 +1274,9 @@ local Defs = {
     end,
 
     -- EmmyLua 支持
+    EmmyLua = function (emmy, comment)
+        State.Emmy[#State.Emmy+1] = emmy
+    end,
     EmmyName = function (start, str)
         return {
             type   = 'emmyName',
@@ -1896,7 +1899,7 @@ return function (self, lua, mode, version)
     end
     if not res then
         pushError(err)
-        return nil, Errs
+        return nil, Errs, State.Emmy
     end
-    return res, Errs
+    return res, Errs, State.Emmy
 end

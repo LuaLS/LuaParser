@@ -527,27 +527,26 @@ FuncMethod  <-  COLON Name / COLON {} -> MissMethod
 ]]
 
 grammar 'EmmyLua' [[
-EmmyLua         <-  ('---@' EmmyBody ShortComment)
+EmmyLua         <-  ('---' EmmyBody ShortComment)
                 ->  EmmyLua
-                /   '---'  EmmyComments
-                <-  EmmyComment
+                ->  EmmyLua
 EmmySp          <-  (!'---@' !'---' Comment / %s / %nl)*
 EmmyComments    <-  (EmmyComment (%nl EmmyComMulti / %nl EmmyComSingle)*)
-                ->  EmmyComment
 EmmyComment     <-  EmmySp %s*                      {(!%nl .)*}
 EmmyComMulti    <-  EmmySp '---|'         {} -> en  {(!%nl .)*}
 EmmyComSingle   <-  EmmySp '---' !'@' %s* {} -> ' ' {(!%nl .)*}
-EmmyBody        <-  'class'    %s+ EmmyClass    -> EmmyClass
-                /   'type'     %s+ EmmyType     -> EmmyType
-                /   'alias'    %s+ EmmyAlias    -> EmmyAlias
-                /   'param'    %s+ EmmyParam    -> EmmyParam
-                /   'return'   %s+ EmmyReturn   -> EmmyReturn
-                /   'field'    %s+ EmmyField    -> EmmyField
-                /   'generic'  %s+ EmmyGeneric  -> EmmyGeneric
-                /   'vararg'   %s+ EmmyVararg   -> EmmyVararg
-                /   'language' %s+ EmmyLanguage -> EmmyLanguage
-                /   'see'      %s+ EmmySee      -> EmmySee
-                /   'overload' %s+ EmmyOverLoad -> EmmyOverLoad
+EmmyBody        <-  '@class'    %s+ EmmyClass    -> EmmyClass
+                /   '@type'     %s+ EmmyType     -> EmmyType
+                /   '@alias'    %s+ EmmyAlias    -> EmmyAlias
+                /   '@param'    %s+ EmmyParam    -> EmmyParam
+                /   '@return'   %s+ EmmyReturn   -> EmmyReturn
+                /   '@field'    %s+ EmmyField    -> EmmyField
+                /   '@generic'  %s+ EmmyGeneric  -> EmmyGeneric
+                /   '@vararg'   %s+ EmmyVararg   -> EmmyVararg
+                /   '@language' %s+ EmmyLanguage -> EmmyLanguage
+                /   '@see'      %s+ EmmySee      -> EmmySee
+                /   '@overload' %s+ EmmyOverLoad -> EmmyOverLoad
+                /               %s* EmmyComments -> EmmyComment
                 /   EmmyIncomplete
 
 EmmyName        <-  ({} {[a-zA-Z_] [a-zA-Z0-9_]*})

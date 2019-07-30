@@ -66,5 +66,3 @@ y = 2
         }
     }
 }
-
-require 'ast.Emmy'
