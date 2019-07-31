@@ -35,10 +35,7 @@ EmmyIncomplete  <-  MustEmmyName
 EmmyClass       <-  (MustEmmyName EmmyParentClass?)
 EmmyParentClass <-  %s* {} ':' %s* MustEmmyName
 
-EmmyType        <-  EmmyTypes
-                ->  EmmyType
-
-EmmyTypes       <-  (EmmyTypeUnit (%s* {} '|' %s* !String EmmyTypeUnit)*)
+EmmyType        <-  (EmmyTypeUnit (%s* {} '|' %s* !String EmmyTypeUnit)*)
                 ->  EmmyTypes
 EmmyTypeUnit    <-  EmmyFunctionType
                 /   EmmyTableType
@@ -138,7 +135,7 @@ local ast = {
     end,
     EmmyType = function (types)
         local result = {
-            type = 'emmyType',
+            type = 'type',
             types = types,
         }
         return result
@@ -156,12 +153,15 @@ local ast = {
         for i = #result // 2 + 2, #result do
             result[i] = nil
         end
-        result.start = result[1].start
-        result.finish = result[#result].finish
         return result
     end,
     EmmyCommonType = function (name)
-        return name
+        return {
+            type   = 'common',
+            start  = name.start,
+            finish = name.finish,
+            name   = name,
+        }
     end,
     EmmyArrayType = function (start, emmy, _, finish)
         emmy.type = 'emmyArrayType'

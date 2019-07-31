@@ -58,7 +58,6 @@ x = 1
     },
 }
 
-do return end
 EMMY [[
 ---@type Type
 x = 1
@@ -70,10 +69,15 @@ x = 1
         finish = 13,
         types  = {
             {
-                type   = 'name',
+                type   = 'common',
                 start  = 10,
                 finish = 13,
-                [1]    = 'Type',
+                name   = {
+                    type   = 'name',
+                    start  = 10,
+                    finish = 13,
+                    [1]    = 'Type',
+                }
             }
         },
     },
@@ -85,45 +89,48 @@ x = 1
 ]]
 {
     [1] = {
-        type   = 'emmyType',
-        start  = 10,
+        type   = 'type',
+        start  = 1,
         finish = 26,
-        [1] = {
-            type   = 'emmyName',
-            start  = 10,
-            finish = 14,
-            [1]    = 'Type1',
-        },
-        [2] = {
-            type   = 'emmyName',
-            start  = 16,
-            finish = 20,
-            [1]    = 'Type2',
-        },
-        [3] = {
-            type   = 'emmyName',
-            start  = 22,
-            finish = 26,
-            [1]    = 'Type3',
+        types  = {
+            {
+                type   = 'common',
+                start  = 10,
+                finish = 14,
+                name   = {
+                    type   = 'name',
+                    start  = 10,
+                    finish = 14,
+                    [1]    = 'Type1',
+                }
+            },
+            {
+                type   = 'common',
+                start  = 16,
+                finish = 20,
+                name   = {
+                    type   = 'name',
+                    start  = 16,
+                    finish = 20,
+                    [1]    = 'Type2',
+                }
+            },
+            {
+                type   = 'common',
+                start  = 22,
+                finish = 26,
+                name   = {
+                    type   = 'name',
+                    start  = 22,
+                    finish = 26,
+                    [1]    = 'Type3',
+                }
+            },
         },
     },
-    [2] = {
-        type = 'set',
-        [1]  = {
-            type   = 'name',
-            start  = 28,
-            finish = 28,
-            [1]    = 'x',
-        },
-        [2]  = {
-            type   = 'number',
-            start  = 32,
-            finish = 32,
-            [1]    = 1,
-        }
-    }
 }
 
+do return end
 EMMY [[
 ---@type x "'a'" | "'b'"
 ]]
