@@ -1431,36 +1431,6 @@ TEST[[
 --    }
 --}
 
--- EmmyLua
-
-TEST[[
----@class <!!>
-]]
-{
-    type = 'MISS_NAME',
-}
-
-TEST[[
----@class Class :<!!>
-]]
-{
-    type = 'MISS_NAME',
-}
-
-TEST[[
----@type <!!>
-]]
-{
-    type = 'MISS_NAME',
-}
-
-TEST[[
----@type Type1|<!!>
-]]
-{
-    type = 'MISS_NAME',
-}
-
 TEST[[
 local function <!a.b!>()
 end
