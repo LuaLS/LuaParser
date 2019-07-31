@@ -35,22 +35,19 @@ EmmyIncomplete  <-  MustEmmyName
 EmmyClass       <-  (MustEmmyName EmmyParentClass?)
 EmmyParentClass <-  %s* {} ':' %s* MustEmmyName
 
-EmmyType        <-  EmmyTypeUnits %s* EmmyTypeEnums
+EmmyType        <-  EmmyTypeUnits EmmyTypeEnums
 EmmyTypeUnits   <-  {|
                         EmmyTypeUnit?
                         (%s* '|' %s* !String EmmyTypeUnit)*
                     |}
-EmmyTypeEnums   <-  {|
-                        String?
-                        (%s* '|' %s* String)*
-                    |}
+EmmyTypeEnums   <-  {| EmmyTypeEnum* |}
 EmmyTypeUnit    <-  EmmyFunctionType
                 /   EmmyTableType
                 /   EmmyArrayType
                 /   EmmyCommonType
 EmmyCommonType  <-  EmmyName
                 ->  EmmyCommonType
-EmmyTypeEnum    <-  %s* (%nl %s* '---')? '|' EmmyEnum
+EmmyTypeEnum    <-  %s* (%nl %s* '---')? '|'? EmmyEnum
                 ->  EmmyTypeEnum
 EmmyEnum        <-  %s* {'>'?} %s* String (EmmyEnumComment / (!%nl !'|' .)*)
 EmmyEnumComment <-  %s* '#' %s* {(!%nl .)*}
@@ -303,7 +300,7 @@ local ast = {
         return option
     end,
     EmmyTypeEnum = function (default, enum, comment)
-        enum.type = 'emmyEnum'
+        enum.type = 'enum'
         if default ~= '' then
             enum.default = true
         end

@@ -133,13 +133,13 @@ x = 1
 }
 
 EMMY [[
----@type x "'a'" | "'b'"
+---@type x | "'a'" | "'b'"
 ]]
 {
     [1] = {
         type   = 'type',
         start  = 1,
-        finish = 24,
+        finish = 26,
         types  = {
             {
                 type   = 'common',
@@ -155,16 +155,16 @@ EMMY [[
         },
         enums  = {
             {
-                type   = 'string',
-                start  = 12,
-                finish = 16,
+                type   = 'enum',
+                start  = 14,
+                finish = 18,
                 [1]    = [['a']],
                 [2]    = '"',
             },
             {
-                type   = 'string',
-                start  = 20,
-                finish = 24,
+                type   = 'enum',
+                start  = 22,
+                finish = 26,
                 [1]    = [['b']],
                 [2]    = '"',
             },
@@ -183,21 +183,21 @@ EMMY [[
         types  = {},
         enums  = {
             {
-                type   = 'string',
+                type   = 'enum',
                 start  = 10,
                 finish = 14,
                 [1]    = [['a']],
                 [2]    = '"',
             },
             {
-                type   = 'string',
+                type   = 'enum',
                 start  = 18,
                 finish = 22,
                 [1]    = [['b']],
                 [2]    = '"',
             },
             {
-                type   = 'string',
+                type   = 'enum',
                 start  = 26,
                 finish = 30,
                 [1]    = [['c']],
@@ -252,6 +252,7 @@ x = 1
     }
 }
 
+do return end
 EMMY [[
 ---@param a1 t1
 ---@param a2 t2
