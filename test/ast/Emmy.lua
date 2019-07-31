@@ -80,6 +80,7 @@ x = 1
                 }
             }
         },
+        enums = {},
     },
 }
 
@@ -127,24 +128,86 @@ x = 1
                 }
             },
         },
+        enums = {},
     },
 }
 
-do return end
 EMMY [[
 ---@type x "'a'" | "'b'"
 ]]
 {
-
+    [1] = {
+        type   = 'type',
+        start  = 1,
+        finish = 24,
+        types  = {
+            {
+                type   = 'common',
+                start  = 10,
+                finish = 10,
+                name   = {
+                    type   = 'name',
+                    start  = 10,
+                    finish = 10,
+                    [1]    = 'x',
+                }
+            }
+        },
+        enums  = {
+            {
+                type   = 'string',
+                start  = 12,
+                finish = 16,
+                [1]    = [['a']],
+                [2]    = '"',
+            },
+            {
+                type   = 'string',
+                start  = 20,
+                finish = 24,
+                [1]    = [['b']],
+                [2]    = '"',
+            },
+        }
+    }
 }
 
 EMMY [[
 ---@type "'a'" | "'b'" | "'c'"
 ]]
 {
-
+    [1] = {
+        type   = 'type',
+        start  = 1,
+        finish = 30,
+        types  = {},
+        enums  = {
+            {
+                type   = 'string',
+                start  = 10,
+                finish = 14,
+                [1]    = [['a']],
+                [2]    = '"',
+            },
+            {
+                type   = 'string',
+                start  = 18,
+                finish = 22,
+                [1]    = [['b']],
+                [2]    = '"',
+            },
+            {
+                type   = 'string',
+                start  = 26,
+                finish = 30,
+                [1]    = [['c']],
+                [2]    = '"',
+            },
+        }
+    }
 }
 
+do return end
 EMMY [[
 ---@alias Handler LongType
 x = 1
