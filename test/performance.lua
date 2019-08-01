@@ -1,7 +1,3 @@
-local f = io.open [[F:\SSSEditor\client\Output\Lua\SSSEditor\tools\editer_service\test\compileTrigger\example\func\TriggerSysFunctionConfig.json]]
-local buf = f:read 'a'
-f:close()
-
 local function test(lpeg, buf)
     local _ENV = setmetatable(lpeg, {__index = _ENV})
     local paser = P
@@ -46,6 +42,10 @@ local function test(lpeg, buf)
     assert(res == #buf + 1)
     print(passed)
 end
+
+local f = io.open [[test\perform\test.json]]
+local buf = f:read 'a'
+f:close()
 
 print('===========test lpeglabel-1.01====================')
 test(package.loadlib('bin/lpeglabel-1.01.dll', 'luaopen_lpeglabel')(), buf)
