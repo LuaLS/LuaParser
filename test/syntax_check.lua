@@ -1521,7 +1521,7 @@ end
 Version = 'Lua 5.3'
 
 TEST[[
-local <<!toclose!>> x = 1
+local x <<!close!>> = 1
 ]]
 {
     type = 'UNSUPPORT_SYMBOL',
@@ -1535,7 +1535,7 @@ local <<!toclose!>> x = 1
 Version = 'Lua 5.4'
 
 TEST[[
-local <<!toclose!>> x = 1
+local x <<!close!>> = 1
 ]]
 (nil)
 
