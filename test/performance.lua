@@ -2,7 +2,7 @@ local f = io.open [[F:\SSSEditor\client\Output\Lua\SSSEditor\tools\editer_servic
 local buf = f:read 'a'
 f:close()
 
-local function test(lpeg)
+local function test(lpeg, buf)
     local _ENV = setmetatable(lpeg, {__index = _ENV})
     local paser = P
     {
@@ -48,7 +48,7 @@ local function test(lpeg)
 end
 
 print('===========test lpeglabel-1.01====================')
-test(package.loadlib('bin/lpeglabel-1.01.dll', 'luaopen_lpeglabel')())
+test(package.loadlib('bin/lpeglabel-1.01.dll', 'luaopen_lpeglabel')(), buf)
 
 print('===========test lpeglabel-1.02====================')
-test(package.loadlib('bin/lpeglabel-1.02.dll', 'luaopen_lpeglabel')())
+test(package.loadlib('bin/lpeglabel-1.02.dll', 'luaopen_lpeglabel')(), buf)
