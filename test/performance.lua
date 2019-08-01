@@ -2,8 +2,8 @@ local f = io.open [[F:\SSSEditor\client\Output\Lua\SSSEditor\tools\editer_servic
 local buf = f:read 'a'
 f:close()
 
-local function test(l)
-    local _ENV = setmetatable(l, {__index = _ENV})
+local function test(lpeg)
+    local _ENV = setmetatable(lpeg, {__index = _ENV})
     local paser = P
     {
         V'Value',
