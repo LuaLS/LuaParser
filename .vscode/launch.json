@@ -26,5 +26,28 @@
             "sourceCoding": "utf8",
             "luaRuntime": "5.4 64bit"
         },
+        {
+            "name": "performance",
+            "type": "lua",
+            "request": "launch",
+            "stopOnEntry": false,
+            "program": "${workspaceRoot}/test/performance.lua",
+            "cwd": "${workspaceRoot}",
+            "env": {
+                "PATH": "${workspaceRoot}\\bin\\"
+            },
+            "path": "${workspaceRoot}/bin/?.lua",
+            "cpath": "${workspaceRoot}/bin/?.dll;",
+            "arg0": [
+                "-E",
+                "-e",
+                "DEBUG=true",
+            ],
+            "arg": [
+            ],
+            "consoleCoding": "utf8",
+            "sourceCoding": "utf8",
+            "luaRuntime": "5.4 64bit"
+        },
     ]
 }
