@@ -167,19 +167,19 @@ CHECK'local x, y, z = 1, 2, 3'
         },
     },
 }
-CHECK'local <toclose> <const> x = 1'
+CHECK'local x <close> <const> = 1'
 {
     type = 'local',
     [1]  = {
         type   = 'name',
-        start  = 25,
-        finish = 25,
+        start  = 7,
+        finish = 7,
         tags   = {
             [1] = {
                 type   = 'name',
-                start  = 8,
+                start  = 10,
                 finish = 14,
-                [1]    = 'toclose',
+                [1]    = 'close',
             },
             [2] = {
                 type   = 'name',
@@ -192,23 +192,23 @@ CHECK'local <toclose> <const> x = 1'
     },
     [2]  = {
         type   = 'number',
-        start  = 29,
-        finish = 29,
+        start  = 27,
+        finish = 27,
         [1]    = 1,
     },
 }
-CHECK'local < const > x = 1'
+CHECK'local x < const > = 1'
 {
     type = 'local',
     [1]  = {
         type   = 'name',
-        start  = 17,
-        finish = 17,
+        start  = 7,
+        finish = 7,
         tags   = {
             [1] = {
                 type   = 'name',
-                start  = 9,
-                finish = 13,
+                start  = 11,
+                finish = 15,
                 [1]    = 'const',
             }
         },
@@ -221,22 +221,22 @@ CHECK'local < const > x = 1'
         [1]    = 1,
     },
 }
-CHECK'local <const> x, <toclose> y = 1'
+CHECK'local x <const>, y <close> = 1'
 {
     type = 'local',
     [1]  = {
         type   = "list",
-        finish = 28,
-        start  = 15,
+        start  = 7,
+        finish = 18,
         [1]    = {
             type   = 'name',
-            start  = 15,
-            finish = 15,
+            start  = 7,
+            finish = 7,
             tags   = {
                 [1] = {
                     type   = 'name',
-                    start  = 8,
-                    finish = 12,
+                    start  = 10,
+                    finish = 14,
                     [1]    = 'const',
                 }
             },
@@ -244,14 +244,14 @@ CHECK'local <const> x, <toclose> y = 1'
         },
         [2]    = {
             type   = 'name',
-            start  = 28,
-            finish = 28,
+            start  = 18,
+            finish = 18,
             tags   = {
                 [1] = {
                     type   = 'name',
-                    start  = 19,
+                    start  = 21,
                     finish = 25,
-                    [1]    = 'toclose',
+                    [1]    = 'close',
                 }
             },
             [1]    = 'y',
@@ -259,8 +259,8 @@ CHECK'local <const> x, <toclose> y = 1'
     },
     [2] = {
         type   = 'number',
-        start  = 32,
-        finish = 32,
+        start  = 30,
+        finish = 30,
         [1]    = 1,
     },
 }
