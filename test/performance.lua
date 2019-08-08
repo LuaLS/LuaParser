@@ -1,5 +1,8 @@
 local function test(lpeg, buf)
-    local _ENV = setmetatable(lpeg, {__index = _ENV})
+    local P = lpeg.P
+    local V = lpeg.V
+    local S = lpeg.S
+    local R = lpeg.R
     local paser = P
     {
         V'Value',
