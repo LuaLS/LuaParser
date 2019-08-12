@@ -34,7 +34,7 @@ return function (self, lua, mode, version)
     end
     if not res then
         pushError(err)
-        return nil, Errs
+        return nil, Errs, State.Emmy
     end
-    return res, Errs
+    return res, Errs, State.Emmy
 end
