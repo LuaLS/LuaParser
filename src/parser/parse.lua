@@ -26,8 +26,10 @@ return function (self, lua, mode, version)
         Dots = {true},
         Version = version,
         Lua = lua,
+        Emmy = {},
+        pushError = pushError,
     }
-    ast.init(State, Errs)
+    ast.init(State)
     local suc, res, err = xpcall(self.grammar, debug.traceback, self, lua, mode)
     if not suc then
         return nil, res

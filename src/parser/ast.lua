@@ -6,22 +6,8 @@ local utf8_char = utf8.char
 local type = type
 local table = table
 
-local Errs
 local State
-local function pushError(err)
-    if err.finish < err.start then
-        err.finish = err.start
-    end
-    local last = Errs[#Errs]
-    if last then
-        if last.start <= err.start and last.finish >= err.finish then
-            return
-        end
-    end
-    err.level = err.level or 'error'
-    Errs[#Errs+1] = err
-    return err
-end
+local pushError
 
 -- goto 单独处理
 local RESERVED = {
@@ -1673,9 +1659,9 @@ for k, v in pairs(emmy.ast) do
     Defs[k] = v
 end
 
-local function init(state, errs)
+local function init(state)
     State = state
-    Errs = errs
+    pushError = state.pushError
     emmy.init(State)
 end
 

@@ -44,7 +44,7 @@ local function test(type)
     end
     EMMY = function (buf)
         return function (target_ast)
-            local _, err, emmy = parser:ast(buf, type, 'Lua 5.4')
+            local _, err, emmy = parser:parse(buf, type, 'Lua 5.4')
             if not emmy then
                 error(('语法树生成失败：%s'):format(err))
             end
