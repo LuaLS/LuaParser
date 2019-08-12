@@ -32,7 +32,7 @@ end
 local function test(type)
     CHECK = function (buf)
         return function (target_ast)
-            local my_ast, err = parser:ast(buf, type, 'Lua 5.4')
+            local my_ast, err = parser:parse(buf, type, 'Lua 5.4')
             if not my_ast then
                 error(('语法树生成失败：%s'):format(err))
             end

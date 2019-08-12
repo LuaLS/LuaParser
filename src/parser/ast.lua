@@ -1880,22 +1880,12 @@ local Defs = {
     end,
 }
 
-return function (self, lua, mode, version)
-    Errs = {}
-    State= {
-        Break = 0,
-        Label = {{}},
-        Dots = {true},
-        Version = version,
-        Lua = lua,
-    }
-    local suc, res, err = xpcall(self.grammar, debug.traceback, self, lua, mode, Defs)
-    if not suc then
-        return nil, res
-    end
-    if not res then
-        pushError(err)
-        return nil, Errs
-    end
-    return res, Errs
+local function init(state, errs)
+    State = state
+    Errs = errs
 end
+
+return {
+    defs = Defs,
+    init = init,
+}
