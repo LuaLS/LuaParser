@@ -1673,25 +1673,13 @@ for k, v in pairs(emmy.ast) do
     Defs[k] = v
 end
 
-return function (self, lua, mode, version)
-    Errs = {}
-    State= {
-        Break = 0,
-        Label = {{}},
-        Dots = {true},
-        Version = version,
-        Emmy = {},
-        Lua = lua,
-        pushError = pushError,
-    }
+local function init(state, errs)
+    State = state
+    Errs = errs
     emmy.init(State)
-    local suc, res, err = xpcall(self.grammar, debug.traceback, self, lua, mode, Defs)
-    if not suc then
-        return nil, res
-    end
-    if not res then
-        pushError(err)
-        return nil, Errs, State.Emmy
-    end
-    return res, Errs, State.Emmy
 end
+
+return {
+    defs = Defs,
+    init = init,
+}
