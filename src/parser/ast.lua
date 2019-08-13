@@ -9,6 +9,7 @@ local table = table
 local State
 local pushError
 local pushAst
+local getAst
 
 -- goto 单独处理
 local RESERVED = {
@@ -557,21 +558,21 @@ local Defs = {
         }
     end,
     GetField = function (dot, field)
-        return {
+        return pushAst {
             type   = 'getfield',
             field  = field,
             dot    = dot,
-            start  = dot.start,
-            finish = field.finish,
+            start  = getAst(dot).start,
+            finish = getAst(field).finish,
         }
     end,
     Simple = function (units)
         local last = units[1]
         for i = 2, #units do
-            local current = units[i]
+            local current = getAst(units[i])
             current.table = last
-            current.start = last.start
-            last = current
+            current.start = getAst(last).start
+            last = units[i]
         end
         return last
     end,
@@ -672,7 +673,7 @@ local Defs = {
         }
     end,
     DOT = function (start)
-        return {
+        return pushAst {
             type   = '.',
             start  = start,
             finish = start,
@@ -1667,6 +1668,7 @@ local function init(state)
     State = state
     pushError = state.pushError
     pushAst   = state.pushAst
+    getAst    = state.getAst
     emmy.init(State)
 end
 

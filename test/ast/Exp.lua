@@ -15,67 +15,79 @@ CHECK'a'
         [1]    = 'a',
     }
 }
-do return end
 CHECK'a.b'
 {
-    type   = 'getfield',
-    start  = 1,
-    finish = 3,
-    table  = {
+    [1] = {
         type   = 'name',
         start  = 1,
         finish = 1,
         [1]    = 'a',
     },
-    field  = {
+    [2] = {
+        type   = '.',
+        start  = 2,
+        finish = 2,
+    },
+    [3] = {
         type   = 'name',
         start  = 3,
         finish = 3,
         [1]    = 'b',
     },
-    dot    = {
-        type   = '.',
-        start  = 2,
-        finish = 2,
+    [4] = {
+        type   = 'getfield',
+        start  = 1,
+        finish = 3,
+        table  = 1,
+        dot    = 2,
+        field  = 3,
     }
 }
 CHECK'a.b.c'
 {
-    type   = 'getfield',
-    start  = 1,
-    finish = 5,
-    table  = {
+    [1] = {
+        type   = 'name',
+        start  = 1,
+        finish = 1,
+        [1]    = 'a',
+    },
+    [2] = {
+        type   = '.',
+        start  = 2,
+        finish = 2,
+    },
+    [3] = {
+        type   = 'name',
+        start  = 3,
+        finish = 3,
+        [1]    = 'b',
+    },
+    [4] = {
         type   = 'getfield',
         start  = 1,
         finish = 3,
-        table  = {
-            type   = 'name',
-            start  = 1,
-            finish = 1,
-            [1]    = 'a',
-        },
-        field  = {
-            type   = 'name',
-            start  = 3,
-            finish = 3,
-            [1]    = 'b',
-        },
-        dot    = {
-            type   = '.',
-            start  = 2,
-            finish = 2,
-        }
+        table  = 1,
+        dot    = 2,
+        field  = 3,
     },
-    field = {
+    [5] = {
+        type   = '.',
+        start  = 4,
+        finish = 4,
+    },
+    [6] = {
         type   = 'name',
         start  = 5,
         finish = 5,
         [1]    = 'c',
     },
-    dot   = {
-        type   = '.',
-        start  = 4,
-        finish = 4,
+    [7] = {
+        type   = 'getfield',
+        start  = 1,
+        finish = 5,
+        table  = 4,
+        dot    = 5,
+        field  = 6,
     }
 }
 do return end
