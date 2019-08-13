@@ -1,16 +1,21 @@
 CHECK'nil'
 {
-    type   = 'nil',
-    start  = 1,
-    finish = 3,
+    [1] = {
+        type   = 'nil',
+        start  = 1,
+        finish = 3,
+    }
 }
 CHECK'a'
 {
-    type   = 'name',
-    start  = 1,
-    finish = 1,
-    [1]    = 'a',
+    [1] = {
+        type   = 'name',
+        start  = 1,
+        finish = 1,
+        [1]    = 'a',
+    }
 }
+do return end
 CHECK'a.b'
 {
     type   = 'getfield',

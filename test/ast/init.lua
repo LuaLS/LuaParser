@@ -62,7 +62,6 @@ end
 test 'Nil'
 test 'Boolean'
 test 'String'
-do return end
 test 'Number'
 test 'Name'
 test 'Exp'

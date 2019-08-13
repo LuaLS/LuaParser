@@ -471,7 +471,7 @@ local Defs = {
     Number = function (start, number, finish)
         local n = tonumber(number)
         if n then
-            State.LastNumber = {
+            State.LastNumber = pushAst {
                 type   = 'number',
                 start  = start,
                 finish = finish - 1,
@@ -484,7 +484,7 @@ local Defs = {
                 start  = start,
                 finish = finish - 1,
             }
-            State.LastNumber = {
+            State.LastNumber = pushAst {
                 type   = 'number',
                 start  = start,
                 finish = finish - 1,
@@ -549,7 +549,7 @@ local Defs = {
                 finish = finish - 1,
             }
         end
-        return {
+        return pushAst {
             type   = 'name',
             start  = start,
             finish = finish - 1,
