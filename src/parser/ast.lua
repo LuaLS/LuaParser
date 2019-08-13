@@ -555,21 +555,24 @@ local Defs = {
             [1]    = str,
         }
     end,
-    Simple = function (first, ...)
-        if ... then
-            local obj = {
-                type = 'simple',
-                start = first.start,
-                first, ...,
-            }
-            local last = obj[#obj]
-            obj.finish = last.finish
-            return obj
-        elseif first == '' then
-            return nil
-        else
-            return first
+    GetField = function (dot, field)
+        return {
+            type   = 'getfield',
+            field  = field,
+            dot    = dot,
+            start  = dot.start,
+            finish = field.finish,
+        }
+    end,
+    Simple = function (units)
+        local last = units[1]
+        for i = 2, #units do
+            local current = units[i]
+            current.table = last
+            current.start = last.start
+            last = current
         end
+        return last
     end,
     SimpleCall = function (simple)
         if not simple then

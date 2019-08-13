@@ -19,8 +19,9 @@ end
 
 local function main()
 
-    unitTest 'grammar'
     unitTest 'ast'
+    do return end
+    unitTest 'grammar'
     unitTest 'lines'
     unitTest 'syntax_check'
     unitTest 'perform'

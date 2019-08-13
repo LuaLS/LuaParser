@@ -301,13 +301,17 @@ ExpUnit     <-  Nil
             /   Function
             /   Simple
 
-Simple      <-  (Prefix (Sp Suffix)*)
+Simple      <-  {| Prefix (Sp Suffix)+ |}
             ->  Simple
+            /   Prefix
 Prefix      <-  Sp ({} PL DirtyExp DirtyPR)
             ->  Prefix
             /   FreeName
 Index       <-  ({} BL DirtyExp DirtyBR) -> Index
-Suffix      <-  DOT   Name / DOT   {} -> MissField
+Suffix      <-  (DOT Name)
+            ->  GetField
+            /   (DOT {} -> MissField)
+            ->  GetField
             /   Method (!(Sp CallStart) {} -> MissPL)?
             /   ({} Table {}) -> Call
             /   ({} String {}) -> Call

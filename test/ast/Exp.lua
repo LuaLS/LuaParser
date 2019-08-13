@@ -11,40 +11,69 @@ CHECK'a'
     finish = 1,
     [1]    = 'a',
 }
-CHECK'a.b.c'
+CHECK'a.b'
 {
-    type   = 'simple',
+    type   = 'getfield',
     start  = 1,
-    finish = 5,
-    [1]  = {
+    finish = 3,
+    table  = {
         type   = 'name',
         start  = 1,
         finish = 1,
         [1]    = 'a',
     },
-    [2]  = {
-        type   = '.',
-        start  = 2,
-        finish = 2,
-    },
-    [3]  = {
+    field  = {
         type   = 'name',
         start  = 3,
         finish = 3,
         [1]    = 'b',
     },
-    [4]  = {
+    dot    = {
         type   = '.',
-        start  = 4,
-        finish = 4,
+        start  = 2,
+        finish = 2,
+    }
+}
+CHECK'a.b.c'
+{
+    type   = 'getfield',
+    start  = 1,
+    finish = 5,
+    table  = {
+        type   = 'getfield',
+        start  = 1,
+        finish = 3,
+        table  = {
+            type   = 'name',
+            start  = 1,
+            finish = 1,
+            [1]    = 'a',
+        },
+        field  = {
+            type   = 'name',
+            start  = 3,
+            finish = 3,
+            [1]    = 'b',
+        },
+        dot    = {
+            type   = '.',
+            start  = 2,
+            finish = 2,
+        }
     },
-    [5]  = {
+    field = {
         type   = 'name',
         start  = 5,
         finish = 5,
         [1]    = 'c',
     },
+    dot   = {
+        type   = '.',
+        start  = 4,
+        finish = 4,
+    }
 }
+do return end
 CHECK'func()'
 {
     type   = 'simple',

@@ -65,6 +65,7 @@ test 'String'
 test 'Number'
 test 'Name'
 test 'Exp'
+do return end
 test 'Action'
 test 'Lua'
 test 'Dirty'
