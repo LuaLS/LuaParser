@@ -569,9 +569,9 @@ local Defs = {
     Simple = function (units)
         local last = units[1]
         for i = 2, #units do
-            local current = getAst(units[i])
-            current.table = last
-            current.start = getAst(last).start
+            local current  = getAst(units[i])
+            current.parent = last
+            current.start  = getAst(last).start
             last = units[i]
         end
         return last
@@ -623,26 +623,15 @@ local Defs = {
         }
     end,
     Call = function (start, arg, finish)
-        if arg == nil then
-            return {
-                type = 'call',
-                start = start,
-                finish = finish - 1,
-            }
-        end
-        if arg.type == 'list' then
-            arg.type = 'call'
-            arg.start = start
-            arg.finish = finish - 1
-            return arg
-        end
-        local obj = {
-            type = 'call',
-            start = start,
+        arg.type  = 'callargs'
+        arg.start  = start
+        arg.finish = finish - 1
+        return pushAst {
+            type   = 'call',
+            start  = start,
             finish = finish - 1,
-            [1]  = arg,
+            args   = pushAst(arg),
         }
-        return obj
     end,
     DOTS = function (start)
         return {
@@ -928,13 +917,7 @@ local Defs = {
                 finish = finish,
             }
         end
-        if #exps == 0 then
-            return nil
-        elseif #exps == 1 then
-            return exps[1]
-        else
-            return exps
-        end
+        return exps
     end,
     Nothing = function ()
         return nil

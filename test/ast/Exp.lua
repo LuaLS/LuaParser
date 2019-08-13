@@ -38,7 +38,7 @@ CHECK'a.b'
         type   = 'getfield',
         start  = 1,
         finish = 3,
-        table  = 1,
+        parent = 1,
         dot    = 2,
         field  = 3,
     }
@@ -66,7 +66,7 @@ CHECK'a.b.c'
         type   = 'getfield',
         start  = 1,
         finish = 3,
-        table  = 1,
+        parent = 1,
         dot    = 2,
         field  = 3,
     },
@@ -85,29 +85,33 @@ CHECK'a.b.c'
         type   = 'getfield',
         start  = 1,
         finish = 5,
-        table  = 4,
+        parent = 4,
         dot    = 5,
         field  = 6,
     }
 }
-do return end
 CHECK'func()'
 {
-    type   = 'simple',
-    start  = 1,
-    finish = 6,
-    [1]  = {
+    [1] = {
         type   = 'name',
         start  = 1,
         finish = 4,
         [1]    = 'func',
     },
-    [2]  = {
-        type   = 'call',
+    [2] = {
+        type   = 'callargs',
         start  = 5,
         finish = 6,
     },
+    [3] = {
+        type   = 'call',
+        start  = 1,
+        finish = 6,
+        parent = 1,
+        args   = 2,
+    },
 }
+do return end
 CHECK'a.b.c()'
 {
     type   = 'simple',

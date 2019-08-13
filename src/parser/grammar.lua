@@ -313,10 +313,13 @@ Suffix      <-  (DOT Name)
             /   (DOT {} -> MissField)
             ->  GetField
             /   Method (!(Sp CallStart) {} -> MissPL)?
-            /   ({} Table {}) -> Call
-            /   ({} String {}) -> Call
+            /   ({} Table {})
+            ->  Call
+            /   ({} String {})
+            ->  Call
             /   Index
-            /   ({} PL CallArgList DirtyPR) -> Call
+            /   ({} PL CallArgList DirtyPR)
+            ->  Call
 Method      <-  COLON Name / COLON {} -> MissMethod
 CallStart   <-  PL
             /   TL
@@ -332,9 +335,8 @@ ExpList     <-  Sp (MaybeExp (COMMA (MaybeExp))*)
             ->  List
 MustExpList <-  Sp (Exp      (COMMA (MaybeExp))*)
             ->  List
-CallArgList <-  Sp ({} (COMMA {} / Exp)+ {})
+CallArgList <-  Sp ({} (COMMA {} / Exp)* {})
             ->  CallArgList
-            /   %nil
 NameList    <-  (MustName (COMMA MustName)*)
             ->  List
 
