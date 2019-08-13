@@ -111,65 +111,94 @@ CHECK'func()'
         args   = 2,
     },
 }
-do return end
 CHECK'a.b.c()'
 {
-    type   = 'simple',
-    start  = 1,
-    finish = 7,
-    [1]  = {
+    [1] = {
         type   = 'name',
         start  = 1,
         finish = 1,
         [1]    = 'a',
     },
-    [2]  = {
+    [2] = {
         type   = '.',
         start  = 2,
         finish = 2,
     },
-    [3]  = {
+    [3] = {
         type   = 'name',
         start  = 3,
         finish = 3,
         [1]    = 'b',
     },
-    [4]  = {
+    [4] = {
+        type   = 'getfield',
+        start  = 1,
+        finish = 3,
+        parent = 1,
+        dot    = 2,
+        field  = 3,
+    },
+    [5] = {
         type   = '.',
         start  = 4,
         finish = 4,
     },
-    [5]  = {
+    [6] = {
         type   = 'name',
         start  = 5,
         finish = 5,
         [1]    = 'c',
     },
-    [6]  = {
-        type   = 'call',
+    [7] = {
+        type   = 'getfield',
+        start  = 1,
+        finish = 5,
+        parent = 4,
+        dot    = 5,
+        field  = 6,
+    },
+    [8] = {
+        type   = 'callargs',
         start  = 6,
         finish = 7,
     },
+    [9] = {
+        type   = 'call',
+        parent = 7,
+        start  = 1,
+        finish = 7,
+        args   = 8,
+    }
 }
 CHECK'1 or 2'
 {
-    type   = 'binary',
-    op     = 'or',
-    start  = 1,
-    finish = 6,
-    [1]  = {
+    [1] = {
         type   = 'number',
         start  = 1,
         finish = 1,
         [1]    = 1,
     },
-    [2]  = {
+    [2] = {
+        type   = 'or',
+        start  = 3,
+        finish = 4,
+    },
+    [3] = {
         type   = 'number',
         start  = 6,
         finish = 6,
         [1]    = 2,
     },
+    [4] = {
+        type   = 'binary',
+        start  = 1,
+        finish = 6,
+        op     = 2,
+        [1]    = 1,
+        [2]    = 3,
+    },
 }
+do return end
 CHECK'1 and 2'
 {
     type   = 'binary',

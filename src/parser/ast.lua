@@ -45,8 +45,9 @@ local VersionOp = {
     ['//'] = {'Lua 5.3', 'Lua 5.4'},
 }
 
-local function checkOpVersion(op, start)
-    local versions = VersionOp[op]
+local function checkOpVersion(op)
+    local opAst = getAst(op)
+    local versions = VersionOp[opAst.type]
     if not versions then
         return
     end
@@ -56,11 +57,11 @@ local function checkOpVersion(op, start)
         end
     end
     pushError {
-        type = 'UNSUPPORT_SYMBOL',
-        start = start,
-        finish = start + #op - 1,
+        type    = 'UNSUPPORT_SYMBOL',
+        start   = opAst.start,
+        finish  = opAst.finish,
         version = versions,
-        info = {
+        info    = {
             version = State.Version,
         }
     }
@@ -82,10 +83,11 @@ end
 
 local function binaryForward(list, start, finish, level)
     local info = Exp[level]
-    for i = finish-1, start+2, -1 do
+    for i = finish-1, start+1, -1 do
         local op = list[i]
-        if info[op] then
-            local e1 = expSplit(list, start, i-2, level)
+        local opType = getAst(op).type
+        if info[opType] then
+            local e1 = expSplit(list, start, i-1, level)
             if not e1 then
                 goto CONTINUE
             end
@@ -93,12 +95,12 @@ local function binaryForward(list, start, finish, level)
             if not e2 then
                 goto CONTINUE
             end
-            checkOpVersion(op, list[i-1])
-            return {
+            checkOpVersion(op)
+            return pushAst {
                 type   = 'binary',
                 op     = op,
-                start  = e1.start,
-                finish = e2.finish,
+                start  = getAst(e1).start,
+                finish = getAst(e2).finish,
                 [1]    = e1,
                 [2]    = e2,
             }
@@ -110,10 +112,11 @@ end
 
 local function binaryBackward(list, start, finish, level)
     local info = Exp[level]
-    for i = start+2, finish-1 do
+    for i = start+1, finish-1 do
         local op = list[i]
-        if info[op] then
-            local e1 = expSplit(list, start, i-2, level+1)
+        local opType = getAst(op).type
+        if info[opType] then
+            local e1 = expSplit(list, start, i-1, level+1)
             if not e1 then
                 goto CONTINUE
             end
@@ -121,12 +124,12 @@ local function binaryBackward(list, start, finish, level)
             if not e2 then
                 goto CONTINUE
             end
-            checkOpVersion(op, list[i-1])
-            return {
+            checkOpVersion(op)
+            return pushAst {
                 type   = 'binary',
                 op     = op,
-                start  = e1.start,
-                finish = e2.finish,
+                start  = getAst(e1).start,
+                finish = getAst(e2).finish,
                 [1]    = e1,
                 [2]    = e2,
             }
@@ -139,15 +142,16 @@ end
 local function unary(list, start, finish, level)
     local info = Exp[level]
     local op = list[start+1]
-    if info[op] then
-        local e1 = expSplit(list, start+2, finish, level)
+    local opType = getAst(op).type
+    if info[opType] then
+        local e1 = expSplit(list, start+1, finish, level)
         if e1 then
-            checkOpVersion(op, list[start])
+            checkOpVersion(op)
             return {
                 type   = 'unary',
                 op     = op,
-                start  = list[start],
-                finish = e1.finish,
+                start  = getAst(op).start,
+                finish = getAst(e1).finish,
                 [1]    = e1,
             }
         end
@@ -603,6 +607,13 @@ local Defs = {
             finish = last.finish,
         }
         return simple
+    end,
+    BinaryOp = function (start, op)
+        return pushAst {
+            type   = op,
+            start  = start,
+            finish = start + #op - 1,
+        }
     end,
     Exp = function (first, ...)
         if not ... then

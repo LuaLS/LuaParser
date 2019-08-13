@@ -288,7 +288,7 @@ DirtyName   <-  {} -> DirtyName
 ]]
 
 grammar 'Exp' [[
-Exp         <-  (UnUnit (BinaryOp (UnUnit / {} -> DirtyExp))*)
+Exp         <-  (UnUnit (BinaryOp -> BinaryOp (UnUnit / {} -> DirtyExp))*)
             ->  Exp
 UnUnit      <-  ExpUnit
             /   UnaryOp+ (ExpUnit / {} -> DirtyExp)
