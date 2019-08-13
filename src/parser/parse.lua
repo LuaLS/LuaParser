@@ -2,6 +2,7 @@ local ast = require 'parser.ast'
 
 local Errs
 local State
+local Asts
 
 local function pushError(err)
     if err.finish < err.start then
@@ -18,16 +19,25 @@ local function pushError(err)
     return err
 end
 
+local function pushAst(ast)
+    local n = #Asts + 1
+    Asts[n] = ast
+    return n
+end
+
 return function (self, lua, mode, version)
-    Errs = {}
-    State= {
+    Errs  = {}
+    Asts  = {}
+    State = {
         Break = 0,
         Label = {{}},
         Dots = {true},
         Version = version,
         Lua = lua,
         Emmy = {},
+        Ast = Asts,
         pushError = pushError,
+        pushAst = pushAst,
     }
     ast.init(State)
     local suc, res, err = xpcall(self.grammar, debug.traceback, self, lua, mode)
@@ -36,7 +46,7 @@ return function (self, lua, mode, version)
     end
     if not res then
         pushError(err)
-        return nil, Errs, State.Emmy
+        return nil, Errs
     end
-    return res, Errs, State.Emmy
+    return State, Errs
 end

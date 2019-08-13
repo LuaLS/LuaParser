@@ -8,6 +8,7 @@ local table = table
 
 local State
 local pushError
+local pushAst
 
 -- goto 单独处理
 local RESERVED = {
@@ -237,14 +238,14 @@ Exp = {
 
 local Defs = {
     Nil = function (pos)
-        return {
+        return pushAst {
             type   = 'nil',
             start  = pos,
             finish = pos + 2,
         }
     end,
     True = function (pos)
-        return {
+        return pushAst {
             type   = 'boolean',
             start  = pos,
             finish = pos + 3,
@@ -252,7 +253,7 @@ local Defs = {
         }
     end,
     False = function (pos)
-        return {
+        return pushAst {
             type   = 'boolean',
             start  = pos,
             finish = pos + 4,
@@ -336,7 +337,7 @@ local Defs = {
         return false
     end,
     String = function (start, quote, str, finish)
-        return {
+        return pushAst {
             type   = 'string',
             start  = start,
             finish = finish - 1,
@@ -1665,6 +1666,7 @@ end
 local function init(state)
     State = state
     pushError = state.pushError
+    pushAst   = state.pushAst
     emmy.init(State)
 end
 
