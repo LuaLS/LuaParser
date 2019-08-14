@@ -141,13 +141,13 @@ end
 
 local function unary(list, start, finish, level)
     local info = Exp[level]
-    local op = list[start+1]
+    local op = list[start]
     local opType = getAst(op).type
     if info[opType] then
         local e1 = expSplit(list, start+1, finish, level)
         if e1 then
             checkOpVersion(op)
-            return {
+            return pushAst {
                 type   = 'unary',
                 op     = op,
                 start  = getAst(op).start,
@@ -609,6 +609,13 @@ local Defs = {
         return simple
     end,
     BinaryOp = function (start, op)
+        return pushAst {
+            type   = op,
+            start  = start,
+            finish = start + #op - 1,
+        }
+    end,
+    UnaryOp = function (start, op)
         return pushAst {
             type   = op,
             start  = start,
