@@ -652,7 +652,7 @@ local Defs = {
         }
     end,
     DOTS = function (start)
-        return {
+        return pushAst {
             type   = '...',
             start  = start,
             finish = start + 2,
