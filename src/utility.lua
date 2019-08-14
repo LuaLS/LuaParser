@@ -65,6 +65,8 @@ function table.dump(tbl)
         local keys = {}
         local keymap = {}
         local integerFormat = '[%d]'
+        local notInterger = false
+        local keyLen = 0
         if #tbl >= 10 then
             local width = math.log(#tbl, 10)
             integerFormat = ('[%%0%dd]'):format(math.ceil(width))
@@ -79,33 +81,48 @@ function table.dump(tbl)
                 else
                     keymap[key] = key
                 end
+                notInterger = true
             elseif mathType(key) == 'integer' then
                 keymap[key] = integerFormat:format(key)
             else
                 keymap[key] = ('["<%s>"]'):format(key)
+                notInterger = true
             end
             keys[#keys+1] = key
+            if #keymap[key] > keyLen then
+                keyLen = #keymap[key]
+            end
         end
         local mt = getmetatable(tbl)
         if not mt or not mt.__pairs then
-            tableSort(keys, function (a, b)
-                return keymap[a] < keymap[b]
-            end)
+            if notInterger then
+                tableSort(keys, function (a, b)
+                    return keymap[a] > keymap[b]
+                end)
+            else
+                tableSort(keys, function (a, b)
+                    return keymap[a] < keymap[b]
+                end)
+            end
         end
         for _, key in ipairs(keys) do
             local value = tbl[key]
             local tp = type(value)
+            local keyStr = keymap[key]
+            if #keyStr < keyLen then
+                keyStr = keyStr .. (' '):rep(keyLen - #keyStr)
+            end
             if tp == 'table' then
-                lines[#lines+1] = ('%s%s = {'):format(TAB[tab+1], keymap[key])
+                lines[#lines+1] = ('%s%s = {'):format(TAB[tab+1], keyStr)
                 unpack(value, tab+1)
                 lines[#lines+1] = ('%s},'):format(TAB[tab+1])
             elseif tp == 'string' or tp == 'boolean' then
-                lines[#lines+1] = ('%s%s = %q,'):format(TAB[tab+1], keymap[key], value)
+                lines[#lines+1] = ('%s%s = %q,'):format(TAB[tab+1], keyStr, value)
             elseif tp == 'number' then
-                lines[#lines+1] = ('%s%s = %s,'):format(TAB[tab+1], keymap[key], formatNumber(value))
+                lines[#lines+1] = ('%s%s = %s,'):format(TAB[tab+1], keyStr, formatNumber(value))
             elseif tp == 'nil' then
             else
-                lines[#lines+1] = ('%s%s = %s,'):format(TAB[tab+1], keymap[key], tostring(value))
+                lines[#lines+1] = ('%s%s = %s,'):format(TAB[tab+1], keyStr, tostring(value))
             end
         end
     end

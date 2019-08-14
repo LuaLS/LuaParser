@@ -640,15 +640,65 @@ local Defs = {
             [1] = exp,
         }
     end,
-    Call = function (start, arg, finish)
-        arg.type  = 'callargs'
-        arg.start  = start
-        arg.finish = finish - 1
+    Call = function (start, args, finish)
+        args.type   = 'callargs'
+        args.start   = start
+        args.finish  = finish - 1
+        local max = #args
+        local wantExp = true
+        local expCount = 0
+        local lastFinish = start
+        for i = 1, max do
+            local arg = args[i]
+            local argAst = getAst(arg)
+            local isExp = argAst.type ~= ','
+            if wantExp and not isExp then
+                pushError {
+                    type   = 'MISS_EXP',
+                    start  = lastFinish + 1,
+                    finish = argAst.start - 1,
+                }
+            elseif not wantExp and isExp then
+                pushError {
+                    type   = 'MISS_SYMBOL',
+                    start  = lastFinish + 1,
+                    finish = argAst.start - 1,
+                    info = {
+                        symbol = ',',
+                    }
+                }
+            end
+            if isExp then
+                expCount = expCount + 1
+                args[expCount] = arg
+                wantExp = false
+            else
+                wantExp = true
+            end
+            lastFinish = argAst.finish
+        end
+        for i = expCount + 1, max do
+            args[i] = nil
+        end
+        if wantExp and max > 0 then
+            pushError {
+                type   = 'MISS_EXP',
+                start  = lastFinish + 1,
+                finish = finish - 1,
+            }
+        end
         return pushAst {
             type   = 'call',
             start  = start,
             finish = finish - 1,
-            args   = pushAst(arg),
+            args   = pushAst(args),
+        }
+    end,
+    COMMA = function (start)
+        return pushAst {
+            type   = ',',
+            start  = start,
+            finish = start,
         }
     end,
     DOTS = function (start)
@@ -792,6 +842,47 @@ local Defs = {
         end
         return true, table
     end,
+    Table = function (start, ...)
+        local args = {...}
+        local max = #args
+        local finish = args[max] - 1
+        local table = {
+            type   = 'table',
+            start  = start,
+            finish = finish
+        }
+        start = start + 1
+        local wantField = true
+        for i = 1, max-1 do
+            local arg = args[i]
+            local isField = type(arg) == 'table'
+            local isEmmy = isField and arg.type:sub(1, 4) == 'emmy'
+            if wantField and not isField then
+                pushError {
+                    type = 'MISS_EXP',
+                    start = start,
+                    finish = arg - 1,
+                }
+            elseif not wantField and isField and not isEmmy then
+                pushError {
+                    type = 'MISS_SEP_IN_TABLE',
+                    start = start,
+                    finish = arg.start-1,
+                }
+            end
+            if isField then
+                table[#table+1] = arg
+                if not isEmmy then
+                    wantField = false
+                    start = arg.finish + 1
+                end
+            else
+                wantField = true
+                start = arg
+            end
+        end
+        return pushAst(table)
+    end,
     NewField = function (key, value)
         return {
             type = 'pair',
@@ -889,53 +980,6 @@ local Defs = {
             list.finish = list[#list].finish
             return list
         end
-    end,
-    CallArgList = function (start, ...)
-        local args = {...}
-        local max = #args
-        local finish = args[max] - 1
-        local exps = {
-            type = 'list',
-            start = start,
-            finish = finish,
-        }
-        local wantExp = true
-        for i = 1, max-1 do
-            local arg = args[i]
-            local isExp = type(arg) == 'table'
-            if wantExp and not isExp then
-                pushError {
-                    type = 'MISS_EXP',
-                    start = start,
-                    finish = arg - 1,
-                }
-            elseif not wantExp and isExp then
-                pushError {
-                    type = 'MISS_SYMBOL',
-                    start = start,
-                    finish = arg.start-1,
-                    info = {
-                        symbol = ',',
-                    }
-                }
-            end
-            if isExp then
-                exps[#exps+1] = arg
-                wantExp = false
-                start = arg.finish + 1
-            else
-                wantExp = true
-                start = arg
-            end
-        end
-        if wantExp then
-            pushError {
-                type = 'MISS_EXP',
-                start = start,
-                finish = finish,
-            }
-        end
-        return exps
     end,
     Nothing = function ()
         return nil

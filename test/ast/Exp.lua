@@ -1237,172 +1237,218 @@ CHECK'(1 + 2)'
         [2]    = 3,
     },
 }
-do return end
 CHECK'func()'
 {
-    type   = 'simple',
-    start  = 1,
-    finish = 6,
-    [1]  = {
-        type   = 'name',
+    [1] = {
+        type   = "name",
         start  = 1,
         finish = 4,
-        [1]    = 'func',
+        [1]    = "func",
     },
-    [2]  = {
-        type   = 'call',
+    [2] = {
+        type   = "callargs",
         start  = 5,
         finish = 6,
+    },
+    [3] = {
+        type   = "call",
+        start  = 1,
+        finish = 6,
+        parent = 1,
+        args   = 2,
     },
 }
 CHECK'func(1)'
 {
-    type   = 'simple',
-    start  = 1,
-    finish = 7,
-    [1]  = {
-        type   = 'name',
+    [1] = {
+        type   = "name",
         start  = 1,
         finish = 4,
-        [1]    = 'func',
+        [1]    = "func",
     },
-    [2]  = {
-        type   = 'call',
+    [2] = {
+        type   = "number",
+        start  = 6,
+        finish = 6,
+        [1]    = 1,
+    },
+    [3] = {
+        type   = "callargs",
         start  = 5,
         finish = 7,
-        [1]    = {
-            type   = 'number',
-            start  = 6,
-            finish = 6,
-            [1]    = 1,
-        },
+        [1]    = 2,
+    },
+    [4] = {
+        type   = "call",
+        start  = 1,
+        finish = 7,
+        parent = 1,
+        args   = 3,
     },
 }
 CHECK'func(1, 2)'
 {
-    type   = 'simple',
-    start  = 1,
-    finish = 10,
-    [1]  = {
-        type   = 'name',
-        start  = 1,
+    [1] = {
+        type = "name",
+        start = 1,
         finish = 4,
-        [1]    = 'func',
+        [1] = "func",
     },
-    [2]  = {
-        type   = 'call',
+    [2] = {
+        type   = "number",
+        start  = 6,
+        finish = 6,
+        [1]    = 1,
+    },
+    [3] = {
+        type   = ",",
+        start  = 7,
+        finish = 7,
+    },
+    [4] = {
+        type   = "number",
+        start  = 9,
+        finish = 9,
+        [1]    = 2,
+    },
+    [5] = {
+        type   = "callargs",
         start  = 5,
         finish = 10,
-        [1]    = {
-            type   = 'number',
-            start  = 6,
-            finish = 6,
-            [1]    = 1,
-        },
-        [2]    = {
-            type   = 'number',
-            start  = 9,
-            finish = 9,
-            [1]    = 2,
-        },
+        [1]    = 2,
+        [2]    = 4,
+    },
+    [6] = {
+        type   = "call",
+        start  = 1,
+        finish = 10,
+        parent = 1,
+        args   = 5,
     },
 }
 CHECK'func(...)'
 {
-    type   = 'simple',
-    start  = 1,
-    finish = 9,
-    [1]  = {
-        type   = 'name',
+    [1] = {
+        type   = "name",
         start  = 1,
         finish = 4,
-        [1]    = 'func',
+        [1]    = "func",
     },
-    [2]  = {
-        type   = 'call',
+    [2] = {
+        type   = "...",
+        start  = 6,
+        finish = 8,
+    },
+    [3] = {
+        type   = "callargs",
         start  = 5,
         finish = 9,
-        [1]    = {
-            type   = '...',
-            start  = 6,
-            finish = 8,
-        },
+        [1]    = 2,
+    },
+    [4] = {
+        type   = "call",
+        start  = 1,
+        finish = 9,
+        parent = 1,
+        args   = 3,
     },
 }
 CHECK'func(1, ...)'
 {
-    type   = 'simple',
-    start  = 1,
-    finish = 12,
-    [1]  = {
-        type   = 'name',
+    [1] = {
+        type   = "name",
         start  = 1,
         finish = 4,
-        [1]    = 'func',
+        [1]    = "func",
     },
-    [2]  = {
-        type   = 'call',
+    [2] = {
+        type   = "number",
+        start  = 6,
+        finish = 6,
+        [1]    = 1,
+    },
+    [3] = {
+        type   = ",",
+        start  = 7,
+        finish = 7,
+    },
+    [4] = {
+        type   = "...",
+        start  = 9,
+        finish = 11,
+    },
+    [5] = {
+        type   = "callargs",
         start  = 5,
         finish = 12,
-        [1]    = {
-            type   = 'number',
-            start  = 6,
-            finish = 6,
-            [1]    = 1,
-        },
-        [2]    = {
-            type   = '...',
-            start  = 9,
-            finish = 11,
-        },
+        [1]    = 2,
+        [2]    = 4,
+    },
+    [6] = {
+        type   = "call",
+        start  = 1,
+        finish = 12,
+        parent = 1,
+        args   = 5,
     },
 }
 CHECK'func ""'
 {
-    type   = 'simple',
-    start  = 1,
-    finish = 7,
-    [1]  = {
-        type   = 'name',
+    [1] = {
+        type   = "name",
         start  = 1,
         finish = 4,
-        [1]    = 'func',
+        [1]    = "func",
     },
-    [2]  = {
-        type   = 'call',
+    [2] = {
+        type   = "string",
         start  = 6,
         finish = 7,
-        [1]    = {
-            type   = 'string',
-            start  = 6,
-            finish = 7,
-            [1]    = '',
-            [2]    = [=["]=],
-        }
-    }
+        [1]    = "",
+        [2]    = "\"",
+    },
+    [3] = {
+        type   = "callargs",
+        start  = 6,
+        finish = 7,
+        [1]    = 2,
+    },
+    [4] = {
+        type   = "call",
+        start  = 1,
+        parent = 1,
+        finish = 7,
+        args   = 3,
+    },
 }
 CHECK'func {}'
 {
-    type   = 'simple',
-    start  = 1,
-    finish = 7,
-    [1]  = {
-        type   = 'name',
+    [1] = {
+        type   = "name",
         start  = 1,
         finish = 4,
-        [1]    = 'func',
+        [1]    = "func",
     },
-    [2]  = {
-        type   = 'call',
+    [2] = {
+        type   = "table",
         start  = 6,
         finish = 7,
-        [1]    = {
-            type   = 'table',
-            start  = 6,
-            finish = 7,
-        }
-    }
+    },
+    [3] = {
+        type   = "callargs",
+        start  = 6,
+        finish = 7,
+        [1]    = 2,
+    },
+    [4] = {
+        type   = "call",
+        start  = 1,
+        parent = 1,
+        finish = 7,
+        args   = 3,
+    },
 }
+do return end
 CHECK'table[1]'
 {
     type   = 'simple',

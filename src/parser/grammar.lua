@@ -203,14 +203,19 @@ BL          <-  Sp '[' !'[' !'='
 BR          <-  Sp ']'
 TL          <-  Sp '{'
 TR          <-  Sp '}'
-COMMA       <-  Sp ','
+COMMA       <-  Sp ({} ',')
+            ->  COMMA
 SEMICOLON   <-  Sp ';'
-DOTS        <-  Sp ({} '...') -> DOTS
-DOT         <-  Sp ({} '.' !'.') -> DOT
-COLON       <-  Sp ({} ':' !':') -> COLON
+DOTS        <-  Sp ({} '...')
+            ->  DOTS
+DOT         <-  Sp ({} '.' !'.')
+            ->  DOT
+COLON       <-  Sp ({} ':' !':')
+            ->  COLON
 LABEL       <-  Sp '::'
 ASSIGN      <-  Sp '=' !'='
-AssignOrEQ  <-  Sp ({} '==' {}) -> ErrAssign
+AssignOrEQ  <-  Sp ({} '==' {})
+            ->  ErrAssign
             /   Sp '='
 
 Nothing     <-  {} -> Nothing
@@ -315,12 +320,12 @@ Suffix      <-  (DOT Name)
             /   (DOT {} -> MissField)
             ->  GetField
             /   Method (!(Sp CallStart) {} -> MissPL)?
-            /   ({} Table {})
+            /   ({} {| Table |} {})
             ->  Call
-            /   ({} String {})
+            /   ({} {| String |} {})
             ->  Call
             /   Index
-            /   ({} PL CallArgList DirtyPR)
+            /   ({} PL Sp {| (COMMA / Exp)* |} DirtyPR)
             ->  Call
 Method      <-  COLON Name / COLON {} -> MissMethod
 CallStart   <-  PL
@@ -337,8 +342,6 @@ ExpList     <-  Sp (MaybeExp (COMMA (MaybeExp))*)
             ->  List
 MustExpList <-  Sp (Exp      (COMMA (MaybeExp))*)
             ->  List
-CallArgList <-  Sp ({} (COMMA {} / Exp)* {})
-            ->  CallArgList
 NameList    <-  (MustName (COMMA MustName)*)
             ->  List
 
@@ -346,7 +349,7 @@ ArgList     <-  (DOTS -> DotsAsArg / Name / Sp {} COMMA)*
             ->  ArgList
 
 Table       <-  Sp ({} TL TableFields? DirtyTR)
-            =>  RTTable
+            ->  Table
 TableFields <-  (TableSep {} / TableField)+
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
