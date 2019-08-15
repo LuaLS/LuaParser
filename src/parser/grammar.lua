@@ -48,7 +48,7 @@ defs.NotReserved = function (_, _, str)
     if RESERVED[str] then
         return false
     end
-    return true, str
+    return true
 end
 defs.Reserved = function (_, _, str)
     if RESERVED[str] then
@@ -277,7 +277,7 @@ grammar 'Name' [[
 Name        <-  Sp ({} NameBody {})
             ->  Name
 NameBody    <-  {[a-zA-Z_] [a-zA-Z0-9_]*}
-FreeName    <-  Sp ({} NameBody=>NotReserved {})
+FreeName    <-  Sp ({} {NameBody=>NotReserved} {})
             ->  Name
 MustName    <-  Name / DirtyName
 DirtyName   <-  {} -> DirtyName
@@ -334,7 +334,7 @@ ArgList     <-  (DOTS -> DotsAsArg / Name / Sp {} COMMA)*
             ->  ArgList
 
 Table       <-  Sp ({} TL TableFields? DirtyTR)
-            =>  RTTable
+            ->  Table
 TableFields <-  (Emmy / TableSep {} / TableField)+
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
