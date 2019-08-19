@@ -570,6 +570,14 @@ local Defs = {
             finish = getAst(field).finish,
         }
     end,
+    GetIndex = function (start, exp, finish)
+        return pushAst {
+            type = 'getindex',
+            start = start,
+            finish = finish - 1,
+            [1] = exp,
+        }
+    end,
     Simple = function (units)
         local last = units[1]
         for i = 2, #units do
@@ -631,14 +639,6 @@ local Defs = {
     end,
     Prefix = function (start, exp, finish)
         return exp
-    end,
-    Index = function (start, exp, finish)
-        return {
-            type = 'index',
-            start = start,
-            finish = finish - 1,
-            [1] = exp,
-        }
     end,
     Call = function (start, args, finish)
         args.type   = 'callargs'
@@ -800,47 +800,6 @@ local Defs = {
 
         checkMissEnd(start)
         return obj
-    end,
-    Table = function (start, ...)
-        local args = {...}
-        local max = #args
-        local finish = args[max] - 1
-        local table = {
-            type   = 'table',
-            start  = start,
-            finish = finish
-        }
-        start = start + 1
-        local wantField = true
-        for i = 1, max-1 do
-            local arg = args[i]
-            local isField = type(arg) == 'table'
-            local isEmmy = isField and arg.type:sub(1, 4) == 'emmy'
-            if wantField and not isField then
-                pushError {
-                    type = 'MISS_EXP',
-                    start = start,
-                    finish = arg - 1,
-                }
-            elseif not wantField and isField and not isEmmy then
-                pushError {
-                    type = 'MISS_SEP_IN_TABLE',
-                    start = start,
-                    finish = arg.start-1,
-                }
-            end
-            if isField then
-                table[#table+1] = arg
-                if not isEmmy then
-                    wantField = false
-                    start = arg.finish + 1
-                end
-            else
-                wantField = true
-                start = arg
-            end
-        end
-        return table
     end,
     Table = function (start, ...)
         local args = {...}
@@ -1431,7 +1390,6 @@ local Defs = {
                 symbol = ']',
             }
         }
-        return pos + 1
     end,
     MissPL = function (pos)
         pushError {

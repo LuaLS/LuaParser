@@ -220,7 +220,7 @@ AssignOrEQ  <-  Sp ({} '==' {})
 
 Nothing     <-  {} -> Nothing
 
-DirtyBR     <-  BR {}  / {} -> MissBR
+DirtyBR     <-  BR     / {} -> MissBR
 DirtyTR     <-  TR {}  / {} -> MissTR
 DirtyPR     <-  PR {}  / {} -> DirtyPR
 DirtyLabel  <-  LABEL  / {} -> MissLabel
@@ -314,19 +314,18 @@ Simple      <-  {| Prefix (Sp Suffix)+ |}
 Prefix      <-  Sp ({} PL DirtyExp DirtyPR)
             ->  Prefix
             /   FreeName
-Index       <-  ({} BL DirtyExp DirtyBR) -> Index
-Suffix      <-  (DOT Name)
+Suffix      <-  (DOT (Name / MissField))
             ->  GetField
-            /   (DOT {} -> MissField)
-            ->  GetField
+            /   ({} BL DirtyExp DirtyBR {})
+            ->  GetIndex
             /   Method (!(Sp CallStart) {} -> MissPL)?
             /   ({} {| Table |} {})
             ->  Call
             /   ({} {| String |} {})
             ->  Call
-            /   Index
             /   ({} PL Sp {| (COMMA / Exp)* |} DirtyPR)
             ->  Call
+MissField   <-  {} -> MissField
 Method      <-  COLON Name / COLON {} -> MissMethod
 CallStart   <-  PL
             /   TL
@@ -353,6 +352,7 @@ Table       <-  Sp ({} TL TableFields? DirtyTR)
 TableFields <-  (TableSep {} / TableField)+
 TableSep    <-  COMMA / SEMICOLON
 TableField  <-  NewIndex / NewField / Exp
+Index       <-  ({} BL DirtyExp DirtyBR {})
 NewIndex    <-  Sp (Index NeedAssign DirtyExp)
             ->  NewIndex
 NewField    <-  (MustName ASSIGN DirtyExp)

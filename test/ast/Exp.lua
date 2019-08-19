@@ -1448,57 +1448,67 @@ CHECK'func {}'
         args   = 3,
     },
 }
-do return end
 CHECK'table[1]'
 {
-    type   = 'simple',
-    start  = 1,
-    finish = 8,
-    [1]  = {
-        type   = 'name',
-        start  = 1,
-        finish = 5,
-        [1]    = 'table',
-    },
-    [2]  = {
-        type   = 'index',
-        start  = 6,
-        finish = 8,
-        [1]    = {
-            type   = 'number',
-            start  = 7,
-            finish = 7,
-            [1]    = 1,
-        }
-    }
+	[1] = {
+		type   = "name",
+		start  = 1,
+		finish = 5,
+		[1]    = "table",
+	},
+	[2] = {
+		type   = "number",
+		start  = 7,
+		finish = 7,
+		[1]    = 1,
+	},
+	[3] = {
+		type   = "getindex",
+		start  = 1,
+		finish = 8,
+		parent = 1,
+		[1]    = 2,
+	},
 }
 CHECK'get_point().x'
 {
-    type   = 'simple',
-    start  = 1,
-    finish = 13,
-    [1]  = {
-        type   = 'name',
-        start  = 1,
-        finish = 9,
-        [1]    = 'get_point',
-    },
-    [2]  = {
-        type   = 'call',
-        start  = 10,
-        finish = 11,
-    },
-    [3]  = {
-        type   = '.',
-        start  = 12,
-        finish = 12,
-    },
-    [4]  = {
-        type   = 'name',
-        start  = 13,
-        finish = 13,
-        [1]    = 'x',
-    }
+	[1] = {
+		type   = "name",
+		start  = 1,
+		finish = 9,
+		[1]    = "get_point",
+	},
+	[2] = {
+		type   = "callargs",
+		start  = 10,
+		finish = 11,
+	},
+	[3] = {
+		type   = "call",
+		start  = 1,
+		finish = 11,
+		parent = 1,
+		args   = 2,
+	},
+	[4] = {
+		type   = ".",
+		start  = 12,
+		finish = 12,
+	},
+	[5] = {
+		type   = "name",
+		start  = 13,
+		finish = 13,
+		[1]    = "x",
+	},
+	[6] = {
+		type   = "getfield",
+		start  = 1,
+		finish = 13,
+		dot    = 4,
+		parent = 3,
+		field  = 5,
+	},
 }
 CHECK'obj:remove()'
 {
