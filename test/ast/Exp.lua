@@ -1467,7 +1467,7 @@ CHECK'table[1]'
 		start  = 1,
 		finish = 8,
 		parent = 1,
-		[1]    = 2,
+		index  = 2,
 	},
 }
 CHECK'get_point().x'
@@ -1512,54 +1512,66 @@ CHECK'get_point().x'
 }
 CHECK'obj:remove()'
 {
-    type   = 'simple',
-    start  = 1,
-    finish = 12,
-    [1]  = {
-        type   = 'name',
-        start  = 1,
-        finish = 3,
-        [1]    = 'obj'
-    },
-    [2]  = {
-        type   = ':',
-        start  = 4,
-        finish = 4,
-    },
-    [3]  = {
-        type   = 'name',
-        start  = 5,
-        finish = 10,
-        [1]    = 'remove',
-    },
-    [4]  = {
-        type   = 'call',
-        start  = 11,
-        finish = 12,
-    },
+	[1] = {
+		type   = "name",
+		start  = 1,
+		finish = 3,
+		[1]    = "obj",
+	},
+	[2] = {
+		type   = ":",
+		start  = 4,
+		finish = 4,
+	},
+	[3] = {
+		type   = "name",
+		start  = 5,
+		finish = 10,
+		[1]    = "remove",
+	},
+	[4] = {
+		type   = "getmethod",
+		start  = 1,
+		finish = 10,
+		parent = 1,
+		colon  = 2,
+		method = 3,
+	},
+	[5] = {
+		type   = "callargs",
+		start  = 11,
+		finish = 12,
+	},
+	[6] = {
+		type   = "call",
+		start  = 1,
+		finish = 12,
+		parent = 4,
+		args   = 5,
+	},
 }
 CHECK'(...)[1]'
 {
-    type   = 'simple',
-    start  = 2,
-    finish = 8,
-    [1]  = {
-        type   = '...',
-        start  = 2,
-        finish = 4,
-    },
-    [2]  = {
-        type   = 'index',
-        start  = 6,
-        finish = 8,
-        [1]    = {
-            type   = 'number',
-            start  = 7,
-            finish = 7,
-            [1]    = 1,
-        },
-    }
+	[1] = {
+		type   = "...",
+		start  = 2,
+		finish = 4,
+	},
+	[2] = {
+		type   = "number",
+		start  = 7,
+		finish = 7,
+		[1]    = 1,
+	},
+	[3] = {
+		type   = "getindex",
+		start  = 2,
+		finish = 8,
+		parent = 1,
+		index  = 2,
+	},
 }
+do return end
 CHECK'function () end'
 {
     type      = 'function',

@@ -570,12 +570,21 @@ local Defs = {
             finish = getAst(field).finish,
         }
     end,
-    GetIndex = function (start, exp, finish)
+    GetIndex = function (start, index, finish)
         return pushAst {
-            type = 'getindex',
-            start = start,
+            type   = 'getindex',
+            start  = start,
             finish = finish - 1,
-            [1] = exp,
+            index  = index,
+        }
+    end,
+    GetMethod = function (colon, method)
+        return pushAst {
+            type   = 'getmethod',
+            method = method,
+            colon  = colon,
+            start  = getAst(colon).start,
+            finish = getAst(method).finish,
         }
     end,
     Simple = function (units)
@@ -723,7 +732,7 @@ local Defs = {
         return obj
     end,
     COLON = function (start)
-        return {
+        return pushAst {
             type   = ':',
             start  = start,
             finish = start,

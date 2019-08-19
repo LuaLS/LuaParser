@@ -318,15 +318,17 @@ Suffix      <-  (DOT (Name / MissField))
             ->  GetField
             /   ({} BL DirtyExp DirtyBR {})
             ->  GetIndex
-            /   Method (!(Sp CallStart) {} -> MissPL)?
+            /   (COLON (Name / MissMethod) NeedCall)
+            ->  GetMethod
             /   ({} {| Table |} {})
             ->  Call
             /   ({} {| String |} {})
             ->  Call
             /   ({} PL Sp {| (COMMA / Exp)* |} DirtyPR)
             ->  Call
+NeedCall    <-  (!(Sp CallStart) {} -> MissPL)?
 MissField   <-  {} -> MissField
-Method      <-  COLON Name / COLON {} -> MissMethod
+MissMethod  <-  {} -> MissMethod
 CallStart   <-  PL
             /   TL
             /   '"'
