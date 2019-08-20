@@ -1,69 +1,84 @@
 CHECK'x = 1'
 {
-    type = 'set',
-    [1]  = {
-        type   = 'name',
-        start  = 1,
-        finish = 1,
-        [1]    = 'x',
-    },
-    [2]  = {
-        type   = 'number',
-        start  = 5,
-        finish = 5,
-        [1]    = 1,
-    }
+	[1] = {
+		type   = "name",
+		start  = 1,
+		finish = 1,
+		[1]    = "x",
+	},
+	[2] = {
+		type   = "number",
+		start  = 5,
+		finish = 5,
+		[1]    = 1,
+	},
+	[3] = {
+		type   = "set",
+		start  = 1,
+		finish = 5,
+		keys   = {
+			[1] = 1,
+		},
+		values = {
+			[1] = 2,
+		},
+	},
 }
 CHECK'x, y, z = 1, 2, 3'
 {
-    type = 'set',
-    [1]  = {
-        type   = 'list',
-        start  = 1,
-        finish = 7,
-        [1]  = {
-            type   = 'name',
-            start  = 1,
-            finish = 1,
-            [1]    = 'x',
-        },
-        [2]  = {
-            type   = 'name',
-            start  = 4,
-            finish = 4,
-            [1]    = 'y',
-        },
-        [3]  = {
-            type   = 'name',
-            start  = 7,
-            finish = 7,
-            [1]    = 'z',
-        },
-    },
-    [2]  = {
-        type = 'list',
-        start = 11,
-        finish = 17,
-        [1]  = {
-            type   = 'number',
-            start  = 11,
-            finish = 11,
-            [1]    = 1,
-        },
-        [2]  = {
-            type   = 'number',
-            start  = 14,
-            finish = 14,
-            [1]    = 2,
-        },
-        [3]  = {
-            type   = 'number',
-            start  = 17,
-            finish = 17,
-            [1]    = 3,
-        },
-    },
+	[1] = {
+		type   = "name",
+		start  = 1,
+		finish = 1,
+		[1]    = "x",
+	},
+	[2] = {
+		type   = "name",
+		start  = 4,
+		finish = 4,
+		[1]    = "y",
+	},
+	[3] = {
+		type   = "name",
+		start  = 7,
+		finish = 7,
+		[1]    = "z",
+	},
+	[4] = {
+		type   = "number",
+		start  = 11,
+		finish = 11,
+		[1]    = 1,
+	},
+	[5] = {
+		type   = "number",
+		start  = 14,
+		finish = 14,
+		[1]    = 2,
+	},
+	[6] = {
+		type   = "number",
+		start  = 17,
+		finish = 17,
+		[1]    = 3,
+	},
+	[7] = {
+		type   = "set",
+		start  = 1,
+		finish = 17,
+		keys   = {
+			[1] = 1,
+			[2] = 2,
+			[3] = 3,
+		},
+		values = {
+			[1] = 4,
+			[2] = 5,
+			[3] = 6,
+		},
+	},
 }
+do return end
 CHECK'local x'
 {
     type = 'local',

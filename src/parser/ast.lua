@@ -869,22 +869,6 @@ local Defs = {
             value  = value,
         }
     end,
-    List = function (first, second, ...)
-        if second then
-            local list = {
-                type = 'list',
-                start = first.start,
-                first, second, ...
-            }
-            local last = list[#list]
-            list.finish = last.finish
-            return list
-        elseif type(first) == 'table' then
-            return first
-        else
-            return nil
-        end
-    end,
     FuncArgs = function (start, args, finish)
         args.type   = 'funcargs'
         args.start  = start
@@ -954,10 +938,13 @@ local Defs = {
     Skip = function ()
         return false
     end,
-    Set = function (keys, values)
-        return {
-            type = 'set',
-            keys, values,
+    Set = function (start, keys, values, finish)
+        return pushAst {
+            type   = 'set',
+            start  = start,
+            finish = finish - 1,
+            keys   = keys,
+            values = values,
         }
     end,
     LocalTag = function (...)

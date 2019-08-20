@@ -340,12 +340,9 @@ DirtyExp    <-  Exp
             /   {} -> DirtyExp
 MaybeExp    <-  Exp / MissExp
 MissExp     <-  {} -> MissExp
-ExpList     <-  Sp (MaybeExp (COMMA (MaybeExp))*)
-            ->  List
-MustExpList <-  Sp (Exp      (COMMA (MaybeExp))*)
-            ->  List
-NameList    <-  (MustName (COMMA MustName)*)
-            ->  List
+ExpList     <-  Sp {| MaybeExp (Sp ',' MaybeExp)* |}
+MustExpList <-  Sp {| Exp      (Sp ',' MaybeExp)* |}
+NameList    <-  Sp {| MustName (Sp ',' MustName)* |}
 
 
 Table       <-  Sp ({} TL {| TableField* |} DirtyTR {})
@@ -381,7 +378,6 @@ BlockEnd    <-  {} -> BlockEnd
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
 Action      <-  !END .
-Set         <-  END
 ]]
 
 grammar 'Action' [[
@@ -413,8 +409,7 @@ ExpInAction <-  Sp ({} Exp {})
 
 Semicolon   <-  SEMICOLON
             ->  Skip
-SimpleList  <-  (Simple (COMMA Simple)*)
-            ->  List
+SimpleList  <-  {| Simple (Sp ',' Simple)* |}
 
 Do          <-  Sp ({} 'do' Cut DoBody NeedEnd {})
             ->  Do
@@ -506,11 +501,10 @@ LocalTag    <-  (Sp '<' Sp MustName Sp LocalTagEnd)*
 LocalTagEnd <-  '>' / {} -> MissGT
 Local       <-  (LOCAL LocalNameList (AssignOrEQ ExpList)?)
             ->  Local
-Set         <-  (SimpleList AssignOrEQ ExpList?)
+Set         <-  Sp ({} SimpleList AssignOrEQ ExpList {})
             ->  Set
 LocalNameList
-            <-  (LocalName (COMMA LocalName)*)
-            ->  List
+            <-  {| LocalName (Sp ',' LocalName)* |}
 LocalName   <-  (MustName LocalTag)
             ->  LocalName
 

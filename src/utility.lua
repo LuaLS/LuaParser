@@ -68,7 +68,7 @@ function table.dump(tbl)
         local notInterger = false
         local keyLen = 0
         if #tbl >= 10 then
-            local width = math.log(#tbl, 10)
+            local width = #tostring(#tbl)
             integerFormat = ('[%%0%dd]'):format(math.ceil(width))
         end
         for key in pairs(tbl) do
