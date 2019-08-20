@@ -334,57 +334,88 @@ CHECK'local x <const>, y <close> = 1'
         },
     },
 }
-do return end
 CHECK'x = function () end'
 {
-    type = 'set',
-    [1]  = {
-        type   = 'name',
-        start  = 1,
-        finish = 1,
-        [1]    = 'x',
-    },
-    [2]  = {
-        type      = 'function',
-        start     = 5,
-        finish    = 19,
-        argStart  = 14,
-        argFinish = 15,
-    }
+	[1] = {
+		type   = "name",
+		start  = 1,
+		finish = 1,
+		[1]    = "x",
+	},
+	[2] = {
+		type   = "funcargs",
+		start  = 14,
+		finish = 15,
+	},
+	[3] = {
+		type   = "function",
+		start  = 5,
+		finish = 19,
+		args   = 2,
+	},
+	[4] = {
+		type   = "set",
+		start  = 1,
+		finish = 19,
+		keys   = {
+			[1] = 1,
+		},
+		values = {
+			[1] = 3,
+		},
+	},
 }
 CHECK'x.y = function () end'
 {
-    type = 'set',
-    [1]  = {
-        type   = 'simple',
-        start  = 1,
-        finish = 3,
-        [1]  = {
-            type   = 'name',
-            start  = 1,
-            finish = 1,
-            [1]    = 'x',
-        },
-        [2]  = {
-            type   = '.',
-            start  = 2,
-            finish = 2,
-        },
-        [3]  = {
-            type   = 'name',
-            start  = 3,
-            finish = 3,
-            [1]    = 'y',
-        },
-    },
-    [2]  = {
-        type      = 'function',
-        start     = 7,
-        finish    = 21,
-        argStart  = 16,
-        argFinish = 17,
-    }
+	[1] = {
+		type   = "name",
+		start  = 1,
+		finish = 1,
+		[1]    = "x",
+	},
+	[2] = {
+		type   = ".",
+		start  = 2,
+		finish = 2,
+	},
+	[3] = {
+		type   = "name",
+		start  = 3,
+		finish = 3,
+		[1]    = "y",
+	},
+	[4] = {
+		type   = "getfield",
+		start  = 1,
+		parent = 1,
+		finish = 3,
+		field  = 3,
+		dot    = 2,
+	},
+	[5] = {
+		type   = "funcargs",
+		start  = 16,
+		finish = 17,
+	},
+	[6] = {
+		type   = "function",
+		start  = 7,
+		finish = 21,
+		args   = 5,
+	},
+	[7] = {
+		type   = "set",
+		start  = 1,
+		finish = 21,
+		keys   = {
+			[1] = 4,
+		},
+		values = {
+			[1] = 6,
+		},
+	},
 }
+do return end
 CHECK'func.x(1, 2)'
 {
     type   = 'simple',

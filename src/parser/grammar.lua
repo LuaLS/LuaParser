@@ -520,12 +520,13 @@ NamedFunction
             ->  NamedFunction
 FunctionNamedBody
             <-  FUNCTION FuncName BlockStart FuncArg
-                    (!END Action)*
+                    {| (!END Action)* |}
                     BlockEnd
                 NeedEnd
-FuncName    <-  (MustName (DOT MustName)* FuncMethod?)
+FuncName    <-  {| MustName (DOT MustName)* FuncMethod? |}
             ->  Simple
-FuncMethod  <-  COLON Name / COLON {} -> MissMethod
+FuncMethod  <-  COLON Name
+            /   COLON {} -> MissMethod
 ]]
 
 grammar 'EmmyLua' (emmy.grammar)
