@@ -1,284 +1,340 @@
 CHECK'x = 1'
 {
-	[1] = {
-		type   = "name",
-		start  = 1,
-		finish = 1,
-		[1]    = "x",
-	},
-	[2] = {
-		type   = "number",
-		start  = 5,
-		finish = 5,
-		[1]    = 1,
-	},
-	[3] = {
-		type   = "set",
-		start  = 1,
-		finish = 5,
-		keys   = {
-			[1] = 1,
-		},
-		values = {
-			[1] = 2,
-		},
-	},
+    [1] = {
+        type   = "name",
+        start  = 1,
+        finish = 1,
+        [1]    = "x",
+    },
+    [2] = {
+        type   = "number",
+        start  = 5,
+        finish = 5,
+        [1]    = 1,
+    },
+    [3] = {
+        type   = "set",
+        start  = 1,
+        finish = 5,
+        keys   = {
+            [1] = 1,
+        },
+        values = {
+            [1] = 2,
+        },
+    },
 }
 CHECK'x, y, z = 1, 2, 3'
 {
-	[1] = {
-		type   = "name",
-		start  = 1,
-		finish = 1,
-		[1]    = "x",
-	},
-	[2] = {
-		type   = "name",
-		start  = 4,
-		finish = 4,
-		[1]    = "y",
-	},
-	[3] = {
-		type   = "name",
-		start  = 7,
-		finish = 7,
-		[1]    = "z",
-	},
-	[4] = {
-		type   = "number",
-		start  = 11,
-		finish = 11,
-		[1]    = 1,
-	},
-	[5] = {
-		type   = "number",
-		start  = 14,
-		finish = 14,
-		[1]    = 2,
-	},
-	[6] = {
-		type   = "number",
-		start  = 17,
-		finish = 17,
-		[1]    = 3,
-	},
-	[7] = {
-		type   = "set",
-		start  = 1,
-		finish = 17,
-		keys   = {
-			[1] = 1,
-			[2] = 2,
-			[3] = 3,
-		},
-		values = {
-			[1] = 4,
-			[2] = 5,
-			[3] = 6,
-		},
-	},
-}
-do return end
-CHECK'local x'
-{
-    type = 'local',
-    [1]  = {
-        type   = 'name',
+    [1] = {
+        type   = "name",
+        start  = 1,
+        finish = 1,
+        [1]    = "x",
+    },
+    [2] = {
+        type   = "name",
+        start  = 4,
+        finish = 4,
+        [1]    = "y",
+    },
+    [3] = {
+        type   = "name",
         start  = 7,
         finish = 7,
-        [1]    = 'x',
+        [1]    = "z",
+    },
+    [4] = {
+        type   = "number",
+        start  = 11,
+        finish = 11,
+        [1]    = 1,
+    },
+    [5] = {
+        type   = "number",
+        start  = 14,
+        finish = 14,
+        [1]    = 2,
+    },
+    [6] = {
+        type   = "number",
+        start  = 17,
+        finish = 17,
+        [1]    = 3,
+    },
+    [7] = {
+        type   = "set",
+        start  = 1,
+        finish = 17,
+        keys   = {
+            [1] = 1,
+            [2] = 2,
+            [3] = 3,
+        },
+        values = {
+            [1] = 4,
+            [2] = 5,
+            [3] = 6,
+        },
+    },
+}
+CHECK'local x'
+{
+    [1] = {
+        type   = "name",
+        start  = 7,
+        finish = 7,
+        [1]    = "x",
+    },
+    [2] = {
+        type   = "local",
+        start  = 1,
+        finish = 7,
+        keys   = {
+            [1] = 1,
+        },
     },
 }
 CHECK'local x, y, z'
 {
-    type = 'local',
-    [1]  = {
-        type   = 'list',
+    [1] = {
+        type   = "name",
         start  = 7,
+        finish = 7,
+        [1]    = "x",
+    },
+    [2] = {
+        type   = "name",
+        start  = 10,
+        finish = 10,
+        [1]    = "y",
+    },
+    [3] = {
+        type   = "name",
+        start  = 13,
         finish = 13,
-        [1]  = {
-            type   = 'name',
-            start  = 7,
-            finish = 7,
-            [1]    = 'x',
-        },
-        [2]  = {
-            type   = 'name',
-            start  = 10,
-            finish = 10,
-            [1]    = 'y',
-        },
-        [3]  = {
-            type   = 'name',
-            start  = 13,
-            finish = 13,
-            [1]    = 'z',
+        [1]    = "z",
+    },
+    [4] = {
+        type   = "local",
+        start  = 1,
+        finish = 13,
+        keys   = {
+            [1] = 1,
+            [2] = 2,
+            [3] = 3,
         },
     },
 }
 CHECK'local x = 1'
 {
-    type = 'local',
-    [1]  = {
-        type   = 'name',
+    [1] = {
+        type   = "name",
         start  = 7,
         finish = 7,
-        [1]    = 'x',
+        [1]    = "x",
     },
-    [2]  = {
-        type   = 'number',
+    [2] = {
+        type   = "number",
         start  = 11,
         finish = 11,
         [1]    = 1,
-    }
+    },
+    [3] = {
+        type   = "local",
+        start  = 1,
+        finish = 11,
+        keys   = {
+            [1] = 1,
+        },
+        values = {
+            [1] = 2,
+        },
+    },
 }
 CHECK'local x, y, z = 1, 2, 3'
 {
-    type = 'local',
-    [1]  = {
-        type   = 'list',
+    [1] = {
+        type   = "name",
         start  = 7,
-        finish = 13,
-        [1]  = {
-            type   = 'name',
-            start  = 7,
-            finish = 7,
-            [1]    = 'x',
-        },
-        [2]  = {
-            type   = 'name',
-            start  = 10,
-            finish = 10,
-            [1]    = 'y',
-        },
-        [3]  = {
-            type   = 'name',
-            start  = 13,
-            finish = 13,
-            [1]    = 'z',
-        },
+        finish = 7,
+        [1]    = "x",
     },
-    [2]  = {
-        type   = 'list',
+    [2] = {
+        type   = "name",
+        start  = 10,
+        finish = 10,
+        [1]    = "y",
+    },
+    [3] = {
+        type   = "name",
+        start  = 13,
+        finish = 13,
+        [1]    = "z",
+    },
+    [4] = {
+        type   = "number",
         start  = 17,
+        finish = 17,
+        [1]    = 1,
+    },
+    [5] = {
+        type   = "number",
+        start  = 20,
+        finish = 20,
+        [1]    = 2,
+    },
+    [6] = {
+        type   = "number",
+        start  = 23,
         finish = 23,
-        [1]  = {
-            type   = 'number',
-            start  = 17,
-            finish = 17,
-            [1]    = 1,
+        [1]    = 3,
+    },
+    [7] = {
+        type   = "local",
+        start  = 1,
+        finish = 23,
+        keys   = {
+            [1] = 1,
+            [2] = 2,
+            [3] = 3,
         },
-        [2]  = {
-            type   = 'number',
-            start  = 20,
-            finish = 20,
-            [1]    = 2,
-        },
-        [3]  = {
-            type   = 'number',
-            start  = 23,
-            finish = 23,
-            [1]    = 3,
+        values = {
+            [1] = 4,
+            [2] = 5,
+            [3] = 6,
         },
     },
 }
 CHECK'local x <close> <const> = 1'
 {
-    type = 'local',
-    [1]  = {
-        type   = 'name',
+    [1] = {
+        type   = "name",
         start  = 7,
         finish = 7,
-        tags   = {
-            [1] = {
-                type   = 'name',
-                start  = 10,
-                finish = 14,
-                [1]    = 'close',
-            },
-            [2] = {
-                type   = 'name',
-                start  = 18,
-                finish = 22,
-                [1]    = 'const',
-            },
+        [1]    = "x",
+        attrs  = {
+            [1] = 2,
+            [2] = 3,
         },
-        [1]    = 'x',
     },
-    [2]  = {
-        type   = 'number',
+    [2] = {
+        type   = "localattr",
+        start  = 10,
+        finish = 14,
+        [1]    = "close",
+    },
+    [3] = {
+        type   = "localattr",
+        start  = 18,
+        finish = 22,
+        [1]    = "const",
+    },
+    [4] = {
+        type   = "number",
         start  = 27,
         finish = 27,
         [1]    = 1,
     },
+    [5] = {
+        type   = "local",
+        start  = 1,
+        finish = 27,
+        keys   = {
+            [1] = 1,
+        },
+        values = {
+            [1] = 4,
+        },
+    },
 }
 CHECK'local x < const > = 1'
 {
-    type = 'local',
-    [1]  = {
-        type   = 'name',
+    [1] = {
+        type   = "name",
         start  = 7,
         finish = 7,
-        tags   = {
-            [1] = {
-                type   = 'name',
-                start  = 11,
-                finish = 15,
-                [1]    = 'const',
-            }
+        [1]    = "x",
+        attrs  = {
+            [1] = 2,
         },
-        [1]    = 'x',
     },
     [2] = {
-        type   = 'number',
+        type   = "localattr",
+        start  = 11,
+        finish = 15,
+        [1]    = "const",
+    },
+    [3] = {
+        type   = "number",
         start  = 21,
         finish = 21,
         [1]    = 1,
     },
+    [4] = {
+        type   = "local",
+        start  = 1,
+        finish = 21,
+        keys   = {
+            [1] = 1,
+        },
+        values = {
+            [1] = 3,
+        },
+    },
 }
 CHECK'local x <const>, y <close> = 1'
 {
-    type = 'local',
-    [1]  = {
-        type   = "list",
+    [1] = {
+        type   = "name",
         start  = 7,
-        finish = 18,
-        [1]    = {
-            type   = 'name',
-            start  = 7,
-            finish = 7,
-            tags   = {
-                [1] = {
-                    type   = 'name',
-                    start  = 10,
-                    finish = 14,
-                    [1]    = 'const',
-                }
-            },
-            [1]    = 'x',
-        },
-        [2]    = {
-            type   = 'name',
-            start  = 18,
-            finish = 18,
-            tags   = {
-                [1] = {
-                    type   = 'name',
-                    start  = 21,
-                    finish = 25,
-                    [1]    = 'close',
-                }
-            },
-            [1]    = 'y',
+        finish = 7,
+        [1]    = "x",
+        attrs  = {
+            [1] = 2,
         },
     },
     [2] = {
-        type   = 'number',
+        type   = "localattr",
+        start  = 10,
+        finish = 14,
+        [1]    = "const",
+    },
+    [3] = {
+        type   = "name",
+        start  = 18,
+        finish = 18,
+        [1]    = "y",
+        attrs  = {
+            [1] = 4,
+        },
+    },
+    [4] = {
+        type   = "localattr",
+        start  = 21,
+        finish = 25,
+        [1]    = "close",
+    },
+    [5] = {
+        type   = "number",
         start  = 30,
         finish = 30,
         [1]    = 1,
     },
+    [6] = {
+        type   = "local",
+        start  = 1,
+        finish = 30,
+        keys   = {
+            [1] = 1,
+            [2] = 3,
+        },
+        values = {
+            [1] = 5,
+        },
+    },
 }
+do return end
 CHECK'x = function () end'
 {
     type = 'set',

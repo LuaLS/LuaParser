@@ -947,52 +947,53 @@ local Defs = {
             values = values,
         }
     end,
-    LocalTag = function (...)
-        if not ... or ... == '' then
-            return nil
-        end
-        local tags = {...}
-        for i, tag in ipairs(tags) do
+    LocalAttr = function (attrs)
+        for i, attr in ipairs(attrs) do
+            local attrAst = getAst(attr)
+            attrAst.type = 'localattr'
             if State.Version ~= 'Lua 5.4' then
                 pushError {
-                    type = 'UNSUPPORT_SYMBOL',
-                    start = tag.start,
-                    finish = tag.finish,
+                    type    = 'UNSUPPORT_SYMBOL',
+                    start   = attrAst.start,
+                    finish  = attrAst.finish,
                     version = 'Lua 5.4',
-                    info = {
+                    info    = {
                         version = State.Version,
                     }
                 }
-            elseif tag[1] ~= 'const' and tag[1] ~= 'close' then
+            elseif attrAst[1] ~= 'const' and attrAst[1] ~= 'close' then
                 pushError {
-                    type = 'UNKNOWN_TAG',
-                    start = tag.start,
-                    finish = tag.finish,
-                    info = {
-                        tag = tag[1],
+                    type   = 'UNKNOWN_TAG',
+                    start  = attrAst.start,
+                    finish = attrAst.finish,
+                    info   = {
+                        tag = attrAst[1],
                     }
                 }
             elseif i > 1 then
                 pushError {
-                    type = 'MULTI_TAG',
-                    start = tag.start,
-                    finish = tag.finish,
-                    info = {
-                        tag = tag[1],
+                    type   = 'MULTI_TAG',
+                    start  = attrAst.start,
+                    finish = attrAst.finish,
+                    info   = {
+                        tag = attrAst[1],
                     }
                 }
             end
         end
-        return tags
+        return attrs
     end,
-    LocalName = function (name, tags)
-        name.tags = tags
+    LocalName = function (name, attrs)
+        getAst(name).attrs = attrs
         return name
     end,
-    Local = function (keys, values)
-        return {
-            type = 'local',
-            keys, values,
+    Local = function (start, keys, values, finish)
+        return pushAst {
+            type   = 'local',
+            start  = start,
+            finish = finish - 1,
+            keys   = keys,
+            values = values,
         }
     end,
     DoBody = function (...)

@@ -496,16 +496,16 @@ RepeatBody  <-  REPEAT
                     BreakEnd
                 NeedUntil DirtyExp
 
-LocalTag    <-  (Sp '<' Sp MustName Sp LocalTagEnd)*
-            ->  LocalTag
-LocalTagEnd <-  '>' / {} -> MissGT
-Local       <-  (LOCAL LocalNameList (AssignOrEQ ExpList)?)
+LocalAttr   <-  {| (Sp '<' Sp MustName Sp LocalAttrEnd)+ |}
+            ->  LocalAttr
+LocalAttrEnd<-  '>' / {} -> MissGT
+Local       <-  Sp ({} LOCAL LocalNameList ((AssignOrEQ ExpList) / %nil) {})
             ->  Local
 Set         <-  Sp ({} SimpleList AssignOrEQ ExpList {})
             ->  Set
 LocalNameList
             <-  {| LocalName (Sp ',' LocalName)* |}
-LocalName   <-  (MustName LocalTag)
+LocalName   <-  (MustName LocalAttr?)
             ->  LocalName
 
 Call        <-  Simple
