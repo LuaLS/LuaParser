@@ -1450,173 +1450,197 @@ CHECK'func {}'
 }
 CHECK'table[1]'
 {
-	[1] = {
-		type   = "name",
-		start  = 1,
-		finish = 5,
-		[1]    = "table",
-	},
-	[2] = {
-		type   = "number",
-		start  = 7,
-		finish = 7,
-		[1]    = 1,
-	},
-	[3] = {
-		type   = "getindex",
-		start  = 1,
-		finish = 8,
-		parent = 1,
-		index  = 2,
-	},
+    [1] = {
+        type   = "name",
+        start  = 1,
+        finish = 5,
+        [1]    = "table",
+    },
+    [2] = {
+        type   = "number",
+        start  = 7,
+        finish = 7,
+        [1]    = 1,
+    },
+    [3] = {
+        type   = "getindex",
+        start  = 1,
+        finish = 8,
+        parent = 1,
+        index  = 2,
+    },
 }
 CHECK'get_point().x'
 {
-	[1] = {
-		type   = "name",
-		start  = 1,
-		finish = 9,
-		[1]    = "get_point",
-	},
-	[2] = {
-		type   = "callargs",
-		start  = 10,
-		finish = 11,
-	},
-	[3] = {
-		type   = "call",
-		start  = 1,
-		finish = 11,
-		parent = 1,
-		args   = 2,
-	},
-	[4] = {
-		type   = ".",
-		start  = 12,
-		finish = 12,
-	},
-	[5] = {
-		type   = "name",
-		start  = 13,
-		finish = 13,
-		[1]    = "x",
-	},
-	[6] = {
-		type   = "getfield",
-		start  = 1,
-		finish = 13,
-		dot    = 4,
-		parent = 3,
-		field  = 5,
-	},
+    [1] = {
+        type   = "name",
+        start  = 1,
+        finish = 9,
+        [1]    = "get_point",
+    },
+    [2] = {
+        type   = "callargs",
+        start  = 10,
+        finish = 11,
+    },
+    [3] = {
+        type   = "call",
+        start  = 1,
+        finish = 11,
+        parent = 1,
+        args   = 2,
+    },
+    [4] = {
+        type   = ".",
+        start  = 12,
+        finish = 12,
+    },
+    [5] = {
+        type   = "name",
+        start  = 13,
+        finish = 13,
+        [1]    = "x",
+    },
+    [6] = {
+        type   = "getfield",
+        start  = 1,
+        finish = 13,
+        dot    = 4,
+        parent = 3,
+        field  = 5,
+    },
 }
 CHECK'obj:remove()'
 {
-	[1] = {
-		type   = "name",
-		start  = 1,
-		finish = 3,
-		[1]    = "obj",
-	},
-	[2] = {
-		type   = ":",
-		start  = 4,
-		finish = 4,
-	},
-	[3] = {
-		type   = "name",
-		start  = 5,
-		finish = 10,
-		[1]    = "remove",
-	},
-	[4] = {
-		type   = "getmethod",
-		start  = 1,
-		finish = 10,
-		parent = 1,
-		colon  = 2,
-		method = 3,
-	},
-	[5] = {
-		type   = "callargs",
-		start  = 11,
-		finish = 12,
-	},
-	[6] = {
-		type   = "call",
-		start  = 1,
-		finish = 12,
-		parent = 4,
-		args   = 5,
-	},
+    [1] = {
+        type   = "name",
+        start  = 1,
+        finish = 3,
+        [1]    = "obj",
+    },
+    [2] = {
+        type   = ":",
+        start  = 4,
+        finish = 4,
+    },
+    [3] = {
+        type   = "name",
+        start  = 5,
+        finish = 10,
+        [1]    = "remove",
+    },
+    [4] = {
+        type   = "getmethod",
+        start  = 1,
+        finish = 10,
+        parent = 1,
+        colon  = 2,
+        method = 3,
+    },
+    [5] = {
+        type   = "callargs",
+        start  = 11,
+        finish = 12,
+    },
+    [6] = {
+        type   = "call",
+        start  = 1,
+        finish = 12,
+        parent = 4,
+        args   = 5,
+    },
 }
 CHECK'(...)[1]'
 {
-	[1] = {
-		type   = "...",
-		start  = 2,
-		finish = 4,
-	},
-	[2] = {
-		type   = "number",
-		start  = 7,
-		finish = 7,
-		[1]    = 1,
-	},
-	[3] = {
-		type   = "getindex",
-		start  = 2,
-		finish = 8,
-		parent = 1,
-		index  = 2,
-	},
+    [1] = {
+        type   = "...",
+        start  = 2,
+        finish = 4,
+    },
+    [2] = {
+        type   = "number",
+        start  = 7,
+        finish = 7,
+        [1]    = 1,
+    },
+    [3] = {
+        type   = "getindex",
+        start  = 2,
+        finish = 8,
+        parent = 1,
+        index  = 2,
+    },
 }
-do return end
 CHECK'function () end'
 {
-    type      = 'function',
-    start     = 1,
-    finish    = 15,
-    argStart  = 10,
-    argFinish = 11,
+    [1] = {
+        type    = "function",
+        start   = 1,
+        finish  = 16,
+        args    = {
+            type   = "funcargs",
+            start  = 9,
+            finish = 12,
+        },
+        actions = {
+        },
+    },
 }
 CHECK'function (...) end'
 {
-    type      = 'function',
-    start     = 1,
-    finish    = 18,
-    argStart  = 10,
-    argFinish = 14,
-    arg       = {
-        type   = '...',
+    [1] = {
+        type   = "...",
         start  = 11,
         finish = 13,
+    },
+    [2] = {
+        type    = "function",
+        start   = 1,
+        finish  = 19,
+        args    = {
+            type   = "funcargs",
+            start  = 9,
+            finish = 15,
+            [1]    = 1,
+        },
+        actions = {
+        },
     },
 }
 CHECK'function (a, ...) end'
 {
-    type      = 'function',
-    start     = 1,
-    finish    = 21,
-    argStart  = 10,
-    argFinish = 17,
-    arg       = {
-        type   = 'list',
+    [1] = {
+        type   = "name",
         start  = 11,
+        finish = 11,
+        [1]    = "a",
+    },
+    [2] = {
+        type   = ",",
+        start  = 12,
+        finish = 12,
+    },
+    [3] = {
+        type   = "...",
+        start  = 14,
         finish = 16,
-        [1]  = {
-            type   = 'name',
-            start  = 11,
-            finish = 11,
-            [1]    = 'a',
+    },
+    [4] = {
+        type    = "function",
+        start   = 1,
+        finish  = 22,
+        args    = {
+            type   = "funcargs",
+            start  = 9,
+            finish = 18,
+            [1]    = 1,
+            [2]    = 3,
         },
-        [2]  = {
-            type   = '...',
-            start  = 14,
-            finish = 16,
+        actions = {
         },
     },
 }
+do return end
 CHECK'{}'
 {
     type   = 'table',

@@ -346,8 +346,6 @@ MustExpList <-  Sp (Exp      (COMMA (MaybeExp))*)
 NameList    <-  (MustName (COMMA MustName)*)
             ->  List
 
-ArgList     <-  (DOTS -> DotsAsArg / Name / Sp {} COMMA)*
-            ->  ArgList
 
 Table       <-  Sp ({} TL TableFields? DirtyTR)
             ->  Table
@@ -362,10 +360,15 @@ NewField    <-  (MustName ASSIGN DirtyExp)
 
 Function    <-  Sp ({} FunctionBody {})
             ->  Function
-FuncArg     <-  PL {} ArgList {} NeedPR
-            /   {} {} -> MissPL Nothing {}
-FunctionBody<-  FUNCTION BlockStart FuncArg
-                    (!END Action)*
+FuncArgs    <-  ({} PL {| FuncArg* |} NeedPR {})
+            ->  FuncArgs
+            /   {} -> MissPL
+FuncArg     <-  DOTS
+            ->  DotsAsArg
+            /   Name
+            /   COMMA
+FunctionBody<-  FUNCTION BlockStart FuncArgs
+                    {| (!END Action)* |}
                     BlockEnd
                 NeedEnd
 

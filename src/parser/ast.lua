@@ -1,10 +1,10 @@
 local emmy = require 'parser.emmy'
 
-local tonumber = tonumber
-local string_char = string.char
-local utf8_char = utf8.char
-local type = type
-local table = table
+local tonumber   = tonumber
+local stringChar = string.char
+local utf8Char   = utf8.char
+local type       = type
+local ipairs     = ipairs
 
 local State
 local pushError
@@ -396,7 +396,7 @@ local Defs = {
         if not char or char < 0 or char > 255 then
             return ''
         end
-        return string_char(char)
+        return stringChar(char)
     end,
     Char16 = function (pos, char)
         if State.Version == 'Lua 5.1' then
@@ -407,7 +407,7 @@ local Defs = {
             }
             return char
         end
-        return string_char(tonumber(char, 16))
+        return stringChar(tonumber(char, 16))
     end,
     CharUtf8 = function (pos, char)
         if  State.Version ~= 'Lua 5.3'
@@ -469,7 +469,7 @@ local Defs = {
             end
         end
         if v >= 0 and v <= 0x10FFFF then
-            return utf8_char(v)
+            return utf8Char(v)
         end
         return ''
     end,
@@ -650,7 +650,7 @@ local Defs = {
         return exp
     end,
     Call = function (start, args, finish)
-        args.type   = 'callargs'
+        args.type    = 'callargs'
         args.start   = start
         args.finish  = finish - 1
         local max = #args
@@ -725,8 +725,8 @@ local Defs = {
         if not State.Dots[#State.Dots] then
             pushError {
                 type = 'UNEXPECT_DOTS',
-                start = obj.start,
-                finish = obj.finish,
+                start = getAst(obj).start,
+                finish = getAst(obj).finish,
             }
         end
         return obj
@@ -745,21 +745,14 @@ local Defs = {
             finish = start,
         }
     end,
-    Function = function (start, argStart, arg, argFinish, ...)
-        local obj = {
-            type      = 'function',
-            start     = start,
-            arg       = arg,
-            argStart  = argStart - 1,
-            argFinish = argFinish,
-            ...
+    Function = function (start, args, actions, finish)
+        local obj = pushAst {
+            type    = 'function',
+            start   = start,
+            finish  = finish,
+            args    = args,
+            actions = actions,
         }
-        local max = #obj
-        obj.finish = obj[max] - 1
-        obj[max]   = nil
-        if obj.argFinish > obj.finish then
-            obj.argFinish = obj.finish
-        end
         checkMissEnd(start)
         return obj
     end,
@@ -883,23 +876,21 @@ local Defs = {
             return nil
         end
     end,
-    ArgList = function (...)
-        if ... == '' then
-            return nil
-        end
-        local args = table.pack(...)
-        local list = {}
-        local max = args.n
-        args.n = nil
+    FuncArgs = function (start, args, finish)
+        args.type   = 'funcargs'
+        args.start  = start
+        args.finish = finish
+        local lastStart = start + 1
         local wantName = true
-        for i = 1, max do
-            local obj = args[i]
-            if type(obj) == 'number' then
+        local argCount = 0
+        for i, arg in ipairs(args) do
+            local argAst = getAst(arg)
+            if argAst.type == ',' then
                 if wantName then
                     pushError {
                         type = 'MISS_NAME',
-                        start = obj,
-                        finish = obj,
+                        start = lastStart,
+                        finish = argAst.start-1,
                     }
                 end
                 wantName = true
@@ -907,47 +898,43 @@ local Defs = {
                 if not wantName then
                     pushError {
                         type = 'MISS_SYMBOL',
-                        start = obj.start-1,
-                        finish = obj.start-1,
+                        start = lastStart-1,
+                        finish = argAst.start-1,
                         info = {
                             symbol = ',',
                         }
                     }
                 end
                 wantName = false
-                list[#list+1] = obj
-                if obj.type == '...' then
-                    if i < max then
+                argCount = argCount + 1
+                args[argCount] = arg
+
+                if argAst.type == '...' then
+                    if i < #args then
                         local a = args[i+1]
-                        local b = args[max]
+                        local b = args[#args]
                         pushError {
-                            type = 'ARGS_AFTER_DOTS',
-                            start = type(a) == 'number' and a or a.start,
-                            finish = type(b) == 'number' and b or b.finish,
+                            type   = 'ARGS_AFTER_DOTS',
+                            start  = getAst(a).start,
+                            finish = getAst(b).finish,
                         }
                     end
                     break
                 end
             end
+            lastStart = argAst.finish + 1
         end
-        if wantName then
-            local last = args[max]
+        for i = argCount + 1, #args do
+            args[i] = nil
+        end
+        if wantName and argCount > 0 then
             pushError {
-                type = 'MISS_NAME',
-                start = last+1,
-                finish = last+1,
+                type   = 'MISS_NAME',
+                start  = lastStart,
+                finish = finish - 1,
             }
         end
-        if #list == 0 then
-            return nil
-        elseif #list == 1 then
-            return list[1]
-        else
-            list.type = 'list'
-            list.start = list[1].start
-            list.finish = list[#list].finish
-            return list
-        end
+        return args
     end,
     Nothing = function ()
         return nil
