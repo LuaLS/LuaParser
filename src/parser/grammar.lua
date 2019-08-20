@@ -205,7 +205,8 @@ TL          <-  Sp '{'
 TR          <-  Sp '}'
 COMMA       <-  Sp ({} ',')
             ->  COMMA
-SEMICOLON   <-  Sp ';'
+SEMICOLON   <-  Sp ({} ';')
+            ->  SEMICOLON
 DOTS        <-  Sp ({} '...')
             ->  DOTS
 DOT         <-  Sp ({} '.' !'.')
@@ -221,7 +222,7 @@ AssignOrEQ  <-  Sp ({} '==' {})
 Nothing     <-  {} -> Nothing
 
 DirtyBR     <-  BR     / {} -> MissBR
-DirtyTR     <-  TR {}  / {} -> MissTR
+DirtyTR     <-  TR     / {} -> MissTR
 DirtyPR     <-  PR {}  / {} -> DirtyPR
 DirtyLabel  <-  LABEL  / {} -> MissLabel
 NeedPR      <-  PR     / {} -> MissPR
@@ -347,12 +348,15 @@ NameList    <-  (MustName (COMMA MustName)*)
             ->  List
 
 
-Table       <-  Sp ({} TL TableFields? DirtyTR)
+Table       <-  Sp ({} TL {| TableField* |} DirtyTR {})
             ->  Table
-TableFields <-  (TableSep {} / TableField)+
-TableSep    <-  COMMA / SEMICOLON
-TableField  <-  NewIndex / NewField / Exp
+TableField  <-  COMMA
+            /   SEMICOLON
+            /   NewIndex
+            /   NewField
+            /   Exp
 Index       <-  ({} BL DirtyExp DirtyBR {})
+            ->  Index
 NewIndex    <-  Sp (Index NeedAssign DirtyExp)
             ->  NewIndex
 NewField    <-  (MustName ASSIGN DirtyExp)
@@ -360,7 +364,7 @@ NewField    <-  (MustName ASSIGN DirtyExp)
 
 Function    <-  Sp ({} FunctionBody {})
             ->  Function
-FuncArgs    <-  ({} PL {| FuncArg* |} NeedPR {})
+FuncArgs    <-  Sp ({} PL {| FuncArg* |} NeedPR {})
             ->  FuncArgs
             /   {} -> MissPL
 FuncArg     <-  DOTS

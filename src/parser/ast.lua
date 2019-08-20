@@ -710,6 +710,13 @@ local Defs = {
             finish = start,
         }
     end,
+    SEMICOLON = function (start)
+        return pushAst {
+            type   = ';',
+            start  = start,
+            finish = start,
+        }
+    end,
     DOTS = function (start)
         return pushAst {
             type   = '...',
@@ -746,15 +753,12 @@ local Defs = {
         }
     end,
     Function = function (start, args, actions, finish)
-        local obj = pushAst {
-            type    = 'function',
-            start   = start,
-            finish  = finish,
-            args    = args,
-            actions = actions,
-        }
+        actions.type    = 'function'
+        actions.start   = start
+        actions.finish  = finish - 1
+        actions.args    = args
         checkMissEnd(start)
-        return obj
+        return pushAst(actions)
     end,
     NamedFunction = function (start, name, argStart, arg, argFinish, ...)
         local obj = {
@@ -803,61 +807,66 @@ local Defs = {
         checkMissEnd(start)
         return obj
     end,
-    Table = function (start, ...)
-        local args = {...}
-        local max = #args
-        local finish = args[max] - 1
-        local table = {
-            type   = 'table',
-            start  = start,
-            finish = finish
-        }
-        start = start + 1
+    Table = function (start, tbl, finish)
+        tbl.type   = 'table'
+        tbl.start  = start
+        tbl.finish = finish - 1
         local wantField = true
-        for i = 1, max-1 do
-            local arg = args[i]
-            local isField = type(arg) == 'table'
-            local isEmmy = isField and arg.type:sub(1, 4) == 'emmy'
-            if wantField and not isField then
-                pushError {
-                    type = 'MISS_EXP',
-                    start = start,
-                    finish = arg - 1,
-                }
-            elseif not wantField and isField and not isEmmy then
-                pushError {
-                    type = 'MISS_SEP_IN_TABLE',
-                    start = start,
-                    finish = arg.start-1,
-                }
-            end
-            if isField then
-                table[#table+1] = arg
-                if not isEmmy then
-                    wantField = false
-                    start = arg.finish + 1
+        local lastStart = start + 1
+        local fieldCount = 0
+        for i, field in ipairs(tbl) do
+            local fieldAst = getAst(field)
+            if fieldAst.type == ',' or fieldAst.type == ';' then
+                if wantField then
+                    pushError {
+                        type = 'MISS_EXP',
+                        start = lastStart,
+                        finish = fieldAst.start - 1,
+                    }
                 end
+                wantField = false
             else
+                if not wantField then
+                    pushError {
+                        type = 'MISS_SEP_IN_TABLE',
+                        start = lastStart,
+                        finish = fieldAst.start - 1,
+                    }
+                end
                 wantField = true
-                start = arg
+                fieldCount = fieldCount + 1
+                tbl[fieldCount] = field
             end
         end
-        return pushAst(table)
+        for i = fieldCount + 1, #tbl do
+            tbl[i] = nil
+        end
+        return pushAst(tbl)
     end,
-    NewField = function (key, value)
-        return {
-            type = 'pair',
-            start = key.start,
-            finish = value.finish,
-            key, value,
+    NewField = function (field, value)
+        return pushAst {
+            type   = 'tablefield',
+            start  = getAst(field).start,
+            finish = getAst(value).finish,
+            field  = field,
+            value  = value,
         }
     end,
-    NewIndex = function (key, value)
-        return {
-            type = 'pair',
-            start = key.start,
-            finish = value.finish,
-            key, value,
+    Index = function (start, index, finish)
+        return pushAst {
+            type   = 'index',
+            start  = start,
+            finish = finish - 1,
+            index  = index,
+        }
+    end,
+    NewIndex = function (index, value)
+        return pushAst {
+            type   = 'tableindex',
+            start  = getAst(index).start,
+            finish = getAst(value).finish,
+            index  = index,
+            value  = value,
         }
     end,
     List = function (first, second, ...)
@@ -879,7 +888,7 @@ local Defs = {
     FuncArgs = function (start, args, finish)
         args.type   = 'funcargs'
         args.start  = start
-        args.finish = finish
+        args.finish = finish - 1
         local lastStart = start + 1
         local wantName = true
         local argCount = 0
@@ -934,7 +943,7 @@ local Defs = {
                 finish = finish - 1,
             }
         end
-        return args
+        return pushAst(args)
     end,
     Nothing = function ()
         return nil
@@ -1375,7 +1384,6 @@ local Defs = {
                 symbol = '}',
             }
         }
-        return pos + 1
     end,
     MissBR = function (pos)
         pushError {
