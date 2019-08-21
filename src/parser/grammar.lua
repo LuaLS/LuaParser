@@ -223,7 +223,7 @@ Nothing     <-  {} -> Nothing
 
 DirtyBR     <-  BR     / {} -> MissBR
 DirtyTR     <-  TR     / {} -> MissTR
-DirtyPR     <-  PR {}  / {} -> DirtyPR
+DirtyPR     <-  PR     / {} -> DirtyPR
 DirtyLabel  <-  LABEL  / {} -> MissLabel
 NeedPR      <-  PR     / {} -> MissPR
 NeedEnd     <-  END    / {} -> MissEnd
@@ -312,7 +312,7 @@ ExpUnit     <-  Nil
 Simple      <-  {| Prefix (Sp Suffix)+ |}
             ->  Simple
             /   Prefix
-Prefix      <-  Sp ({} PL DirtyExp DirtyPR)
+Prefix      <-  Sp ({} PL DirtyExp DirtyPR {})
             ->  Prefix
             /   FreeName
 Suffix      <-  (DOT (Name / MissField))
@@ -325,7 +325,7 @@ Suffix      <-  (DOT (Name / MissField))
             ->  Call
             /   ({} {| String |} {})
             ->  Call
-            /   ({} PL Sp {| (COMMA / Exp)* |} DirtyPR)
+            /   ({} PL Sp {| (COMMA / Exp)* |} DirtyPR {})
             ->  Call
 NeedCall    <-  (!(Sp CallStart) {} -> MissPL)?
 MissField   <-  {} -> MissField

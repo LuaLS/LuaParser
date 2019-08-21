@@ -597,33 +597,16 @@ local Defs = {
         end
         return last
     end,
-    SimpleCall = function (simple)
-        if not simple then
-            return nil
-        end
-        if simple.type ~= 'simple' then
+    SimpleCall = function (call)
+        local callAst = getAst(call)
+        if callAst.type ~= 'call' then
             pushError {
                 type   = 'EXP_IN_ACTION',
-                start  = simple.start,
-                finish = simple.finish,
+                start  = callAst.start,
+                finish = callAst.finish,
             }
-            return simple
         end
-        local last = simple[#simple]
-        if last.type == 'call' then
-            return simple
-        end
-        local colon = simple[#simple-1]
-        if colon and colon.type == ':' then
-            -- 型如 `obj:method`，将错误让给MISS_SYMBOL
-            return simple
-        end
-        pushError {
-            type   = 'EXP_IN_ACTION',
-            start  = simple[1].start,
-            finish = last.finish,
-        }
-        return simple
+        return callAst
     end,
     BinaryOp = function (start, op)
         return pushAst {
@@ -647,7 +630,18 @@ local Defs = {
         return expSplit(list, 1, #list, 1)
     end,
     Prefix = function (start, exp, finish)
-        return exp
+        local expAst = getAst(exp)
+        if expAst.type == 'parentheses' then
+            expAst.start  = start
+            expAst.finish = finish - 1
+            return expAst
+        end
+        return pushAst {
+            type   = 'parentheses',
+            start  = start,
+            finish = finish - 1,
+            exp    = exp
+        }
     end,
     Call = function (start, args, finish)
         args.type    = 'callargs'
@@ -753,31 +747,21 @@ local Defs = {
         }
     end,
     Function = function (start, args, actions, finish)
-        actions.type    = 'function'
-        actions.start   = start
-        actions.finish  = finish - 1
-        actions.args    = args
+        actions.type   = 'function'
+        actions.start  = start
+        actions.finish = finish - 1
+        actions.args   = args
         checkMissEnd(start)
         return pushAst(actions)
     end,
-    NamedFunction = function (start, name, argStart, arg, argFinish, ...)
-        local obj = {
-            type      = 'function',
-            start     = start,
-            name      = name,
-            arg       = arg,
-            argStart  = argStart - 1,
-            argFinish = argFinish,
-            ...
-        }
-        local max = #obj
-        obj.finish = obj[max] - 1
-        obj[max]   = nil
-        if obj.argFinish > obj.finish then
-            obj.argFinish = obj.finish
-        end
+    NamedFunction = function (start, name, args, actions, finish)
+        actions.type   = 'function'
+        actions.start  = start
+        actions.finish = finish - 1
+        actions.name   = name
+        actions.args   = args
         checkMissEnd(start)
-        return obj
+        return pushAst(actions)
     end,
     LocalFunction = function (start, name, argStart, arg, argFinish, ...)
         local obj = {

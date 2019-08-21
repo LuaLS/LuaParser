@@ -336,201 +336,258 @@ CHECK'local x <const>, y <close> = 1'
 }
 CHECK'x = function () end'
 {
-	[1] = {
-		type   = "name",
-		start  = 1,
-		finish = 1,
-		[1]    = "x",
-	},
-	[2] = {
-		type   = "funcargs",
-		start  = 14,
-		finish = 15,
-	},
-	[3] = {
-		type   = "function",
-		start  = 5,
-		finish = 19,
-		args   = 2,
-	},
-	[4] = {
-		type   = "set",
-		start  = 1,
-		finish = 19,
-		keys   = {
-			[1] = 1,
-		},
-		values = {
-			[1] = 3,
-		},
-	},
+    [1] = {
+        type   = "name",
+        start  = 1,
+        finish = 1,
+        [1]    = "x",
+    },
+    [2] = {
+        type   = "funcargs",
+        start  = 14,
+        finish = 15,
+    },
+    [3] = {
+        type   = "function",
+        start  = 5,
+        finish = 19,
+        args   = 2,
+    },
+    [4] = {
+        type   = "set",
+        start  = 1,
+        finish = 19,
+        keys   = {
+            [1] = 1,
+        },
+        values = {
+            [1] = 3,
+        },
+    },
 }
 CHECK'x.y = function () end'
 {
-	[1] = {
-		type   = "name",
-		start  = 1,
-		finish = 1,
-		[1]    = "x",
-	},
-	[2] = {
-		type   = ".",
-		start  = 2,
-		finish = 2,
-	},
-	[3] = {
-		type   = "name",
-		start  = 3,
-		finish = 3,
-		[1]    = "y",
-	},
-	[4] = {
-		type   = "getfield",
-		start  = 1,
-		parent = 1,
-		finish = 3,
-		field  = 3,
-		dot    = 2,
-	},
-	[5] = {
-		type   = "funcargs",
-		start  = 16,
-		finish = 17,
-	},
-	[6] = {
-		type   = "function",
-		start  = 7,
-		finish = 21,
-		args   = 5,
-	},
-	[7] = {
-		type   = "set",
-		start  = 1,
-		finish = 21,
-		keys   = {
-			[1] = 4,
-		},
-		values = {
-			[1] = 6,
-		},
-	},
+    [1] = {
+        type   = "name",
+        start  = 1,
+        finish = 1,
+        [1]    = "x",
+    },
+    [2] = {
+        type   = ".",
+        start  = 2,
+        finish = 2,
+    },
+    [3] = {
+        type   = "name",
+        start  = 3,
+        finish = 3,
+        [1]    = "y",
+    },
+    [4] = {
+        type   = "getfield",
+        start  = 1,
+        finish = 3,
+        parent = 1,
+        field  = 3,
+        dot    = 2,
+    },
+    [5] = {
+        type   = "funcargs",
+        start  = 16,
+        finish = 17,
+    },
+    [6] = {
+        type   = "function",
+        start  = 7,
+        finish = 21,
+        args   = 5,
+    },
+    [7] = {
+        type   = "set",
+        start  = 1,
+        finish = 21,
+        keys   = {
+            [1] = 4,
+        },
+        values = {
+            [1] = 6,
+        },
+    },
 }
-do return end
 CHECK'func.x(1, 2)'
 {
-    type   = 'simple',
-    start  = 1,
-    finish = 12,
-    [1]  = {
-        type   = 'name',
+    [1] = {
+        type   = "name",
         start  = 1,
         finish = 4,
-        [1]    = 'func',
+        [1]    = "func",
     },
-    [2]  = {
-        type   = '.',
+    [2] = {
+        type   = ".",
         start  = 5,
         finish = 5,
     },
-    [3]  = {
-        type   = 'name',
+    [3] = {
+        type   = "name",
         start  = 6,
         finish = 6,
-        [1]    = 'x',
+        [1]    = "x",
     },
-    [4]  = {
-        type = 'call',
+    [4] = {
+        type   = "getfield",
+        start  = 1,
+        finish = 6,
+        parent = 1,
+        dot    = 2,
+        field  = 3,
+    },
+    [5] = {
+        type   = "number",
+        start  = 8,
+        finish = 8,
+        [1]    = 1,
+    },
+    [6] = {
+        type   = ",",
+        start  = 9,
+        finish = 9,
+    },
+    [7] = {
+        type   = "number",
+        start  = 11,
+        finish = 11,
+        [1]    = 2,
+    },
+    [8] = {
+        type   = "callargs",
         start  = 7,
         finish = 12,
-        [1]  = {
-            type   = 'number',
-            start  = 8,
-            finish = 8,
-            [1]    = 1,
-        },
-        [2]  = {
-            type   = 'number',
-            start  = 11,
-            finish = 11,
-            [1]    = 2,
-        },
-    }
+        [1]    = 5,
+        [2]    = 7,
+    },
+    [9] = {
+        type   = "call",
+        start  = 1,
+        finish = 12,
+        parent = 4,
+        args   = 8,
+    },
 }
 CHECK'func:x(1, 2)'
 {
-    type   = 'simple',
-    start  = 1,
-    finish = 12,
-    [1]  = {
-        type   = 'name',
+    [1] = {
+        type   = "name",
         start  = 1,
         finish = 4,
-        [1]    = 'func',
+        [1]    = "func",
     },
-    [2]  = {
-        type   = ':',
+    [2] = {
+        type   = ":",
         start  = 5,
         finish = 5,
     },
-    [3]  = {
-        type   = 'name',
+    [3] = {
+        type   = "name",
         start  = 6,
         finish = 6,
-        [1]    = 'x',
+        [1]    = "x",
     },
-    [4]  = {
-        type = 'call',
+    [4] = {
+        type   = "getmethod",
+        start  = 1,
+        finish = 6,
+        parent = 1,
+        colon  = 2,
+        method = 3,
+    },
+    [5] = {
+        type   = "number",
+        start  = 8,
+        finish = 8,
+        [1]    = 1,
+    },
+    [6] = {
+        type   = ",",
+        start  = 9,
+        finish = 9,
+    },
+    [7] = {
+        type   = "number",
+        start  = 11,
+        finish = 11,
+        [1]    = 2,
+    },
+    [8] = {
+        type   = "callargs",
         start  = 7,
         finish = 12,
-        [1]  = {
-            type   = 'number',
-            start  = 8,
-            finish = 8,
-            [1]    = 1,
-        },
-        [2]  = {
-            type   = 'number',
-            start  = 11,
-            finish = 11,
-            [1]    = 2,
-        },
-    }
+        [2]    = 7,
+        [1]    = 5,
+    },
+    [9] = {
+        type   = "call",
+        start  = 1,
+        finish = 12,
+        parent = 4,
+        args   = 8,
+    },
 }
 CHECK'("%s"):format(1)'
 {
-    type   = 'simple',
-    start  = 2,
-    finish = 16,
-    [1]  = {
-        type   = 'string',
+    [1] = {
+        type   = "string",
         start  = 2,
         finish = 5,
-        [1]    = '%s',
-        [2]    = [=["]=],
+        [2]    = "\"",
+        [1]    = "%s",
     },
-    [2]  = {
-        type   = ':',
+    [2] = {
+        type   = "parentheses",
+        start  = 1,
+        finish = 6,
+        exp    = 1,
+    },
+    [3] = {
+        type   = ":",
         start  = 7,
         finish = 7,
     },
-    [3]  = {
-        type   = 'name',
+    [4] = {
+        type   = "name",
         start  = 8,
         finish = 13,
-        [1]    = 'format',
+        [1]    = "format",
     },
-    [4]  = {
-        type   = 'call',
+    [5] = {
+        type   = "getmethod",
+        start  = 1,
+        finish = 13,
+        parent = 2,
+        colon  = 3,
+        method = 4,
+    },
+    [6] = {
+        type   = "number",
+        start  = 15,
+        finish = 15,
+        [1]    = 1,
+    },
+    [7] = {
+        type   = "callargs",
         start  = 14,
         finish = 16,
-        [1]    = {
-            type   = 'number',
-            start  = 15,
-            finish = 15,
-            [1]    = 1,
-        }
-    }
+        [1]    = 6,
+    },
+    [8] = {
+        type   = "call",
+        start  = 1,
+        finish = 16,
+        parent = 5,
+        args   = 7,
+    },
 }
+do return end
 CHECK'do end'
 {
     type   = 'do',

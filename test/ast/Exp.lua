@@ -1203,11 +1203,17 @@ CHECK'1 .. 2 .. 3'
 CHECK'(1)'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 2,
         finish = 2,
         [1]    = 1,
-    }
+    },
+    [2] = {
+        type   = "parentheses",
+        start  = 1,
+        finish = 3,
+        exp    = 1,
+    },
 }
 CHECK'(1 + 2)'
 {
@@ -1235,6 +1241,12 @@ CHECK'(1 + 2)'
         op     = 2,
         [1]    = 1,
         [2]    = 3,
+    },
+    [5] = {
+        type   = "parentheses",
+        start  = 1,
+        finish = 7,
+        exp    = 4,
     },
 }
 CHECK'func()'
@@ -1558,17 +1570,23 @@ CHECK'(...)[1]'
         finish = 4,
     },
     [2] = {
+        type   = "parentheses",
+        start  = 1,
+        finish = 5,
+        exp    = 1,
+    },
+    [3] = {
         type   = "number",
         start  = 7,
         finish = 7,
         [1]    = 1,
     },
-    [3] = {
+    [4] = {
         type   = "getindex",
-        start  = 2,
+        start  = 1,
         finish = 8,
-        parent = 1,
-        index  = 2,
+        parent = 2,
+        index  = 3,
     },
 }
 CHECK'function () end'
