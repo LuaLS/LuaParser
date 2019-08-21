@@ -587,70 +587,98 @@ CHECK'("%s"):format(1)'
         args   = 7,
     },
 }
-do return end
 CHECK'do end'
 {
-    type   = 'do',
-    start  = 1,
-    finish = 6,
+    [1] = {
+        type   = "do",
+        start  = 1,
+        finish = 6,
+    },
 }
 CHECK'do x = 1 end'
 {
-    type   = 'do',
-    start  = 1,
-    finish = 12,
-    [1]    = {
-        type = 'set',
-        [1]  = {
-            type   = 'name',
-            start  = 4,
-            finish = 4,
-            [1]    = 'x',
-        },
-        [2]  = {
-            type   = 'number',
-            start  = 8,
-            finish = 8,
-            [1]    = 1,
-        }
-    }
-}
-CHECK'return'
-{
-    type   = 'return',
-    start  = 1,
-    finish = 6,
-}
-CHECK'return 1'
-{
-    type   = 'return',
-    start  = 1,
-    finish = 8,
-    [1]  = {
-        type   = 'number',
-        start  = 8,
-        finish = 8,
-        [1]    = 1,
-    }
-}
-CHECK'return 1, 2'
-{
-    type   = 'return',
-    start  = 1,
-    finish = 11,
-    [1]  = {
-        type   = 'number',
+    [1] = {
+        type   = "name",
+        start  = 4,
+        finish = 4,
+        [1]    = "x",
+    },
+    [2] = {
+        type   = "number",
         start  = 8,
         finish = 8,
         [1]    = 1,
     },
-    [2]  = {
-        type   = 'number',
+    [3] = {
+        type   = "set",
+        start  = 4,
+        finish = 8,
+        keys   = {
+            [1] = 1,
+        },
+        values = {
+            [1] = 2,
+        },
+    },
+    [4] = {
+        type   = "do",
+        start  = 1,
+        finish = 12,
+        [1]    = 3,
+    },
+}
+CHECK'return'
+{
+    [1] = {
+        type   = "return",
+        start  = 1,
+        finish = 6,
+        exps   = {
+        },
+    },
+}
+CHECK'return 1'
+{
+    [1] = {
+        type   = "number",
+        start  = 8,
+        finish = 8,
+        [1]    = 1,
+    },
+    [2] = {
+        type   = "return",
+        start  = 1,
+        finish = 8,
+        exps   = {
+            [1] = 1,
+        },
+    },
+}
+CHECK'return 1, 2'
+{
+    [1] = {
+        type   = "number",
+        start  = 8,
+        finish = 8,
+        [1]    = 1,
+    },
+    [2] = {
+        type   = "number",
         start  = 11,
         finish = 11,
         [1]    = 2,
-    }
+    },
+    [3] = {
+        type   = "return",
+        start  = 1,
+        finish = 11,
+        exps   = {
+            [1] = 1,
+            [2] = 2,
+        },
+    },
 }
+do return end
 CHECK'::CONTINUE::'
 {
     type   = 'label',

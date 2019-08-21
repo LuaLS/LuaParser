@@ -980,23 +980,12 @@ local Defs = {
             values = values,
         }
     end,
-    DoBody = function (...)
-        if ... == '' then
-            return {
-                type = 'do',
-            }
-        else
-            return {
-                type = 'do',
-                ...
-            }
-        end
-    end,
-    Do = function (start, action, finish)
-        action.start  = start
-        action.finish = finish - 1
+    Do = function (start, actions, finish)
+        actions.type = 'do'
+        actions.start  = start
+        actions.finish = finish - 1
         checkMissEnd(start)
-        return action
+        return pushAst(actions)
     end,
     Break = function (finish, ...)
         if State.Break > 0 then
@@ -1040,29 +1029,13 @@ local Defs = {
     BreakEnd = function ()
         State.Break = State.Break - 1
     end,
-    Return = function (start, exp, finish)
-        if not finish then
-            finish = exp
-            exp = {
-                type = 'return',
-                start = start,
-                finish = finish - 1,
-            }
-        else
-            if exp.type == 'list' then
-                exp.type = 'return'
-                exp.start = start
-                exp.finish = finish - 1
-            else
-                exp = {
-                    type = 'return',
-                    start = start,
-                    finish = finish - 1,
-                    [1] = exp,
-                }
-            end
-        end
-        return exp
+    Return = function (start, exps, finish)
+        return pushAst {
+            type   = 'return',
+            start  = start,
+            finish = finish - 1,
+            exps   = exps,
+        }
     end,
     Label = function (start, name, finish)
         if State.Version == 'Lua 5.1' then

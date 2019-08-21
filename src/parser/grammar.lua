@@ -341,7 +341,6 @@ DirtyExp    <-  Exp
 MaybeExp    <-  Exp / MissExp
 MissExp     <-  {} -> MissExp
 ExpList     <-  Sp {| MaybeExp (Sp ',' MaybeExp)* |}
-MustExpList <-  Sp {| Exp      (Sp ',' MaybeExp)* |}
 NameList    <-  Sp {| MustName (Sp ',' MustName)* |}
 
 
@@ -411,10 +410,12 @@ Semicolon   <-  SEMICOLON
             ->  Skip
 SimpleList  <-  {| Simple (Sp ',' Simple)* |}
 
-Do          <-  Sp ({} 'do' Cut DoBody NeedEnd {})
+Do          <-  Sp ({} 
+                'do' Cut
+                    {| (!END Action)* |}
+                NeedEnd
+                {})
             ->  Do
-DoBody      <-  (!END Action)*
-            ->  DoBody
 
 Break       <-  BREAK ({} Semicolon* AfterBreak?)
             ->  Break
@@ -422,11 +423,8 @@ AfterBreak  <-  Sp !END !UNTIL !ELSEIF !ELSE Action
 BreakStart  <-  {} -> BreakStart
 BreakEnd    <-  {} -> BreakEnd
 
-Return      <-  (ReturnBody Semicolon* AfterReturn?)
-            ->  AfterReturn
-ReturnBody  <-  Sp ({} RETURN MustExpList? {})
+Return      <-  Sp ({} RETURN ExpList {})
             ->  Return
-AfterReturn <-  Sp !END !UNTIL !ELSEIF !ELSE Action
 
 Label       <-  Sp ({} LABEL MustName DirtyLabel {}) -> Label 
 
