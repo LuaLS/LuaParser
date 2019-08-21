@@ -304,7 +304,7 @@ ExpUnit     <-  Nil
             /   Boolean
             /   String
             /   Number
-            /   DOTS -> DotsAsExp
+            /   DOTS
             /   Table
             /   Function
             /   Simple
@@ -364,16 +364,11 @@ FuncArgs    <-  Sp ({} PL {| FuncArg* |} NeedPR {})
             ->  FuncArgs
             /   {} -> MissPL
 FuncArg     <-  DOTS
-            ->  DotsAsArg
             /   Name
             /   COMMA
-FunctionBody<-  FUNCTION BlockStart FuncArgs
+FunctionBody<-  FUNCTION FuncArgs
                     {| (!END Action)* |}
-                    BlockEnd
                 NeedEnd
-
-BlockStart  <-  {} -> BlockStart
-BlockEnd    <-  {} -> BlockEnd
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
 Action      <-  !END .
@@ -426,9 +421,11 @@ BreakEnd    <-  {} -> BreakEnd
 Return      <-  Sp ({} RETURN ExpList {})
             ->  Return
 
-Label       <-  Sp ({} LABEL MustName DirtyLabel {}) -> Label 
+Label       <-  Sp ({} LABEL MustName DirtyLabel {})
+            ->  Label 
 
-GoTo        <-  Sp ({} GOTO MustName {}) -> GoTo
+GoTo        <-  Sp ({} GOTO MustName {})
+            ->  GoTo
 
 If          <-  Sp ({} IfBody {})
             ->  If
@@ -517,9 +514,8 @@ NamedFunction
             <-  Sp ({} FunctionNamedBody {})
             ->  NamedFunction
 FunctionNamedBody
-            <-  FUNCTION FuncName BlockStart FuncArg
+            <-  FUNCTION FuncName FuncArg
                     {| (!END Action)* |}
-                    BlockEnd
                 NeedEnd
 FuncName    <-  {| MustName (DOT MustName)* FuncMethod? |}
             ->  Simple
@@ -532,7 +528,6 @@ grammar 'EmmyLua' (emmy.grammar)
 grammar 'Lua' [[
 Lua         <-  Head?
                 Action* -> Lua
-                BlockEnd
                 Sp
 Head        <-  '#' (!%nl .)*
 ]]

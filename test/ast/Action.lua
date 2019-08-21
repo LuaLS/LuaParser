@@ -678,21 +678,25 @@ CHECK'return 1, 2'
         },
     },
 }
-do return end
 CHECK'::CONTINUE::'
 {
-    type   = 'label',
-    start  = 3,
-    finish = 10,
-    [1]    = 'CONTINUE',
+    [1] = {
+        type   = "label",
+        start  = 3,
+        finish = 10,
+        [1]    = "CONTINUE",
+    },
 }
 CHECK'goto CONTINUE'
 {
-    type   = 'goto',
-    start  = 6,
-    finish = 13,
-    [1]    = 'CONTINUE',
+    [1] = {
+        type   = 'goto',
+        start  = 6,
+        finish = 13,
+        [1]    = 'CONTINUE',
+    }
 }
+do return end
 CHECK[[if 1 then
 end]]
 {

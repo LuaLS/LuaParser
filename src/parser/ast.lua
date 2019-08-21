@@ -718,20 +718,6 @@ local Defs = {
             finish = start + 2,
         }
     end,
-    DotsAsArg = function (obj)
-        State.Dots[#State.Dots] = true
-        return obj
-    end,
-    DotsAsExp = function (obj)
-        if not State.Dots[#State.Dots] then
-            pushError {
-                type = 'UNEXPECT_DOTS',
-                start = getAst(obj).start,
-                finish = getAst(obj).finish,
-            }
-        end
-        return obj
-    end,
     COLON = function (start)
         return pushAst {
             type   = ':',
@@ -1038,80 +1024,38 @@ local Defs = {
         }
     end,
     Label = function (start, name, finish)
+        local nameAst = getAst(name)
         if State.Version == 'Lua 5.1' then
             pushError {
-                type = 'UNSUPPORT_SYMBOL',
-                start = start,
+                type   = 'UNSUPPORT_SYMBOL',
+                start  = start,
                 finish = finish - 1,
                 version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
                 info = {
                     version = State.Version,
                 }
             }
-            return false
+            return
         end
-        name.type = 'label'
-        local labels = State.Label[#State.Label]
-        local str = name[1]
-        if labels[str] then
-            --pushError {
-            --    type = 'REDEFINE_LABEL',
-            --    start = name.start,
-            --    finish = name.finish,
-            --    info = {
-            --        label = str,
-            --        related = {labels[str].start, labels[str].finish},
-            --    }
-            --}
-        else
-            labels[str] = name
-        end
+        nameAst.type = 'label'
         return name
     end,
     GoTo = function (start, name, finish)
+        local nameAst = getAst(name)
         if State.Version == 'Lua 5.1' then
             pushError {
-                type = 'UNSUPPORT_SYMBOL',
-                start = start,
-                finish = finish - 1,
+                type    = 'UNSUPPORT_SYMBOL',
+                start   = start,
+                finish  = finish - 1,
                 version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
                 info = {
                     version = State.Version,
                 }
             }
-            return false
+            return
         end
-        name.type = 'goto'
-        local labels = State.Label[#State.Label]
-        labels[#labels+1] = name
+        nameAst.type = 'goto'
         return name
-    end,
-    -- TODO 这里的检查不完整，但是完整的检查比较复杂，开销比较高
-    -- 不能jump到另一个局部变量的作用域
-    -- 函数会切断goto与label
-    -- 不能从block外jump到block内，但是可以从block内jump到block外
-    BlockStart = function ()
-        State.Label[#State.Label+1] = {}
-        State.Dots[#State.Dots+1] = false
-    end,
-    BlockEnd = function ()
-        local labels = State.Label[#State.Label]
-        State.Label[#State.Label] = nil
-        State.Dots[#State.Dots] = nil
-        for i = 1, #labels do
-            local name = labels[i]
-            local str = name[1]
-            if not labels[str] then
-                pushError {
-                    type = 'NO_VISIBLE_LABEL',
-                    start = name.start,
-                    finish = name.finish,
-                    info = {
-                        label = str,
-                    }
-                }
-            end
-        end
     end,
     IfBlock = function (exp, start, ...)
         local obj = {

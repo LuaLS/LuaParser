@@ -34,8 +34,6 @@ return function (self, lua, mode, version)
     Asts  = {}
     State = {
         Break = 0,
-        Label = {{}},
-        Dots = {true},
         Version = version,
         Lua = lua,
         Emmy = {},
