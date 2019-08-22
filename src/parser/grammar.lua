@@ -422,32 +422,35 @@ Return      <-  Sp ({} RETURN ExpList {})
             ->  Return
 
 Label       <-  Sp ({} LABEL MustName DirtyLabel {})
-            ->  Label 
+            ->  Label
 
 GoTo        <-  Sp ({} GOTO MustName {})
             ->  GoTo
 
-If          <-  Sp ({} IfBody {})
+If          <-  Sp ({} {| IfBody |} {})
             ->  If
-IfHead      <-  (IfPart     -> IfBlock)
-            /   ({} ElseIfPart -> ElseIfBlock)
+IfHead      <-  Sp ({} IfPart {})
+            ->  IfBlock
+            /   Sp ({} ElseIfPart {})
+            ->  ElseIfBlock
             ->  MissIf
-            /   ({} ElsePart   -> ElseBlock)
+            /   Sp ({} ElsePart {})
+            ->  ElseBlock
             ->  MissIf
 IfBody      <-  IfHead
-                (ElseIfPart -> ElseIfBlock)*
-                (ElsePart   -> ElseBlock)?
+                (({} ElseIfPart {}) -> ElseIfBlock)*
+                (({} ElsePart   {}) -> ElseBlock)?
                 NeedEnd
 IfPart      <-  IF DirtyExp THEN
-                    {} (!ELSEIF !ELSE !END Action)* {}
+                    {| (!ELSEIF !ELSE !END Action)* |}
             /   IF DirtyExp {}->MissThen
-                    {}        {}
+                    {| %None                        |}
 ElseIfPart  <-  ELSEIF DirtyExp THEN
-                    {} (!ELSE !ELSEIF !END Action)* {}
+                    {| (!ELSE !ELSEIF !END Action)* |}
             /   ELSEIF DirtyExp {}->MissThen
-                    {}         {}
+                    {| %None                        |}
 ElsePart    <-  ELSE
-                    {} (!END Action)* {}
+                    {| (!END Action)*               |}
 
 For         <-  Loop / In
             /   FOR

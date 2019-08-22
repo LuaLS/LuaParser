@@ -1057,49 +1057,32 @@ local Defs = {
         nameAst.type = 'goto'
         return name
     end,
-    IfBlock = function (exp, start, ...)
-        local obj = {
-            filter = exp,
-            start  = start,
-            ...
-        }
-        local max = #obj
-        obj.finish = obj[max]
-        obj[max]   = nil
-        return obj
+    IfBlock = function (start, exp, actions, finish)
+        actions.type   = 'ifblock'
+        actions.start  = start
+        actions.finish = finish - 1
+        actions.filter = exp
+        return pushAst(actions)
     end,
-    ElseIfBlock = function (exp, start, ...)
-        local obj = {
-            filter = exp,
-            start  = start,
-            ...
-        }
-        local max = #obj
-        obj.finish = obj[max]
-        obj[max]   = nil
-        return obj
+    ElseIfBlock = function (start, exp, actions, finish)
+        actions.type   = 'elseifblock'
+        actions.start  = start
+        actions.finish = finish - 1
+        actions.filter = exp
+        return pushAst(actions)
     end,
-    ElseBlock = function (start, ...)
-        local obj = {
-            start  = start,
-            ...
-        }
-        local max = #obj
-        obj.finish = obj[max]
-        obj[max]   = nil
-        return obj
+    ElseBlock = function (start, actions, finish)
+        actions.type   = 'elseblock'
+        actions.start  = start
+        actions.finish = finish - 1
+        return pushAst(actions)
     end,
-    If = function (start, ...)
-        local obj = {
-            type  = 'if',
-            start = start,
-            ...
-        }
-        local max = #obj
-        obj.finish = obj[max] - 1
-        obj[max]   = nil
+    If = function (start, blocks, finish)
+        blocks.type   = 'if'
+        blocks.start  = start
+        blocks.finish = finish - 1
         checkMissEnd(start)
-        return obj
+        return pushAst(blocks)
     end,
     Loop = function (start, arg, min, max, step, ...)
         local obj = {

@@ -696,46 +696,58 @@ CHECK'goto CONTINUE'
         [1]    = 'CONTINUE',
     }
 }
-do return end
 CHECK[[if 1 then
 end]]
 {
-    type   = 'if',
-    start  = 1,
-    finish = 13,
-    [1]    = {
-        start  = 10,
-        finish = 10,
-        filter = {
-            type   = 'number',
-            start  = 4,
-            finish = 4,
-            [1]    = 1,
-        },
-    }
+    [1] = {
+        type   = "number",
+        start  = 4,
+        finish = 4,
+        [1]    = 1,
+    },
+    [2] = {
+        type   = 'ifblock',
+        start  = 1,
+        finish = 9,
+        filter = 1,
+    },
+    [3] = {
+        type   = "if",
+        start  = 1,
+        finish = 13,
+        [1]    = 2,
+    },
 }
 CHECK[[if 1 then
     return
 end]]
 {
-    type   = 'if',
-    start  = 1,
-    finish = 24,
-    [1]    = {
-        start  = 10,
+    [1] = {
+        type   = "number",
+        start  = 4,
+        finish = 4,
+        [1]    = 1,
+    },
+    [2] = {
+        type   = "return",
+        start  = 15,
         finish = 21,
-        filter = {
-            type   = 'number',
-            start  = 4,
-            finish = 4,
-            [1]    = 1,
+        exps   = {
         },
-        [1]    = {
-            type   = 'return',
-            start  = 15,
-            finish = 20,
-        }
-    }
+    },
+    [3] = {
+        type   = 'ifblock',
+        start  = 1,
+        finish = 21,
+        filter = 1,
+        [1]    = 2,
+    },
+    [4] = {
+        type   = "if",
+        start  = 1,
+        finish = 24,
+        [1]    = 3,
+    },
 }
 CHECK[[if 1 then
     return
@@ -743,33 +755,46 @@ else
     return
 end]]
 {
-    type   = 'if',
-    start  = 1,
-    finish = 40,
-    [1]    = {
-        start  = 10,
-        finish = 21,
-        filter = {
-            type   = 'number',
-            start  = 4,
-            finish = 4,
-            [1]    = 1,
-        },
-        [1]    = {
-            type   = 'return',
-            start  = 15,
-            finish = 20,
-        }
+    [1] = {
+        type   = "number",
+        start  = 4,
+        finish = 4,
+        [1]    = 1,
     },
-    [2]    = {
-        start  = 26,
+    [2] = {
+        type   = "return",
+        start  = 15,
+        finish = 21,
+        exps   = {
+        },
+    },
+    [3] = {
+        type   = "ifblock",
+        start  = 1,
+        finish = 21,
+        filter = 1,
+        [1]    = 2,
+    },
+    [4] = {
+        type   = "return",
+        start  = 31,
         finish = 37,
-        [1]    = {
-            type   = 'return',
-            start  = 31,
-            finish = 36,
-        }
-    }
+        exps   = {
+        },
+    },
+    [5] = {
+        type   = "elseblock",
+        start  = 22,
+        finish = 37,
+        [1]    = 4,
+    },
+    [6] = {
+        type   = "if",
+        start  = 1,
+        finish = 40,
+        [1]    = 3,
+        [2]    = 5,
+    },
 }
 CHECK[[if 1 then
     return
@@ -777,39 +802,53 @@ elseif 1 then
     return
 end]]
 {
-    type   = 'if',
-    start  = 1,
-    finish = 49,
-    [1]    = {
-        start  = 10,
-        finish = 21,
-        filter = {
-            type   = 'number',
-            start  = 4,
-            finish = 4,
-            [1]    = 1,
-        },
-        [1]    = {
-            type   = 'return',
-            start  = 15,
-            finish = 20,
-        }
+    [1] = {
+        type   = "number",
+        start  = 4,
+        finish = 4,
+        [1]    = 1,
     },
-    [2]    = {
-        start  = 35,
-        finish = 46,
-        filter = {
-            type   = 'number',
-            start  = 29,
-            finish = 29,
-            [1]    = 1,
+    [2] = {
+        type   = "return",
+        start  = 15,
+        finish = 21,
+        exps   = {
         },
-        [1]    = {
-            type   = 'return',
-            start  = 40,
-            finish = 45,
-        }
-    }
+    },
+    [3] = {
+        type   = "ifblock",
+        start  = 1,
+        finish = 21,
+        filter = 1,
+        [1]    = 2,
+    },
+    [4] = {
+        type   = "number",
+        start  = 29,
+        finish = 29,
+        [1]    = 1,
+    },
+    [5] = {
+        type   = "return",
+        start  = 40,
+        finish = 46,
+        exps   = {
+        },
+    },
+    [6] = {
+        type   = "elseifblock",
+        start  = 22,
+        finish = 46,
+        filter = 4,
+        [1]    = 5,
+    },
+    [7] = {
+        type   = "if",
+        start  = 1,
+        finish = 49,
+        [1]    = 3,
+        [2]    = 6,
+    },
 }
 CHECK[[if 1 then
     return
@@ -819,48 +858,67 @@ else
     return
 end]]
 {
-    type   = 'if',
-    start  = 1,
-    finish = 65,
-    [1]    = {
-        start  = 10,
+    [1] = {
+        type   = "number",
+        start  = 4,
+        finish = 4,
+        [1]    = 1,
+    },
+    [2] = {
+        type   = "return",
+        start  = 15,
         finish = 21,
-        filter = {
-            type   = 'number',
-            start  = 4,
-            finish = 4,
-            [1]    = 1,
+        exps   = {
         },
-        [1]    = {
-            type   = 'return',
-            start  = 15,
-            finish = 20,
-        }
     },
-    [2]    = {
-        start  = 35,
+    [3] = {
+        type   = "ifblock",
+        start  = 1,
+        finish = 21,
+        filter = 1,
+        [1]    = 2,
+    },
+    [4] = {
+        type   = "number",
+        start  = 29,
+        finish = 29,
+        [1]    = 1,
+    },
+    [5] = {
+        type   = "return",
+        start  = 40,
         finish = 46,
-        filter = {
-            type   = 'number',
-            start  = 29,
-            finish = 29,
-            [1]    = 1,
+        exps   = {
         },
-        [1]    = {
-            type   = 'return',
-            start  = 40,
-            finish = 45,
-        }
     },
-    [3]    = {
-        start  = 51,
+    [6] = {
+        type   = "elseifblock",
+        start  = 22,
+        finish = 46,
+        filter = 4,
+        [1]    = 5,
+    },
+    [7] = {
+        type   = "return",
+        start  = 56,
         finish = 62,
-        [1]    = {
-            type   = 'return',
-            start  = 56,
-            finish = 61,
-        }
-    }
+        exps   = {
+        },
+    },
+    [8] = {
+        type   = "elseblock",
+        start  = 47,
+        finish = 62,
+        [1]    = 7,
+    },
+    [9] = {
+        type   = "if",
+        start  = 1,
+        finish = 65,
+        [1]    = 3,
+        [2]    = 6,
+        [3]    = 8,
+    },
 }
 CHECK[[
 if 1 then
@@ -869,48 +927,62 @@ elseif 1 then
 elseif 1 then
 end]]
 {
-    type   = 'if',
-    start  = 1,
-    finish = 55,
-    [1]    = {
+    [1] = {
+        type   = "number",
+        start  = 4,
+        finish = 4,
+        [1]    = 1,
+    },
+    [2] = {
+        type   = "ifblock",
+        start  = 1,
+        finish = 9,
+        filter = 1,
+    },
+    [3] = {
+        type   = "number",
+        start  = 18,
+        finish = 18,
+        [1]    = 1,
+    },
+    [4] = {
+        type   = "elseifblock",
         start  = 10,
-        finish = 10,
-        filter = {
-            type   = 'number',
-            start  = 4,
-            finish = 4,
-            [1]    = 1,
-        }
+        finish = 23,
+        filter = 3,
     },
-    [2]    = {
+    [5] = {
+        type   = "number",
+        start  = 32,
+        finish = 32,
+        [1]    = 1,
+    },
+    [6] = {
+        type   = "elseifblock",
         start  = 24,
-        finish = 24,
-        filter = {
-            type   = 'number',
-            start  = 18,
-            finish = 18,
-            [1]    = 1,
-        }
+        finish = 37,
+        filter = 5,
     },
-    [3]    = {
+    [7] = {
+        type   = "number",
+        start  = 46,
+        finish = 46,
+        [1]    = 1,
+    },
+    [8] = {
+        type   = "elseifblock",
         start  = 38,
-        finish = 38,
-        filter = {
-            type   = 'number',
-            start  = 32,
-            finish = 32,
-            [1]    = 1,
-        }
+        finish = 51,
+        filter = 7,
     },
-    [4]    = {
-        start  = 52,
-        finish = 52,
-        filter = {
-            type   = 'number',
-            start  = 46,
-            finish = 46,
-            [1]    = 1,
-        }
+    [9] = {
+        type   = "if",
+        start  = 1,
+        finish = 55,
+        [1]    = 2,
+        [2]    = 4,
+        [3]    = 6,
+        [4]    = 8,
     },
 }
 CHECK[[
@@ -919,34 +991,43 @@ if 1 then
     end
 end]]
 {
-    type   = 'if',
-    start  = 1,
-    finish = 35,
-    [1]    = {
-        start  = 10,
-        finish = 32,
-        filter = {
-            type   = 'number',
-            start  = 4,
-            finish = 4,
-            [1]    = 1,
-        },
-        [1]    = {
-            type   = 'if',
-            start  = 15,
-            finish = 31,
-            [1]    = {
-                start  = 24,
-                finish = 24,
-                filter = {
-                    type   = 'number',
-                    start  = 18,
-                    finish = 18,
-                    [1]    = 2,
-                }
-            }
-        }
-    }
+    [1] = {
+        type   = "number",
+        start  = 4,
+        finish = 4,
+        [1]    = 1,
+    },
+    [2] = {
+        type   = "number",
+        start  = 18,
+        finish = 18,
+        [1]    = 2,
+    },
+    [3] = {
+        type   = "ifblock",
+        start  = 15,
+        finish = 23,
+        filter = 2,
+    },
+    [4] = {
+        type   = "if",
+        start  = 15,
+        finish = 31,
+        [1]    = 3,
+    },
+    [5] = {
+        type   = "ifblock",
+        start  = 1,
+        finish = 31,
+        filter = 1,
+        [1]    = 4,
+    },
+    [6] = {
+        type   = "if",
+        start  = 1,
+        finish = 35,
+        [1]    = 5,
+    },
 }
 CHECK[[
 if a then
@@ -954,35 +1035,45 @@ elseif b then
 else
 end]]
 {
-    type   = 'if',
-    start  = 1,
-    finish = 32,
-    [1]    = {
+    [1] = {
+        type   = "name",
+        start  = 4,
+        finish = 4,
+        [1]    = "a",
+    },
+    [2] = {
+        type   = "ifblock",
+        start  = 1,
+        finish = 9,
+        filter = 1,
+    },
+    [3] = {
+        type   = "name",
+        start  = 18,
+        finish = 18,
+        [1]    = "b",
+    },
+    [4] = {
+        type   = "elseifblock",
         start  = 10,
-        finish = 10,
-        filter = {
-            type   = 'name',
-            start  = 4,
-            finish = 4,
-            [1]    = 'a',
-        },
+        finish = 23,
+        filter = 3,
     },
-    [2]    = {
+    [5] = {
+        type   = "elseblock",
         start  = 24,
-        finish = 24,
-        filter = {
-            type   = 'name',
-            start  = 18,
-            finish = 18,
-            [1]    = 'b',
-        },
+        finish = 28,
     },
-    [3]    = {
-        start  = 29,
-        finish = 29,
+    [6] = {
+        type   = "if",
+        start  = 1,
+        finish = 32,
+        [1]    = 2,
+        [2]    = 4,
+        [3]    = 5,
     },
 }
-
+do return end
 CHECK[[
 for i = 1, 10 do
     return
