@@ -1180,162 +1180,169 @@ for a in a do
     return
 end]]
 {
-	[1] = {
-		type   = "name",
-		start  = 5,
-		finish = 5,
-		[1]    = "a",
-	},
-	[2] = {
-		type   = "name",
-		start  = 10,
-		finish = 10,
-		[1]    = "a",
-	},
-	[3] = {
-		type   = "return",
-		start  = 19,
-		finish = 25,
-		exps   = {
-		},
-	},
-	[4] = {
-		type   = "in",
-		start  = 1,
-		finish = 29,
-		arg    = {
-			[1] = 1,
-		},
-		exp    = {
-			[1] = 2,
-		},
-		[1]    = 3,
-	},
+    [1] = {
+        type   = "name",
+        start  = 5,
+        finish = 5,
+        [1]    = "a",
+    },
+    [2] = {
+        type   = "name",
+        start  = 10,
+        finish = 10,
+        [1]    = "a",
+    },
+    [3] = {
+        type   = "return",
+        start  = 19,
+        finish = 25,
+        exps   = {
+        },
+    },
+    [4] = {
+        type   = "in",
+        start  = 1,
+        finish = 28,
+        arg    = {
+            [1] = 1,
+        },
+        exp    = {
+            [1] = 2,
+        },
+        [1]    = 3,
+    },
 }
 CHECK[[
 for a, b, c in a, b, c do
     return
 end]]
 {
-	[01] = {
-		type   = "name",
-		start  = 5,
-		finish = 5,
-		[1]    = "a",
-	},
-	[02] = {
-		type   = ",",
-		start  = 6,
-		finish = 6,
-	},
-	[03] = {
-		type   = "name",
-		start  = 8,
-		finish = 8,
-		[1]    = "b",
-	},
-	[04] = {
-		type   = ",",
-		start  = 9,
-		finish = 9,
-	},
-	[05] = {
-		type   = "name",
-		start  = 11,
-		finish = 11,
-		[1]    = "c",
-	},
-	[06] = {
-		type   = "name",
-		start  = 16,
-		finish = 16,
-		[1]    = "a",
-	},
-	[07] = {
-		type   = ",",
-		start  = 17,
-		finish = 17,
-	},
-	[08] = {
-		type   = "name",
-		start  = 19,
-		finish = 19,
-		[1]    = "b",
-	},
-	[09] = {
-		type   = ",",
-		start  = 20,
-		finish = 20,
-	},
-	[10] = {
-		type   = "name",
-		start  = 22,
-		finish = 22,
-		[1]    = "c",
-	},
-	[11] = {
-		type   = "return",
-		start  = 31,
-		finish = 37,
-		exps   = {
-		},
-	},
-	[12] = {
-		type   = "in",
-		start  = 1,
-		finish = 41,
-		arg    = {
-			[1] = 1,
-			[2] = 3,
-			[3] = 5,
-		},
-		exp    = {
-			[1] = 6,
-			[2] = 8,
-			[3] = 10,
-		},
-		[1]    = 11,
-	},
+    [01] = {
+        type   = "name",
+        start  = 5,
+        finish = 5,
+        [1]    = "a",
+    },
+    [02] = {
+        type   = ",",
+        start  = 6,
+        finish = 6,
+    },
+    [03] = {
+        type   = "name",
+        start  = 8,
+        finish = 8,
+        [1]    = "b",
+    },
+    [04] = {
+        type   = ",",
+        start  = 9,
+        finish = 9,
+    },
+    [05] = {
+        type   = "name",
+        start  = 11,
+        finish = 11,
+        [1]    = "c",
+    },
+    [06] = {
+        type   = "name",
+        start  = 16,
+        finish = 16,
+        [1]    = "a",
+    },
+    [07] = {
+        type   = ",",
+        start  = 17,
+        finish = 17,
+    },
+    [08] = {
+        type   = "name",
+        start  = 19,
+        finish = 19,
+        [1]    = "b",
+    },
+    [09] = {
+        type   = ",",
+        start  = 20,
+        finish = 20,
+    },
+    [10] = {
+        type   = "name",
+        start  = 22,
+        finish = 22,
+        [1]    = "c",
+    },
+    [11] = {
+        type   = "return",
+        start  = 31,
+        finish = 37,
+        exps   = {
+        },
+    },
+    [12] = {
+        type   = "in",
+        start  = 1,
+        finish = 40,
+        arg    = {
+            [1] = 1,
+            [2] = 3,
+            [3] = 5,
+        },
+        exp    = {
+            [1] = 6,
+            [2] = 8,
+            [3] = 10,
+        },
+        [1]    = 11,
+    },
 }
-do return end
 CHECK[[
 while true do
     return
 end]]
 {
-    type   = 'while',
-    start  = 1,
-    finish = 28,
-    filter = {
-        type   = 'boolean',
+    [1] = {
+        type   = "boolean",
         start  = 7,
         finish = 10,
         [1]    = true,
     },
-    [1]    = {
-        type   = 'return',
+    [2] = {
+        type   = "return",
         start  = 19,
-        finish = 24,
-    }
+        finish = 25,
+        exps   = {
+        },
+    },
+    [3] = {
+        type   = "while",
+        start  = 1,
+        finish = 28,
+        filter = 1,
+        [1]    = 2,
+    },
 }
 CHECK[[
 repeat
     break
 until 1]]
 {
-    type   = 'repeat',
-    start  = 1,
-    finish = 24,
-    filter = {
-        type   = 'number',
+    [1] = {
+        type   = "number",
         start  = 24,
         finish = 24,
         [1]    = 1,
     },
-    [1]    = {
-        type = 'break',
-    }
+    [2] = {
+        type   = "repeat",
+        start  = 1,
+        finish = 25,
+        filter = 1,
+        [1]    = false,
+    },
 }
+do return end
 CHECK[[
 function test()
     return

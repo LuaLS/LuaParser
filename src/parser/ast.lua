@@ -1084,37 +1084,26 @@ local Defs = {
     In = function (start, arg, exp, actions, finish)
         actions.type   = 'in'
         actions.start  = start
-        actions.finish = finish
+        actions.finish = finish - 1
         actions.arg    = arg
         actions.exp    = exp
         checkMissEnd(start)
         return pushAst(actions)
     end,
-    While = function (start, filter, ...)
-        local obj = {
-            type   = 'while',
-            start  = start,
-            filter = filter,
-            ...
-        }
-        local max = #obj
-        obj.finish = obj[max] - 1
-        obj[max]   = nil
+    While = function (start, filter, actions, finish)
+        actions.type   = 'while'
+        actions.start  = start
+        actions.finish = finish - 1
+        actions.filter = filter
         checkMissEnd(start)
-        return obj
+        return pushAst(actions)
     end,
-    Repeat = function (start, ...)
-        local obj = {
-            type  = 'repeat',
-            start = start,
-            ...
-        }
-        local max = #obj
-        obj.finish = obj[max] - 1
-        obj.filter = obj[max-1]
-        obj[max]   = nil
-        obj[max-1] = nil
-        return obj
+    Repeat = function (start, actions, filter, finish)
+        actions.type   = 'repeat'
+        actions.start  = start
+        actions.finish = finish
+        actions.filter = filter
+        return pushAst(actions)
     end,
     Lua = function (...)
         if ... == '' then

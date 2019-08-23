@@ -470,13 +470,13 @@ InExpList   <-  ({} {| (COMMA / !DO Exp)*  |} {})
 While       <-  Sp ({} WhileBody {})
             ->  While
 WhileBody   <-  WHILE DirtyExp NeedDo
-                    (!END Action)*
+                    {| (!END Action)* |}
                 NeedEnd
 
 Repeat      <-  Sp ({} RepeatBody {})
             ->  Repeat
 RepeatBody  <-  REPEAT
-                    (!UNTIL Action)*
+                    {| (!UNTIL Action)* |}
                 NeedUntil DirtyExp
 
 LocalAttr   <-  {| (Sp '<' Sp MustName Sp LocalAttrEnd)+ |}
