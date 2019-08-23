@@ -1073,77 +1073,109 @@ end]]
         [3]    = 5,
     },
 }
-do return end
 CHECK[[
 for i = 1, 10 do
     return
 end]]
 {
-    type   = 'loop',
-    start  = 1,
-    finish = 31,
-    arg    = {
-        type   = 'name',
+    [1] = {
+        type   = "name",
         start  = 5,
         finish = 5,
-        [1]    = 'i',
+        [1]    = "i",
     },
-    min    = {
-        type   = 'number',
+    [2] = {
+        type   = "number",
         start  = 9,
         finish = 9,
         [1]    = 1,
     },
-    max    = {
-        type   = 'number',
+    [3] = {
+        type   = ",",
+        start  = 10,
+        finish = 10,
+    },
+    [4] = {
+        type   = "number",
         start  = 12,
         finish = 13,
         [1]    = 10,
     },
-    [1]    = {
-        type   = 'return',
+    [5] = {
+        type   = "return",
         start  = 22,
-        finish = 27,
-    }
+        finish = 28,
+        exps   = {
+        },
+    },
+    [6] = {
+        type   = "loop",
+        start  = 1,
+        finish = 31,
+        min    = 2,
+        max    = 4,
+        arg    = 1,
+        [1]    = 5,
+    },
 }
 CHECK[[
 for i = 1, 10, 1 do
     return
 end]]
 {
-    type   = 'loop',
-    start  = 1,
-    finish = 34,
-    arg    = {
-        type   = 'name',
+    [1] = {
+        type   = "name",
         start  = 5,
         finish = 5,
-        [1]    = 'i',
+        [1]    = "i",
     },
-    min    = {
-        type   = 'number',
+    [2] = {
+        type   = "number",
         start  = 9,
         finish = 9,
         [1]    = 1,
     },
-    max    = {
-        type   = 'number',
+    [3] = {
+        type   = ",",
+        start  = 10,
+        finish = 10,
+    },
+    [4] = {
+        type   = "number",
         start  = 12,
         finish = 13,
         [1]    = 10,
     },
-    step   = {
-        type   = 'number',
+    [5] = {
+        type   = ",",
+        start  = 14,
+        finish = 14,
+    },
+    [6] = {
+        type   = "number",
         start  = 16,
         finish = 16,
-        [1]    = 1
+        [1]    = 1,
     },
-    [1]    = {
-        type   = 'return',
+    [7] = {
+        type   = "return",
         start  = 25,
-        finish = 30,
-    }
+        finish = 31,
+        exps   = {
+        },
+    },
+    [8] = {
+        type   = "loop",
+        start  = 1,
+        finish = 34,
+        arg    = 1,
+        min    = 2,
+        max    = 4,
+        step   = 6,
+        [1]    = 7,
+    },
 }
+do return end
 CHECK[[
 for a in a do
     return

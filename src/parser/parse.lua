@@ -33,7 +33,6 @@ return function (self, lua, mode, version)
     Errs  = {}
     Asts  = {}
     State = {
-        Break = 0,
         Version = version,
         Lua = lua,
         Emmy = {},

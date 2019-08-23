@@ -899,15 +899,6 @@ local Defs = {
         end
         return pushAst(args)
     end,
-    Nothing = function ()
-        return nil
-    end,
-    None = function()
-        return
-    end,
-    Skip = function ()
-        return false
-    end,
     Set = function (start, keys, values, finish)
         return pushAst {
             type   = 'set',
@@ -974,7 +965,7 @@ local Defs = {
         return pushAst(actions)
     end,
     Break = function (finish, ...)
-        if State.Break > 0 then
+        if false then
             local breakChunk = {
                 type = 'break',
             }
@@ -1008,12 +999,6 @@ local Defs = {
             end
             return action
         end
-    end,
-    BreakStart = function ()
-        State.Break = State.Break + 1
-    end,
-    BreakEnd = function ()
-        State.Break = State.Break - 1
     end,
     Return = function (start, exps, finish)
         return pushAst {
@@ -1084,21 +1069,66 @@ local Defs = {
         checkMissEnd(start)
         return pushAst(blocks)
     end,
-    Loop = function (start, arg, min, max, step, ...)
-        local obj = {
-            type  = 'loop',
-            start = start,
-            arg   = arg,
-            min   = min,
-            max   = max,
-            step  = step,
-            ...
-        }
-        local max = #obj
-        obj.finish = obj[max] - 1
-        obj[max]   = nil
+    Loop = function (start, arg, stepStart, steps, actions, finish)
+        local wantStep = true
+        local lastFinish = stepStart
+        local stepCount = 0
+        for _, step in ipairs(steps) do
+            if stepCount >= 3 then
+                pushError {
+                    type   = 'UNEXPECT_LOOP_STEP',
+                    start  = getAst(step).start,
+                    finish = getAst(steps[#steps]).finish,
+                }
+                break
+            end
+            local stepAst = getAst(step)
+            if stepAst.type == ',' then
+                if wantStep then
+                    pushError {
+                        type   = 'MISS_EXP',
+                        start  = lastFinish,
+                        finish = stepAst.start - 1,
+                    }
+                end
+                wantStep = true
+            else
+                if not wantStep then
+                    pushError {
+                        type   = 'MISS_SYMBOL',
+                        start  = lastFinish,
+                        finish = stepAst.start - 1,
+                        info = {
+                            symbol = ','
+                        }
+                    }
+                end
+                wantStep = false
+                stepCount = stepCount + 1
+                steps[stepCount] = step
+            end
+            lastFinish = stepAst.finish + 1
+        end
+        if #steps == 0 then
+            pushError {
+                type   = 'MISS_EXP',
+                start  = lastFinish,
+                finish = lastFinish,
+            }
+        else
+            for i = stepCount + 1, #steps do
+                steps[i] = nil
+            end
+        end
+        actions.type   = 'loop'
+        actions.start  = start
+        actions.finish = finish - 1
+        actions.arg    = arg
+        actions.min    = steps[1]
+        actions.max    = steps[2]
+        actions.step   = steps[3]
         checkMissEnd(start)
-        return obj
+        return pushAst(actions)
     end,
     In = function (start, arg, exp, ...)
         local obj = {

@@ -219,8 +219,6 @@ AssignOrEQ  <-  Sp ({} '==' {})
             ->  ErrAssign
             /   Sp '='
 
-Nothing     <-  {} -> Nothing
-
 DirtyBR     <-  BR     / {} -> MissBR
 DirtyTR     <-  TR     / {} -> MissTR
 DirtyPR     <-  PR     / {} -> DirtyPR
@@ -401,8 +399,7 @@ UnkAction   <-  ({} {Word+})
 ExpInAction <-  Sp ({} Exp {})
             ->  ExpInAction
 
-Semicolon   <-  SEMICOLON
-            ->  Skip
+Semicolon   <-  Sp ';'
 SimpleList  <-  {| Simple (Sp ',' Simple)* |}
 
 Do          <-  Sp ({} 
@@ -415,8 +412,6 @@ Do          <-  Sp ({}
 Break       <-  BREAK ({} Semicolon* AfterBreak?)
             ->  Break
 AfterBreak  <-  Sp !END !UNTIL !ELSEIF !ELSE Action
-BreakStart  <-  {} -> BreakStart
-BreakEnd    <-  {} -> BreakEnd
 
 Return      <-  Sp ({} RETURN ExpList {})
             ->  Return
@@ -457,23 +452,15 @@ For         <-  Loop / In
 
 Loop        <-  Sp ({} LoopBody {})
             ->  Loop
-LoopBody    <-  FOR LoopStart LoopFinish LoopStep NeedDo
-                    BreakStart
-                    (!END Action)*
-                    BreakEnd
+LoopBody    <-  FOR LoopArgs NeedDo
+                    {| (!END Action)* |}
                 NeedEnd
-LoopStart   <-  MustName AssignOrEQ DirtyExp
-LoopFinish  <-  NeedComma DirtyExp
-LoopStep    <-  COMMA DirtyExp
-            /   NeedComma Exp
-            /   Nothing
+LoopArgs    <-  MustName AssignOrEQ {} {| (COMMA / !DO !END Exp)* |}
 
 In          <-  Sp ({} InBody {})
             ->  In
 InBody      <-  FOR InNameList NeedIn ExpList NeedDo
-                    BreakStart
                     (!END Action)*
-                    BreakEnd
                 NeedEnd
 InNameList  <-  &IN DirtyName
             /   NameList
@@ -481,17 +468,13 @@ InNameList  <-  &IN DirtyName
 While       <-  Sp ({} WhileBody {})
             ->  While
 WhileBody   <-  WHILE DirtyExp NeedDo
-                    BreakStart
                     (!END Action)*
-                    BreakEnd
                 NeedEnd
 
 Repeat      <-  Sp ({} RepeatBody {})
             ->  Repeat
 RepeatBody  <-  REPEAT
-                    BreakStart
                     (!UNTIL Action)*
-                    BreakEnd
                 NeedUntil DirtyExp
 
 LocalAttr   <-  {| (Sp '<' Sp MustName Sp LocalAttrEnd)+ |}
