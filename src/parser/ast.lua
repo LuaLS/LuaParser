@@ -643,53 +643,54 @@ local Defs = {
             exp    = exp
         }
     end,
+    PackExpList = function (start, list, finish)
+        local lastFinish = start
+        local wantExp = true
+        local count = 0
+        for i = 1, #list do
+            local ast = getAst(list[i])
+            if ast.type == ',' then
+                if wantExp then
+                    pushError {
+                        type   = 'MISS_EXP',
+                        start  = lastFinish,
+                        finish = ast.start - 1,
+                    }
+                end
+                wantExp = true
+            else
+                if not wantExp then
+                    pushError {
+                        type   = 'MISS_SYMBOL',
+                        start  = lastFinish,
+                        finish = ast.start - 1,
+                        info = {
+                            symbol = ',',
+                        }
+                    }
+                end
+                wantExp = false
+                count = count + 1
+                list[count] = list[i]
+            end
+            lastFinish = ast.finish + 1
+        end
+        for i = count + 1, #list do
+            list[i] = nil
+        end
+        if wantExp and #list > 0 then
+            pushError {
+                type   = 'MISS_EXP',
+                start  = lastFinish,
+                finish = finish - 1,
+            }
+        end
+        return list
+    end,
     Call = function (start, args, finish)
         args.type    = 'callargs'
         args.start   = start
         args.finish  = finish - 1
-        local max = #args
-        local wantExp = true
-        local expCount = 0
-        local lastFinish = start
-        for i = 1, max do
-            local arg = args[i]
-            local argAst = getAst(arg)
-            local isExp = argAst.type ~= ','
-            if wantExp and not isExp then
-                pushError {
-                    type   = 'MISS_EXP',
-                    start  = lastFinish + 1,
-                    finish = argAst.start - 1,
-                }
-            elseif not wantExp and isExp then
-                pushError {
-                    type   = 'MISS_SYMBOL',
-                    start  = lastFinish + 1,
-                    finish = argAst.start - 1,
-                    info = {
-                        symbol = ',',
-                    }
-                }
-            end
-            if isExp then
-                expCount = expCount + 1
-                args[expCount] = arg
-                wantExp = false
-            else
-                wantExp = true
-            end
-            lastFinish = argAst.finish
-        end
-        for i = expCount + 1, max do
-            args[i] = nil
-        end
-        if wantExp and max > 0 then
-            pushError {
-                type   = 'MISS_EXP',
-                start  = lastFinish + 1,
-                finish = finish - 1,
-            }
-        end
         return pushAst {
             type   = 'call',
             start  = start,
@@ -1069,57 +1070,7 @@ local Defs = {
         checkMissEnd(start)
         return pushAst(blocks)
     end,
-    Loop = function (start, arg, stepStart, steps, actions, finish)
-        local wantStep = true
-        local lastFinish = stepStart
-        local stepCount = 0
-        for _, step in ipairs(steps) do
-            if stepCount >= 3 then
-                pushError {
-                    type   = 'UNEXPECT_LOOP_STEP',
-                    start  = getAst(step).start,
-                    finish = getAst(steps[#steps]).finish,
-                }
-                break
-            end
-            local stepAst = getAst(step)
-            if stepAst.type == ',' then
-                if wantStep then
-                    pushError {
-                        type   = 'MISS_EXP',
-                        start  = lastFinish,
-                        finish = stepAst.start - 1,
-                    }
-                end
-                wantStep = true
-            else
-                if not wantStep then
-                    pushError {
-                        type   = 'MISS_SYMBOL',
-                        start  = lastFinish,
-                        finish = stepAst.start - 1,
-                        info = {
-                            symbol = ','
-                        }
-                    }
-                end
-                wantStep = false
-                stepCount = stepCount + 1
-                steps[stepCount] = step
-            end
-            lastFinish = stepAst.finish + 1
-        end
-        if #steps == 0 then
-            pushError {
-                type   = 'MISS_EXP',
-                start  = lastFinish,
-                finish = lastFinish,
-            }
-        else
-            for i = stepCount + 1, #steps do
-                steps[i] = nil
-            end
-        end
+    Loop = function (start, arg, steps, actions, finish)
         actions.type   = 'loop'
         actions.start  = start
         actions.finish = finish - 1

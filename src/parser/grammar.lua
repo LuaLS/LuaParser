@@ -323,7 +323,7 @@ Suffix      <-  (DOT (Name / MissField))
             ->  Call
             /   ({} {| String |} {})
             ->  Call
-            /   ({} PL Sp {| (COMMA / Exp)* |} DirtyPR {})
+            /   ({} PL Sp ({} {| (COMMA / Exp)* |} {})->PackExpList DirtyPR {})
             ->  Call
 NeedCall    <-  (!(Sp CallStart) {} -> MissPL)?
 MissField   <-  {} -> MissField
@@ -339,7 +339,6 @@ DirtyExp    <-  Exp
 MaybeExp    <-  Exp / MissExp
 MissExp     <-  {} -> MissExp
 ExpList     <-  Sp {| MaybeExp (Sp ',' MaybeExp)* |}
-NameList    <-  Sp {| MustName (Sp ',' MustName)* |}
 
 
 Table       <-  Sp ({} TL {| TableField* |} DirtyTR {})
@@ -448,22 +447,25 @@ ElsePart    <-  ELSE
                     {| (!END Action)*               |}
 
 For         <-  Loop / In
-            /   FOR
 
 Loop        <-  Sp ({} LoopBody {})
             ->  Loop
 LoopBody    <-  FOR LoopArgs NeedDo
                     {| (!END Action)* |}
                 NeedEnd
-LoopArgs    <-  MustName AssignOrEQ {} {| (COMMA / !DO !END Exp)* |}
+LoopArgs    <-  MustName AssignOrEQ
+                ({} {| (COMMA / !DO !END Exp)* |} {})
+            ->  PackExpList
 
 In          <-  Sp ({} InBody {})
             ->  In
 InBody      <-  FOR InNameList NeedIn ExpList NeedDo
                     (!END Action)*
                 NeedEnd
-InNameList  <-  &IN DirtyName
-            /   NameList
+InNameList  <-  ({} {| (COMMA / !IN Name)* |} {})
+            ->  PackExpList
+InExpList   <-  ({} {| (COMMA / !DO Exp)*  |} {})
+            ->  PackExpList
 
 While       <-  Sp ({} WhileBody {})
             ->  While
