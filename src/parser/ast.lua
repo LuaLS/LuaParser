@@ -1081,19 +1081,14 @@ local Defs = {
         checkMissEnd(start)
         return pushAst(actions)
     end,
-    In = function (start, arg, exp, ...)
-        local obj = {
-            type  = 'in',
-            start = start,
-            arg   = arg,
-            exp   = exp,
-            ...
-        }
-        local max = #obj
-        obj.finish = obj[max] - 1
-        obj[max]   = nil
+    In = function (start, arg, exp, actions, finish)
+        actions.type   = 'in'
+        actions.start  = start
+        actions.finish = finish
+        actions.arg    = arg
+        actions.exp    = exp
         checkMissEnd(start)
-        return obj
+        return pushAst(actions)
     end,
     While = function (start, filter, ...)
         local obj = {
