@@ -502,7 +502,7 @@ NamedFunction
             <-  Sp ({} FunctionNamedBody {})
             ->  NamedFunction
 FunctionNamedBody
-            <-  FUNCTION FuncName FuncArg
+            <-  FUNCTION FuncName FuncArgs
                     {| (!END Action)* |}
                 NeedEnd
 FuncName    <-  {| MustName (DOT MustName)* FuncMethod? |}

@@ -1342,129 +1342,166 @@ until 1]]
         [1]    = false,
     },
 }
-do return end
 CHECK[[
 function test()
     return
 end]]
 {
-    type      = 'function',
-    start     = 1,
-    finish    = 30,
-    argStart  = 14,
-    argFinish = 15,
-    name      = {
-        type   = 'name',
-        start  = 10,
-        finish = 13,
-        [1]    = 'test',
-    },
-    [1]       = {
-        type   = 'return',
-        start  = 21,
-        finish = 26,
-    }
+	[1] = {
+		type   = "name",
+		start  = 10,
+		finish = 13,
+		[1]    = "test",
+	},
+	[2] = {
+		type   = "funcargs",
+		start  = 14,
+		finish = 15,
+	},
+	[3] = {
+		type   = "return",
+		start  = 21,
+		finish = 27,
+		exps   = {
+		},
+	},
+	[4] = {
+		type   = "function",
+		start  = 1,
+		finish = 30,
+		name   = 1,
+		args   = 2,
+		[1]    = 3,
+	},
 }
 CHECK[[
 function test(a)
     return
 end]]
 {
-    type      = 'function',
-    start     = 1,
-    finish    = 31,
-    argStart  = 14,
-    argFinish = 16,
-    name      = {
-        type   = 'name',
-        start  = 10,
-        finish = 13,
-        [1]    = 'test',
-    },
-    arg       = {
-        type   = 'name',
-        start  = 15,
-        finish = 15,
-        [1]    = 'a',
-    },
-    [1]       = {
-        type   = 'return',
-        start  = 22,
-        finish = 27,
-    }
+	[1] = {
+		type   = "name",
+		start  = 10,
+		finish = 13,
+		[1]    = "test",
+	},
+	[2] = {
+		type   = "name",
+		start  = 15,
+		finish = 15,
+		[1]    = "a",
+	},
+	[3] = {
+		type   = "funcargs",
+		start  = 14,
+		finish = 16,
+		[1]    = 2,
+	},
+	[4] = {
+		type   = "return",
+		start  = 22,
+		finish = 28,
+		exps   = {
+		},
+	},
+	[5] = {
+		type   = "function",
+		start  = 1,
+		finish = 31,
+		name   = 1,
+		args   = 3,
+		[1]    = 4,
+	},
 }
 CHECK[[
 function a.b:c(a, b, c)
     return
-end]]
-{
-    type      = 'function',
-    start     = 1,
-    finish    = 38,
-    argStart  = 15,
-    argFinish = 23,
-    name      = {
-        type   = 'simple',
-        start  = 10,
-        finish = 14,
-        [1]  = {
-            type   = 'name',
-            start  = 10,
-            finish = 10,
-            [1]    = 'a',
-        },
-        [2]  = {
-            type   = '.',
-            start  = 11,
-            finish = 11,
-        },
-        [3]  = {
-            type   = 'name',
-            start  = 12,
-            finish = 12,
-            [1]    = 'b',
-        },
-        [4]  = {
-            type   = ':',
-            start  = 13,
-            finish = 13,
-        },
-        [5]  = {
-            type   = 'name',
-            start  = 14,
-            finish = 14,
-            [1]    = 'c',
-        }
-    },
-    arg       = {
-        type   = 'list',
-        start  = 16,
-        finish = 22,
-        [1]  = {
-            type   = 'name',
-            start  = 16,
-            finish = 16,
-            [1]    = 'a',
-        },
-        [2]  = {
-            type   = 'name',
-            start  = 19,
-            finish = 19,
-            [1]    = 'b',
-        },
-        [3]  = {
-            type   = 'name',
-            start  = 22,
-            finish = 22,
-            [1]    = 'c',
-        },
-    },
-    [1]       = {
-        type   = 'return',
-        start  = 29,
-        finish = 34,
-    }
+end]]{
+	[01] = {
+		type   = "name",
+		start  = 10,
+		finish = 10,
+		[1]    = "a",
+	},
+	[02] = {
+		type   = ".",
+		start  = 10,
+		finish = 11,
+		parent = 1,
+	},
+	[03] = {
+		type   = "name",
+		start  = 10,
+		finish = 12,
+		parent = 2,
+		[1]    = "b",
+	},
+	[04] = {
+		type   = ":",
+		start  = 10,
+		parent = 3,
+		finish = 13,
+	},
+	[05] = {
+		type   = "name",
+		start  = 10,
+		finish = 14,
+		parent = 4,
+		[1]    = "c",
+	},
+	[06] = {
+		type   = "name",
+		start  = 16,
+		finish = 16,
+		[1]    = "a",
+	},
+	[07] = {
+		type   = ",",
+		start  = 17,
+		finish = 17,
+	},
+	[08] = {
+		type   = "name",
+		start  = 19,
+		finish = 19,
+		[1]    = "b",
+	},
+	[09] = {
+		type   = ",",
+		start  = 20,
+		finish = 20,
+	},
+	[10] = {
+		type   = "name",
+		start  = 22,
+		finish = 22,
+		[1]    = "c",
+	},
+	[11] = {
+		type   = "funcargs",
+		start  = 15,
+		finish = 23,
+		[3]    = 10,
+		[2]    = 8,
+		[1]    = 6,
+	},
+	[12] = {
+		type   = "return",
+		start  = 29,
+		finish = 35,
+		exps   = {
+		},
+	},
+	[13] = {
+		type   = "function",
+		start  = 1,
+		name   = 5,
+		finish = 38,
+		args   = 11,
+		[1]    = 12,
+	},
 }
+do return end
 CHECK[[
 local function a()
     return
