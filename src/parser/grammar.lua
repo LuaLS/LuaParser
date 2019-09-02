@@ -310,6 +310,7 @@ ExpUnit     <-  Nil
 Simple      <-  {| Prefix (Sp Suffix)+ |}
             ->  Simple
             /   Prefix
+            ->  Single
 Prefix      <-  Sp ({} PL DirtyExp DirtyPR {})
             ->  Prefix
             /   FreeName

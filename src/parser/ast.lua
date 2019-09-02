@@ -595,6 +595,18 @@ local Defs = {
             finish = getAst(method).finish,
         }
     end,
+    Single = function (unit)
+        local unitAst = getAst(unit)
+        if unitAst.type == 'name' then
+            return pushAst {
+                type   = 'getname',
+                start  = unitAst.start,
+                finish = unitAst.finish,
+                name   = unit,
+            }
+        end
+        return unit
+    end,
     Simple = function (units)
         local last = units[1]
         for i = 2, #units do
@@ -909,13 +921,15 @@ local Defs = {
         return pushAst(args)
     end,
     Set = function (start, keys, values, finish)
-        return pushAst {
-            type   = 'set',
-            start  = start,
-            finish = finish - 1,
-            keys   = keys,
-            values = values,
-        }
+        for i, key in ipairs(keys) do
+            local keyAst = getAst(key)
+            if keyAst.type == 'getfield' then
+            else
+                pushAst {
+                    type = 'setglobal'
+                }
+            end
+        end
     end,
     LocalAttr = function (attrs)
         for i, attr in ipairs(attrs) do

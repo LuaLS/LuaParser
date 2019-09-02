@@ -13,7 +13,13 @@ CHECK'a'
         start  = 1,
         finish = 1,
         [1]    = 'a',
-    }
+    },
+    [2] = {
+        type   = "getname",
+        start  = 1,
+        finish = 1,
+        name   = 1
+    },
 }
 CHECK'a.b'
 {
@@ -565,29 +571,41 @@ CHECK'1 .. 2'
 CHECK'a .. b'
 {
     [1] = {
-        type   = 'name',
+        type   = "name",
         start  = 1,
         finish = 1,
-        [1]    = 'a',
+        [1]    = "a",
     },
     [2] = {
-        type   = '..',
+        type   = "getname",
+        start  = 1,
+        finish = 1,
+        name   = 1,
+    },
+    [3] = {
+        type   = "..",
         start  = 3,
         finish = 4,
     },
-    [3] = {
-        type   = 'name',
+    [4] = {
+        type   = "name",
         start  = 6,
         finish = 6,
-        [1]    = 'b',
+        [1]    = "b",
     },
-    [4] = {
-        type   = 'binary',
+    [5] = {
+        type   = "getname",
+        start  = 6,
+        finish = 6,
+        name   = 4,
+    },
+    [6] = {
+        type   = "binary",
         start  = 1,
         finish = 6,
-        op     = 2,
-        [1]    = 1,
-        [2]    = 3,
+        op     = 3,
+        [1]    = 2,
+        [2]    = 5,
     },
 }
 CHECK'1 + 2'
@@ -1838,67 +1856,79 @@ CHECK'{["x"] = 1, ["y"] = 2}'
 }
 CHECK'{[x] = 1, [y] = 2}'
 {
-    [1]  = {
+    [01] = {
         type   = "name",
         start  = 3,
         finish = 3,
         [1]    = "x",
     },
-    [2]  = {
+    [02] = {
+        type   = "getname",
+        start  = 3,
+        finish = 3,
+        name   = 1,
+    },
+    [03] = {
         type   = "index",
         start  = 2,
         finish = 4,
-        index  = 1,
+        index  = 2,
     },
-    [3]  = {
+    [04] = {
         type   = "number",
         start  = 8,
         finish = 8,
         [1]    = 1,
     },
-    [4]  = {
+    [05] = {
+        value  = 4,
         type   = "tableindex",
         start  = 2,
         finish = 8,
-        index  = 2,
-        value  = 3,
+        index  = 3,
     },
-    [5]  = {
+    [06] = {
         type   = ",",
         start  = 9,
         finish = 9,
     },
-    [6]  = {
+    [07] = {
         type   = "name",
         start  = 12,
         finish = 12,
         [1]    = "y",
     },
-    [7]  = {
+    [08] = {
+        type   = "getname",
+        start  = 12,
+        finish = 12,
+        name   = 7,
+    },
+    [09] = {
         type   = "index",
         start  = 11,
         finish = 13,
-        index  = 6,
+        index  = 8,
     },
-    [8]  = {
+    [10] = {
         type   = "number",
         start  = 17,
         finish = 17,
         [1]    = 2,
     },
-    [9]  = {
+    [11] = {
         type   = "tableindex",
         start  = 11,
         finish = 17,
-        index  = 7,
-        value  = 8,
+        index  = 9,
+        value  = 10,
     },
-    [10] = {
+    [12] = {
         type   = "table",
         start  = 1,
         finish = 18,
-        [2]    = 9,
-        [1]    = 4,
+        [2]    = 11,
+        [1]    = 5,
     },
 }
 CHECK'{{}}'
@@ -2085,5 +2115,11 @@ CHECK 'notify'
         start  = 1,
         finish = 6,
         [1]    = "notify",
+    },
+    [2] = {
+        type   = "getname",
+        start  = 1,
+        finish = 6,
+        name   = 1,
     },
 }

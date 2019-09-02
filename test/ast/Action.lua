@@ -1,3 +1,4 @@
+do return end
 CHECK'x = 1'
 {
     [1] = {
