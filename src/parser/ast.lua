@@ -921,13 +921,19 @@ local Defs = {
         return pushAst(args)
     end,
     Set = function (start, keys, values, finish)
+        local function getValue(i)
+            local value = values[i]
+            local valueAst = getAst(value)
+            return value
+        end
         for i, key in ipairs(keys) do
             local keyAst = getAst(key)
-            if keyAst.type == 'getfield' then
-            else
-                pushAst {
-                    type = 'setglobal'
-                }
+            if keyAst.type == 'getname' then
+                keyAst.type = 'setname'
+                keyAst.value = getValue(i)
+            elseif keyAst.type == 'getfield' then
+                keyAst.type = 'setfield'
+                keyAst.value = getValue(i)
             end
         end
     end,

@@ -1,4 +1,3 @@
-do return end
 CHECK'x = 1'
 {
     [1] = {
@@ -8,21 +7,17 @@ CHECK'x = 1'
         [1]    = "x",
     },
     [2] = {
+        type   = "setname",
+        start  = 1,
+        finish = 1,
+        name   = 1,
+        value  = 3,
+    },
+    [3] = {
         type   = "number",
         start  = 5,
         finish = 5,
         [1]    = 1,
-    },
-    [3] = {
-        type   = "set",
-        start  = 1,
-        finish = 5,
-        keys   = {
-            [1] = 1,
-        },
-        values = {
-            [1] = 2,
-        },
     },
 }
 CHECK'x, y, z = 1, 2, 3'
@@ -34,51 +29,58 @@ CHECK'x, y, z = 1, 2, 3'
         [1]    = "x",
     },
     [2] = {
+        type   = "setname",
+        start  = 1,
+        finish = 1,
+        name   = 1,
+        value  = 7,
+    },
+    [3] = {
         type   = "name",
         start  = 4,
         finish = 4,
         [1]    = "y",
     },
-    [3] = {
+    [4] = {
+        type   = "setname",
+        start  = 4,
+        finish = 4,
+        name   = 3,
+        value  = 8,
+    },
+    [5] = {
         type   = "name",
         start  = 7,
         finish = 7,
         [1]    = "z",
     },
-    [4] = {
+    [6] = {
+        type   = "setname",
+        start  = 7,
+        finish = 7,
+        name   = 5,
+        value  = 9,
+    },
+    [7] = {
         type   = "number",
         start  = 11,
         finish = 11,
         [1]    = 1,
     },
-    [5] = {
+    [8] = {
         type   = "number",
         start  = 14,
         finish = 14,
         [1]    = 2,
     },
-    [6] = {
+    [9] = {
         type   = "number",
         start  = 17,
         finish = 17,
         [1]    = 3,
     },
-    [7] = {
-        type   = "set",
-        start  = 1,
-        finish = 17,
-        keys   = {
-            [1] = 1,
-            [2] = 2,
-            [3] = 3,
-        },
-        values = {
-            [1] = 4,
-            [2] = 5,
-            [3] = 6,
-        },
-    },
 }
+do return end
 CHECK'local x'
 {
     [1] = {
@@ -1348,159 +1350,159 @@ function test()
     return
 end]]
 {
-	[1] = {
-		type   = "name",
-		start  = 10,
-		finish = 13,
-		[1]    = "test",
-	},
-	[2] = {
-		type   = "funcargs",
-		start  = 14,
-		finish = 15,
-	},
-	[3] = {
-		type   = "return",
-		start  = 21,
-		finish = 27,
-		exps   = {
-		},
-	},
-	[4] = {
-		type   = "function",
-		start  = 1,
-		finish = 30,
-		name   = 1,
-		args   = 2,
-		[1]    = 3,
-	},
+    [1] = {
+        type   = "name",
+        start  = 10,
+        finish = 13,
+        [1]    = "test",
+    },
+    [2] = {
+        type   = "funcargs",
+        start  = 14,
+        finish = 15,
+    },
+    [3] = {
+        type   = "return",
+        start  = 21,
+        finish = 27,
+        exps   = {
+        },
+    },
+    [4] = {
+        type   = "function",
+        start  = 1,
+        finish = 30,
+        name   = 1,
+        args   = 2,
+        [1]    = 3,
+    },
 }
 CHECK[[
 function test(a)
     return
 end]]
 {
-	[1] = {
-		type   = "name",
-		start  = 10,
-		finish = 13,
-		[1]    = "test",
-	},
-	[2] = {
-		type   = "name",
-		start  = 15,
-		finish = 15,
-		[1]    = "a",
-	},
-	[3] = {
-		type   = "funcargs",
-		start  = 14,
-		finish = 16,
-		[1]    = 2,
-	},
-	[4] = {
-		type   = "return",
-		start  = 22,
-		finish = 28,
-		exps   = {
-		},
-	},
-	[5] = {
-		type   = "function",
-		start  = 1,
-		finish = 31,
-		name   = 1,
-		args   = 3,
-		[1]    = 4,
-	},
+    [1] = {
+        type   = "name",
+        start  = 10,
+        finish = 13,
+        [1]    = "test",
+    },
+    [2] = {
+        type   = "name",
+        start  = 15,
+        finish = 15,
+        [1]    = "a",
+    },
+    [3] = {
+        type   = "funcargs",
+        start  = 14,
+        finish = 16,
+        [1]    = 2,
+    },
+    [4] = {
+        type   = "return",
+        start  = 22,
+        finish = 28,
+        exps   = {
+        },
+    },
+    [5] = {
+        type   = "function",
+        start  = 1,
+        finish = 31,
+        name   = 1,
+        args   = 3,
+        [1]    = 4,
+    },
 }
 CHECK[[
 function a.b:c(a, b, c)
     return
 end]]{
-	[01] = {
-		type   = "name",
-		start  = 10,
-		finish = 10,
-		[1]    = "a",
-	},
-	[02] = {
-		type   = ".",
-		start  = 10,
-		finish = 11,
-		parent = 1,
-	},
-	[03] = {
-		type   = "name",
-		start  = 10,
-		finish = 12,
-		parent = 2,
-		[1]    = "b",
-	},
-	[04] = {
-		type   = ":",
-		start  = 10,
-		parent = 3,
-		finish = 13,
-	},
-	[05] = {
-		type   = "name",
-		start  = 10,
-		finish = 14,
-		parent = 4,
-		[1]    = "c",
-	},
-	[06] = {
-		type   = "name",
-		start  = 16,
-		finish = 16,
-		[1]    = "a",
-	},
-	[07] = {
-		type   = ",",
-		start  = 17,
-		finish = 17,
-	},
-	[08] = {
-		type   = "name",
-		start  = 19,
-		finish = 19,
-		[1]    = "b",
-	},
-	[09] = {
-		type   = ",",
-		start  = 20,
-		finish = 20,
-	},
-	[10] = {
-		type   = "name",
-		start  = 22,
-		finish = 22,
-		[1]    = "c",
-	},
-	[11] = {
-		type   = "funcargs",
-		start  = 15,
-		finish = 23,
-		[3]    = 10,
-		[2]    = 8,
-		[1]    = 6,
-	},
-	[12] = {
-		type   = "return",
-		start  = 29,
-		finish = 35,
-		exps   = {
-		},
-	},
-	[13] = {
-		type   = "function",
-		start  = 1,
-		name   = 5,
-		finish = 38,
-		args   = 11,
-		[1]    = 12,
-	},
+    [01] = {
+        type   = "name",
+        start  = 10,
+        finish = 10,
+        [1]    = "a",
+    },
+    [02] = {
+        type   = ".",
+        start  = 10,
+        finish = 11,
+        parent = 1,
+    },
+    [03] = {
+        type   = "name",
+        start  = 10,
+        finish = 12,
+        parent = 2,
+        [1]    = "b",
+    },
+    [04] = {
+        type   = ":",
+        start  = 10,
+        parent = 3,
+        finish = 13,
+    },
+    [05] = {
+        type   = "name",
+        start  = 10,
+        finish = 14,
+        parent = 4,
+        [1]    = "c",
+    },
+    [06] = {
+        type   = "name",
+        start  = 16,
+        finish = 16,
+        [1]    = "a",
+    },
+    [07] = {
+        type   = ",",
+        start  = 17,
+        finish = 17,
+    },
+    [08] = {
+        type   = "name",
+        start  = 19,
+        finish = 19,
+        [1]    = "b",
+    },
+    [09] = {
+        type   = ",",
+        start  = 20,
+        finish = 20,
+    },
+    [10] = {
+        type   = "name",
+        start  = 22,
+        finish = 22,
+        [1]    = "c",
+    },
+    [11] = {
+        type   = "funcargs",
+        start  = 15,
+        finish = 23,
+        [3]    = 10,
+        [2]    = 8,
+        [1]    = 6,
+    },
+    [12] = {
+        type   = "return",
+        start  = 29,
+        finish = 35,
+        exps   = {
+        },
+    },
+    [13] = {
+        type   = "function",
+        start  = 1,
+        name   = 5,
+        finish = 38,
+        args   = 11,
+        [1]    = 12,
+    },
 }
 do return end
 CHECK[[
