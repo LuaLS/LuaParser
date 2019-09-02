@@ -177,6 +177,15 @@ local function checkMissEnd(start)
     }
 end
 
+local function getValue(values, i)
+    if not values then
+        return nil, nil
+    end
+    local value = values[i]
+    local valueAst = getAst(value)
+    return value, valueAst
+end
+
 Exp = {
     {
         ['or'] = true,
@@ -921,19 +930,14 @@ local Defs = {
         return pushAst(args)
     end,
     Set = function (start, keys, values, finish)
-        local function getValue(i)
-            local value = values[i]
-            local valueAst = getAst(value)
-            return value
-        end
         for i, key in ipairs(keys) do
             local keyAst = getAst(key)
             if keyAst.type == 'getname' then
                 keyAst.type = 'setname'
-                keyAst.value = getValue(i)
+                keyAst.value = getValue(values, i)
             elseif keyAst.type == 'getfield' then
                 keyAst.type = 'setfield'
-                keyAst.value = getValue(i)
+                keyAst.value = getValue(values, i)
             end
         end
     end,
@@ -978,13 +982,20 @@ local Defs = {
         return name
     end,
     Local = function (start, keys, values, finish)
-        return pushAst {
-            type   = 'local',
-            start  = start,
-            finish = finish - 1,
-            keys   = keys,
-            values = values,
-        }
+        for i, key in ipairs(keys) do
+            local keyAst = getAst(key)
+            local value, valueAst = getValue(values, i)
+            local attrs = keyAst.attrs
+            keyAst.attrs = nil
+            pushAst {
+                type   = 'local',
+                start  = keyAst.start,
+                finish = keyAst.finish,
+                loc    = key,
+                value  = value,
+                attrs  = attrs
+            }
+        end
     end,
     Do = function (start, actions, finish)
         actions.type = 'do'

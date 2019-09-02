@@ -80,7 +80,6 @@ CHECK'x, y, z = 1, 2, 3'
         [1]    = 3,
     },
 }
-do return end
 CHECK'local x'
 {
     [1] = {
@@ -91,11 +90,9 @@ CHECK'local x'
     },
     [2] = {
         type   = "local",
-        start  = 1,
+        start  = 7,
         finish = 7,
-        keys   = {
-            [1] = 1,
-        },
+        loc    = 1,
     },
 }
 CHECK'local x, y, z'
@@ -120,13 +117,21 @@ CHECK'local x, y, z'
     },
     [4] = {
         type   = "local",
-        start  = 1,
+        start  = 7,
+        finish = 7,
+        loc    = 1,
+    },
+    [5] = {
+        type   = "local",
+        start  = 10,
+        finish = 10,
+        loc    = 2,
+    },
+    [6] = {
+        type   = "local",
+        start  = 13,
         finish = 13,
-        keys   = {
-            [1] = 1,
-            [2] = 2,
-            [3] = 3,
-        },
+        loc    = 3,
     },
 }
 CHECK'local x = 1'
@@ -145,14 +150,10 @@ CHECK'local x = 1'
     },
     [3] = {
         type   = "local",
-        start  = 1,
-        finish = 11,
-        keys   = {
-            [1] = 1,
-        },
-        values = {
-            [1] = 2,
-        },
+        start  = 7,
+        finish = 7,
+        loc    = 1,
+        value  = 2,
     },
 }
 CHECK'local x, y, z = 1, 2, 3'
@@ -195,18 +196,24 @@ CHECK'local x, y, z = 1, 2, 3'
     },
     [7] = {
         type   = "local",
-        start  = 1,
-        finish = 23,
-        keys   = {
-            [1] = 1,
-            [2] = 2,
-            [3] = 3,
-        },
-        values = {
-            [1] = 4,
-            [2] = 5,
-            [3] = 6,
-        },
+        start  = 7,
+        finish = 7,
+        loc    = 1,
+        value  = 4,
+    },
+    [8] = {
+        type   = "local",
+        start  = 10,
+        finish = 10,
+        loc    = 2,
+        value  = 5,
+    },
+    [9] = {
+        type   = "local",
+        start  = 13,
+        finish = 13,
+        loc    = 3,
+        value  = 6,
     },
 }
 CHECK'local x <close> <const> = 1'
@@ -216,10 +223,6 @@ CHECK'local x <close> <const> = 1'
         start  = 7,
         finish = 7,
         [1]    = "x",
-        attrs  = {
-            [1] = 2,
-            [2] = 3,
-        },
     },
     [2] = {
         type   = "localattr",
@@ -241,13 +244,13 @@ CHECK'local x <close> <const> = 1'
     },
     [5] = {
         type   = "local",
-        start  = 1,
-        finish = 27,
-        keys   = {
-            [1] = 1,
-        },
-        values = {
-            [1] = 4,
+        start  = 7,
+        finish = 7,
+        loc    = 1,
+        value  = 4,
+        attrs  = {
+            [1] = 2,
+            [2] = 3,
         },
     },
 }
@@ -258,9 +261,6 @@ CHECK'local x < const > = 1'
         start  = 7,
         finish = 7,
         [1]    = "x",
-        attrs  = {
-            [1] = 2,
-        },
     },
     [2] = {
         type   = "localattr",
@@ -276,13 +276,12 @@ CHECK'local x < const > = 1'
     },
     [4] = {
         type   = "local",
-        start  = 1,
-        finish = 21,
-        keys   = {
-            [1] = 1,
-        },
-        values = {
-            [1] = 3,
+        start  = 7,
+        finish = 7,
+        loc    = 1,
+        value  = 3,
+        attrs  = {
+            [1] = 2,
         },
     },
 }
@@ -293,9 +292,6 @@ CHECK'local x <const>, y <close> = 1'
         start  = 7,
         finish = 7,
         [1]    = "x",
-        attrs  = {
-            [1] = 2,
-        },
     },
     [2] = {
         type   = "localattr",
@@ -308,9 +304,6 @@ CHECK'local x <const>, y <close> = 1'
         start  = 18,
         finish = 18,
         [1]    = "y",
-        attrs  = {
-            [1] = 4,
-        },
     },
     [4] = {
         type   = "localattr",
@@ -326,17 +319,25 @@ CHECK'local x <const>, y <close> = 1'
     },
     [6] = {
         type   = "local",
-        start  = 1,
-        finish = 30,
-        keys   = {
-            [1] = 1,
-            [2] = 3,
+        start  = 7,
+        finish = 7,
+        loc    = 1,
+        value  = 5,
+        attrs  = {
+            [1] = 2,
         },
-        values = {
-            [1] = 5,
+    },
+    [7] = {
+        type   = "local",
+        start  = 18,
+        finish = 18,
+        loc    = 3,
+        attrs  = {
+            [1] = 4,
         },
     },
 }
+do return end
 CHECK'x = function () end'
 {
     [1] = {
