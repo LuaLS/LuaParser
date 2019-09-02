@@ -506,10 +506,8 @@ FunctionNamedBody
             <-  FUNCTION FuncName FuncArgs
                     {| (!END Action)* |}
                 NeedEnd
-FuncName    <-  {| MustName (DOT MustName)* FuncMethod? |}
-            ->  Simple
-FuncMethod  <-  COLON Name
-            /   COLON {} -> MissMethod
+FuncName    <-  Simple
+            ->  FuncName
 ]]
 
 grammar 'EmmyLua' (emmy.grammar)

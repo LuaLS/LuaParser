@@ -337,7 +337,6 @@ CHECK'local x <const>, y <close> = 1'
         },
     },
 }
-do return end
 CHECK'x = function () end'
 {
     [1] = {
@@ -347,26 +346,22 @@ CHECK'x = function () end'
         [1]    = "x",
     },
     [2] = {
+        type   = "setname",
+        start  = 1,
+        finish = 1,
+        name   = 1,
+        value  = 4,
+    },
+    [3] = {
         type   = "funcargs",
         start  = 14,
         finish = 15,
     },
-    [3] = {
+    [4] = {
         type   = "function",
         start  = 5,
         finish = 19,
-        args   = 2,
-    },
-    [4] = {
-        type   = "set",
-        start  = 1,
-        finish = 19,
-        keys   = {
-            [1] = 1,
-        },
-        values = {
-            [1] = 3,
-        },
+        args   = 3,
     },
 }
 CHECK'x.y = function () end'
@@ -389,12 +384,13 @@ CHECK'x.y = function () end'
         [1]    = "y",
     },
     [4] = {
-        type   = "getfield",
+        type   = "setfield",
         start  = 1,
         finish = 3,
         parent = 1,
-        field  = 3,
         dot    = 2,
+        field  = 3,
+        value  = 6,
     },
     [5] = {
         type   = "funcargs",
@@ -406,17 +402,6 @@ CHECK'x.y = function () end'
         start  = 7,
         finish = 21,
         args   = 5,
-    },
-    [7] = {
-        type   = "set",
-        start  = 1,
-        finish = 21,
-        keys   = {
-            [1] = 4,
-        },
-        values = {
-            [1] = 6,
-        },
     },
 }
 CHECK'func.x(1, 2)'
@@ -608,27 +593,22 @@ CHECK'do x = 1 end'
         [1]    = "x",
     },
     [2] = {
+        type   = "setname",
+        start  = 4,
+        finish = 4,
+        name   = 1,
+        value  = 3,
+    },
+    [3] = {
         type   = "number",
         start  = 8,
         finish = 8,
         [1]    = 1,
     },
-    [3] = {
-        type   = "set",
-        start  = 4,
-        finish = 8,
-        keys   = {
-            [1] = 1,
-        },
-        values = {
-            [1] = 2,
-        },
-    },
     [4] = {
         type   = "do",
         start  = 1,
         finish = 12,
-        [1]    = 3,
     },
 }
 CHECK'return'
@@ -1034,16 +1014,16 @@ end]]
     },
 }
 CHECK[[
-if a then
-elseif b then
+if 1 then
+elseif 1 then
 else
 end]]
 {
     [1] = {
-        type   = "name",
+        type   = "number",
         start  = 4,
         finish = 4,
-        [1]    = "a",
+        [1]    = 1,
     },
     [2] = {
         type   = "ifblock",
@@ -1052,10 +1032,10 @@ end]]
         filter = 1,
     },
     [3] = {
-        type   = "name",
+        type   = "number",
         start  = 18,
         finish = 18,
-        [1]    = "b",
+        [1]    = 1,
     },
     [4] = {
         type   = "elseifblock",
@@ -1113,12 +1093,18 @@ end]]
         },
     },
     [6] = {
+        type   = "local",
+        start  = 5,
+        finish = 5,
+        loc    = 1,
+        value  = 2,
+    },
+    [7] = {
         type   = "loop",
         start  = 1,
         finish = 31,
-        min    = 2,
+        loc    = 6,
         max    = 4,
-        arg    = 1,
         [1]    = 5,
     },
 }
@@ -1169,16 +1155,23 @@ end]]
         },
     },
     [8] = {
+        type   = "local",
+        start  = 5,
+        finish = 5,
+        loc    = 1,
+        value  = 2,
+    },
+    [9] = {
         type   = "loop",
         start  = 1,
         finish = 34,
-        arg    = 1,
-        min    = 2,
+        loc    = 8,
         max    = 4,
         step   = 6,
         [1]    = 7,
     },
 }
+do return end
 CHECK[[
 for a in a do
     return
@@ -1346,6 +1339,7 @@ until 1]]
         [1]    = false,
     },
 }
+do return end
 CHECK[[
 function test()
     return

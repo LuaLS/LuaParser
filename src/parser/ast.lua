@@ -186,6 +186,18 @@ local function getValue(values, i)
     return value, valueAst
 end
 
+local function createLocal(key, value, attrs)
+    local keyAst = getAst(key)
+    return pushAst {
+        type   = 'local',
+        start  = keyAst.start,
+        finish = keyAst.finish,
+        loc    = key,
+        value  = value,
+        attrs  = attrs
+    }
+end
+
 Exp = {
     {
         ['or'] = true,
@@ -770,14 +782,33 @@ local Defs = {
         checkMissEnd(start)
         return pushAst(actions)
     end,
+    FuncName = function (units)
+        local last = units[1]
+        for i = 2, #units do
+            local current  = getAst(units[i])
+            current.parent = last
+            current.start  = getAst(last).start
+            last = units[i]
+        end
+        return last
+    end,
     NamedFunction = function (start, name, args, actions, finish)
         actions.type   = 'function'
         actions.start  = start
         actions.finish = finish - 1
-        actions.name   = name
         actions.args   = args
         checkMissEnd(start)
-        return pushAst(actions)
+        local func = pushAst(actions)
+        local nameAst = getAst(name)
+        if nameAst.type == 'getname' then
+            nameAst.type = 'setname'
+            nameAst.value = func
+            return name
+        elseif nameAst.type == 'getfield' then
+            nameAst.type = 'setfield'
+            nameAst.value = func
+            return name
+        end
     end,
     LocalFunction = function (start, name, argStart, arg, argFinish, ...)
         local obj = {
@@ -984,17 +1015,10 @@ local Defs = {
     Local = function (start, keys, values, finish)
         for i, key in ipairs(keys) do
             local keyAst = getAst(key)
-            local value, valueAst = getValue(values, i)
             local attrs = keyAst.attrs
             keyAst.attrs = nil
-            pushAst {
-                type   = 'local',
-                start  = keyAst.start,
-                finish = keyAst.finish,
-                loc    = key,
-                value  = value,
-                attrs  = attrs
-            }
+            local value = getValue(values, i)
+            createLocal(key, value, attrs)
         end
     end,
     Do = function (start, actions, finish)
@@ -1110,11 +1134,11 @@ local Defs = {
         return pushAst(blocks)
     end,
     Loop = function (start, arg, steps, actions, finish)
+        local loc = createLocal(arg, steps[1])
         actions.type   = 'loop'
         actions.start  = start
         actions.finish = finish - 1
-        actions.arg    = arg
-        actions.min    = steps[1]
+        actions.loc    = loc
         actions.max    = steps[2]
         actions.step   = steps[3]
         checkMissEnd(start)
