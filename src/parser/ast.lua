@@ -404,6 +404,10 @@ local Defs = {
                 type = 'ERR_ESC',
                 start = pos-1,
                 finish = pos,
+                version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+                info = {
+                    version = State.Version,
+                }
             }
             return char
         end
@@ -418,6 +422,10 @@ local Defs = {
                 type = 'ERR_ESC',
                 start = pos-3,
                 finish = pos-2,
+                version = {'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+                info = {
+                    version = State.Version,
+                }
             }
             return char
         end
