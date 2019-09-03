@@ -814,15 +814,8 @@ local Defs = {
         checkMissEnd(start)
         return pushAst(actions)
     end,
-    FuncName = function (units)
-        local last = units[1]
-        for i = 2, #units do
-            local current  = getAst(units[i])
-            current.parent = last
-            current.start  = getAst(last).start
-            last = units[i]
-        end
-        return last
+    FuncName = function (name)
+        return name
     end,
     NamedFunction = function (start, name, args, actions, finish)
         actions.type   = 'function'
@@ -838,6 +831,10 @@ local Defs = {
             return name
         elseif nameAst.type == 'getfield' then
             nameAst.type = 'setfield'
+            nameAst.value = func
+            return name
+        elseif nameAst.type == 'getmethod' then
+            nameAst.type = 'setmethod'
             nameAst.value = func
             return name
         end
@@ -1097,12 +1094,10 @@ local Defs = {
         end
     end,
     Return = function (start, exps, finish)
-        return pushAst {
-            type   = 'return',
-            start  = start,
-            finish = finish - 1,
-            exps   = exps,
-        }
+        exps.type   = 'return'
+        exps.start  = start
+        exps.finish = finish - 1
+        return pushAst(exps)
     end,
     Label = function (start, name, finish)
         local nameAst = getAst(name)

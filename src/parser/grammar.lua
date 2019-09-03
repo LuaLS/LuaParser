@@ -314,7 +314,11 @@ Simple      <-  {| Prefix (Sp Suffix)+ |}
 Prefix      <-  Sp ({} PL DirtyExp DirtyPR {})
             ->  Prefix
             /   FreeName
-Suffix      <-  (DOT (Name / MissField))
+Suffix      <-  SuffixWithoutCall
+            /   ({} PL Sp ({} {| (COMMA / Exp)* |} {})->PackExpList DirtyPR {})
+            ->  Call
+SuffixWithoutCall
+            <-  (DOT (Name / MissField))
             ->  GetField
             /   ({} BL DirtyExp DirtyBR {})
             ->  GetIndex
@@ -323,8 +327,6 @@ Suffix      <-  (DOT (Name / MissField))
             /   ({} {| Table |} {})
             ->  Call
             /   ({} {| String |} {})
-            ->  Call
-            /   ({} PL Sp ({} {| (COMMA / Exp)* |} {})->PackExpList DirtyPR {})
             ->  Call
 NeedCall    <-  (!(Sp CallStart) {} -> MissPL)?
 MissField   <-  {} -> MissField
@@ -506,7 +508,11 @@ FunctionNamedBody
             <-  FUNCTION FuncName FuncArgs
                     {| (!END Action)* |}
                 NeedEnd
-FuncName    <-  Simple
+FuncName    <-  {| Prefix (Sp SuffixWithoutCall)+ |}
+            ->  Simple
+            ->  FuncName
+            /   Prefix
+            ->  Single
             ->  FuncName
 ]]
 
