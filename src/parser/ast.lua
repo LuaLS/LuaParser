@@ -224,9 +224,7 @@ local function createCall(args, start, finish)
     if not start then
         start = getAst(args[1]).start
     end
-    if finish then
-        finish = finish - 1
-    else
+    if not finish then
         finish = getAst(args[#args]).finish
     end
     args.type    = 'callargs'
@@ -771,7 +769,7 @@ local Defs = {
         return list
     end,
     Call = function (start, args, finish)
-        return createCall(args, start, finish)
+        return createCall(args, start, finish-1)
     end,
     COMMA = function (start)
         return pushAst {
@@ -1178,17 +1176,24 @@ local Defs = {
         checkMissEnd(start)
         return pushAst(actions)
     end,
-    In = function (start, arg, exp, actions, finish)
+    In = function (start, locs, exp, actions, finish)
         local func = table.remove(exp)
+        local funcAst = getAst(func)
         local call
         if #exp == 0 then
-            call = getSelect(func, '...')
+            call = createCall(exp, funcAst.start, funcAst.finish)
         else
             call = createCall(exp)
         end
+        getAst(call).parent = func
         actions.type   = 'in'
         actions.start  = start
         actions.finish = finish - 1
+        actions.locs = {}
+        local values = {call}
+        for i, loc in ipairs(locs) do
+            actions.locs[i] = createLocal(loc, getValue(values, i), nil)
+        end
         checkMissEnd(start)
         return pushAst(actions)
     end,

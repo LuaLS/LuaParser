@@ -1464,7 +1464,6 @@ end]]
         [1]    = 7,
     },
 }
-do return end
 CHECK[[
 for a in a do
     return
@@ -1483,26 +1482,52 @@ end]]
         [1]    = "a",
     },
     [3] = {
+        type   = "getname",
+        start  = 10,
+        finish = 10,
+        name   = 2,
+    },
+    [4] = {
         type   = "return",
         start  = 19,
         finish = 25,
         exps   = {
         },
     },
-    [4] = {
+    [5] = {
+        type   = "callargs",
+        start  = 10,
+        finish = 10,
+    },
+    [6] = {
+        type   = "call",
+        start  = 10,
+        finish = 10,
+        parent = 3,
+        args   = 5,
+    },
+    [7] = {
+        type   = "select",
+        vararg = 6,
+        index  = 1,
+    },
+    [8] = {
+        type   = "local",
+        start  = 5,
+        finish = 5,
+        loc    = 1,
+        value  = 7,
+    },
+    [9] = {
         type   = "in",
         start  = 1,
         finish = 28,
-        arg    = {
-            [1] = 1,
+        locs   = {
+            [1] = 8,
         },
-        exp    = {
-            [1] = 2,
-        },
-        [1]    = 3,
+        [1]    = 4,
     },
 }
-do return end
 CHECK[[
 for a, b, c in a, b, c do
     return
@@ -1543,49 +1568,112 @@ end]]
         [1]    = "a",
     },
     [07] = {
+        type   = "getname",
+        start  = 16,
+        finish = 16,
+        name   = 6,
+    },
+    [08] = {
         type   = ",",
         start  = 17,
         finish = 17,
     },
-    [08] = {
+    [09] = {
         type   = "name",
         start  = 19,
         finish = 19,
         [1]    = "b",
     },
-    [09] = {
+    [10] = {
+        type   = "getname",
+        start  = 19,
+        finish = 19,
+        name   = 9,
+    },
+    [11] = {
         type   = ",",
         start  = 20,
         finish = 20,
     },
-    [10] = {
+    [12] = {
         type   = "name",
         start  = 22,
         finish = 22,
         [1]    = "c",
     },
-    [11] = {
+    [13] = {
+        type   = "getname",
+        start  = 22,
+        finish = 22,
+        name   = 12,
+    },
+    [14] = {
         type   = "return",
         start  = 31,
         finish = 37,
         exps   = {
         },
     },
-    [12] = {
+    [15] = {
+        type   = "callargs",
+        start  = 16,
+        finish = 19,
+        [1]    = 7,
+        [2]    = 10,
+    },
+    [16] = {
+        type   = "call",
+        start  = 16,
+        finish = 19,
+        parent = 13,
+        args   = 15,
+    },
+    [17] = {
+        type   = "select",
+        vararg = 16,
+        index  = 1,
+    },
+    [18] = {
+        type   = "local",
+        start  = 5,
+        finish = 5,
+        loc    = 1,
+        value  = 17,
+    },
+    [19] = {
+        type   = "select",
+        vararg = 16,
+        index  = 2,
+    },
+    [20] = {
+        type   = "local",
+        start  = 8,
+        finish = 8,
+        loc    = 3,
+        value  = 19,
+    },
+    [21] = {
+        type   = "select",
+        vararg = 16,
+        index  = 3,
+    },
+    [22] = {
+        type   = "local",
+        start  = 11,
+        finish = 11,
+        loc    = 5,
+        value  = 21,
+    },
+    [23] = {
         type   = "in",
         start  = 1,
         finish = 40,
-        arg    = {
-            [1] = 1,
-            [2] = 3,
-            [3] = 5,
+        locs   = {
+            [1] = 18,
+            [2] = 20,
+            [3] = 22,
         },
-        exp    = {
-            [1] = 6,
-            [2] = 8,
-            [3] = 10,
-        },
-        [1]    = 11,
+        [1]    = 14,
     },
 }
 CHECK[[
