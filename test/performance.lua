@@ -50,8 +50,14 @@ local f = io.open [[test\perform\test.json]]
 local buf = f:read 'a'
 f:close()
 
-print('===========test lpeglabel-1.01====================')
-test(package.loadlib('bin/lpeglabel-1.01.dll', 'luaopen_lpeglabel')(), buf)
+print('===========test lpeglabel-1.0.1-DEBUG====================')
+test(package.loadlib('bin/lpeg-1.0.1-DEBUG.dll', 'luaopen_lpeg')(), buf)
 
-print('===========test lpeglabel-1.02====================')
-test(package.loadlib('bin/lpeglabel-1.02.dll', 'luaopen_lpeglabel')(), buf)
+print('===========test lpeglabel-1.0.2-DEBUG====================')
+test(package.loadlib('bin/lpeg-1.0.2-DEBUG.dll', 'luaopen_lpeg')(), buf)
+
+print('===========test lpeglabel-1.0.1-DEBUG====================')
+test(package.loadlib('bin/lpeg-1.0.1-NDEBUG.dll', 'luaopen_lpeg')(), buf)
+
+print('===========test lpeglabel-1.0.2-DEBUG====================')
+test(package.loadlib('bin/lpeg-1.0.2-NDEBUG.dll', 'luaopen_lpeg')(), buf)
