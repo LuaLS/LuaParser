@@ -814,9 +814,6 @@ local Defs = {
         checkMissEnd(start)
         return pushAst(actions)
     end,
-    FuncName = function (name)
-        return name
-    end,
     NamedFunction = function (start, name, args, actions, finish)
         actions.type   = 'function'
         actions.start  = start
@@ -839,33 +836,28 @@ local Defs = {
             return name
         end
     end,
-    LocalFunction = function (start, name, argStart, arg, argFinish, ...)
-        local obj = {
-            type      = 'localfunction',
-            start     = start,
-            name      = name,
-            arg       = arg,
-            argStart  = argStart - 1,
-            argFinish = argFinish,
-            ...
-        }
-        local max = #obj
-        obj.finish = obj[max] - 1
-        obj[max]   = nil
-        if obj.argFinish > obj.finish then
-            obj.argFinish = obj.finish
-        end
+    LocalFunction = function (start, name, args, actions, finish)
+        actions.type   = 'function'
+        actions.start  = start
+        actions.finish = finish - 1
+        actions.args   = args
+        checkMissEnd(start)
+        local func = pushAst(actions)
 
-        if name.type ~= 'name' then
+        local nameAst = getAst(name)
+        if nameAst.type ~= 'getname' then
             pushError {
                 type = 'UNEXPECT_LFUNC_NAME',
-                start = name.start,
-                finish = name.finish,
+                start = nameAst.start,
+                finish = nameAst.finish,
             }
+            return
         end
 
-        checkMissEnd(start)
-        return obj
+        nameAst.type = 'setname'
+        nameAst.value = func
+
+        return createLocal(nameAst.name), name
     end,
     Table = function (start, tbl, finish)
         tbl.type   = 'table'

@@ -510,10 +510,8 @@ FunctionNamedBody
                 NeedEnd
 FuncName    <-  {| Prefix (Sp SuffixWithoutCall)+ |}
             ->  Simple
-            ->  FuncName
             /   Prefix
             ->  Single
-            ->  FuncName
 ]]
 
 grammar 'EmmyLua' (emmy.grammar)

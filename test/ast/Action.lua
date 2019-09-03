@@ -1867,65 +1867,106 @@ end]]
         [1]    = 14,
     },
 }
-do return end
 CHECK[[
 local function a()
     return
 end]]
 {
-    type      = 'localfunction',
-    start     = 1,
-    finish    = 33,
-    argStart  = 17,
-    argFinish = 18,
-    name   = {
-        type   = 'name',
+    [1] = {
+        type   = "name",
         start  = 16,
         finish = 16,
-        [1]    = 'a',
+        [1]    = "a",
     },
-    [1]    = {
-        type   = 'return',
+    [2] = {
+        type   = "setname",
+        start  = 16,
+        finish = 16,
+        name   = 1,
+        value  = 5,
+    },
+    [3] = {
+        type   = "funcargs",
+        start  = 17,
+        finish = 18,
+    },
+    [4] = {
+        type   = "return",
         start  = 24,
-        finish = 29,
-    }
+        finish = 30,
+    },
+    [5] = {
+        type   = "function",
+        start  = 1,
+        finish = 33,
+        args   = 3,
+        [1]    = 4,
+    },
+    [6] = {
+        type   = "local",
+        start  = 16,
+        finish = 16,
+        loc    = 1,
+    },
 }
 CHECK[[
 local function a(b, c)
     return
 end]]
 {
-    type      = 'localfunction',
-    start     = 1,
-    finish    = 37,
-    argStart  = 17,
-    argFinish = 22,
-    name   = {
-        type   = 'name',
+    [1] = {
+        type   = "name",
         start  = 16,
         finish = 16,
-        [1]    = 'a',
+        [1]    = "a",
     },
-    arg    = {
-        type   = 'list',
+    [2] = {
+        type   = "setname",
+        start  = 16,
+        finish = 16,
+        name   = 1,
+        value  = 8,
+    },
+    [3] = {
+        type   = "name",
         start  = 18,
-        finish = 21,
-        [1]  = {
-            type   = 'name',
-            start  = 18,
-            finish = 18,
-            [1]    = 'b',
-        },
-        [2]  = {
-            type   = 'name',
-            start  = 21,
-            finish = 21,
-            [1]    = 'c',
-        },
+        finish = 18,
+        [1]    = "b",
     },
-    [1]    = {
-        type = 'return',
+    [4] = {
+        type   = ",",
+        start  = 19,
+        finish = 19,
+    },
+    [5] = {
+        type   = "name",
+        start  = 21,
+        finish = 21,
+        [1]    = "c",
+    },
+    [6] = {
+        type   = "funcargs",
+        start  = 17,
+        finish = 22,
+        [1]    = 3,
+        [2]    = 5,
+    },
+    [7] = {
+        type   = "return",
         start  = 28,
-        finish = 33,
-    }
+        finish = 34,
+    },
+    [8] = {
+        type   = "function",
+        start  = 1,
+        finish = 37,
+        args   = 6,
+        [1]    = 7,
+    },
+    [9] = {
+        type   = "local",
+        start  = 16,
+        finish = 16,
+        loc    = 1,
+    },
 }
