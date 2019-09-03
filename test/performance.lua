@@ -50,6 +50,8 @@ local f = io.open [[test\perform\test.json]]
 local buf = f:read 'a'
 f:close()
 
+collectgarbage 'stop'
+
 print('===========test lpeg-1.0.1-DEBUG====================')
 test(package.loadlib('bin/lpeg-1.0.1-DEBUG.dll', 'luaopen_lpeg')(), buf)
 
