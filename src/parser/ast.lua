@@ -657,15 +657,12 @@ local Defs = {
     end,
     Single = function (unit)
         local unitAst = getAst(unit)
-        if unitAst.type == 'name' then
-            return pushAst {
-                type   = 'getname',
-                start  = unitAst.start,
-                finish = unitAst.finish,
-                name   = unit,
-            }
-        end
-        return unit
+        return pushAst {
+            type   = 'getname',
+            start  = unitAst.start,
+            finish = unitAst.finish,
+            name   = unit,
+        }
     end,
     Simple = function (units)
         local last = units[1]

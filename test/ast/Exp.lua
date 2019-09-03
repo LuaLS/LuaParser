@@ -24,157 +24,181 @@ CHECK'a'
 CHECK'a.b'
 {
     [1] = {
-        type   = 'name',
+        type   = "name",
         start  = 1,
         finish = 1,
-        [1]    = 'a',
+        [1]    = "a",
     },
     [2] = {
-        type   = '.',
+        type   = "getname",
+        start  = 1,
+        finish = 1,
+        name   = 1,
+    },
+    [3] = {
+        type   = ".",
         start  = 2,
         finish = 2,
     },
-    [3] = {
-        type   = 'name',
+    [4] = {
+        type   = "name",
         start  = 3,
         finish = 3,
-        [1]    = 'b',
+        [1]    = "b",
     },
-    [4] = {
-        type   = 'getfield',
+    [5] = {
+        type   = "getfield",
         start  = 1,
         finish = 3,
-        parent = 1,
-        dot    = 2,
-        field  = 3,
-    }
+        parent = 2,
+        dot    = 3,
+        field  = 4,
+    },
 }
 CHECK'a.b.c'
 {
     [1] = {
-        type   = 'name',
+        type   = "name",
         start  = 1,
         finish = 1,
-        [1]    = 'a',
+        [1]    = "a",
     },
     [2] = {
-        type   = '.',
+        type   = "getname",
+        start  = 1,
+        finish = 1,
+        name   = 1,
+    },
+    [3] = {
+        type   = ".",
         start  = 2,
         finish = 2,
     },
-    [3] = {
-        type   = 'name',
+    [4] = {
+        type   = "name",
         start  = 3,
         finish = 3,
-        [1]    = 'b',
-    },
-    [4] = {
-        type   = 'getfield',
-        start  = 1,
-        finish = 3,
-        parent = 1,
-        dot    = 2,
-        field  = 3,
+        [1]    = "b",
     },
     [5] = {
-        type   = '.',
+        type   = "getfield",
+        start  = 1,
+        finish = 3,
+        parent = 2,
+        dot    = 3,
+        field  = 4,
+    },
+    [6] = {
+        type   = ".",
         start  = 4,
         finish = 4,
     },
-    [6] = {
-        type   = 'name',
+    [7] = {
+        type   = "name",
         start  = 5,
         finish = 5,
-        [1]    = 'c',
+        [1]    = "c",
     },
-    [7] = {
-        type   = 'getfield',
+    [8] = {
+        type   = "getfield",
         start  = 1,
         finish = 5,
-        parent = 4,
-        dot    = 5,
-        field  = 6,
-    }
+        parent = 5,
+        dot    = 6,
+        field  = 7,
+    },
 }
 CHECK'func()'
 {
     [1] = {
-        type   = 'name',
+        type   = "name",
         start  = 1,
         finish = 4,
-        [1]    = 'func',
+        [1]    = "func",
     },
     [2] = {
-        type   = 'callargs',
+        type   = "getname",
+        start  = 1,
+        finish = 4,
+        name   = 1,
+    },
+    [3] = {
+        type   = "callargs",
         start  = 5,
         finish = 6,
     },
-    [3] = {
-        type   = 'call',
+    [4] = {
+        type   = "call",
         start  = 1,
         finish = 6,
-        parent = 1,
-        args   = 2,
+        parent = 2,
+        args   = 3,
     },
 }
 CHECK'a.b.c()'
 {
-    [1] = {
-        type   = 'name',
+    [01] = {
+        type   = "name",
         start  = 1,
         finish = 1,
-        [1]    = 'a',
+        [1]    = "a",
     },
-    [2] = {
-        type   = '.',
+    [02] = {
+        type   = "getname",
+        start  = 1,
+        finish = 1,
+        name   = 1,
+    },
+    [03] = {
+        type   = ".",
         start  = 2,
         finish = 2,
     },
-    [3] = {
-        type   = 'name',
+    [04] = {
+        type   = "name",
         start  = 3,
         finish = 3,
-        [1]    = 'b',
+        [1]    = "b",
     },
-    [4] = {
-        type   = 'getfield',
+    [05] = {
+        type   = "getfield",
         start  = 1,
         finish = 3,
-        parent = 1,
-        dot    = 2,
-        field  = 3,
+        parent = 2,
+        dot    = 3,
+        field  = 4,
     },
-    [5] = {
-        type   = '.',
+    [06] = {
+        type   = ".",
         start  = 4,
         finish = 4,
     },
-    [6] = {
-        type   = 'name',
+    [07] = {
+        type   = "name",
         start  = 5,
         finish = 5,
-        [1]    = 'c',
+        [1]    = "c",
     },
-    [7] = {
-        type   = 'getfield',
+    [08] = {
+        type   = "getfield",
         start  = 1,
         finish = 5,
-        parent = 4,
-        dot    = 5,
-        field  = 6,
+        parent = 5,
+        dot    = 6,
+        field  = 7,
     },
-    [8] = {
-        type   = 'callargs',
+    [09] = {
+        type   = "callargs",
         start  = 6,
         finish = 7,
     },
-    [9] = {
-        type   = 'call',
-        parent = 7,
+    [10] = {
+        type   = "call",
         start  = 1,
         finish = 7,
-        args   = 8,
-    }
+        parent = 8,
+        args   = 9,
+    },
 }
 CHECK'1 or 2'
 {
@@ -1267,27 +1291,6 @@ CHECK'(1 + 2)'
         exp    = 4,
     },
 }
-CHECK'func()'
-{
-    [1] = {
-        type   = "name",
-        start  = 1,
-        finish = 4,
-        [1]    = "func",
-    },
-    [2] = {
-        type   = "callargs",
-        start  = 5,
-        finish = 6,
-    },
-    [3] = {
-        type   = "call",
-        start  = 1,
-        finish = 6,
-        parent = 1,
-        args   = 2,
-    },
-}
 CHECK'func(1)'
 {
     [1] = {
@@ -1297,63 +1300,75 @@ CHECK'func(1)'
         [1]    = "func",
     },
     [2] = {
+        type   = "getname",
+        start  = 1,
+        finish = 4,
+        name   = 1,
+    },
+    [3] = {
         type   = "number",
         start  = 6,
         finish = 6,
         [1]    = 1,
     },
-    [3] = {
+    [4] = {
         type   = "callargs",
         start  = 5,
         finish = 7,
-        [1]    = 2,
+        [1]    = 3,
     },
-    [4] = {
+    [5] = {
         type   = "call",
         start  = 1,
         finish = 7,
-        parent = 1,
-        args   = 3,
+        parent = 2,
+        args   = 4,
     },
 }
 CHECK'func(1, 2)'
 {
     [1] = {
-        type = "name",
-        start = 1,
+        type   = "name",
+        start  = 1,
         finish = 4,
-        [1] = "func",
+        [1]    = "func",
     },
     [2] = {
+        type   = "getname",
+        start  = 1,
+        finish = 4,
+        name   = 1,
+    },
+    [3] = {
         type   = "number",
         start  = 6,
         finish = 6,
         [1]    = 1,
     },
-    [3] = {
+    [4] = {
         type   = ",",
         start  = 7,
         finish = 7,
     },
-    [4] = {
+    [5] = {
         type   = "number",
         start  = 9,
         finish = 9,
         [1]    = 2,
     },
-    [5] = {
+    [6] = {
         type   = "callargs",
         start  = 5,
         finish = 10,
-        [1]    = 2,
-        [2]    = 4,
+        [1]    = 3,
+        [2]    = 5,
     },
-    [6] = {
+    [7] = {
         type   = "call",
         start  = 1,
         finish = 10,
-        parent = 1,
-        args   = 5,
+        parent = 2,
+        args   = 6,
     },
 }
 CHECK'func(...)'
@@ -1365,22 +1380,28 @@ CHECK'func(...)'
         [1]    = "func",
     },
     [2] = {
+        type   = "getname",
+        start  = 1,
+        finish = 4,
+        name   = 1,
+    },
+    [3] = {
         type   = "...",
         start  = 6,
         finish = 8,
     },
-    [3] = {
+    [4] = {
         type   = "callargs",
         start  = 5,
         finish = 9,
-        [1]    = 2,
+        [1]    = 3,
     },
-    [4] = {
+    [5] = {
         type   = "call",
         start  = 1,
         finish = 9,
-        parent = 1,
-        args   = 3,
+        parent = 2,
+        args   = 4,
     },
 }
 CHECK'func(1, ...)'
@@ -1392,34 +1413,40 @@ CHECK'func(1, ...)'
         [1]    = "func",
     },
     [2] = {
+        type   = "getname",
+        start  = 1,
+        finish = 4,
+        name   = 1,
+    },
+    [3] = {
         type   = "number",
         start  = 6,
         finish = 6,
         [1]    = 1,
     },
-    [3] = {
+    [4] = {
         type   = ",",
         start  = 7,
         finish = 7,
     },
-    [4] = {
+    [5] = {
         type   = "...",
         start  = 9,
         finish = 11,
     },
-    [5] = {
+    [6] = {
         type   = "callargs",
         start  = 5,
         finish = 12,
-        [1]    = 2,
-        [2]    = 4,
+        [1]    = 3,
+        [2]    = 5,
     },
-    [6] = {
+    [7] = {
         type   = "call",
         start  = 1,
         finish = 12,
-        parent = 1,
-        args   = 5,
+        parent = 2,
+        args   = 6,
     },
 }
 CHECK'func ""'
@@ -1431,24 +1458,30 @@ CHECK'func ""'
         [1]    = "func",
     },
     [2] = {
+        type   = "getname",
+        start  = 1,
+        finish = 4,
+        name   = 1,
+    },
+    [3] = {
         type   = "string",
         start  = 6,
         finish = 7,
         [1]    = "",
         [2]    = "\"",
     },
-    [3] = {
+    [4] = {
         type   = "callargs",
         start  = 6,
         finish = 7,
-        [1]    = 2,
+        [1]    = 3,
     },
-    [4] = {
+    [5] = {
         type   = "call",
         start  = 1,
-        parent = 1,
         finish = 7,
-        args   = 3,
+        parent = 2,
+        args   = 4,
     },
 }
 CHECK'func {}'
@@ -1460,22 +1493,28 @@ CHECK'func {}'
         [1]    = "func",
     },
     [2] = {
+        type   = "getname",
+        start  = 1,
+        finish = 4,
+        name   = 1,
+    },
+    [3] = {
         type   = "table",
         start  = 6,
         finish = 7,
     },
-    [3] = {
+    [4] = {
         type   = "callargs",
         start  = 6,
         finish = 7,
-        [1]    = 2,
+        [1]    = 3,
     },
-    [4] = {
+    [5] = {
         type   = "call",
         start  = 1,
-        parent = 1,
         finish = 7,
-        args   = 3,
+        parent = 2,
+        args   = 4,
     },
 }
 CHECK'table[1]'
@@ -1487,17 +1526,23 @@ CHECK'table[1]'
         [1]    = "table",
     },
     [2] = {
+        type   = "getname",
+        start  = 1,
+        finish = 5,
+        name   = 1,
+    },
+    [3] = {
         type   = "number",
         start  = 7,
         finish = 7,
         [1]    = 1,
     },
-    [3] = {
+    [4] = {
         type   = "getindex",
         start  = 1,
         finish = 8,
-        parent = 1,
-        index  = 2,
+        parent = 2,
+        index  = 3,
     },
 }
 CHECK'get_point().x'
@@ -1509,35 +1554,41 @@ CHECK'get_point().x'
         [1]    = "get_point",
     },
     [2] = {
+        type   = "getname",
+        start  = 1,
+        finish = 9,
+        name   = 1,
+    },
+    [3] = {
         type   = "callargs",
         start  = 10,
         finish = 11,
     },
-    [3] = {
+    [4] = {
         type   = "call",
         start  = 1,
         finish = 11,
-        parent = 1,
-        args   = 2,
+        parent = 2,
+        args   = 3,
     },
-    [4] = {
+    [5] = {
         type   = ".",
         start  = 12,
         finish = 12,
     },
-    [5] = {
+    [6] = {
         type   = "name",
         start  = 13,
         finish = 13,
         [1]    = "x",
     },
-    [6] = {
+    [7] = {
         type   = "getfield",
         start  = 1,
         finish = 13,
-        dot    = 4,
-        parent = 3,
-        field  = 5,
+        parent = 4,
+        dot    = 5,
+        field  = 6,
     },
 }
 CHECK'obj:remove()'
@@ -1549,35 +1600,41 @@ CHECK'obj:remove()'
         [1]    = "obj",
     },
     [2] = {
+        type   = "getname",
+        start  = 1,
+        finish = 3,
+        name   = 1,
+    },
+    [3] = {
         type   = ":",
         start  = 4,
         finish = 4,
     },
-    [3] = {
+    [4] = {
         type   = "name",
         start  = 5,
         finish = 10,
         [1]    = "remove",
     },
-    [4] = {
+    [5] = {
         type   = "getmethod",
         start  = 1,
         finish = 10,
-        parent = 1,
-        colon  = 2,
-        method = 3,
+        parent = 2,
+        colon  = 3,
+        method = 4,
     },
-    [5] = {
+    [6] = {
         type   = "callargs",
         start  = 11,
         finish = 12,
     },
-    [6] = {
+    [7] = {
         type   = "call",
         start  = 1,
         finish = 12,
-        parent = 4,
-        args   = 5,
+        parent = 5,
+        args   = 6,
     },
 }
 CHECK'(...)[1]'

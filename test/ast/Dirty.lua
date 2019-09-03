@@ -7,20 +7,26 @@ CHECK'a.'
         [1]    = "a",
     },
     [2] = {
+        type   = "getname",
+        start  = 1,
+        finish = 1,
+        name   = 1,
+    },
+    [3] = {
         type   = ".",
         start  = 2,
         finish = 2,
     },
-    [3] = {
+    [4] = {
         type   = "getfield",
         start  = 1,
         finish = 2,
-        parent = 1,
-        dot    = 2,
+        parent = 2,
+        dot    = 3,
     },
-    [4] = {
+    [5] = {
         type = "main",
-        [1]  = 3,
+        [1]  = 4,
     },
 }
 
@@ -33,20 +39,26 @@ CHECK'a:'
         [1]    = "a",
     },
     [2] = {
+        type   = "getname",
+        start  = 1,
+        finish = 1,
+        name   = 1,
+    },
+    [3] = {
         type   = ":",
         start  = 2,
         finish = 2,
     },
-    [3] = {
+    [4] = {
         type   = "getmethod",
         start  = 1,
         finish = 2,
-        parent = 1,
-        colon  = 2,
+        parent = 2,
+        colon  = 3,
     },
-    [4] = {
+    [5] = {
         type = "main",
-        [1]  = 3,
+        [1]  = 4,
     },
 }
 
@@ -311,26 +323,32 @@ CHECK 'function a:'
         [1]    = "a",
     },
     [2] = {
+        type   = "getname",
+        start  = 10,
+        finish = 10,
+        name   = 1,
+    },
+    [3] = {
         type   = ":",
         start  = 11,
         finish = 11,
     },
-    [3] = {
+    [4] = {
         type   = "setmethod",
         start  = 10,
         finish = 11,
-        parent = 1,
-        colon  = 2,
-        value  = 4,
+        parent = 2,
+        colon  = 3,
+        value  = 5,
     },
-    [4] = {
+    [5] = {
         type   = "function",
         start  = 1,
         finish = 11,
     },
-    [5] = {
+    [6] = {
         type = "main",
-        [1]  = 3,
+        [1]  = 4,
     },
 }
 do return end

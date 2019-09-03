@@ -310,10 +310,10 @@ ExpUnit     <-  Nil
 Simple      <-  {| Prefix (Sp Suffix)+ |}
             ->  Simple
             /   Prefix
-            ->  Single
 Prefix      <-  Sp ({} PL DirtyExp DirtyPR {})
             ->  Prefix
             /   FreeName
+            ->  Single
 Suffix      <-  SuffixWithoutCall
             /   ({} PL Sp ({} {| (COMMA / Exp)* |} {})->PackExpList DirtyPR {})
             ->  Call
@@ -510,7 +510,6 @@ FunctionNamedBody
 FuncName    <-  {| Prefix (Sp SuffixWithoutCall)+ |}
             ->  Simple
             /   Prefix
-            ->  Single
 ]]
 
 grammar 'EmmyLua' (emmy.grammar)

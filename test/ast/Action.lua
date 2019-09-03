@@ -218,59 +218,65 @@ CHECK'local x, y, z = 1, 2, 3'
 }
 CHECK'local x, y = f()'
 {
-    [1] = {
+    [01] = {
         type   = "name",
         start  = 7,
         finish = 7,
         [1]    = "x",
     },
-    [2] = {
+    [02] = {
         type   = "name",
         start  = 10,
         finish = 10,
         [1]    = "y",
     },
-    [3] = {
+    [03] = {
         type   = "name",
         start  = 14,
         finish = 14,
         [1]    = "f",
     },
-    [4] = {
+    [04] = {
+        type   = "getname",
+        start  = 14,
+        finish = 14,
+        name   = 3,
+    },
+    [05] = {
         type   = "callargs",
         start  = 15,
         finish = 16,
     },
-    [5] = {
+    [06] = {
         type   = "call",
         start  = 14,
         finish = 16,
-        parent = 3,
-        args   = 4,
+        parent = 4,
+        args   = 5,
     },
-    [6] = {
+    [07] = {
         type   = "select",
-        vararg = 5,
+        vararg = 6,
         index  = 1,
     },
-    [7] = {
+    [08] = {
         type   = "local",
         start  = 7,
         finish = 7,
         loc    = 1,
-        value  = 6,
+        value  = 7,
     },
-    [8] = {
+    [09] = {
         type   = "select",
-        vararg = 5,
+        vararg = 6,
         index  = 2,
     },
-    [9] = {
+    [10] = {
         type   = "local",
         start  = 10,
         finish = 10,
         loc    = 2,
-        value  = 8,
+        value  = 9,
     },
 }
 CHECK'local x, y = (f())'
@@ -294,78 +300,28 @@ CHECK'local x, y = (f())'
         [1]    = "f",
     },
     [4] = {
+        type   = "getname",
+        start  = 15,
+        finish = 15,
+        name   = 3,
+    },
+    [5] = {
         type   = "callargs",
         start  = 16,
         finish = 17,
     },
-    [5] = {
+    [6] = {
         type   = "call",
         start  = 15,
         finish = 17,
-        parent = 3,
-        args   = 4,
+        parent = 4,
+        args   = 5,
     },
-    [6] = {
+    [7] = {
         type   = "paren",
         start  = 14,
         finish = 18,
-        exp    = 5,
-    },
-    [7] = {
-        type   = "local",
-        start  = 7,
-        finish = 7,
-        loc    = 1,
-        value  = 6,
-    },
-    [8] = {
-        type   = "local",
-        start  = 10,
-        finish = 10,
-        loc    = 2,
-    },
-}
-CHECK'local x, y = f(), nil'
-{
-    [1] = {
-        type   = "name",
-        start  = 7,
-        finish = 7,
-        [1]    = "x",
-    },
-    [2] = {
-        type   = "name",
-        start  = 10,
-        finish = 10,
-        [1]    = "y",
-    },
-    [3] = {
-        type   = "name",
-        start  = 14,
-        finish = 14,
-        [1]    = "f",
-    },
-    [4] = {
-        type   = "callargs",
-        start  = 15,
-        finish = 16,
-    },
-    [5] = {
-        type   = "call",
-        start  = 14,
-        finish = 16,
-        parent = 3,
-        args   = 4,
-    },
-    [6] = {
-        type   = "nil",
-        start  = 19,
-        finish = 21,
-    },
-    [7] = {
-        vararg = 5,
-        type   = "select",
-        index  = 1,
+        exp    = 6,
     },
     [8] = {
         type   = "local",
@@ -379,7 +335,69 @@ CHECK'local x, y = f(), nil'
         start  = 10,
         finish = 10,
         loc    = 2,
-        value  = 6,
+    },
+}
+CHECK'local x, y = f(), nil'
+{
+    [01] = {
+        type   = "name",
+        start  = 7,
+        finish = 7,
+        [1]    = "x",
+    },
+    [02] = {
+        type   = "name",
+        start  = 10,
+        finish = 10,
+        [1]    = "y",
+    },
+    [03] = {
+        type   = "name",
+        start  = 14,
+        finish = 14,
+        [1]    = "f",
+    },
+    [04] = {
+        type   = "getname",
+        start  = 14,
+        finish = 14,
+        name   = 3,
+    },
+    [05] = {
+        type   = "callargs",
+        start  = 15,
+        finish = 16,
+    },
+    [06] = {
+        type   = "call",
+        start  = 14,
+        finish = 16,
+        parent = 4,
+        args   = 5,
+    },
+    [07] = {
+        type   = "nil",
+        start  = 19,
+        finish = 21,
+    },
+    [08] = {
+        type   = "select",
+        vararg = 6,
+        index  = 1,
+    },
+    [09] = {
+        type   = "local",
+        start  = 7,
+        finish = 7,
+        loc    = 1,
+        value  = 8,
+    },
+    [10] = {
+        type   = "local",
+        start  = 10,
+        finish = 10,
+        loc    = 2,
+        value  = 7,
     },
 }
 CHECK'local x, y = ...'
@@ -666,153 +684,171 @@ CHECK'x.y = function () end'
         [1]    = "x",
     },
     [2] = {
+        type   = "getname",
+        start  = 1,
+        finish = 1,
+        name   = 1,
+    },
+    [3] = {
         type   = ".",
         start  = 2,
         finish = 2,
     },
-    [3] = {
+    [4] = {
         type   = "name",
         start  = 3,
         finish = 3,
         [1]    = "y",
     },
-    [4] = {
+    [5] = {
         type   = "setfield",
         start  = 1,
         finish = 3,
-        parent = 1,
-        dot    = 2,
-        field  = 3,
-        value  = 6,
+        parent = 2,
+        dot    = 3,
+        field  = 4,
+        value  = 7,
     },
-    [5] = {
+    [6] = {
         type   = "funcargs",
         start  = 16,
         finish = 17,
     },
-    [6] = {
+    [7] = {
         type   = "function",
         start  = 7,
         finish = 21,
-        args   = 5,
+        args   = 6,
     },
 }
 CHECK'func.x(1, 2)'
 {
-    [1] = {
+    [01] = {
         type   = "name",
         start  = 1,
         finish = 4,
         [1]    = "func",
     },
-    [2] = {
+    [02] = {
+        type   = "getname",
+        start  = 1,
+        finish = 4,
+        name   = 1,
+    },
+    [03] = {
         type   = ".",
         start  = 5,
         finish = 5,
     },
-    [3] = {
+    [04] = {
         type   = "name",
         start  = 6,
         finish = 6,
         [1]    = "x",
     },
-    [4] = {
+    [05] = {
         type   = "getfield",
         start  = 1,
         finish = 6,
-        parent = 1,
-        dot    = 2,
-        field  = 3,
+        parent = 2,
+        dot    = 3,
+        field  = 4,
     },
-    [5] = {
+    [06] = {
         type   = "number",
         start  = 8,
         finish = 8,
         [1]    = 1,
     },
-    [6] = {
+    [07] = {
         type   = ",",
         start  = 9,
         finish = 9,
     },
-    [7] = {
+    [08] = {
         type   = "number",
         start  = 11,
         finish = 11,
         [1]    = 2,
     },
-    [8] = {
+    [09] = {
         type   = "callargs",
         start  = 7,
         finish = 12,
-        [1]    = 5,
-        [2]    = 7,
+        [1]    = 6,
+        [2]    = 8,
     },
-    [9] = {
+    [10] = {
         type   = "call",
         start  = 1,
         finish = 12,
-        parent = 4,
-        args   = 8,
+        parent = 5,
+        args   = 9,
     },
 }
 CHECK'func:x(1, 2)'
 {
-    [1] = {
+    [01] = {
         type   = "name",
         start  = 1,
         finish = 4,
         [1]    = "func",
     },
-    [2] = {
+    [02] = {
+        type   = "getname",
+        start  = 1,
+        finish = 4,
+        name   = 1,
+    },
+    [03] = {
         type   = ":",
         start  = 5,
         finish = 5,
     },
-    [3] = {
+    [04] = {
         type   = "name",
         start  = 6,
         finish = 6,
         [1]    = "x",
     },
-    [4] = {
+    [05] = {
         type   = "getmethod",
         start  = 1,
         finish = 6,
-        parent = 1,
-        colon  = 2,
-        method = 3,
+        parent = 2,
+        colon  = 3,
+        method = 4,
     },
-    [5] = {
+    [06] = {
         type   = "number",
         start  = 8,
         finish = 8,
         [1]    = 1,
     },
-    [6] = {
+    [07] = {
         type   = ",",
         start  = 9,
         finish = 9,
     },
-    [7] = {
+    [08] = {
         type   = "number",
         start  = 11,
         finish = 11,
         [1]    = 2,
     },
-    [8] = {
+    [09] = {
         type   = "callargs",
         start  = 7,
         finish = 12,
-        [2]    = 7,
-        [1]    = 5,
+        [1]    = 6,
+        [2]    = 8,
     },
-    [9] = {
+    [10] = {
         type   = "call",
         start  = 1,
         finish = 12,
-        parent = 4,
-        args   = 8,
+        parent = 5,
+        args   = 9,
     },
 }
 CHECK'("%s"):format(1)'
@@ -1676,24 +1712,24 @@ repeat
     break
 until 1]]
 {
-	[1] = {
-		type   = "break",
-		start  = 12,
-		finish = 17,
-	},
-	[2] = {
-		type   = "number",
-		start  = 24,
-		finish = 24,
-		[1]    = 1,
-	},
-	[3] = {
-		type   = "repeat",
-		start  = 1,
-		finish = 25,
-		filter = 2,
-		[1]    = 1,
-	},
+    [1] = {
+        type   = "break",
+        start  = 12,
+        finish = 17,
+    },
+    [2] = {
+        type   = "number",
+        start  = 24,
+        finish = 24,
+        [1]    = 1,
+    },
+    [3] = {
+        type   = "repeat",
+        start  = 1,
+        finish = 25,
+        filter = 2,
+        [1]    = 1,
+    },
 }
 CHECK[[
 function test()
@@ -1786,91 +1822,97 @@ end]]
         [1]    = "a",
     },
     [02] = {
+        type   = "getname",
+        start  = 10,
+        finish = 10,
+        name   = 1,
+    },
+    [03] = {
         type   = ".",
         start  = 11,
         finish = 11,
     },
-    [03] = {
+    [04] = {
         type   = "name",
         start  = 12,
         finish = 12,
         [1]    = "b",
     },
-    [04] = {
+    [05] = {
         type   = "getfield",
         start  = 10,
         finish = 12,
-        parent = 1,
-        dot    = 2,
-        field  = 3,
+        parent = 2,
+        dot    = 3,
+        field  = 4,
     },
-    [05] = {
+    [06] = {
         type   = ":",
         start  = 13,
         finish = 13,
     },
-    [06] = {
+    [07] = {
         type   = "name",
         start  = 14,
         finish = 14,
         [1]    = "c",
     },
-    [07] = {
+    [08] = {
         type   = "setmethod",
         start  = 10,
         finish = 14,
-        parent = 4,
-        colon  = 5,
-        method = 6,
-        value  = 15,
+        parent = 5,
+        colon  = 6,
+        method = 7,
+        value  = 16,
     },
-    [08] = {
+    [09] = {
         type   = "name",
         start  = 16,
         finish = 16,
         [1]    = "a",
     },
-    [09] = {
+    [10] = {
         type   = ",",
         start  = 17,
         finish = 17,
     },
-    [10] = {
+    [11] = {
         type   = "name",
         start  = 19,
         finish = 19,
         [1]    = "b",
     },
-    [11] = {
+    [12] = {
         type   = ",",
         start  = 20,
         finish = 20,
     },
-    [12] = {
+    [13] = {
         type   = "name",
         start  = 22,
         finish = 22,
         [1]    = "c",
     },
-    [13] = {
+    [14] = {
         type   = "funcargs",
         start  = 15,
         finish = 23,
-        [1]    = 8,
-        [2]    = 10,
-        [3]    = 12,
+        [1]    = 9,
+        [2]    = 11,
+        [3]    = 13,
     },
-    [14] = {
+    [15] = {
         type   = "return",
         start  = 29,
         finish = 35,
     },
-    [15] = {
+    [16] = {
         type   = "function",
         start  = 1,
         finish = 38,
-        args   = 13,
-        [1]    = 14,
+        args   = 14,
+        [1]    = 15,
     },
 }
 CHECK[[
