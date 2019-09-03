@@ -351,78 +351,114 @@ CHECK 'function a:'
         [1]  = 4,
     },
 }
-do return end
+
 CHECK 'function a:b(v'
 {
     [1] = {
-        type      = 'function',
-        start     = 1,
-        finish    = 14,
-        argStart  = 13,
-        argFinish = 14,
-        name      = {
-            type   = 'simple',
-            start  = 10,
-            finish = 12,
-            [1]    = {
-                type   = 'name',
-                start  = 10,
-                finish = 10,
-                [1]    = 'a',
-            },
-            [2]    = {
-                type   = ':',
-                start  = 11,
-                finish = 11,
-            },
-            [3]    = {
-                type   = 'name',
-                start  = 12,
-                finish = 12,
-                [1]    = 'b',
-            },
-        },
-        arg   = {
-            type   = 'name',
-            start  = 14,
-            finish = 14,
-            [1]    = 'v'
-        },
-    }
+        type   = "name",
+        start  = 10,
+        finish = 10,
+        [1]    = "a",
+    },
+    [2] = {
+        type   = "getname",
+        start  = 10,
+        finish = 10,
+        name   = 1,
+    },
+    [3] = {
+        type   = ":",
+        start  = 11,
+        finish = 11,
+    },
+    [4] = {
+        type   = "name",
+        start  = 12,
+        finish = 12,
+        [1]    = "b",
+    },
+    [5] = {
+        type   = "setmethod",
+        start  = 10,
+        finish = 12,
+        parent = 2,
+        colon  = 3,
+        method = 4,
+        value  = 8,
+    },
+    [6] = {
+        type   = "name",
+        start  = 14,
+        finish = 14,
+        [1]    = "v",
+    },
+    [7] = {
+        type   = "funcargs",
+        start  = 13,
+        finish = 14,
+        [1]    = 6,
+    },
+    [8] = {
+        type   = "function",
+        start  = 1,
+        finish = 14,
+        args   = 7,
+    },
+    [9] = {
+        type = "main",
+        [1]  = 5,
+    },
 }
 
 CHECK 'return local a'
 {
     [1] = {
-        type   = 'return',
+        type   = "return",
         start  = 1,
-        finish = 6,
+        finish = 7,
     },
     [2] = {
-        type   = 'local',
-        [1]    = {
-            type   = 'name',
-            start  = 14,
-            finish = 14,
-            [1]    = 'a',
-        }
-    }
+        type   = "name",
+        start  = 14,
+        finish = 14,
+        [1]    = "a",
+    },
+    [3] = {
+        type   = "local",
+        start  = 14,
+        finish = 14,
+        loc    = 2,
+    },
+    [4] = {
+        type = "main",
+        [1]  = 1,
+        [2]  = 2,
+    },
 }
 
 CHECK 'end'
 {
-    [1] = false,
+    [1] = {
+        type = "main",
+    },
 }
 
 CHECK 'local x = ,'
 {
     [1] = {
-        type = "local",
-        [1] = {
-            type   = "name",
-            start  = 7,
-            finish = 7,
-            [1]    = "x",
-        },
+        type   = "name",
+        start  = 7,
+        finish = 7,
+        [1]    = "x",
+    },
+    [2] = {
+        type   = "local",
+        start  = 7,
+        finish = 7,
+        loc    = 1,
+    },
+    [3] = {
+        type = "main",
+        [1]  = 1,
     },
 }

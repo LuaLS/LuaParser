@@ -20,7 +20,6 @@ end
 local function main()
 
     unitTest 'ast'
-    do return end
     unitTest 'grammar'
     unitTest 'lines'
     unitTest 'syntax_check'
