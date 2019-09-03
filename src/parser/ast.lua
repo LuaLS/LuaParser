@@ -400,7 +400,6 @@ local Defs = {
                 },
             }
         }
-        return false
     end,
     String = function (start, quote, str, finish)
         return pushAst {
@@ -636,7 +635,7 @@ local Defs = {
             field  = field,
             dot    = dot,
             start  = getAst(dot).start,
-            finish = getAst(field).finish,
+            finish = getAst(field or dot).finish,
         }
     end,
     GetIndex = function (start, index, finish)
@@ -653,7 +652,7 @@ local Defs = {
             method = method,
             colon  = colon,
             start  = getAst(colon).start,
-            finish = getAst(method).finish,
+            finish = getAst(method or colon).finish,
         }
     end,
     Single = function (unit)
@@ -687,7 +686,7 @@ local Defs = {
                 finish = callAst.finish,
             }
         end
-        return callAst
+        return call
     end,
     BinaryOp = function (start, op)
         return pushAst {
@@ -1051,41 +1050,12 @@ local Defs = {
         checkMissEnd(start)
         return pushAst(actions)
     end,
-    Break = function (finish, ...)
-        if false then
-            local breakChunk = {
-                type = 'break',
-            }
-            if not ... then
-                return breakChunk
-            end
-            local action = select(-1, ...)
-            if not action then
-                return breakChunk
-            end
-            if State.Version == 'Lua 5.1' or State.Version == 'LuaJIT' then
-                pushError {
-                    type = 'ACTION_AFTER_BREAK',
-                    start = finish - #'break',
-                    finish = finish - 1,
-                }
-            end
-            return breakChunk, action
-        else
-            pushError {
-                type = 'BREAK_OUTSIDE',
-                start = finish - #'break',
-                finish = finish - 1,
-            }
-            if not ... then
-                return false
-            end
-            local action = select(-1, ...)
-            if not action then
-                return false
-            end
-            return action
-        end
+    Break = function (start, finish)
+        return pushAst {
+            type   = 'break',
+            start  = start,
+            finish = finish,
+        }
     end,
     Return = function (start, exps, finish)
         exps.type   = 'return'
@@ -1227,7 +1197,6 @@ local Defs = {
                 symbol = symbol,
             }
         }
-        return false
     end,
     DirtyName = function (pos)
         pushError {

@@ -362,7 +362,7 @@ Function    <-  Sp ({} FunctionBody {})
             ->  Function
 FuncArgs    <-  Sp ({} PL {| FuncArg* |} NeedPR {})
             ->  FuncArgs
-            /   {} -> MissPL
+            /   {} -> MissPL %nil
 FuncArg     <-  DOTS
             /   Name
             /   COMMA
@@ -411,9 +411,8 @@ Do          <-  Sp ({}
                 {})
             ->  Do
 
-Break       <-  BREAK ({} Semicolon* AfterBreak?)
+Break       <-  Sp ({} BREAK {})
             ->  Break
-AfterBreak  <-  Sp !END !UNTIL !ELSEIF !ELSE Action
 
 Return      <-  Sp ({} RETURN ExpList {})
             ->  Return

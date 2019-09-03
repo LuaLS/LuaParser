@@ -1676,19 +1676,24 @@ repeat
     break
 until 1]]
 {
-    [1] = {
-        type   = "number",
-        start  = 24,
-        finish = 24,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "repeat",
-        start  = 1,
-        finish = 25,
-        filter = 1,
-        [1]    = false,
-    },
+	[1] = {
+		type   = "break",
+		start  = 12,
+		finish = 17,
+	},
+	[2] = {
+		type   = "number",
+		start  = 24,
+		finish = 24,
+		[1]    = 1,
+	},
+	[3] = {
+		type   = "repeat",
+		start  = 1,
+		finish = 25,
+		filter = 2,
+		[1]    = 1,
+	},
 }
 CHECK[[
 function test()

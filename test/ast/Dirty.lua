@@ -1,41 +1,53 @@
 CHECK'a.'
 {
     [1] = {
-        type   = 'simple',
+        type   = "name",
+        start  = 1,
+        finish = 1,
+        [1]    = "a",
+    },
+    [2] = {
+        type   = ".",
+        start  = 2,
+        finish = 2,
+    },
+    [3] = {
+        type   = "getfield",
         start  = 1,
         finish = 2,
-        [1]  = {
-            type   = 'name',
-            start  = 1,
-            finish = 1,
-            [1]    = 'a',
-        },
-        [2]  = {
-            type   = '.',
-            start  = 2,
-            finish = 2,
-        },
-    }
+        parent = 1,
+        dot    = 2,
+    },
+    [4] = {
+        type = "main",
+        [1]  = 3,
+    },
 }
 
 CHECK'a:'
 {
     [1] = {
-        type   = 'simple',
+        type   = "name",
+        start  = 1,
+        finish = 1,
+        [1]    = "a",
+    },
+    [2] = {
+        type   = ":",
+        start  = 2,
+        finish = 2,
+    },
+    [3] = {
+        type   = "getmethod",
         start  = 1,
         finish = 2,
-        [1]  = {
-            type   = 'name',
-            start  = 1,
-            finish = 1,
-            [1]    = 'a',
-        },
-        [2]  = {
-            type   = ':',
-            start  = 2,
-            finish = 2,
-        },
-    }
+        parent = 1,
+        colon  = 2,
+    },
+    [4] = {
+        type = "main",
+        [1]  = 3,
+    },
 }
 
 CHECK [[
@@ -44,26 +56,28 @@ a
 ]]
 {
     [1] = {
-        type   = 'if',
-        start  = 1,
+        type   = "boolean",
+        start  = 4,
         finish = 7,
-        [1]    = {
-            start  = 8,
-            finish = 8,
-            filter = {
-                type   = 'boolean',
-                start  = 4,
-                finish = 7,
-                [1]    = true,
-            },
-        },
+        [1]    = true,
     },
     [2] = {
-        type   = 'name',
+        type   = "name",
         start  = 9,
         finish = 9,
-        [1]    = 'a',
-    }
+        [1]    = "a",
+    },
+    [3] = {
+        type   = "getname",
+        start  = 9,
+        finish = 9,
+        name   = 2,
+    },
+    [4] = {
+        type = "main",
+        [1]  = 1,
+        [2]  = 3,
+    },
 }
 
 CHECK [[
@@ -72,25 +86,39 @@ a
 ]]
 {
     [1] = {
-        type   = 'if',
+        type   = "boolean",
+        start  = 4,
+        finish = 7,
+        [1]    = true,
+    },
+    [2] = {
+        type   = "name",
+        start  = 14,
+        finish = 14,
+        [1]    = "a",
+    },
+    [3] = {
+        type   = "getname",
+        start  = 14,
+        finish = 14,
+        name   = 2,
+    },
+    [4] = {
+        type   = "ifblock",
         start  = 1,
         finish = 14,
-        [1]    = {
-            start  = 13,
-            finish = 15,
-            filter = {
-                type   = 'boolean',
-                start  = 4,
-                finish = 7,
-                [1]    = true,
-            },
-            [1] = {
-                type   = 'name',
-                start  = 14,
-                finish = 14,
-                [1]    = 'a',
-            }
-        },
+        filter = 1,
+        [1]    = 3,
+    },
+    [5] = {
+        type   = "if",
+        start  = 1,
+        finish = 14,
+        [1]    = 4,
+    },
+    [6] = {
+        type = "main",
+        [1]  = 5,
     },
 }
 
@@ -99,139 +127,213 @@ x =
 ]]
 {
     [1] = {
-        type   = 'set',
-        [1]    = {
-            type   = 'name',
-            start  = 1,
-            finish = 1,
-            [1]    = 'x'
-        },
-    }
+        type   = "name",
+        start  = 1,
+        finish = 1,
+        [1]    = "x",
+    },
+    [2] = {
+        type   = "setname",
+        start  = 1,
+        finish = 1,
+        name   = 1,
+    },
+    [3] = {
+        type = "main",
+        [1]  = 2,
+    },
 }
 
 CHECK'1 == 2'
 {
     [1] = {
-        type   = 'binary',
-        op     = '==',
+        type   = "number",
+        start  = 1,
+        finish = 1,
+        [1]    = 1,
+    },
+    [2] = {
+        type   = "==",
+        start  = 3,
+        finish = 4,
+    },
+    [3] = {
+        type   = "number",
+        start  = 6,
+        finish = 6,
+        [1]    = 2,
+    },
+    [4] = {
+        type   = "binary",
         start  = 1,
         finish = 6,
-        [1]  = {
-            type   = 'number',
-            start  = 1,
-            finish = 1,
-            [1]    = 1,
-        },
-        [2]  = {
-            type   = 'number',
-            start  = 6,
-            finish = 6,
-            [1]    = 2,
-        },
-    }
+        op     = 2,
+        [1]    = 1,
+        [2]    = 3,
+    },
+    [5] = {
+        type = "main",
+        [1]  = 4,
+    },
 }
 
 CHECK 'local function a'
 {
     [1] = {
-        type      = 'localfunction',
-        start     = 1,
-        finish    = 16,
-        argStart  = 16,
-        argFinish = 16,
-        name      = {
-            type   = 'name',
-            start  = 16,
-            finish = 16,
-            [1]    = 'a',
-        },
-    }
+        type   = "name",
+        start  = 16,
+        finish = 16,
+        [1]    = "a",
+    },
+    [2] = {
+        type   = "setname",
+        start  = 16,
+        finish = 16,
+        name   = 1,
+        value  = 3,
+    },
+    [3] = {
+        type   = "function",
+        start  = 1,
+        finish = 16,
+    },
+    [4] = {
+        type   = "local",
+        start  = 16,
+        finish = 16,
+        loc    = 1,
+    },
+    [5] = {
+        type = "main",
+        [1]  = 4,
+        [2]  = 2,
+    },
 }
 
 CHECK 'local function'
 {
     [1] = {
-        type      = 'localfunction',
-        start     = 1,
-        finish    = 14,
-        argStart  = 14,
-        argFinish = 14,
-        name      = {
-            type   = 'name',
-            start  = 14,
-            finish = 14,
-            [1]    = '',
-        }
-    }
+        type   = "name",
+        start  = 7,
+        finish = 14,
+        [1]    = "function",
+    },
+    [2] = {
+        type   = "local",
+        start  = 7,
+        finish = 14,
+        loc    = 1,
+    },
+    [3] = {
+        type = "main",
+        [1]  = 1,
+    },
 }
 
 CHECK 'local function a(v'
 {
     [1] = {
-        type      = 'localfunction',
-        start     = 1,
-        finish    = 18,
-        argStart  = 17,
-        argFinish = 18,
-        name      = {
-            type   = 'name',
-            start  = 16,
-            finish = 16,
-            [1]    = 'a',
-        },
-        arg       = {
-            type   = 'name',
-            start  = 18,
-            finish = 18,
-            [1]    = 'v',
-        }
-    }
+        type   = "name",
+        start  = 16,
+        finish = 16,
+        [1]    = "a",
+    },
+    [2] = {
+        type   = "setname",
+        start  = 16,
+        finish = 16,
+        name   = 1,
+        value  = 5,
+    },
+    [3] = {
+        type   = "name",
+        start  = 18,
+        finish = 18,
+        [1]    = "v",
+    },
+    [4] = {
+        type   = "funcargs",
+        start  = 17,
+        finish = 18,
+        [1]    = 3,
+    },
+    [5] = {
+        type   = "function",
+        start  = 1,
+        finish = 18,
+        args   = 4,
+    },
+    [6] = {
+        type   = "local",
+        start  = 16,
+        finish = 16,
+        loc    = 1,
+    },
+    [7] = {
+        type = "main",
+        [1]  = 6,
+        [2]  = 2,
+    },
 }
 
 CHECK 'function a'
 {
     [1] = {
-        type      = 'function',
-        start     = 1,
-        finish    = 10,
-        argStart  = 10,
-        argFinish = 10,
-        name      = {
-            type   = 'name',
-            start  = 10,
-            finish = 10,
-            [1]    = 'a',
-        },
-    }
+        type   = "name",
+        start  = 10,
+        finish = 10,
+        [1]    = "a",
+    },
+    [2] = {
+        type   = "setname",
+        start  = 10,
+        finish = 10,
+        name   = 1,
+        value  = 3,
+    },
+    [3] = {
+        type   = "function",
+        start  = 1,
+        finish = 10,
+    },
+    [4] = {
+        type = "main",
+        [1]  = 2,
+    },
 }
 
 CHECK 'function a:'
 {
     [1] = {
-        type      = 'function',
-        start     = 1,
-        finish    = 11,
-        argStart  = 11,
-        argFinish = 11,
-        name   = {
-            type   = 'simple',
-            start  = 10,
-            finish = 11,
-            [1]    = {
-                type   = 'name',
-                start  = 10,
-                finish = 10,
-                [1]    = 'a',
-            },
-            [2]    = {
-                type   = ':',
-                start  = 11,
-                finish = 11,
-            },
-        },
-    }
+        type   = "name",
+        start  = 10,
+        finish = 10,
+        [1]    = "a",
+    },
+    [2] = {
+        type   = ":",
+        start  = 11,
+        finish = 11,
+    },
+    [3] = {
+        type   = "setmethod",
+        start  = 10,
+        finish = 11,
+        parent = 1,
+        colon  = 2,
+        value  = 4,
+    },
+    [4] = {
+        type   = "function",
+        start  = 1,
+        finish = 11,
+    },
+    [5] = {
+        type = "main",
+        [1]  = 3,
+    },
 }
-
+do return end
 CHECK 'function a:b(v'
 {
     [1] = {
