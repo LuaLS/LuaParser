@@ -221,9 +221,8 @@ AssignOrEQ  <-  Sp ({} '==' {})
 
 DirtyBR     <-  BR     / {} -> MissBR
 DirtyTR     <-  TR     / {} -> MissTR
-DirtyPR     <-  PR     / {} -> DirtyPR
+DirtyPR     <-  PR     / {} -> MissPR
 DirtyLabel  <-  LABEL  / {} -> MissLabel
-NeedPR      <-  PR     / {} -> MissPR
 NeedEnd     <-  END    / {} -> MissEnd
 NeedDo      <-  DO     / {} -> MissDo
 NeedAssign  <-  ASSIGN / {} -> MissAssign
@@ -307,16 +306,19 @@ ExpUnit     <-  Nil
             /   Function
             /   Simple
 
-Simple      <-  {| Prefix (Sp Suffix)+ |}
+Simple      <-  {| Prefix (Sp Suffix)* |}
             ->  Simple
-            /   Prefix
 Prefix      <-  Sp ({} PL DirtyExp DirtyPR {})
             ->  Paren
-            /   FreeName
+            /   Single
+Single      <-  FreeName
             ->  Single
 Suffix      <-  SuffixWithoutCall
-            /   ({} PL Sp ({} {| (COMMA / Exp)* |} {})->PackExpList DirtyPR {})
+            /   ({} PL SuffixCall DirtyPR {})
             ->  Call
+SuffixCall  <-  Sp ({} {| (COMMA / Exp)+ |} {})
+            ->  PackExpList
+            /   {| %nil |}
 SuffixWithoutCall
             <-  (DOT (Name / MissField))
             ->  GetField
@@ -360,7 +362,7 @@ NewField    <-  Sp ({} MustName ASSIGN DirtyExp {})
 
 Function    <-  Sp ({} FunctionBody {})
             ->  Function
-FuncArgs    <-  Sp ({} PL {| FuncArg* |} NeedPR {})
+FuncArgs    <-  Sp ({} PL {| FuncArg* |} DirtyPR {})
             ->  FuncArgs
             /   {} -> MissPL %nil
 FuncArg     <-  DOTS
@@ -511,9 +513,9 @@ FunctionNamedBody
             <-  FUNCTION FuncName FuncArgs
                     {| (!END Action)* |}
                 NeedEnd
-FuncName    <-  {| Prefix (Sp SuffixWithoutCall)+ |}
+FuncName    <-  {| Single (Sp SuffixWithoutCall)* |}
             ->  Simple
-            /   Prefix
+            /   {} -> MissName %nil
 ]]
 
 grammar 'EmmyLua' (emmy.grammar)

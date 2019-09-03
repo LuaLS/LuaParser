@@ -670,7 +670,7 @@ local Defs = {
     end,
     SimpleCall = function (call)
         local callAst = getAst(call)
-        if callAst.type ~= 'call' then
+        if callAst.type ~= 'call' and callAst.type ~= 'getmethod' then
             pushError {
                 type   = 'EXP_IN_ACTION',
                 start  = callAst.start,
@@ -701,11 +701,8 @@ local Defs = {
         return expSplit(list, 1, #list, 1)
     end,
     Paren = function (start, exp, finish)
-        if not exp then
-            return nil
-        end
         local expAst = getAst(exp)
-        if expAst.type == 'paren' then
+        if expAst and expAst.type == 'paren' then
             expAst.start  = start
             expAst.finish = finish - 1
             return expAst
@@ -840,6 +837,10 @@ local Defs = {
         checkMissEnd(start)
         local func = pushAst(actions)
 
+        if not name then
+            return
+        end
+
         local nameAst = getAst(name)
         if nameAst.type ~= 'getname' then
             pushError {
@@ -873,6 +874,7 @@ local Defs = {
                     }
                 end
                 wantField = true
+                lastStart = fieldAst.finish + 1
             else
                 if not wantField then
                     pushError {
@@ -882,6 +884,7 @@ local Defs = {
                     }
                 end
                 wantField = false
+                lastStart = fieldAst.finish + 1
                 fieldCount = fieldCount + 1
                 tbl[fieldCount] = field
             end
@@ -1064,7 +1067,6 @@ local Defs = {
         return pushAst(exps)
     end,
     Label = function (start, name, finish)
-        local nameAst = getAst(name)
         if State.Version == 'Lua 5.1' then
             pushError {
                 type   = 'UNSUPPORT_SYMBOL',
@@ -1077,11 +1079,14 @@ local Defs = {
             }
             return
         end
+        if not name then
+            return nil
+        end
+        local nameAst = getAst(name)
         nameAst.type = 'label'
         return name
     end,
     GoTo = function (start, name, finish)
-        local nameAst = getAst(name)
         if State.Version == 'Lua 5.1' then
             pushError {
                 type    = 'UNSUPPORT_SYMBOL',
@@ -1094,6 +1099,10 @@ local Defs = {
             }
             return
         end
+        if not name then
+            return nil
+        end
+        local nameAst = getAst(name)
         nameAst.type = 'goto'
         return name
     end,
@@ -1307,17 +1316,6 @@ local Defs = {
             }
         }
     end,
-    DirtyPR = function (pos)
-        pushError {
-            type = 'MISS_SYMBOL',
-            start = pos,
-            finish = pos,
-            info = {
-                symbol = ')',
-            }
-        }
-        return pos + 1
-    end,
     MissPR = function (pos)
         pushError {
             type = 'MISS_SYMBOL',
@@ -1444,6 +1442,13 @@ local Defs = {
             info = {
                 symbol = 'then',
             }
+        }
+    end,
+    MissName = function (pos)
+        pushError {
+            type = 'MISS_NAME',
+            start = pos,
+            finish = pos,
         }
     end,
     ExpInAction = function (start, exp, finish)

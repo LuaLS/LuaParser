@@ -464,7 +464,6 @@ goto<!!>
 ]]
 {
     type = 'MISS_NAME',
-    multi = 1,
 }
 
 TEST[[

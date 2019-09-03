@@ -225,20 +225,12 @@ CHECK 'local function a'
 CHECK 'local function'
 {
     [1] = {
-        type   = "name",
-        start  = 7,
+        type   = "function",
+        start  = 1,
         finish = 14,
-        [1]    = "function",
     },
     [2] = {
-        type   = "local",
-        start  = 7,
-        finish = 14,
-        loc    = 1,
-    },
-    [3] = {
         type = "main",
-        [1]  = 1,
     },
 }
 
