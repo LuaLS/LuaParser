@@ -177,12 +177,34 @@ local function checkMissEnd(start)
     }
 end
 
+local function getSelect(vararg, index)
+    return pushAst {
+        type   = 'select',
+        vararg = vararg,
+        index  = index,
+    }
+end
+
 local function getValue(values, i)
     if not values then
         return nil, nil
     end
     local value = values[i]
+    if not value then
+        local last = values[#values]
+        if not last then
+            return nil, nil
+        end
+        local lastAst = getAst(last)
+        if lastAst.type == 'call' or lastAst.type == '...' then
+            return getSelect(last, i - #values + 1)
+        end
+        return nil, nil
+    end
     local valueAst = getAst(value)
+    if valueAst.type == 'call' or valueAst.type == '...' then
+        value = getSelect(value, 1)
+    end
     return value, valueAst
 end
 
@@ -195,6 +217,26 @@ local function createLocal(key, value, attrs)
         loc    = key,
         value  = value,
         attrs  = attrs
+    }
+end
+
+local function createCall(args, start, finish)
+    if not start then
+        start = getAst(args[1]).start
+    end
+    if finish then
+        finish = finish - 1
+    else
+        finish = getAst(args[#args]).finish
+    end
+    args.type    = 'callargs'
+    args.start   = start
+    args.finish  = finish
+    return pushAst {
+        type   = 'call',
+        start  = start,
+        finish = finish,
+        args   = pushAst(args),
     }
 end
 
@@ -672,13 +714,13 @@ local Defs = {
     end,
     Prefix = function (start, exp, finish)
         local expAst = getAst(exp)
-        if expAst.type == 'parentheses' then
+        if expAst.type == 'paren' then
             expAst.start  = start
             expAst.finish = finish - 1
             return expAst
         end
         return pushAst {
-            type   = 'parentheses',
+            type   = 'paren',
             start  = start,
             finish = finish - 1,
             exp    = exp
@@ -729,15 +771,7 @@ local Defs = {
         return list
     end,
     Call = function (start, args, finish)
-        args.type    = 'callargs'
-        args.start   = start
-        args.finish  = finish - 1
-        return pushAst {
-            type   = 'call',
-            start  = start,
-            finish = finish - 1,
-            args   = pushAst(args),
-        }
+        return createCall(args, start, finish)
     end,
     COMMA = function (start)
         return pushAst {
@@ -1145,11 +1179,16 @@ local Defs = {
         return pushAst(actions)
     end,
     In = function (start, arg, exp, actions, finish)
+        local func = table.remove(exp)
+        local call
+        if #exp == 0 then
+            call = getSelect(func, '...')
+        else
+            call = createCall(exp)
+        end
         actions.type   = 'in'
         actions.start  = start
         actions.finish = finish - 1
-        actions.arg    = arg
-        actions.exp    = exp
         checkMissEnd(start)
         return pushAst(actions)
     end,

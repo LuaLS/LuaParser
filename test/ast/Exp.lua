@@ -1227,7 +1227,7 @@ CHECK'(1)'
         [1]    = 1,
     },
     [2] = {
-        type   = "parentheses",
+        type   = "paren",
         start  = 1,
         finish = 3,
         exp    = 1,
@@ -1261,7 +1261,7 @@ CHECK'(1 + 2)'
         [2]    = 3,
     },
     [5] = {
-        type   = "parentheses",
+        type   = "paren",
         start  = 1,
         finish = 7,
         exp    = 4,
@@ -1588,7 +1588,7 @@ CHECK'(...)[1]'
         finish = 4,
     },
     [2] = {
-        type   = "parentheses",
+        type   = "paren",
         start  = 1,
         finish = 5,
         exp    = 1,
