@@ -902,6 +902,7 @@ CHECK'do x = 1 end'
         type   = "do",
         start  = 1,
         finish = 12,
+        [1]    = 2,
     },
 }
 CHECK'return'

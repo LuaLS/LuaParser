@@ -66,7 +66,7 @@ test 'Number'
 test 'Name'
 test 'Exp'
 test 'Action'
-do return end
 test 'Lua'
+do return end
 test 'Dirty'
 test 'Emmy'

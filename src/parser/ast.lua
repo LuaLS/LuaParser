@@ -1,10 +1,10 @@
 local emmy = require 'parser.emmy'
 
-local tonumber   = tonumber
-local stringChar = string.char
-local utf8Char   = utf8.char
-local type       = type
-local ipairs     = ipairs
+local tonumber    = tonumber
+local stringChar  = string.char
+local utf8Char    = utf8.char
+local tableUnpack = table.unpack
+local ipairs      = ipairs
 
 local State
 local pushError
@@ -992,6 +992,7 @@ local Defs = {
                 keyAst.value = getValue(values, i)
             end
         end
+        return tableUnpack(keys)
     end,
     LocalAttr = function (attrs)
         for i, attr in ipairs(attrs) do
@@ -1041,6 +1042,7 @@ local Defs = {
             local value = getValue(values, i)
             createLocal(key, value, attrs)
         end
+        return tableUnpack(keys)
     end,
     Do = function (start, actions, finish)
         actions.type = 'do'
@@ -1199,11 +1201,9 @@ local Defs = {
         actions.filter = filter
         return pushAst(actions)
     end,
-    Lua = function (...)
-        if ... == '' then
-            return {}
-        end
-        return {...}
+    Lua = function (actions)
+        actions.type = 'main'
+        pushAst(actions)
     end,
 
     -- 捕获错误
