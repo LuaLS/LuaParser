@@ -22,6 +22,7 @@ local function main()
     unitTest 'ast'
     unitTest 'grammar'
     unitTest 'lines'
+    do return end
     unitTest 'syntax_check'
     unitTest 'perform'
 

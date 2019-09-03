@@ -221,12 +221,6 @@ local function createLocal(key, value, attrs)
 end
 
 local function createCall(args, start, finish)
-    if not start then
-        start = getAst(args[1]).start
-    end
-    if not finish then
-        finish = getAst(args[#args]).finish
-    end
     args.type    = 'callargs'
     args.start   = start
     args.finish  = finish
@@ -706,7 +700,10 @@ local Defs = {
         local list = {first, ...}
         return expSplit(list, 1, #list, 1)
     end,
-    Prefix = function (start, exp, finish)
+    Paren = function (start, exp, finish)
+        if not exp then
+            return nil
+        end
         local expAst = getAst(exp)
         if expAst.type == 'paren' then
             expAst.start  = start
@@ -817,6 +814,9 @@ local Defs = {
         actions.args   = args
         checkMissEnd(start)
         local func = pushAst(actions)
+        if not name then
+            return
+        end
         local nameAst = getAst(name)
         if nameAst.type == 'getname' then
             nameAst.type = 'setname'
@@ -872,7 +872,7 @@ local Defs = {
                         finish = fieldAst.start - 1,
                     }
                 end
-                wantField = false
+                wantField = true
             else
                 if not wantField then
                     pushError {
@@ -881,7 +881,7 @@ local Defs = {
                         finish = fieldAst.start - 1,
                     }
                 end
-                wantField = true
+                wantField = false
                 fieldCount = fieldCount + 1
                 tbl[fieldCount] = field
             end
@@ -891,11 +891,11 @@ local Defs = {
         end
         return pushAst(tbl)
     end,
-    NewField = function (field, value)
+    NewField = function (start, field, value, finish)
         return pushAst {
             type   = 'tablefield',
-            start  = getAst(field).start,
-            finish = getAst(value).finish,
+            start  = start,
+            finish = finish-1,
             field  = field,
             value  = value,
         }
@@ -908,11 +908,11 @@ local Defs = {
             index  = index,
         }
     end,
-    NewIndex = function (index, value)
+    NewIndex = function (start, index, value, finish)
         return pushAst {
             type   = 'tableindex',
-            start  = getAst(index).start,
-            finish = getAst(value).finish,
+            start  = start,
+            finish = finish-1,
             index  = index,
             value  = value,
         }
@@ -1027,6 +1027,9 @@ local Defs = {
         return attrs
     end,
     LocalName = function (name, attrs)
+        if not name then
+            return name
+        end
         getAst(name).attrs = attrs
         return name
     end,
@@ -1137,9 +1140,9 @@ local Defs = {
         local funcAst = getAst(func)
         local call
         if #exp == 0 then
-            call = createCall(exp, funcAst.start, funcAst.finish)
+            call = createCall(exp, 0, 0)
         else
-            call = createCall(exp)
+            call = createCall(exp, getAst(exp[1]).start, getAst(exp[#exp]).finish)
         end
         getAst(call).parent = func
         actions.type   = 'in'
@@ -1201,12 +1204,13 @@ local Defs = {
             start = pos,
             finish = pos,
         }
-        return {
-            type   = 'name',
-            start  = pos-1,
-            finish = pos-1,
-            [1]    = ''
-        }
+        --return pushAst {
+        --    type   = 'name',
+        --    start  = pos-1,
+        --    finish = pos-1,
+        --    [1]    = ''
+        --}
+        return nil
     end,
     DirtyExp = function (pos)
         pushError {
@@ -1214,12 +1218,13 @@ local Defs = {
             start = pos,
             finish = pos,
         }
-        return {
-            type   = 'name',
-            start  = pos,
-            finish = pos,
-            [1]    = ''
-        }
+        --return pushAst {
+        --    type   = 'name',
+        --    start  = pos,
+        --    finish = pos,
+        --    [1]    = ''
+        --}
+        return nil
     end,
     MissExp = function (pos)
         pushError {

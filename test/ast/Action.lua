@@ -1505,13 +1505,13 @@ end]]
     },
     [5] = {
         type   = "callargs",
-        start  = 10,
-        finish = 10,
+        start  = 0,
+        finish = 0,
     },
     [6] = {
         type   = "call",
-        start  = 10,
-        finish = 10,
+        start  = 0,
+        finish = 0,
         parent = 3,
         args   = 5,
     },

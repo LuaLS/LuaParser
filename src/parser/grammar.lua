@@ -311,7 +311,7 @@ Simple      <-  {| Prefix (Sp Suffix)+ |}
             ->  Simple
             /   Prefix
 Prefix      <-  Sp ({} PL DirtyExp DirtyPR {})
-            ->  Prefix
+            ->  Paren
             /   FreeName
             ->  Single
 Suffix      <-  SuffixWithoutCall
@@ -353,9 +353,9 @@ TableField  <-  COMMA
             /   Exp
 Index       <-  ({} BL DirtyExp DirtyBR {})
             ->  Index
-NewIndex    <-  Sp (Index NeedAssign DirtyExp)
+NewIndex    <-  Sp ({} Index NeedAssign DirtyExp {})
             ->  NewIndex
-NewField    <-  (MustName ASSIGN DirtyExp)
+NewField    <-  Sp ({} MustName ASSIGN DirtyExp {})
             ->  NewField
 
 Function    <-  Sp ({} FunctionBody {})
@@ -414,8 +414,12 @@ Do          <-  Sp ({}
 Break       <-  Sp ({} BREAK {})
             ->  Break
 
-Return      <-  Sp ({} RETURN ExpList {})
+Return      <-  Sp ({} RETURN ReturnExpList {})
             ->  Return
+ReturnExpList 
+            <-  Sp {| Exp (Sp ',' MaybeExp)* |}
+            /   Sp {| !Exp !',' |}
+            /   ExpList
 
 Label       <-  Sp ({} LABEL MustName DirtyLabel {})
             ->  Label
