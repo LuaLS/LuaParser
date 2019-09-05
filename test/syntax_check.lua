@@ -333,14 +333,17 @@ f(<!!>
 }
 
 TEST[[
-f(<!!>,1)
+f(<!,!>1)
 ]]
 {
-    type = 'MISS_EXP',
+    type = 'UNEXPECT_SYMBOL',
+    info = {
+        symbol = ',',
+    }
 }
 
 TEST[[
-f(1,<!!>)
+f(1<!,!>)
 ]]
 {
     type = 'MISS_EXP',
@@ -616,7 +619,7 @@ end
 }
 
 TEST[[
-for k, v<!!> next do
+for k, v<!!> do
 end
 ]]
 {
@@ -627,7 +630,7 @@ end
 }
 
 TEST[[
-for k, v in <!!>do
+for k, v in<!!> do
 end
 ]]
 {
@@ -666,11 +669,15 @@ TEST[[
 }
 
 TEST[[
-for i =<!!>, 2 do
+for i =<!,!> 2 do
 end
 ]]
 {
-    type = 'MISS_EXP',
+    multi = 1,
+    type = 'UNEXPECT_SYMBOL',
+    info = {
+        symbol = ',',
+    }
 }
 
 TEST[[
@@ -686,10 +693,7 @@ for i = 1<!!> do
 end
 ]]
 {
-    type = 'MISS_SYMBOL',
-    info = {
-        symbol = ',',
-    }
+    type = 'MISS_LOOP_MAX',
 }
 
 TEST[[
@@ -697,6 +701,7 @@ for i = 1,<!!> do
 end
 ]]
 {
+    multi = 1,
     type = 'MISS_EXP',
 }
 

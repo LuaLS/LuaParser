@@ -209,6 +209,9 @@ local function getValue(values, i)
 end
 
 local function createLocal(key, value, attrs)
+    if not key then
+        return nil
+    end
     local keyAst = getAst(key)
     return pushAst {
         type   = 'local',
@@ -230,6 +233,47 @@ local function createCall(args, start, finish)
         finish = finish,
         args   = pushAst(args),
     }
+end
+
+local function packList(start, list, finish)
+    local lastFinish = start
+    local wantName = true
+    local count = 0
+    for i = 1, #list do
+        local ast = getAst(list[i])
+        if ast.type == ',' then
+            if wantName then
+                pushError {
+                    type   = 'UNEXPECT_SYMBOL',
+                    start  = ast.start,
+                    finish = ast.finish,
+                    info = {
+                        symbol = ',',
+                    }
+                }
+            end
+            wantName = true
+        else
+            if not wantName then
+                pushError {
+                    type   = 'MISS_SYMBOL',
+                    start  = lastFinish,
+                    finish = ast.start - 1,
+                    info = {
+                        symbol = ',',
+                    }
+                }
+            end
+            wantName = false
+            count = count + 1
+            list[count] = list[i]
+        end
+        lastFinish = ast.finish + 1
+    end
+    for i = count + 1, #list do
+        list[i] = nil
+    end
+    return list
 end
 
 Exp = {
@@ -714,48 +758,29 @@ local Defs = {
             exp    = exp
         }
     end,
-    PackExpList = function (start, list, finish)
-        local lastFinish = start
-        local wantExp = true
-        local count = 0
-        for i = 1, #list do
-            local ast = getAst(list[i])
-            if ast.type == ',' then
-                if wantExp then
-                    pushError {
-                        type   = 'MISS_EXP',
-                        start  = lastFinish,
-                        finish = ast.start - 1,
-                    }
-                end
-                wantExp = true
-            else
-                if not wantExp then
-                    pushError {
-                        type   = 'MISS_SYMBOL',
-                        start  = lastFinish,
-                        finish = ast.start - 1,
-                        info = {
-                            symbol = ',',
-                        }
-                    }
-                end
-                wantExp = false
-                count = count + 1
-                list[count] = list[i]
-            end
-            lastFinish = ast.finish + 1
-        end
-        for i = count + 1, #list do
-            list[i] = nil
-        end
-        if wantExp and #list > 0 then
+    PackLoopArgs = function (start, list, finish)
+        local list = packList(start, list, finish)
+        if #list == 0 then
             pushError {
-                type   = 'MISS_EXP',
-                start  = lastFinish,
-                finish = finish - 1,
+                type   = 'MISS_LOOP_MIN',
+                start  = finish,
+                finish = finish,
+            }
+        elseif #list == 1 then
+            pushError {
+                type   = 'MISS_LOOP_MAX',
+                start  = finish,
+                finish = finish,
             }
         end
+        return list
+    end,
+    PackExpList = function (start, list, finish)
+        local list = packList(start, list, finish)
+        return list
+    end,
+    PackNameList = function (start, list, finish)
+        local list = packList(start, list, finish)
         return list
     end,
     Call = function (start, args, finish)

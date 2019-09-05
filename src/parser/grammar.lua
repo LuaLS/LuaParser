@@ -463,16 +463,16 @@ LoopBody    <-  FOR LoopArgs NeedDo
                 NeedEnd
 LoopArgs    <-  MustName AssignOrEQ
                 ({} {| (COMMA / !DO !END Exp)* |} {})
-            ->  PackExpList
+            ->  PackLoopArgs
 
 In          <-  Sp ({} InBody {})
             ->  In
 InBody      <-  FOR InNameList NeedIn InExpList NeedDo
                     {| (!END Action)* |}
                 NeedEnd
-InNameList  <-  ({} {| (COMMA / !IN Name)* |} {})
-            ->  PackExpList
-InExpList   <-  ({} {| (COMMA / !DO Exp)*  |} {})
+InNameList  <-  ({} {| (COMMA / !IN !DO !END Name)* |} {})
+            ->  PackNameList
+InExpList   <-  ({} {| (COMMA / !DO !DO !END Exp)*  |} {})
             ->  PackExpList
 
 While       <-  Sp ({} WhileBody {})
