@@ -471,9 +471,9 @@ InBody      <-  FOR InNameList NeedIn InExpList NeedDo
                     {| (!END Action)* |}
                 NeedEnd
 InNameList  <-  ({} {| (COMMA / !IN !DO !END Name)* |} {})
-            ->  PackNameList
+            ->  PackInNameList
 InExpList   <-  ({} {| (COMMA / !DO !DO !END Exp)*  |} {})
-            ->  PackExpList
+            ->  PackInExpList
 
 While       <-  Sp ({} WhileBody {})
             ->  While

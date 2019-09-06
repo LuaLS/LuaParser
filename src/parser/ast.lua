@@ -242,7 +242,7 @@ local function packList(start, list, finish)
     for i = 1, #list do
         local ast = getAst(list[i])
         if ast.type == ',' then
-            if wantName then
+            if wantName or i == #list then
                 pushError {
                     type   = 'UNEXPECT_SYMBOL',
                     start  = ast.start,
@@ -775,6 +775,28 @@ local Defs = {
         end
         return list
     end,
+    PackInNameList = function (start, list, finish)
+        local list = packList(start, list, finish)
+        if #list == 0 then
+            pushError {
+                type   = 'MISS_NAME',
+                start  = start,
+                finish = finish,
+            }
+        end
+        return list
+    end,
+    PackInExpList = function (start, list, finish)
+        local list = packList(start, list, finish)
+        if #list == 0 then
+            pushError {
+                type   = 'MISS_EXP',
+                start  = start,
+                finish = finish,
+            }
+        end
+        return list
+    end,
     PackExpList = function (start, list, finish)
         local list = packList(start, list, finish)
         return list
@@ -1171,7 +1193,6 @@ local Defs = {
     end,
     In = function (start, locs, exp, actions, finish)
         local func = table.remove(exp)
-        local funcAst = getAst(func)
         local call
         if #exp == 0 then
             call = createCall(exp, 0, 0)

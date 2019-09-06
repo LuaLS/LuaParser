@@ -346,7 +346,10 @@ TEST[[
 f(1<!,!>)
 ]]
 {
-    type = 'MISS_EXP',
+    type = 'UNEXPECT_SYMBOL',
+    info = {
+        symbol = ',',
+    }
 }
 
 TEST[[
@@ -701,16 +704,39 @@ for i = 1,<!!> do
 end
 ]]
 {
-    multi = 1,
-    type = 'MISS_EXP',
+    multi = 2,
+    type = 'MISS_LOOP_MAX'
 }
 
 TEST[[
-for i = 1, 2,<!!> do
+for i =<!!> do
 end
 ]]
 {
-    type = 'MISS_EXP',
+    type = 'MISS_LOOP_MIN'
+}
+
+TEST[[
+for i = 1<!,!> do
+end
+]]
+{
+    multi = 1,
+    type = 'UNEXPECT_SYMBOL',
+    info = {
+        symbol = ',',
+    }
+}
+
+TEST[[
+for i = 1, 2<!,!> do
+end
+]]
+{
+    type = 'UNEXPECT_SYMBOL',
+    info = {
+        symbol = ',',
+    }
 }
 
 TEST[[
