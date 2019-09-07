@@ -1244,31 +1244,6 @@ b = 1 <<!!> < 0
 }
 
 TEST[[
-<!break!>
-]]
-{
-    type = 'BREAK_OUTSIDE',
-}
-
-TEST[[
-function f (x)
-    if 1 then <!break!> end
-end
-]]
-{
-    type = 'BREAK_OUTSIDE',
-}
-
-TEST[[
-while 1 do
-end
-<!break!>
-]]
-{
-    type = 'BREAK_OUTSIDE',
-}
-
-TEST[[
 concat2 = 2^<!3..1!>
 ]]
 {
@@ -1297,10 +1272,13 @@ for k,v in pairs(t:any<!!>) do end
 }
 
 TEST[[
-for i=1,10,<!!> do end
+for i=1,10<!,!> do end
 ]]
 {
-    type = 'MISS_EXP',
+    type = 'UNEXPECT_SYMBOL',
+    info = {
+        symbol = ','
+    },
 }
 
 TEST[[
@@ -1334,36 +1312,6 @@ function a.b:c<!!>:d () end
     type = 'MISS_SYMBOL',
     info = {
         symbol = '(',
-    }
-}
-
-TEST[[
-:: label :: <!return
-goto!> label
-]]
-{
-    type = 'ACTION_AFTER_RETURN',
-    multi = 3,
-}
-
-TEST[[
-goto <!label!>
-]]
-{
-    type = 'NO_VISIBLE_LABEL',
-    info = {
-        label = 'label',
-    }
-}
-
-TEST[[
-::other_label::
-do do do goto <!label!> end end end
-]]
-{
-    type = 'NO_VISIBLE_LABEL',
-    info = {
-        label = 'label',
     }
 }
 
@@ -1496,16 +1444,6 @@ local x = '<!\x!>ff'
     info = {
         version = 'Lua 5.1',
     }
-}
-
-TEST[[
-while true do
-    <!break!>
-    x = 1
-end
-]]
-{
-    type = 'ACTION_AFTER_BREAK',
 }
 
 Version = 'Lua 5.2'

@@ -605,7 +605,8 @@ local Defs = {
         end
     end,
     FFINumber = function (start, symbol)
-        if math.type(State.LastNumber[1]) == 'float' then
+        local lastNumber = getAst(State.LastNumber)
+        if math.type(lastNumber[1]) == 'float' then
             pushError {
                 type = 'UNKNOWN_SYMBOL',
                 start = start,
@@ -614,7 +615,7 @@ local Defs = {
                     symbol = symbol,
                 }
             }
-            State.LastNumber[1] = 0
+            lastNumber[1] = 0
             return
         end
         if State.Version ~= 'LuaJIT' then
@@ -627,10 +628,11 @@ local Defs = {
                     version = State.Version,
                 }
             }
-            State.LastNumber[1] = 0
+            lastNumber[1] = 0
         end
     end,
     ImaginaryNumber = function (start, symbol)
+        local lastNumber = getAst(State.LastNumber)
         if State.Version ~= 'LuaJIT' then
             pushError {
                 type = 'UNSUPPORT_SYMBOL',
@@ -642,7 +644,7 @@ local Defs = {
                 }
             }
         end
-        State.LastNumber[1] = 0
+        lastNumber[1] = 0
     end,
     Name = function (start, str, finish)
         local isKeyWord

@@ -93,3 +93,68 @@ end
 {
     type = 'UNEXPECT_DOTS',
 }
+
+TEST[[
+<!break!>
+]]
+{
+    type = 'BREAK_OUTSIDE',
+}
+
+TEST[[
+function f (x)
+    if 1 then <!break!> end
+end
+]]
+{
+    type = 'BREAK_OUTSIDE',
+}
+
+TEST[[
+while 1 do
+end
+<!break!>
+]]
+{
+    type = 'BREAK_OUTSIDE',
+}
+
+TEST[[
+:: label :: <!return
+goto!> label
+]]
+{
+    type = 'ACTION_AFTER_RETURN',
+    multi = 3,
+}
+
+TEST[[
+goto <!label!>
+]]
+{
+    type = 'NO_VISIBLE_LABEL',
+    info = {
+        label = 'label',
+    }
+}
+
+TEST[[
+::other_label::
+do do do goto <!label!> end end end
+]]
+{
+    type = 'NO_VISIBLE_LABEL',
+    info = {
+        label = 'label',
+    }
+}
+
+TEST[[
+while true do
+    <!break!>
+    x = 1
+end
+]]
+{
+    type = 'ACTION_AFTER_BREAK',
+}
