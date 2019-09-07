@@ -9,7 +9,6 @@ local ipairs      = ipairs
 local State
 local pushError
 local pushAst
-local getAst
 
 -- goto 单独处理
 local RESERVED = {
@@ -46,7 +45,7 @@ local VersionOp = {
 }
 
 local function checkOpVersion(op)
-    local opAst = getAst(op)
+    local opAst = Asts[op]
     local versions = VersionOp[opAst.type]
     if not versions then
         return
@@ -85,7 +84,7 @@ local function binaryForward(list, start, finish, level)
     local info = Exp[level]
     for i = finish-1, start+1, -1 do
         local op = list[i]
-        local opType = getAst(op).type
+        local opType = Asts[op].type
         if info[opType] then
             local e1 = expSplit(list, start, i-1, level)
             if not e1 then
@@ -99,8 +98,8 @@ local function binaryForward(list, start, finish, level)
             return pushAst {
                 type   = 'binary',
                 op     = op,
-                start  = getAst(e1).start,
-                finish = getAst(e2).finish,
+                start  = Asts[e1].start,
+                finish = Asts[e2].finish,
                 [1]    = e1,
                 [2]    = e2,
             }
@@ -114,7 +113,7 @@ local function binaryBackward(list, start, finish, level)
     local info = Exp[level]
     for i = start+1, finish-1 do
         local op = list[i]
-        local opType = getAst(op).type
+        local opType = Asts[op].type
         if info[opType] then
             local e1 = expSplit(list, start, i-1, level+1)
             if not e1 then
@@ -128,8 +127,8 @@ local function binaryBackward(list, start, finish, level)
             return pushAst {
                 type   = 'binary',
                 op     = op,
-                start  = getAst(e1).start,
-                finish = getAst(e2).finish,
+                start  = Asts[e1].start,
+                finish = Asts[e2].finish,
                 [1]    = e1,
                 [2]    = e2,
             }
@@ -142,7 +141,7 @@ end
 local function unary(list, start, finish, level)
     local info = Exp[level]
     local op = list[start]
-    local opType = getAst(op).type
+    local opType = Asts[op].type
     if info[opType] then
         local e1 = expSplit(list, start+1, finish, level)
         if e1 then
@@ -150,8 +149,8 @@ local function unary(list, start, finish, level)
             return pushAst {
                 type   = 'unary',
                 op     = op,
-                start  = getAst(op).start,
-                finish = getAst(e1).finish,
+                start  = Asts[op].start,
+                finish = Asts[e1].finish,
                 [1]    = e1,
             }
         end
@@ -195,13 +194,13 @@ local function getValue(values, i)
         if not last then
             return nil, nil
         end
-        local lastAst = getAst(last)
+        local lastAst = Asts[last]
         if lastAst.type == 'call' or lastAst.type == '...' then
             return getSelect(last, i - #values + 1)
         end
         return nil, nil
     end
-    local valueAst = getAst(value)
+    local valueAst = Asts[value]
     if valueAst.type == 'call' or valueAst.type == '...' then
         value = getSelect(value, 1)
     end
@@ -212,7 +211,7 @@ local function createLocal(key, value, attrs)
     if not key then
         return nil
     end
-    local keyAst = getAst(key)
+    local keyAst = Asts[key]
     return pushAst {
         type   = 'local',
         start  = keyAst.start,
@@ -240,7 +239,7 @@ local function packList(start, list, finish)
     local wantName = true
     local count = 0
     for i = 1, #list do
-        local ast = getAst(list[i])
+        local ast = Asts[list[i]]
         if ast.type == ',' then
             if wantName or i == #list then
                 pushError {
@@ -605,7 +604,7 @@ local Defs = {
         end
     end,
     FFINumber = function (start, symbol)
-        local lastNumber = getAst(State.LastNumber)
+        local lastNumber = Asts[State.LastNumber]
         if math.type(lastNumber[1]) == 'float' then
             pushError {
                 type = 'UNKNOWN_SYMBOL',
@@ -632,7 +631,7 @@ local Defs = {
         end
     end,
     ImaginaryNumber = function (start, symbol)
-        local lastNumber = getAst(State.LastNumber)
+        local lastNumber = Asts[State.LastNumber]
         if State.Version ~= 'LuaJIT' then
             pushError {
                 type = 'UNSUPPORT_SYMBOL',
@@ -674,8 +673,8 @@ local Defs = {
             type   = 'getfield',
             field  = field,
             dot    = dot,
-            start  = getAst(dot).start,
-            finish = getAst(field or dot).finish,
+            start  = Asts[dot].start,
+            finish = Asts[field or dot].finish,
         }
     end,
     GetIndex = function (start, index, finish)
@@ -691,12 +690,12 @@ local Defs = {
             type   = 'getmethod',
             method = method,
             colon  = colon,
-            start  = getAst(colon).start,
-            finish = getAst(method or colon).finish,
+            start  = Asts[colon].start,
+            finish = Asts[method or colon].finish,
         }
     end,
     Single = function (unit)
-        local unitAst = getAst(unit)
+        local unitAst = Asts[unit]
         return pushAst {
             type   = 'getname',
             start  = unitAst.start,
@@ -707,15 +706,15 @@ local Defs = {
     Simple = function (units)
         local last = units[1]
         for i = 2, #units do
-            local current  = getAst(units[i])
+            local current  = Asts[units[i]]
             current.parent = last
-            current.start  = getAst(last).start
+            current.start  = Asts[last].start
             last = units[i]
         end
         return last
     end,
     SimpleCall = function (call)
-        local callAst = getAst(call)
+        local callAst = Asts[call]
         if callAst.type ~= 'call' and callAst.type ~= 'getmethod' then
             pushError {
                 type   = 'EXP_IN_ACTION',
@@ -747,7 +746,7 @@ local Defs = {
         return expSplit(list, 1, #list, 1)
     end,
     Paren = function (start, exp, finish)
-        local expAst = getAst(exp)
+        local expAst = Asts[exp]
         if expAst and expAst.type == 'paren' then
             expAst.start  = start
             expAst.finish = finish - 1
@@ -863,7 +862,7 @@ local Defs = {
         if not name then
             return
         end
-        local nameAst = getAst(name)
+        local nameAst = Asts[name]
         if nameAst.type == 'getname' then
             nameAst.type = 'setname'
             nameAst.value = func
@@ -890,7 +889,7 @@ local Defs = {
             return
         end
 
-        local nameAst = getAst(name)
+        local nameAst = Asts[name]
         if nameAst.type ~= 'getname' then
             pushError {
                 type = 'UNEXPECT_LFUNC_NAME',
@@ -913,7 +912,7 @@ local Defs = {
         local lastStart = start + 1
         local fieldCount = 0
         for i, field in ipairs(tbl) do
-            local fieldAst = getAst(field)
+            local fieldAst = Asts[field]
             if fieldAst.type == ',' or fieldAst.type == ';' then
                 if wantField then
                     pushError {
@@ -977,7 +976,7 @@ local Defs = {
         local wantName = true
         local argCount = 0
         for i, arg in ipairs(args) do
-            local argAst = getAst(arg)
+            local argAst = Asts[arg]
             if argAst.type == ',' then
                 if wantName then
                     pushError {
@@ -1008,8 +1007,8 @@ local Defs = {
                         local b = args[#args]
                         pushError {
                             type   = 'ARGS_AFTER_DOTS',
-                            start  = getAst(a).start,
-                            finish = getAst(b).finish,
+                            start  = Asts[a].start,
+                            finish = Asts[b].finish,
                         }
                     end
                     break
@@ -1031,7 +1030,7 @@ local Defs = {
     end,
     Set = function (start, keys, values, finish)
         for i, key in ipairs(keys) do
-            local keyAst = getAst(key)
+            local keyAst = Asts[key]
             if keyAst.type == 'getname' then
                 keyAst.type = 'setname'
                 keyAst.value = getValue(values, i)
@@ -1044,7 +1043,7 @@ local Defs = {
     end,
     LocalAttr = function (attrs)
         for i, attr in ipairs(attrs) do
-            local attrAst = getAst(attr)
+            local attrAst = Asts[attr]
             attrAst.type = 'localattr'
             if State.Version ~= 'Lua 5.4' then
                 pushError {
@@ -1082,12 +1081,12 @@ local Defs = {
         if not name then
             return name
         end
-        getAst(name).attrs = attrs
+        Asts[name].attrs = attrs
         return name
     end,
     Local = function (start, keys, values, finish)
         for i, key in ipairs(keys) do
-            local keyAst = getAst(key)
+            local keyAst = Asts[key]
             local attrs = keyAst.attrs
             keyAst.attrs = nil
             local value = getValue(values, i)
@@ -1131,7 +1130,7 @@ local Defs = {
         if not name then
             return nil
         end
-        local nameAst = getAst(name)
+        local nameAst = Asts[name]
         nameAst.type = 'label'
         return name
     end,
@@ -1151,7 +1150,7 @@ local Defs = {
         if not name then
             return nil
         end
-        local nameAst = getAst(name)
+        local nameAst = Asts[name]
         nameAst.type = 'goto'
         return name
     end,
@@ -1181,7 +1180,7 @@ local Defs = {
         blocks.finish = finish - 1
         local hasElse
         for i, block in ipairs(blocks) do
-            local blockAst = getAst(block)
+            local blockAst = Asts[block]
             if i == 1 and blockAst.type ~= 'ifblock' then
                 pushError {
                     type = 'MISS_SYMBOL',
@@ -1223,9 +1222,9 @@ local Defs = {
         if #exp == 0 then
             call = createCall(exp, 0, 0)
         else
-            call = createCall(exp, getAst(exp[1]).start, getAst(exp[#exp]).finish)
+            call = createCall(exp, Asts[exp[1]].start, Asts[exp[#exp]].finish)
         end
-        getAst(call).parent = func
+        Asts[call].parent = func
         actions.type   = 'in'
         actions.start  = start
         actions.finish = finish - 1
@@ -1654,7 +1653,7 @@ local function init(state)
     State     = state
     pushError = state.pushError
     pushAst   = state.pushAst
-    getAst    = state.getAst
+    Asts      = state.Ast
     emmy.init(State)
 end
 

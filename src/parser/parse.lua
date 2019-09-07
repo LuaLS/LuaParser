@@ -25,10 +25,6 @@ local function pushAst(ast)
     return n
 end
 
-local function getAst(n)
-    return Asts[n]
-end
-
 return function (self, lua, mode, version)
     Errs  = {}
     Asts  = {}
@@ -39,7 +35,6 @@ return function (self, lua, mode, version)
         Ast = Asts,
         pushError = pushError,
         pushAst = pushAst,
-        getAst = getAst,
     }
     ast.init(State)
     local suc, res, err = xpcall(self.grammar, debug.traceback, self, lua, mode)
