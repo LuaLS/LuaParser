@@ -1177,6 +1177,19 @@ local Defs = {
         blocks.type   = 'if'
         blocks.start  = start
         blocks.finish = finish - 1
+        for i, block in ipairs(blocks) do
+            local blockAst = getAst(block)
+            if i == 1 and blockAst.type ~= 'ifblock' then
+                pushError {
+                    type = 'MISS_SYMBOL',
+                    start = blockAst.start,
+                    finish = blockAst.start,
+                    info = {
+                        symbol = 'if',
+                    }
+                }
+            end
+        end
         checkMissEnd(start)
         return pushAst(blocks)
     end,

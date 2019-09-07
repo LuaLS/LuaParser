@@ -229,6 +229,7 @@ NeedAssign  <-  ASSIGN / {} -> MissAssign
 NeedComma   <-  COMMA  / {} -> MissComma
 NeedIn      <-  IN     / {} -> MissIn
 NeedUntil   <-  UNTIL  / {} -> MissUntil
+NeedThen    <-  THEN   / {} -> MissThen
 ]]
 
 grammar 'Nil' [[
@@ -429,30 +430,17 @@ Label       <-  Sp ({} LABEL MustName DirtyLabel {})
 GoTo        <-  Sp ({} GOTO MustName {})
             ->  GoTo
 
-If          <-  Sp ({} {| IfBody |} {})
+If          <-  Sp ({} {| IfBody+ |} NeedEnd {})
             ->  If
-IfHead      <-  Sp ({} IfPart {})
-            ->  IfBlock
-            /   Sp ({} ElseIfPart {})
-            ->  ElseIfBlock
-            ->  MissIf
-            /   Sp ({} ElsePart {})
-            ->  ElseBlock
-            ->  MissIf
-IfBody      <-  IfHead
-                (({} ElseIfPart {}) -> ElseIfBlock)*
-                (({} ElsePart   {}) -> ElseBlock)?
-                NeedEnd
-IfPart      <-  IF DirtyExp THEN
+IfBody      <-  (({} IfPart     {}) -> IfBlock)
+            /   (({} ElseIfPart {}) -> ElseIfBlock)
+            /   (({} ElsePart   {}) -> ElseBlock)
+IfPart      <-  IF DirtyExp NeedThen
                     {| (!ELSEIF !ELSE !END Action)* |}
-            /   IF DirtyExp {}->MissThen
-                    {| %None                        |}
-ElseIfPart  <-  ELSEIF DirtyExp THEN
-                    {| (!ELSE !ELSEIF !END Action)* |}
-            /   ELSEIF DirtyExp {}->MissThen
-                    {| %None                        |}
+ElseIfPart  <-  ELSEIF DirtyExp NeedThen
+                    {| (!ELSEIF !ELSE !END Action)* |}
 ElsePart    <-  ELSE
-                    {| (!END Action)*               |}
+                    {| (!ELSEIF !ELSE !END Action)* |}
 
 For         <-  Loop / In
 

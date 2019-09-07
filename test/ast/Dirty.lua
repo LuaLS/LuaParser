@@ -86,9 +86,21 @@ a
         name   = 2,
     },
     [4] = {
+        type   = "ifblock",
+        start  = 1,
+        finish = 9,
+        filter = 1,
+        [1]    = 3,
+    },
+    [5] = {
+        type   = "if",
+        start  = 1,
+        finish = 9,
+        [1]    = 4,
+    },
+    [6] = {
         type = "main",
-        [1]  = 1,
-        [2]  = 3,
+        [1]  = 5,
     },
 }
 
