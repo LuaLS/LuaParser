@@ -1177,6 +1177,7 @@ local Defs = {
         blocks.type   = 'if'
         blocks.start  = start
         blocks.finish = finish - 1
+        local hasElse
         for i, block in ipairs(blocks) do
             local blockAst = getAst(block)
             if i == 1 and blockAst.type ~= 'ifblock' then
@@ -1188,6 +1189,16 @@ local Defs = {
                         symbol = 'if',
                     }
                 }
+            end
+            if hasElse then
+                pushError {
+                    type   = 'BLOCK_AFTER_ELSE',
+                    start  = blockAst.start,
+                    finish = blockAst.finish,
+                }
+            end
+            if blockAst.type == 'elseblock' then
+                hasElse = true
             end
         end
         checkMissEnd(start)
@@ -1638,7 +1649,7 @@ for k, v in pairs(emmy.ast) do
 end
 
 local function init(state)
-    State = state
+    State     = state
     pushError = state.pushError
     pushAst   = state.pushAst
     getAst    = state.getAst

@@ -430,11 +430,14 @@ Label       <-  Sp ({} LABEL MustName DirtyLabel {})
 GoTo        <-  Sp ({} GOTO MustName {})
             ->  GoTo
 
-If          <-  Sp ({} {| IfBody+ |} NeedEnd {})
+If          <-  Sp ({} {| IfHead IfBody* |} NeedEnd {})
             ->  If
-IfBody      <-  (({} IfPart     {}) -> IfBlock)
-            /   (({} ElseIfPart {}) -> ElseIfBlock)
-            /   (({} ElsePart   {}) -> ElseBlock)
+
+IfHead      <-  Sp ({} IfPart     {}) -> IfBlock
+            /   Sp ({} ElseIfPart {}) -> ElseIfBlock
+            /   Sp ({} ElsePart   {}) -> ElseBlock
+IfBody      <-  Sp ({} ElseIfPart {}) -> ElseIfBlock
+            /   Sp ({} ElsePart   {}) -> ElseBlock
 IfPart      <-  IF DirtyExp NeedThen
                     {| (!ELSEIF !ELSE !END Action)* |}
 ElseIfPart  <-  ELSEIF DirtyExp NeedThen
