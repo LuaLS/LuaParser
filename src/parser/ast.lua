@@ -8,7 +8,6 @@ local ipairs      = ipairs
 
 local State
 local pushError
-local pushAst
 
 -- goto 单独处理
 local RESERVED = {
@@ -95,7 +94,7 @@ local function binaryForward(list, start, finish, level)
                 goto CONTINUE
             end
             checkOpVersion(op)
-            return pushAst {
+            Asts[#Asts+1] = {
                 type   = 'binary',
                 op     = op,
                 start  = Asts[e1].start,
@@ -103,6 +102,7 @@ local function binaryForward(list, start, finish, level)
                 [1]    = e1,
                 [2]    = e2,
             }
+            return #Asts
         end
         ::CONTINUE::
     end
@@ -124,7 +124,7 @@ local function binaryBackward(list, start, finish, level)
                 goto CONTINUE
             end
             checkOpVersion(op)
-            return pushAst {
+            Asts[#Asts+1] = {
                 type   = 'binary',
                 op     = op,
                 start  = Asts[e1].start,
@@ -132,6 +132,7 @@ local function binaryBackward(list, start, finish, level)
                 [1]    = e1,
                 [2]    = e2,
             }
+            return #Asts
         end
         ::CONTINUE::
     end
@@ -146,13 +147,14 @@ local function unary(list, start, finish, level)
         local e1 = expSplit(list, start+1, finish, level)
         if e1 then
             checkOpVersion(op)
-            return pushAst {
+            Asts[#Asts+1] = {
                 type   = 'unary',
                 op     = op,
                 start  = Asts[op].start,
                 finish = Asts[e1].finish,
                 [1]    = e1,
             }
+            return #Asts
         end
     end
     return expSplit(list, start, finish, level+1)
@@ -177,11 +179,12 @@ local function checkMissEnd(start)
 end
 
 local function getSelect(vararg, index)
-    return pushAst {
+    Asts[#Asts+1] = {
         type   = 'select',
         vararg = vararg,
         index  = index,
     }
+    return #Asts
 end
 
 local function getValue(values, i)
@@ -212,7 +215,7 @@ local function createLocal(key, value, attrs)
         return nil
     end
     local keyAst = Asts[key]
-    return pushAst {
+    Asts[#Asts+1] = {
         type   = 'local',
         start  = keyAst.start,
         finish = keyAst.finish,
@@ -220,18 +223,21 @@ local function createLocal(key, value, attrs)
         value  = value,
         attrs  = attrs
     }
+    return #Asts
 end
 
 local function createCall(args, start, finish)
     args.type    = 'callargs'
     args.start   = start
     args.finish  = finish
-    return pushAst {
+    Asts[#Asts+1] = args
+    Asts[#Asts+1] = {
         type   = 'call',
         start  = start,
         finish = finish,
-        args   = pushAst(args),
+        args   = #Asts,
     }
+    return #Asts
 end
 
 local function packList(start, list, finish)
@@ -341,27 +347,30 @@ Exp = {
 
 local Defs = {
     Nil = function (pos)
-        return pushAst {
+        Asts[#Asts+1] = {
             type   = 'nil',
             start  = pos,
             finish = pos + 2,
         }
+        return #Asts
     end,
     True = function (pos)
-        return pushAst {
+        Asts[#Asts+1] = {
             type   = 'boolean',
             start  = pos,
             finish = pos + 3,
             [1]    = true,
         }
+        return #Asts
     end,
     False = function (pos)
-        return pushAst {
+        Asts[#Asts+1] = {
             type   = 'boolean',
             start  = pos,
             finish = pos + 4,
             [1]    = false,
         }
+        return #Asts
     end,
     LongComment = function (beforeEq, afterEq, str, missPos)
         if missPos then
@@ -439,13 +448,14 @@ local Defs = {
         }
     end,
     String = function (start, quote, str, finish)
-        return pushAst {
+        Asts[#Asts+1] = {
             type   = 'string',
             start  = start,
             finish = finish - 1,
             [1]    = str,
             [2]    = quote,
         }
+        return #Asts
     end,
     LongString = function (beforeEq, afterEq, str, missPos)
         if missPos then
@@ -581,12 +591,13 @@ local Defs = {
     Number = function (start, number, finish)
         local n = tonumber(number)
         if n then
-            State.LastNumber = pushAst {
+            Asts[#Asts+1] = {
                 type   = 'number',
                 start  = start,
                 finish = finish - 1,
                 [1]    = n,
             }
+            State.LastNumber = #Asts
             return State.LastNumber
         else
             pushError {
@@ -594,12 +605,13 @@ local Defs = {
                 start  = start,
                 finish = finish - 1,
             }
-            State.LastNumber = pushAst {
+            Asts[#Asts+1] = {
                 type   = 'number',
                 start  = start,
                 finish = finish - 1,
                 [1]    = 0,
             }
+            State.LastNumber = #Asts
             return State.LastNumber
         end
     end,
@@ -661,47 +673,52 @@ local Defs = {
                 finish = finish - 1,
             }
         end
-        return pushAst {
+        Asts[#Asts+1] = {
             type   = 'name',
             start  = start,
             finish = finish - 1,
             [1]    = str,
         }
+        return #Asts
     end,
     GetField = function (dot, field)
-        return pushAst {
+        Asts[#Asts+1] = {
             type   = 'getfield',
             field  = field,
             dot    = dot,
             start  = Asts[dot].start,
             finish = Asts[field or dot].finish,
         }
+        return #Asts
     end,
     GetIndex = function (start, index, finish)
-        return pushAst {
+        Asts[#Asts+1] = {
             type   = 'getindex',
             start  = start,
             finish = finish - 1,
             index  = index,
         }
+        return #Asts
     end,
     GetMethod = function (colon, method)
-        return pushAst {
+        Asts[#Asts+1] = {
             type   = 'getmethod',
             method = method,
             colon  = colon,
             start  = Asts[colon].start,
             finish = Asts[method or colon].finish,
         }
+        return #Asts
     end,
     Single = function (unit)
         local unitAst = Asts[unit]
-        return pushAst {
+        Asts[#Asts+1] = {
             type   = 'getname',
             start  = unitAst.start,
             finish = unitAst.finish,
             name   = unit,
         }
+        return #Asts
     end,
     Simple = function (units)
         local last = units[1]
@@ -725,18 +742,20 @@ local Defs = {
         return call
     end,
     BinaryOp = function (start, op)
-        return pushAst {
+        Asts[#Asts+1] = {
             type   = op,
             start  = start,
             finish = start + #op - 1,
         }
+        return #Asts
     end,
     UnaryOp = function (start, op)
-        return pushAst {
+        Asts[#Asts+1] = {
             type   = op,
             start  = start,
             finish = start + #op - 1,
         }
+        return #Asts
     end,
     Exp = function (first, ...)
         if not ... then
@@ -752,12 +771,13 @@ local Defs = {
             expAst.finish = finish - 1
             return expAst
         end
-        return pushAst {
+        Asts[#Asts+1] = {
             type   = 'paren',
             start  = start,
             finish = finish - 1,
             exp    = exp
         }
+        return #Asts
     end,
     PackLoopArgs = function (start, list, finish)
         local list = packList(start, list, finish)
@@ -810,39 +830,44 @@ local Defs = {
         return createCall(args, start, finish-1)
     end,
     COMMA = function (start)
-        return pushAst {
+        Asts[#Asts+1] = {
             type   = ',',
             start  = start,
             finish = start,
         }
+        return #Asts
     end,
     SEMICOLON = function (start)
-        return pushAst {
+        Asts[#Asts+1] = {
             type   = ';',
             start  = start,
             finish = start,
         }
+        return #Asts
     end,
     DOTS = function (start)
-        return pushAst {
+        Asts[#Asts+1] = {
             type   = '...',
             start  = start,
             finish = start + 2,
         }
+        return #Asts
     end,
     COLON = function (start)
-        return pushAst {
+        Asts[#Asts+1] = {
             type   = ':',
             start  = start,
             finish = start,
         }
+        return #Asts
     end,
     DOT = function (start)
-        return pushAst {
+        Asts[#Asts+1] = {
             type   = '.',
             start  = start,
             finish = start,
         }
+        return #Asts
     end,
     Function = function (start, args, actions, finish)
         actions.type   = 'function'
@@ -850,7 +875,8 @@ local Defs = {
         actions.finish = finish - 1
         actions.args   = args
         checkMissEnd(start)
-        return pushAst(actions)
+        Asts[#Asts+1] = actions
+        return #Asts
     end,
     NamedFunction = function (start, name, args, actions, finish)
         actions.type   = 'function'
@@ -858,7 +884,8 @@ local Defs = {
         actions.finish = finish - 1
         actions.args   = args
         checkMissEnd(start)
-        local func = pushAst(actions)
+        Asts[#Asts+1] = (actions)
+        local func = #Asts
         if not name then
             return
         end
@@ -883,7 +910,8 @@ local Defs = {
         actions.finish = finish - 1
         actions.args   = args
         checkMissEnd(start)
-        local func = pushAst(actions)
+        Asts[#Asts+1] = actions
+        local func = #Asts
 
         if not name then
             return
@@ -940,33 +968,37 @@ local Defs = {
         for i = fieldCount + 1, #tbl do
             tbl[i] = nil
         end
-        return pushAst(tbl)
+        Asts[#Asts+1] = tbl
+        return #Asts
     end,
     NewField = function (start, field, value, finish)
-        return pushAst {
+        Asts[#Asts+1] = {
             type   = 'tablefield',
             start  = start,
             finish = finish-1,
             field  = field,
             value  = value,
         }
+        return #Asts
     end,
     Index = function (start, index, finish)
-        return pushAst {
+        Asts[#Asts+1] = {
             type   = 'index',
             start  = start,
             finish = finish - 1,
             index  = index,
         }
+        return #Asts
     end,
     NewIndex = function (start, index, value, finish)
-        return pushAst {
+        Asts[#Asts+1] = {
             type   = 'tableindex',
             start  = start,
             finish = finish-1,
             index  = index,
             value  = value,
         }
+        return #Asts
     end,
     FuncArgs = function (start, args, finish)
         args.type   = 'funcargs'
@@ -1026,7 +1058,8 @@ local Defs = {
                 finish = finish - 1,
             }
         end
-        return pushAst(args)
+        Asts[#Asts+1] = args
+        return #Asts
     end,
     Set = function (start, keys, values, finish)
         for i, key in ipairs(keys) do
@@ -1099,20 +1132,23 @@ local Defs = {
         actions.start  = start
         actions.finish = finish - 1
         checkMissEnd(start)
-        return pushAst(actions)
+        Asts[#Asts+1] = actions
+        return #Asts
     end,
     Break = function (start, finish)
-        return pushAst {
+        Asts[#Asts+1] = {
             type   = 'break',
             start  = start,
             finish = finish,
         }
+        return #Asts
     end,
     Return = function (start, exps, finish)
         exps.type   = 'return'
         exps.start  = start
         exps.finish = finish - 1
-        return pushAst(exps)
+        Asts[#Asts+1] = exps
+        return #Asts
     end,
     Label = function (start, name, finish)
         if State.Version == 'Lua 5.1' then
@@ -1159,20 +1195,23 @@ local Defs = {
         actions.start  = start
         actions.finish = finish - 1
         actions.filter = exp
-        return pushAst(actions)
+        Asts[#Asts+1] = actions
+        return #Asts
     end,
     ElseIfBlock = function (start, exp, actions, finish)
         actions.type   = 'elseifblock'
         actions.start  = start
         actions.finish = finish - 1
         actions.filter = exp
-        return pushAst(actions)
+        Asts[#Asts+1] = actions
+        return #Asts
     end,
     ElseBlock = function (start, actions, finish)
         actions.type   = 'elseblock'
         actions.start  = start
         actions.finish = finish - 1
-        return pushAst(actions)
+        Asts[#Asts+1] = actions
+        return #Asts
     end,
     If = function (start, blocks, finish)
         blocks.type   = 'if'
@@ -1203,7 +1242,8 @@ local Defs = {
             end
         end
         checkMissEnd(start)
-        return pushAst(blocks)
+        Asts[#Asts+1] = blocks
+        return #Asts
     end,
     Loop = function (start, arg, steps, actions, finish)
         local loc = createLocal(arg, steps[1])
@@ -1214,7 +1254,8 @@ local Defs = {
         actions.max    = steps[2]
         actions.step   = steps[3]
         checkMissEnd(start)
-        return pushAst(actions)
+        Asts[#Asts+1] = actions
+        return #Asts
     end,
     In = function (start, locs, exp, actions, finish)
         local func = table.remove(exp)
@@ -1234,7 +1275,8 @@ local Defs = {
             actions.locs[i] = createLocal(loc, getValue(values, i), nil)
         end
         checkMissEnd(start)
-        return pushAst(actions)
+        Asts[#Asts+1] = actions
+        return #Asts
     end,
     While = function (start, filter, actions, finish)
         actions.type   = 'while'
@@ -1242,18 +1284,21 @@ local Defs = {
         actions.finish = finish - 1
         actions.filter = filter
         checkMissEnd(start)
-        return pushAst(actions)
+        Asts[#Asts+1] = actions
+        return #Asts
     end,
     Repeat = function (start, actions, filter, finish)
         actions.type   = 'repeat'
         actions.start  = start
         actions.finish = finish
         actions.filter = filter
-        return pushAst(actions)
+        Asts[#Asts+1] = actions
+        return #Asts
     end,
     Lua = function (actions)
         actions.type = 'main'
-        pushAst(actions)
+        Asts[#Asts+1] = actions
+        return #Asts
     end,
 
     -- 捕获错误
@@ -1284,12 +1329,6 @@ local Defs = {
             start = pos,
             finish = pos,
         }
-        --return pushAst {
-        --    type   = 'name',
-        --    start  = pos-1,
-        --    finish = pos-1,
-        --    [1]    = ''
-        --}
         return nil
     end,
     DirtyExp = function (pos)
@@ -1298,12 +1337,6 @@ local Defs = {
             start = pos,
             finish = pos,
         }
-        --return pushAst {
-        --    type   = 'name',
-        --    start  = pos,
-        --    finish = pos,
-        --    [1]    = ''
-        --}
         return nil
     end,
     MissExp = function (pos)
@@ -1652,7 +1685,6 @@ end
 local function init(state)
     State     = state
     pushError = state.pushError
-    pushAst   = state.pushAst
     Asts      = state.Ast
     emmy.init(State)
 end
