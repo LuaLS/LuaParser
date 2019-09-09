@@ -988,7 +988,7 @@ CHECK'1 ^ -2'
 CHECK'...'
 {
     [1] = {
-        type   = '...',
+        type   = 'varargs',
         start  = 1,
         finish = 3,
     }
@@ -1386,7 +1386,7 @@ CHECK'func(...)'
         name   = 1,
     },
     [3] = {
-        type   = "...",
+        type   = "varargs",
         start  = 6,
         finish = 8,
     },
@@ -1430,7 +1430,7 @@ CHECK'func(1, ...)'
         finish = 7,
     },
     [5] = {
-        type   = "...",
+        type   = "varargs",
         start  = 9,
         finish = 11,
     },
@@ -1640,7 +1640,7 @@ CHECK'obj:remove()'
 CHECK'(...)[1]'
 {
     [1] = {
-        type   = "...",
+        type   = "varargs",
         start  = 2,
         finish = 4,
     },
@@ -1741,7 +1741,7 @@ CHECK'{}'
 CHECK'{...}'
 {
     [1] = {
-        type   = "...",
+        type   = "varargs",
         start  = 2,
         finish = 4,
     },

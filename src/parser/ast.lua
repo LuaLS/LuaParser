@@ -202,13 +202,13 @@ local function getValue(values, i)
             return nil, nil
         end
         local lastAst = Asts[last]
-        if lastAst.type == 'call' or lastAst.type == '...' then
+        if lastAst.type == 'call' or lastAst.type == 'varargs' then
             return getSelect(last, i - #values + 1)
         end
         return nil, nil
     end
     local valueAst = Asts[value]
-    if valueAst.type == 'call' or valueAst.type == '...' then
+    if valueAst.type == 'call' or valueAst.type == 'varargs' then
         value = getSelect(value, 1)
     end
     return value, valueAst
@@ -782,6 +782,10 @@ local Defs = {
             exp    = exp
         }
         return #Asts
+    end,
+    VarArgs = function (dots)
+        Asts[dots].type = 'varargs'
+        return dots
     end,
     PackLoopArgs = function (start, list, finish)
         local list = packList(start, list, finish)

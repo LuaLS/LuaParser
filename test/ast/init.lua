@@ -36,7 +36,7 @@ local function test(type)
             end
             if not eq(state.ast, target_ast) then
                 fs.create_directory(ROOT / 'test' / 'log')
-                io.save(ROOT / 'test' / 'log' / 'my_ast.ast', table.dump(state.Ast))
+                io.save(ROOT / 'test' / 'log' / 'my_ast.ast', table.dump(state.ast))
                 io.save(ROOT / 'test' / 'log' / 'target_ast.ast', table.dump(target_ast))
                 error(('语法树不相等：%s\n%s'):format(type, buf))
             end

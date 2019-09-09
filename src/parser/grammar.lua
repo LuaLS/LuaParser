@@ -302,7 +302,7 @@ ExpUnit     <-  Nil
             /   Boolean
             /   String
             /   Number
-            /   DOTS
+            /   Dots
             /   Table
             /   Function
             /   Simple
@@ -346,6 +346,8 @@ MaybeExp    <-  Exp / MissExp
 MissExp     <-  {} -> MissExp
 ExpList     <-  Sp {| MaybeExp (Sp ',' MaybeExp)* |}
 
+Dots        <-  DOTS
+            ->  VarArgs
 
 Table       <-  Sp ({} TL {| TableField* |} DirtyTR {})
             ->  Table

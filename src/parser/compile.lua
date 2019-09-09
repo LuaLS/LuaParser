@@ -1,3 +1,4 @@
+local guide = require 'parser.guide'
 local print = print
 
 _ENV = nil
@@ -42,12 +43,7 @@ local function markState()
     end
 end
 
-local function doFunction(func)
-end
-
-local function doVM()
-    local main = #State.ast
-    doFunction(main)
+local function doSyntaxCheck()
 end
 
 return function (self, lua, mode, version)
@@ -58,6 +54,6 @@ return function (self, lua, mode, version)
     pushError = State.pushError
     Ast = State.ast
     markState()
-    doVM()
+    doSyntaxCheck()
     return State, Errs
 end

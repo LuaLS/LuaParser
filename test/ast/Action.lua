@@ -415,7 +415,7 @@ CHECK'local x, y = ...'
         [1]    = "y",
     },
     [3] = {
-        type   = "...",
+        type   = "varargs",
         start  = 14,
         finish = 16,
     },
@@ -459,7 +459,7 @@ CHECK'local x, y = (...)'
         [1]    = "y",
     },
     [3] = {
-        type   = "...",
+        type   = "varargs",
         start  = 15,
         finish = 17,
     },
@@ -498,7 +498,7 @@ CHECK'local x, y = ..., nil'
         [1]    = "y",
     },
     [3] = {
-        type   = "...",
+        type   = "varargs",
         start  = 14,
         finish = 16,
     },
