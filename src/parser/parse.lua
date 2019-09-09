@@ -28,6 +28,7 @@ return function (self, lua, mode, version)
         emmy = {},
         ast = Asts,
         pushError = pushError,
+        ref = {},
     }
     ast.init(State)
     local suc, res, err = xpcall(self.grammar, debug.traceback, self, lua, mode)

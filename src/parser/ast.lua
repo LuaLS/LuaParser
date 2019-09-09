@@ -884,6 +884,12 @@ local Defs = {
         actions.args   = args
         checkMissEnd(start)
         Asts[#Asts+1] = actions
+        local id = #Asts
+        local funcList = State.ref['function']
+        for i = 1, #actions do
+            local action = actions[i]
+            funcList[action] = id
+        end
         return #Asts
     end,
     NamedFunction = function (start, name, args, actions, finish)
@@ -894,6 +900,11 @@ local Defs = {
         checkMissEnd(start)
         Asts[#Asts+1] = (actions)
         local func = #Asts
+        local funcList = State.ref['function']
+        for i = 1, #actions do
+            local action = actions[i]
+            funcList[action] = func
+        end
         if not name then
             return
         end
@@ -920,6 +931,11 @@ local Defs = {
         checkMissEnd(start)
         Asts[#Asts+1] = actions
         local func = #Asts
+        local funcList = State.ref['function']
+        for i = 1, #actions do
+            local action = actions[i]
+            funcList[action] = func
+        end
 
         if not name then
             return
@@ -1161,6 +1177,12 @@ local Defs = {
         exps.start  = start
         exps.finish = finish - 1
         Asts[#Asts+1] = exps
+        local id = #Asts
+        local rtnList = State.ref['return']
+        for i = 1, #exps do
+            local exp = exps[i]
+            rtnList[exp] = id
+        end
         return #Asts
     end,
     Label = function (start, name, finish)
@@ -1314,7 +1336,13 @@ local Defs = {
     Lua = function (actions)
         actions.type = 'main'
         Asts[#Asts+1] = actions
-        return #Asts
+        local id = #Asts
+        local funcList = State.ref['function']
+        for i = 1, #actions do
+            local action = actions[i]
+            funcList[action] = id
+        end
+        return id
     end,
 
     -- 捕获错误
@@ -1683,11 +1711,17 @@ for k, v in pairs(emmy.ast) do
     Defs[k] = v
 end
 
+local function initRefs()
+    State.ref['function'] = {}
+    State.ref['return']   = {}
+end
+
 local function init(state)
     State     = state
     pushError = state.pushError
     Asts      = state.ast
     emmy.init(State)
+    initRefs()
 end
 
 return {
