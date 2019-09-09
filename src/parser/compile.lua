@@ -11,8 +11,14 @@ local vmMap = {
         if not func then
             return
         end
-        local funcAst = Ast[func]
-        local argAst  = Ast[funcAst.args]
+        local dots = guide.getFunctionVarArgs(State, func)
+        if not dots then
+            pushError {
+                type   = 'UNEXPECT_DOTS',
+                start  = obj.start,
+                finish = obj.finish,
+            }
+        end
     end,
 }
 

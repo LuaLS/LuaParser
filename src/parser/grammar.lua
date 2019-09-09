@@ -511,7 +511,7 @@ FuncName    <-  {| Single (Sp SuffixWithoutCall)* |}
             /   {} -> MissName %nil
 ]]
 
-grammar 'EmmyLua' (emmy.grammar)
+--grammar 'EmmyLua' (emmy.grammar)
 
 grammar 'Lua' [[
 Lua         <-  Head?

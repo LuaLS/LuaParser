@@ -82,7 +82,6 @@ end
 {
     type = 'UNEXPECT_DOTS',
 }
-do return end
 TEST[[
 function f(...)
     return function ()
@@ -94,6 +93,7 @@ end
     type = 'UNEXPECT_DOTS',
 }
 
+do return end
 TEST[[
 <!break!>
 ]]

@@ -1707,9 +1707,9 @@ local Defs = {
     end,
 }
 
-for k, v in pairs(emmy.ast) do
-    Defs[k] = v
-end
+--for k, v in pairs(emmy.ast) do
+--    Defs[k] = v
+--end
 
 local function initRefs()
     State.ref['function'] = {}
