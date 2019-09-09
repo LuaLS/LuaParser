@@ -50,7 +50,7 @@ local function checkOpVersion(op)
         return
     end
     for i = 1, #versions do
-        if versions[i] == State.Version then
+        if versions[i] == State.version then
             return
         end
     end
@@ -60,7 +60,7 @@ local function checkOpVersion(op)
         finish  = opAst.finish,
         version = versions,
         info    = {
-            version = State.Version,
+            version = State.version,
         }
     }
 end
@@ -166,7 +166,7 @@ local function checkMissEnd(start)
     end
     local err = State.MissEndErr
     State.MissEndErr = nil
-    local _, finish = State.Lua:find('[%w_]+', start)
+    local _, finish = State.lua:find('[%w_]+', start)
     if not finish then
         return
     end
@@ -506,14 +506,14 @@ local Defs = {
         return stringChar(char)
     end,
     Char16 = function (pos, char)
-        if State.Version == 'Lua 5.1' then
+        if State.version == 'Lua 5.1' then
             pushError {
                 type = 'ERR_ESC',
                 start = pos-1,
                 finish = pos,
                 version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
                 info = {
-                    version = State.Version,
+                    version = State.version,
                 }
             }
             return char
@@ -521,9 +521,9 @@ local Defs = {
         return stringChar(tonumber(char, 16))
     end,
     CharUtf8 = function (pos, char)
-        if  State.Version ~= 'Lua 5.3'
-        and State.Version ~= 'Lua 5.4'
-        and State.Version ~= 'LuaJIT'
+        if  State.version ~= 'Lua 5.3'
+        and State.version ~= 'Lua 5.4'
+        and State.version ~= 'LuaJIT'
         then
             pushError {
                 type = 'ERR_ESC',
@@ -531,7 +531,7 @@ local Defs = {
                 finish = pos-2,
                 version = {'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
                 info = {
-                    version = State.Version,
+                    version = State.version,
                 }
             }
             return char
@@ -557,7 +557,7 @@ local Defs = {
             end
             return ''
         end
-        if State.Version == 'Lua 5.4' then
+        if State.version == 'Lua 5.4' then
             if v < 0 or v > 0x7FFFFFFF then
                 pushError {
                     type = 'UTF8_MAX',
@@ -629,14 +629,14 @@ local Defs = {
             lastNumber[1] = 0
             return
         end
-        if State.Version ~= 'LuaJIT' then
+        if State.version ~= 'LuaJIT' then
             pushError {
                 type = 'UNSUPPORT_SYMBOL',
                 start = start,
                 finish = start + #symbol - 1,
                 version = 'LuaJIT',
                 info = {
-                    version = State.Version,
+                    version = State.version,
                 }
             }
             lastNumber[1] = 0
@@ -644,14 +644,14 @@ local Defs = {
     end,
     ImaginaryNumber = function (start, symbol)
         local lastNumber = Asts[State.LastNumber]
-        if State.Version ~= 'LuaJIT' then
+        if State.version ~= 'LuaJIT' then
             pushError {
                 type = 'UNSUPPORT_SYMBOL',
                 start = start,
                 finish = start + #symbol - 1,
                 version = 'LuaJIT',
                 info = {
-                    version = State.Version,
+                    version = State.version,
                 }
             }
         end
@@ -662,7 +662,7 @@ local Defs = {
         if RESERVED[str] then
             isKeyWord = true
         elseif str == 'goto' then
-            if State.Version ~= 'Lua 5.1' and State.Version ~= 'LuaJIT' then
+            if State.version ~= 'Lua 5.1' and State.version ~= 'LuaJIT' then
                 isKeyWord = true
             end
         end
@@ -1078,14 +1078,14 @@ local Defs = {
         for i, attr in ipairs(attrs) do
             local attrAst = Asts[attr]
             attrAst.type = 'localattr'
-            if State.Version ~= 'Lua 5.4' then
+            if State.version ~= 'Lua 5.4' then
                 pushError {
                     type    = 'UNSUPPORT_SYMBOL',
                     start   = attrAst.start,
                     finish  = attrAst.finish,
                     version = 'Lua 5.4',
                     info    = {
-                        version = State.Version,
+                        version = State.version,
                     }
                 }
             elseif attrAst[1] ~= 'const' and attrAst[1] ~= 'close' then
@@ -1151,14 +1151,14 @@ local Defs = {
         return #Asts
     end,
     Label = function (start, name, finish)
-        if State.Version == 'Lua 5.1' then
+        if State.version == 'Lua 5.1' then
             pushError {
                 type   = 'UNSUPPORT_SYMBOL',
                 start  = start,
                 finish = finish - 1,
                 version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
                 info = {
-                    version = State.Version,
+                    version = State.version,
                 }
             }
             return
@@ -1171,14 +1171,14 @@ local Defs = {
         return name
     end,
     GoTo = function (start, name, finish)
-        if State.Version == 'Lua 5.1' then
+        if State.version == 'Lua 5.1' then
             pushError {
                 type    = 'UNSUPPORT_SYMBOL',
                 start   = start,
                 finish  = finish - 1,
                 version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
                 info = {
-                    version = State.Version,
+                    version = State.version,
                 }
             }
             return
@@ -1685,7 +1685,7 @@ end
 local function init(state)
     State     = state
     pushError = state.pushError
-    Asts      = state.Ast
+    Asts      = state.ast
     emmy.init(State)
 end
 

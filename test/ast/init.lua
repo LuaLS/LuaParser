@@ -34,7 +34,7 @@ local function test(type)
             if not state then
                 error(('语法树生成失败：%s'):format(err))
             end
-            if not eq(state.Ast, target_ast) then
+            if not eq(state.ast, target_ast) then
                 fs.create_directory(ROOT / 'test' / 'log')
                 io.save(ROOT / 'test' / 'log' / 'my_ast.ast', table.dump(state.Ast))
                 io.save(ROOT / 'test' / 'log' / 'target_ast.ast', table.dump(target_ast))

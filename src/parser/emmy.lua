@@ -103,7 +103,7 @@ local ast = {
     EmmyLua = function (start, emmy, finish)
         emmy.start = start
         emmy.finish = finish - 1
-        State.Emmy[#State.Emmy+1] = emmy
+        State.emmy[#State.emmy+1] = emmy
     end,
     EmmyName = function (start, str)
         return {

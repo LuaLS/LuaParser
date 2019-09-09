@@ -19,22 +19,15 @@ local function pushError(err)
     return err
 end
 
-local function pushAst(ast)
-    local n = #Asts + 1
-    Asts[n] = ast
-    return n
-end
-
 return function (self, lua, mode, version)
     Errs  = {}
     Asts  = {}
     State = {
-        Version = version,
-        Lua = lua,
-        Emmy = {},
-        Ast = Asts,
+        version = version,
+        lua = lua,
+        emmy = {},
+        ast = Asts,
         pushError = pushError,
-        pushAst = pushAst,
     }
     ast.init(State)
     local suc, res, err = xpcall(self.grammar, debug.traceback, self, lua, mode)
