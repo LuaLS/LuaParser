@@ -8,11 +8,12 @@ local function markState()
 end
 
 local function doFunction(func)
-    
+    local funcs = State.func
+    local funcAst = State.ast[func]
 end
 
 local function doVM()
-    State.funcs = {}
+    State.func = {}
     local main = #State.ast
     doFunction(main)
 end

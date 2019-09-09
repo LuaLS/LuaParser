@@ -4,9 +4,13 @@ local tonumber    = tonumber
 local stringChar  = string.char
 local utf8Char    = utf8.char
 local tableUnpack = table.unpack
-local ipairs      = ipairs
+local mathType    = math.type
+local pairs       = pairs
+
+_ENV = nil
 
 local State
+local Asts
 local pushError
 
 -- goto 单独处理
@@ -617,7 +621,7 @@ local Defs = {
     end,
     FFINumber = function (start, symbol)
         local lastNumber = Asts[State.LastNumber]
-        if math.type(lastNumber[1]) == 'float' then
+        if mathType(lastNumber[1]) == 'float' then
             pushError {
                 type = 'UNKNOWN_SYMBOL',
                 start = start,
@@ -939,7 +943,8 @@ local Defs = {
         local wantField = true
         local lastStart = start + 1
         local fieldCount = 0
-        for i, field in ipairs(tbl) do
+        for i = 1, #tbl do
+            local field = tbl[i]
             local fieldAst = Asts[field]
             if fieldAst.type == ',' or fieldAst.type == ';' then
                 if wantField then
@@ -1007,7 +1012,8 @@ local Defs = {
         local lastStart = start + 1
         local wantName = true
         local argCount = 0
-        for i, arg in ipairs(args) do
+        for i = 1, #args do
+            local arg = args[i]
             local argAst = Asts[arg]
             if argAst.type == ',' then
                 if wantName then
@@ -1062,7 +1068,8 @@ local Defs = {
         return #Asts
     end,
     Set = function (start, keys, values, finish)
-        for i, key in ipairs(keys) do
+        for i = 1, #keys do
+            local key = keys[i]
             local keyAst = Asts[key]
             if keyAst.type == 'getname' then
                 keyAst.type = 'setname'
@@ -1075,7 +1082,8 @@ local Defs = {
         return tableUnpack(keys)
     end,
     LocalAttr = function (attrs)
-        for i, attr in ipairs(attrs) do
+        for i = 1, #attrs do
+            local attr = attrs[i]
             local attrAst = Asts[attr]
             attrAst.type = 'localattr'
             if State.version ~= 'Lua 5.4' then
@@ -1118,7 +1126,8 @@ local Defs = {
         return name
     end,
     Local = function (start, keys, values, finish)
-        for i, key in ipairs(keys) do
+        for i = 1, #keys do
+            local key = keys[i]
             local keyAst = Asts[key]
             local attrs = keyAst.attrs
             keyAst.attrs = nil
@@ -1218,7 +1227,8 @@ local Defs = {
         blocks.start  = start
         blocks.finish = finish - 1
         local hasElse
-        for i, block in ipairs(blocks) do
+        for i = 1, #blocks do
+            local block = blocks[i]
             local blockAst = Asts[block]
             if i == 1 and blockAst.type ~= 'ifblock' then
                 pushError {
@@ -1258,7 +1268,8 @@ local Defs = {
         return #Asts
     end,
     In = function (start, locs, exp, actions, finish)
-        local func = table.remove(exp)
+        local func = exp[#exp]
+        exp[#exp] = nil
         local call
         if #exp == 0 then
             call = createCall(exp, 0, 0)
@@ -1271,7 +1282,8 @@ local Defs = {
         actions.finish = finish - 1
         actions.locs = {}
         local values = {call}
-        for i, loc in ipairs(locs) do
+        for i = 1, #locs do
+            local loc = locs[i]
             actions.locs[i] = createLocal(loc, getValue(values, i), nil)
         end
         checkMissEnd(start)
@@ -1562,21 +1574,6 @@ local Defs = {
             finish = finish - 1,
         }
         return exp
-    end,
-    AfterReturn = function (rtn, ...)
-        if not ... then
-            return rtn
-        end
-        local action = select(-1, ...)
-        if not action then
-            return rtn
-        end
-        pushError {
-            type = 'ACTION_AFTER_RETURN',
-            start = rtn.start,
-            finish = rtn.finish,
-        }
-        return rtn, action
     end,
     MissIf = function (start, block)
         pushError {
