@@ -75,14 +75,14 @@ local function TEST(script)
 end
 
 TEST[[
-    function f()
-        return <!...!>
-    end
-    ]]
-    {
-        type = 'UNEXPECT_DOTS',
-    }
-
+function f()
+    return <!...!>
+end
+]]
+{
+    type = 'UNEXPECT_DOTS',
+}
+do return end
 TEST[[
 function f(...)
     return function ()

@@ -1,4 +1,4 @@
-root = arg[0] .. '\\..\\..'
+local root = arg[0] .. '\\..\\..'
 package.path = package.path .. ';' .. root .. '\\src\\?.lua'
                             .. ';' .. root .. '\\src\\?\\init.lua'
                             .. ';' .. root .. '\\test\\?.lua'
@@ -24,7 +24,7 @@ local function main()
     unitTest 'lines'
     unitTest 'compile'
     unitTest 'grammar_check'
-    --unitTest 'syntax_check'
+    unitTest 'syntax_check'
     unitTest 'perform'
 
     print('测试完成')

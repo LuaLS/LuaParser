@@ -11,7 +11,7 @@ CHECK';;;'
         type = "main",
     },
 }
-
+    
 CHECK';;;x = 1'
 {
     [1] = {

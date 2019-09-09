@@ -34,9 +34,9 @@ local function test(type)
             if not state then
                 error(('语法树生成失败：%s'):format(err))
             end
-            if not eq(state[type], target_ast) then
+            if not eq(state.ref[type], target_ast) then
                 fs.create_directory(ROOT / 'test' / 'log')
-                io.save(ROOT / 'test' / 'log' / 'my_compile.ast', table.dump(state.Ast))
+                io.save(ROOT / 'test' / 'log' / 'my_compile.ast', table.dump(state.ref[type]))
                 io.save(ROOT / 'test' / 'log' / 'target_compile.ast', table.dump(target_ast))
                 error(('编译结果不相等：%s\n%s'):format(type, buf))
             end
@@ -45,4 +45,5 @@ local function test(type)
     require('compile.' .. type)
 end
 
-test 'func'
+test 'function'
+test 'return'
