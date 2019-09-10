@@ -1,16 +1,42 @@
 local m = {}
 
+local blockTypes = {
+    ['while']  = true,
+    ['in']     = true,
+    ['loop']   = true,
+    ['repeat'] = true,
+}
+
 --- 寻找所在函数
 function m.getParentFunction(state, id)
     local ref = state.ref
+    local ast = state.ast
     for _ = 1, 1000 do
-        local func = ref['function'][id]
-        if func then
-            return func
-        end
-        id = ref['return'][id]
+        id = ref[id]
         if not id then
             break
+        end
+        if ast[id].type == 'function' then
+            return id
+        end
+    end
+    return nil
+end
+
+function m.getParentBlock(state, id)
+    local ref = state.ref
+    local ast = state.ast
+    for _ = 1, 1000 do
+        id = ref[id]
+        if not id then
+            break
+        end
+        local tp = ast[id].type
+        if blockTypes[tp] then
+            return id
+        end
+        if tp == 'function' then
+            return nil
         end
     end
     return nil

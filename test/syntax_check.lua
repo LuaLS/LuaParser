@@ -82,6 +82,7 @@ end
 {
     type = 'UNEXPECT_DOTS',
 }
+
 TEST[[
 function f(...)
     return function ()
@@ -92,6 +93,41 @@ end
 {
     type = 'UNEXPECT_DOTS',
 }
+
+TEST[[
+function f(...)
+    return ...
+end
+]]
+(nil)
+
+TEST[[
+for i = 1, 10 do
+    break
+end
+]]
+(nil)
+
+TEST[[
+for k, v in pairs(t) do
+    break
+end
+]]
+(nil)
+
+TEST[[
+while true do
+    break
+end
+]]
+(nil)
+
+TEST[[
+repeat
+    break
+until true
+]]
+(nil)
 
 do return end
 TEST[[

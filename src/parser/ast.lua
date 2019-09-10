@@ -349,6 +349,17 @@ Exp = {
     },
 }
 
+local function refList(func)
+    Asts[#Asts+1] = func
+    local id = #Asts
+    local ref = State.ref
+    for i = 1, #func do
+        local action = func[i]
+        ref[action] = id
+    end
+    return id
+end
+
 local Defs = {
     Nil = function (pos)
         Asts[#Asts+1] = {
@@ -883,13 +894,7 @@ local Defs = {
         actions.finish = finish - 1
         actions.args   = args
         checkMissEnd(start)
-        Asts[#Asts+1] = actions
-        local id = #Asts
-        local funcList = State.ref['function']
-        for i = 1, #actions do
-            local action = actions[i]
-            funcList[action] = id
-        end
+        refList(actions)
         return #Asts
     end,
     NamedFunction = function (start, name, args, actions, finish)
@@ -898,13 +903,7 @@ local Defs = {
         actions.finish = finish - 1
         actions.args   = args
         checkMissEnd(start)
-        Asts[#Asts+1] = (actions)
-        local func = #Asts
-        local funcList = State.ref['function']
-        for i = 1, #actions do
-            local action = actions[i]
-            funcList[action] = func
-        end
+        local func = refList(actions)
         if not name then
             return
         end
@@ -929,13 +928,7 @@ local Defs = {
         actions.finish = finish - 1
         actions.args   = args
         checkMissEnd(start)
-        Asts[#Asts+1] = actions
-        local func = #Asts
-        local funcList = State.ref['function']
-        for i = 1, #actions do
-            local action = actions[i]
-            funcList[action] = func
-        end
+        local func = refList(actions)
 
         if not name then
             return
@@ -1178,10 +1171,10 @@ local Defs = {
         exps.finish = finish - 1
         Asts[#Asts+1] = exps
         local id = #Asts
-        local rtnList = State.ref['return']
+        local refs = State.ref
         for i = 1, #exps do
             local exp = exps[i]
-            rtnList[exp] = id
+            refs[exp] = id
         end
         return #Asts
     end,
@@ -1290,8 +1283,8 @@ local Defs = {
         actions.max    = steps[2]
         actions.step   = steps[3]
         checkMissEnd(start)
-        Asts[#Asts+1] = actions
-        return #Asts
+        local block = refList(actions)
+        return block
     end,
     In = function (start, locs, exp, actions, finish)
         local func = exp[#exp]
@@ -1313,8 +1306,8 @@ local Defs = {
             actions.locs[i] = createLocal(loc, getValue(values, i), nil)
         end
         checkMissEnd(start)
-        Asts[#Asts+1] = actions
-        return #Asts
+        local id = refList(actions)
+        return id
     end,
     While = function (start, filter, actions, finish)
         actions.type   = 'while'
@@ -1335,13 +1328,7 @@ local Defs = {
     end,
     Lua = function (actions)
         actions.type = 'main'
-        Asts[#Asts+1] = actions
-        local id = #Asts
-        local funcList = State.ref['function']
-        for i = 1, #actions do
-            local action = actions[i]
-            funcList[action] = id
-        end
+        local id = refList(actions)
         return id
     end,
 
@@ -1711,17 +1698,11 @@ local Defs = {
 --    Defs[k] = v
 --end
 
-local function initRefs()
-    State.ref['function'] = {}
-    State.ref['return']   = {}
-end
-
 local function init(state)
     State     = state
     pushError = state.pushError
     Asts      = state.ast
     emmy.init(State)
-    initRefs()
 end
 
 return {

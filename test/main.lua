@@ -22,7 +22,6 @@ local function main()
     unitTest 'ast'
     unitTest 'grammar'
     unitTest 'lines'
-    unitTest 'compile'
     unitTest 'grammar_check'
     unitTest 'syntax_check'
     unitTest 'perform'
