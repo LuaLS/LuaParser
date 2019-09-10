@@ -20,6 +20,17 @@ local vmMap = {
             }
         end
     end,
+    ['break'] = function (obj, id)
+        local block = guide.getParentBlock(State, id)
+        if not block then
+            pushError {
+                type   = 'BREAK_OUTSIDE',
+                start  = obj.start,
+                finish = obj.finish,
+            }
+            return
+        end
+    end
 }
 
 local function compileVM()

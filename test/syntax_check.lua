@@ -129,7 +129,6 @@ until true
 ]]
 (nil)
 
-do return end
 TEST[[
 <!break!>
 ]]
@@ -155,6 +154,18 @@ end
     type = 'BREAK_OUTSIDE',
 }
 
+TEST[[
+while 1 do
+    local function f()
+        <!break!>
+    end
+end
+]]
+{
+    type = 'BREAK_OUTSIDE',
+}
+
+do return end
 TEST[[
 :: label :: <!return
 goto!> label

@@ -1161,7 +1161,7 @@ local Defs = {
         Asts[#Asts+1] = {
             type   = 'break',
             start  = start,
-            finish = finish,
+            finish = finish - 1,
         }
         return #Asts
     end,
@@ -1315,16 +1315,16 @@ local Defs = {
         actions.finish = finish - 1
         actions.filter = filter
         checkMissEnd(start)
-        Asts[#Asts+1] = actions
-        return #Asts
+        local block = refList(actions)
+        return block
     end,
     Repeat = function (start, actions, filter, finish)
         actions.type   = 'repeat'
         actions.start  = start
         actions.finish = finish
         actions.filter = filter
-        Asts[#Asts+1] = actions
-        return #Asts
+        local block = refList(actions)
+        return block
     end,
     Lua = function (actions)
         actions.type = 'main'

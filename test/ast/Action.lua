@@ -1715,7 +1715,7 @@ until 1]]
     [1] = {
         type   = "break",
         start  = 12,
-        finish = 17,
+        finish = 16,
     },
     [2] = {
         type   = "number",
