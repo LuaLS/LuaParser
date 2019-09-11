@@ -174,7 +174,51 @@ goto!> label
     multi = 3,
 }
 
-do return end
+TEST[[
+::label::
+goto label
+]]
+(nil)
+
+TEST[[
+goto label
+::label::
+]]
+(nil)
+
+TEST[[
+do
+    goto label
+end
+::label::
+]]
+(nil)
+
+TEST[[
+::label::
+do
+    goto label
+end
+]]
+(nil)
+
+TEST[[
+goto label
+local x = 1
+x = 2
+::label::
+]]
+(nil)
+
+TEST[[
+local x = 1
+goto label
+x = 2
+::label::
+print(x)
+]]
+(nil)
+
 TEST[[
 goto <!label!>
 ]]

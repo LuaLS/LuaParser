@@ -43,6 +43,35 @@ local vmMap = {
             }
         end
     end,
+    ['goto'] = function (obj, id)
+        local ast = State.ast
+        local name = obj[1]
+        local block = id
+        for _ = 1, 1000 do
+            block = guide.getParentBlock(State, block)
+            if not block then
+                break
+            end
+            local blockAst = ast[block]
+            if blockAst.type == 'function' then
+                break
+            end
+            for i = 1, #blockAst do
+                local actionAst = ast[blockAst[i]]
+                if actionAst.type == 'label' and actionAst[1] == name then
+                    return
+                end
+            end
+        end
+        pushError {
+            type   = 'NO_VISIBLE_LABEL',
+            start  = obj.start,
+            finish = obj.finish,
+            info   = {
+                label = name,
+            }
+        }
+    end,
 }
 
 local function compileVM()

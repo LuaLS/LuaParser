@@ -10,6 +10,7 @@ local blockTypes = {
     ['ifblock']     = true,
     ['elseblock']   = true,
     ['elseifblock'] = true,
+    ['main']        = true,
 }
 
 local breakBlockTypes = {
@@ -29,23 +30,6 @@ function m.getParentFunction(state, id)
             break
         end
         if ast[id].type == 'function' then
-            return id
-        end
-    end
-    return nil
-end
-
---- 寻找所在区块
-function m.getParentBlock(state, id)
-    local ref = state.ref
-    local ast = state.ast
-    for _ = 1, 1000 do
-        id = ref[id]
-        if not id then
-            break
-        end
-        local tp = ast[id].type
-        if blockTypes[tp] then
             return id
         end
     end
