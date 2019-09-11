@@ -12,6 +12,7 @@ _ENV = nil
 local State
 local Asts
 local pushError
+local Loc
 
 -- goto 单独处理
 local RESERVED = {
@@ -227,7 +228,13 @@ local function createLocal(key, value, attrs)
         value  = value,
         attrs  = attrs
     }
-    return #Asts
+    local id = #Asts
+    local name = keyAst[1]
+    if not Loc[name] then
+        Loc[name] = {}
+    end
+    Loc[name][#Loc[name]+1] = id
+    return id
 end
 
 local function createCall(args, start, finish)
@@ -1702,6 +1709,7 @@ local function init(state)
     State     = state
     pushError = state.pushError
     Asts      = state.ast
+    Loc       = state.loc
     emmy.init(State)
 end
 

@@ -29,6 +29,7 @@ return function (self, lua, mode, version)
         ast = Asts,
         pushError = pushError,
         ref = {},
+        loc = {},
     }
     ast.init(State)
     local suc, res, err = xpcall(self.grammar, debug.traceback, self, lua, mode)

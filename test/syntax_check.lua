@@ -195,13 +195,3 @@ do do do goto <!label!> end end end
         label = 'label',
     }
 }
-
-TEST[[
-while true do
-    <!break!>
-    x = 1
-end
-]]
-{
-    type = 'ACTION_AFTER_BREAK',
-}
