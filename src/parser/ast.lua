@@ -349,12 +349,12 @@ Exp = {
     },
 }
 
-local function refList(func)
-    Asts[#Asts+1] = func
+local function refList(list)
+    Asts[#Asts+1] = list
     local id = #Asts
     local ref = State.ref
-    for i = 1, #func do
-        local action = func[i]
+    for i = 1, #list do
+        local action = list[i]
         ref[action] = id
     end
     return id
@@ -1154,8 +1154,8 @@ local Defs = {
         actions.start  = start
         actions.finish = finish - 1
         checkMissEnd(start)
-        Asts[#Asts+1] = actions
-        return #Asts
+        local block = refList(actions)
+        return block
     end,
     Break = function (start, finish)
         Asts[#Asts+1] = {
@@ -1223,23 +1223,23 @@ local Defs = {
         actions.start  = start
         actions.finish = finish - 1
         actions.filter = exp
-        Asts[#Asts+1] = actions
-        return #Asts
+        local block = refList(actions)
+        return block
     end,
     ElseIfBlock = function (start, exp, actions, finish)
         actions.type   = 'elseifblock'
         actions.start  = start
         actions.finish = finish - 1
         actions.filter = exp
-        Asts[#Asts+1] = actions
-        return #Asts
+        local block = refList(actions)
+        return block
     end,
     ElseBlock = function (start, actions, finish)
         actions.type   = 'elseblock'
         actions.start  = start
         actions.finish = finish - 1
-        Asts[#Asts+1] = actions
-        return #Asts
+        local block = refList(actions)
+        return block
     end,
     If = function (start, blocks, finish)
         blocks.type   = 'if'

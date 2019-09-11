@@ -21,7 +21,7 @@ local vmMap = {
         end
     end,
     ['break'] = function (obj, id)
-        local block = guide.getParentBlock(State, id)
+        local block = guide.getParentBreakBlock(State, id)
         if not block then
             pushError {
                 type   = 'BREAK_OUTSIDE',
@@ -30,7 +30,19 @@ local vmMap = {
             }
             return
         end
-    end
+    end,
+    ['return'] = function (obj, id)
+        local list = State.ref[id]
+        local listAst = State.ast[list]
+        local last = listAst[#listAst]
+        if last ~= id then
+            pushError {
+                type   = 'ACTION_AFTER_RETURN',
+                start  = obj.start,
+                finish = obj.finish,
+            }
+        end
+    end,
 }
 
 local function compileVM()

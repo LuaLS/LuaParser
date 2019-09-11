@@ -165,7 +165,6 @@ end
     type = 'BREAK_OUTSIDE',
 }
 
-do return end
 TEST[[
 :: label :: <!return
 goto!> label
@@ -175,6 +174,7 @@ goto!> label
     multi = 3,
 }
 
+do return end
 TEST[[
 goto <!label!>
 ]]
