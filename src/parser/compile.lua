@@ -67,7 +67,7 @@ local vmMap1 = {
         end
     end,
     ['getname'] = function (obj, id)
-        local loc = guide.lookupLocal(State, guide.getBlock(State, id), obj[1])
+        local loc = guide.getLocal(State, guide.getBlock(State, id), obj[1])
         if loc then
             obj.type = 'getlocal'
             obj.loc  = loc
@@ -81,7 +81,7 @@ local vmMap1 = {
         end
     end,
     ['setname'] = function (obj, id)
-        local loc = guide.lookupLocal(State, guide.getBlock(State, id), obj[1])
+        local loc = guide.getLocal(State, guide.getBlock(State, id), obj[1])
         if loc then
             obj.type = 'setlocal'
             obj.loc  = loc

@@ -100,7 +100,7 @@ function m.getFunctionVarArgs(state, id)
     return nil
 end
 
-function m.lookupLocal(state, block, name)
+function m.getLocal(state, block, name)
     local astMap = state.ast
     local locals = state.loc[name]
     if not locals then
