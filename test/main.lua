@@ -18,7 +18,7 @@ local function unitTest(name)
 end
 
 local function main()
-
+    --collectgarbage 'stop'
     unitTest 'ast'
     unitTest 'grammar'
     unitTest 'lines'

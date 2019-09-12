@@ -220,21 +220,15 @@ local function createLocal(key, value, attrs)
         return nil
     end
     local keyAst = Asts[key]
-    Asts[#Asts+1] = {
-        type   = 'local',
-        start  = keyAst.start,
-        finish = keyAst.finish,
-        loc    = key,
-        value  = value,
-        attrs  = attrs
-    }
-    local id = #Asts
+    keyAst.type  = 'local'
+    keyAst.value = value
+    keyAst.attrs = attrs
     local name = keyAst[1]
     if not Loc[name] then
         Loc[name] = {}
     end
-    Loc[name][#Loc[name]+1] = id
-    return id
+    Loc[name][#Loc[name]+1] = key
+    return key
 end
 
 local function createCall(args, start, finish)
@@ -734,13 +728,8 @@ local Defs = {
     end,
     Single = function (unit)
         local unitAst = Asts[unit]
-        Asts[#Asts+1] = {
-            type   = 'getname',
-            start  = unitAst.start,
-            finish = unitAst.finish,
-            name   = unit,
-        }
-        return #Asts
+        unitAst.type  = 'getname'
+        return unit
     end,
     Simple = function (units)
         local last = units[1]

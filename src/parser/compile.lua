@@ -33,6 +33,9 @@ local vmMap = {
     end,
     ['return'] = function (obj, id)
         local list = State.ref[id]
+        if not list then
+            return
+        end
         local listAst = State.ast[list]
         local last = listAst[#listAst]
         if last ~= id then
@@ -73,7 +76,7 @@ local vmMap = {
         }
     end,
     ['getname'] = function (obj, id)
-        
+        --local loc = guide.getLocal(State, obj[1])
     end,
 }
 

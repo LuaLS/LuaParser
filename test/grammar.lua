@@ -1,7 +1,7 @@
 local parser = require 'parser'
 
 local function check_str(str, name, mode)
-    local ast, err = parser:parse(str, mode, 'Lua 5.3')
+    local ast, err = parser:compile(str, mode, 'Lua 5.3')
     assert(ast)
     if #err > 0 and mode ~= 'Dirty' then
         error(([[
@@ -239,8 +239,6 @@ check 'Action'
 'return 1, 2',
 
 '::CONTINUE::',
-
-'goto CONTINUE',
 
 [[if 1 then
 end]],
