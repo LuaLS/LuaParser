@@ -100,4 +100,27 @@ function m.getFunctionVarArgs(state, id)
     return nil
 end
 
+function m.getLocal(state, id)
+    local astMap = state.ast
+    local name   = astMap[id][1]
+    local locals = state.loc[name]
+    if not locals then
+        return nil
+    end
+    local block = id
+    for _ = 1, 1000 do
+        block = m.getParentBlock(state, block)
+        if not block then
+            return nil
+        end
+        for i = 1, #locals do
+            local loc = locals[i]
+            if m.getParentBlock(state, loc) == block then
+                return loc
+            end
+        end
+    end
+    return nil
+end
+
 return m

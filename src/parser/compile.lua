@@ -76,7 +76,33 @@ local vmMap = {
         }
     end,
     ['getname'] = function (obj, id)
-        --local loc = guide.getLocal(State, obj[1])
+        local ast = State.ast[id]
+        local loc = guide.getLocal(State, id)
+        if loc then
+            ast.type = 'getlocal'
+            ast.loc  = loc
+            local locAst = State.ast[loc]
+            if not locAst.gets then
+                locAst.gets = {}
+            end
+            locAst.gets[#locAst.gets+1] = id
+        else
+            ast.type = 'getglobal'
+        end
+    end,
+    ['setname'] = function (obj, id)
+        local loc = guide.getLocal(State, id)
+        if loc then
+            obj.type = 'setlocal'
+            obj.loc  = loc
+            local locAst = State.ast[loc]
+            if not locAst.sets then
+                locAst.sets = {}
+            end
+            locAst.sets[#locAst.sets+1] = id
+        else
+            obj.type = 'setglobal'
+        end
     end,
 }
 
