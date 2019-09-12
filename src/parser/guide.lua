@@ -22,10 +22,10 @@ local breakBlockTypes = {
 
 --- 寻找所在函数
 function m.getParentFunction(state, id)
-    local ref = state.ref
+    local parent = state.parent
     local ast = state.ast
     for _ = 1, 1000 do
-        id = ref[id]
+        id = parent[id]
         if not id then
             break
         end
@@ -38,10 +38,10 @@ end
 
 --- 寻找所在区块
 function m.getParentBlock(state, id)
-    local ref = state.ref
+    local parent = state.parent
     local ast = state.ast
     for _ = 1, 1000 do
-        id = ref[id]
+        id = parent[id]
         if not id then
             break
         end
@@ -55,10 +55,10 @@ end
 
 --- 寻找所在可break的区块
 function m.getParentBreakBlock(state, id)
-    local ref = state.ref
+    local parent = state.parent
     local ast = state.ast
     for _ = 1, 1000 do
-        id = ref[id]
+        id = parent[id]
         if not id then
             break
         end

@@ -52,7 +52,7 @@ local vmMap1 = {
         end
     end,
     ['return'] = function (obj, id)
-        local list = State.ref[id]
+        local list = State.parent[id]
         if not list then
             return
         end
@@ -98,7 +98,6 @@ local vmMap1 = {
 
 local vmMap2 = {
     ['goto'] = function (obj, id)
-        local ast = State.ast
         local name = obj[1]
         local block = id
         local labelAst
@@ -107,13 +106,13 @@ local vmMap2 = {
             if not block then
                 break
             end
-            local blockAst = ast[block]
+            local blockAst = Ast[block]
             if blockAst.type == 'function' then
                 break
             end
             for i = 1, #blockAst do
                 local action = blockAst[i]
-                local actionAst = ast[action]
+                local actionAst = Ast[action]
                 if actionAst.type == 'label' and actionAst[1] == name then
                     labelAst = actionAst
                     obj.ref = action
@@ -140,10 +139,10 @@ local vmMap2 = {
             return
         end
         -- 检查在 goto 与 label 之间声明的局部变量
-        local blockAst = ast[block]
+        local blockAst = Ast[block]
         for i = 1, #blockAst do
             local action = blockAst[i]
-            local actionAst = ast[action]
+            local actionAst = Ast[action]
             if actionAst == labelAst then
                 break
             end

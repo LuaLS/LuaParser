@@ -28,7 +28,7 @@ return function (self, lua, mode, version)
         emmy = {},
         ast = Asts,
         pushError = pushError,
-        ref = {},
+        parent = {},
         loc = {},
     }
     ast.init(State)

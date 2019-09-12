@@ -307,3 +307,30 @@ return x
         },
     }
 }
+
+do return end
+
+TEST[[
+::<!label!>::
+::label::
+do
+    ::label::
+end
+]]
+{
+    type = 'REDEFINED_LABEL',
+    relative = {
+        {
+            start = 3,
+            finish = 7,
+        },
+        {
+            start = 13,
+            finish = 17,
+        },
+        {
+            start = 30,
+            finish = 34,
+        },
+    }
+}

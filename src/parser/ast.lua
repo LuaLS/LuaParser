@@ -350,13 +350,13 @@ Exp = {
     },
 }
 
-local function refList(list)
+local function parentList(list)
     Asts[#Asts+1] = list
     local id = #Asts
-    local ref = State.ref
+    local parent = State.parent
     for i = 1, #list do
         local action = list[i]
-        ref[action] = id
+        parent[action] = id
     end
     return id
 end
@@ -890,7 +890,7 @@ local Defs = {
         actions.finish = finish - 1
         actions.args   = args
         checkMissEnd(start)
-        refList(actions)
+        parentList(actions)
         return #Asts
     end,
     NamedFunction = function (start, name, args, actions, finish)
@@ -899,7 +899,7 @@ local Defs = {
         actions.finish = finish - 1
         actions.args   = args
         checkMissEnd(start)
-        local func = refList(actions)
+        local func = parentList(actions)
         if not name then
             return
         end
@@ -924,7 +924,7 @@ local Defs = {
         actions.finish = finish - 1
         actions.args   = args
         checkMissEnd(start)
-        local func = refList(actions)
+        local func = parentList(actions)
 
         if not name then
             return
@@ -1157,7 +1157,7 @@ local Defs = {
         actions.start  = start
         actions.finish = finish - 1
         checkMissEnd(start)
-        local block = refList(actions)
+        local block = parentList(actions)
         return block
     end,
     Break = function (start, finish)
@@ -1174,10 +1174,10 @@ local Defs = {
         exps.finish = finish - 1
         Asts[#Asts+1] = exps
         local id = #Asts
-        local refs = State.ref
+        local parents = State.parent
         for i = 1, #exps do
             local exp = exps[i]
-            refs[exp] = id
+            parents[exp] = id
         end
         return #Asts
     end,
@@ -1226,7 +1226,7 @@ local Defs = {
         actions.start  = start
         actions.finish = finish - 1
         actions.filter = exp
-        local block = refList(actions)
+        local block = parentList(actions)
         return block
     end,
     ElseIfBlock = function (start, exp, actions, finish)
@@ -1234,14 +1234,14 @@ local Defs = {
         actions.start  = start
         actions.finish = finish - 1
         actions.filter = exp
-        local block = refList(actions)
+        local block = parentList(actions)
         return block
     end,
     ElseBlock = function (start, actions, finish)
         actions.type   = 'elseblock'
         actions.start  = start
         actions.finish = finish - 1
-        local block = refList(actions)
+        local block = parentList(actions)
         return block
     end,
     If = function (start, blocks, finish)
@@ -1286,7 +1286,7 @@ local Defs = {
         actions.max    = steps[2]
         actions.step   = steps[3]
         checkMissEnd(start)
-        local block = refList(actions)
+        local block = parentList(actions)
         return block
     end,
     In = function (start, locs, exp, actions, finish)
@@ -1309,7 +1309,7 @@ local Defs = {
             actions.locs[i] = createLocal(loc, getValue(values, i), nil)
         end
         checkMissEnd(start)
-        local id = refList(actions)
+        local id = parentList(actions)
         return id
     end,
     While = function (start, filter, actions, finish)
@@ -1318,7 +1318,7 @@ local Defs = {
         actions.finish = finish - 1
         actions.filter = filter
         checkMissEnd(start)
-        local block = refList(actions)
+        local block = parentList(actions)
         return block
     end,
     Repeat = function (start, actions, filter, finish)
@@ -1326,12 +1326,12 @@ local Defs = {
         actions.start  = start
         actions.finish = finish
         actions.filter = filter
-        local block = refList(actions)
+        local block = parentList(actions)
         return block
     end,
     Lua = function (actions)
         actions.type = 'main'
-        local id = refList(actions)
+        local id = parentList(actions)
         return id
     end,
 
