@@ -36,8 +36,8 @@ function m.getParentFunction(state, id)
     return nil
 end
 
---- 寻找所在区块
-function m.getParentBlock(state, id)
+--- 寻找所在父区块
+function m.getBlock(state, id)
     local parent = state.parent
     local ast = state.ast
     for _ = 1, 1000 do
@@ -53,8 +53,8 @@ function m.getParentBlock(state, id)
     return nil
 end
 
---- 寻找所在可break的区块
-function m.getParentBreakBlock(state, id)
+--- 寻找所在可break的父区块
+function m.getBreakBlock(state, id)
     local parent = state.parent
     local ast = state.ast
     for _ = 1, 1000 do
@@ -100,23 +100,17 @@ function m.getFunctionVarArgs(state, id)
     return nil
 end
 
-function m.getLocal(state, id, name)
+function m.lookupLocal(state, block, name)
     local astMap = state.ast
-    local name   = name or astMap[id][1]
     local locals = state.loc[name]
     if not locals then
         return nil
     end
-    local block = id
     for _ = 1, 1000 do
-        block = m.getParentBlock(state, block)
-        if not block then
-            return nil
-        end
         local result
         for i = 1, #locals do
             local loc = locals[i]
-            if m.getParentBlock(state, loc) == block then
+            if m.getBlock(state, loc) == block then
                 if result then
                     local lastLocAst = astMap[result]
                     local newLocAst  = astMap[loc]
@@ -131,8 +125,37 @@ function m.getLocal(state, id, name)
         if result then
             return result
         end
+        block = m.getBlock(state, block)
+        if not block then
+            return nil
+        end
     end
     return nil
+end
+
+function m.getLabel(state, block, name, exclude)
+    local astMap = state.ast
+    for _ = 1, 1000 do
+        local blockAst = astMap[block]
+        for i = 1, #blockAst do
+            local action = blockAst[i]
+            if action == exclude then
+                goto CONTINUE
+            end
+            local actionAst = astMap[action]
+            if actionAst.type == 'label' and actionAst[1] == name then
+                return action
+            end
+            ::CONTINUE::
+        end
+        if blockAst.type == 'function' then
+            return nil
+        end
+        block = m.getBlock(state, block)
+        if not block then
+            return nil
+        end
+    end
 end
 
 return m

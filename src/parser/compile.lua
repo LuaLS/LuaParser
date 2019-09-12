@@ -41,7 +41,7 @@ local vmMap1 = {
         end
     end,
     ['break'] = function (obj, id)
-        local block = guide.getParentBreakBlock(State, id)
+        local block = guide.getBreakBlock(State, id)
         if not block then
             pushError {
                 type   = 'BREAK_OUTSIDE',
@@ -67,7 +67,7 @@ local vmMap1 = {
         end
     end,
     ['getname'] = function (obj, id)
-        local loc = guide.getLocal(State, id)
+        local loc = guide.lookupLocal(State, guide.getBlock(State, id), obj[1])
         if loc then
             obj.type = 'getlocal'
             obj.loc  = loc
@@ -81,7 +81,7 @@ local vmMap1 = {
         end
     end,
     ['setname'] = function (obj, id)
-        local loc = guide.getLocal(State, id)
+        local loc = guide.lookupLocal(State, guide.getBlock(State, id), obj[1])
         if loc then
             obj.type = 'setlocal'
             obj.loc  = loc
@@ -94,37 +94,36 @@ local vmMap1 = {
             obj.type = 'setglobal'
         end
     end,
+    ['label'] = function (obj, id)
+        local block = guide.getBlock(State, id)
+        if not block then
+            return
+        end
+        local name = obj[1]
+        local label = guide.getLabel(State, block, name, id)
+        if label and label ~= id then
+            local labelAst = Ast[label]
+            pushError {
+                type   = 'REDEFINED_LABEL',
+                start  = obj.start,
+                finish = obj.finish,
+                relative = {
+                    {
+                        labelAst.start,
+                        labelAst.finish,
+                    }
+                }
+            }
+        end
+    end,
 }
 
 local vmMap2 = {
     ['goto'] = function (obj, id)
         local name = obj[1]
-        local block = id
-        local labelAst
-        for _ = 1, 1000 do
-            block = guide.getParentBlock(State, block)
-            if not block then
-                break
-            end
-            local blockAst = Ast[block]
-            if blockAst.type == 'function' then
-                break
-            end
-            for i = 1, #blockAst do
-                local action = blockAst[i]
-                local actionAst = Ast[action]
-                if actionAst.type == 'label' and actionAst[1] == name then
-                    labelAst = actionAst
-                    obj.ref = action
-                    labelAst.ref = id
-                    break
-                end
-            end
-            if labelAst then
-                break
-            end
-        end
-        if not labelAst then
+        local block = guide.getBlock(State, id)
+        local label = guide.getLabel(State, block, name)
+        if not label then
             pushError {
                 type   = 'NO_VISIBLE_LABEL',
                 start  = obj.start,
@@ -135,6 +134,11 @@ local vmMap2 = {
             }
             return
         end
+
+        local labelAst = Ast[label]
+        obj.ref = label
+        labelAst.ref = id
+
         if labelAst.start < obj.start then
             return
         end
