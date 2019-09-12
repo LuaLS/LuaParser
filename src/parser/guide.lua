@@ -113,11 +113,23 @@ function m.getLocal(state, id)
         if not block then
             return nil
         end
+        local result
         for i = 1, #locals do
             local loc = locals[i]
             if m.getParentBlock(state, loc) == block then
-                return loc
+                if result then
+                    local lastLocAst = astMap[result]
+                    local newLocAst  = astMap[loc]
+                    if lastLocAst.start < newLocAst.start then
+                        result = loc
+                    end
+                else
+                    result = loc
+                end
             end
+        end
+        if result then
+            return result
         end
     end
     return nil
