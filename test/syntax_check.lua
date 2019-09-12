@@ -220,6 +220,15 @@ print(x)
 (nil)
 
 TEST[[
+local x = 1
+::label::
+print(x)
+local x
+goto label
+]]
+(nil)
+
+TEST[[
 goto <!label!>
 ]]
 {
@@ -253,12 +262,34 @@ end
     }
 }
 
-do return end
 TEST[[
 goto <!label!>
 local x = 1
 ::label::
 x = 2
+]]
+{
+    type = 'JUMP_LOCAL_SCOPE',
+    info = {
+        loc = 'x',
+    },
+    relative = {
+        {
+            start = 26,
+            finish = 30,
+        },
+        {
+            start = 18,
+            finish = 18,
+        },
+    }
+}
+
+TEST[[
+goto <!label!>
+local x = 1
+::label::
+return x
 ]]
 {
     type = 'JUMP_LOCAL_SCOPE',

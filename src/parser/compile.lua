@@ -5,7 +5,27 @@ _ENV = nil
 
 local State, Errs, pushError, Ast
 
-local vmMap = {
+local function checkJumpLocal(start, finish, obj)
+    if obj.start < start then
+        return nil
+    end
+    if obj.finish > finish then
+        return nil
+    end
+    local refs = obj.ref
+    if not refs then
+        return nil
+    end
+    for i = 1, #refs do
+        local ast = Ast[refs[i]]
+        if ast.start > finish then
+            return ast
+        end
+    end
+    return nil
+end
+
+local vmMap1 = {
     ['varargs'] = function (obj, id)
         local func = guide.getParentFunction(State, id)
         if not func then
@@ -46,10 +66,42 @@ local vmMap = {
             }
         end
     end,
+    ['getname'] = function (obj, id)
+        local loc = guide.getLocal(State, id)
+        if loc then
+            obj.type = 'getlocal'
+            obj.loc  = loc
+            local locAst = State.ast[loc]
+            if not locAst.ref then
+                locAst.ref = {}
+            end
+            locAst.ref[#locAst.ref+1] = id
+        else
+            obj.type = 'getglobal'
+        end
+    end,
+    ['setname'] = function (obj, id)
+        local loc = guide.getLocal(State, id)
+        if loc then
+            obj.type = 'setlocal'
+            obj.loc  = loc
+            local locAst = State.ast[loc]
+            if not locAst.ref then
+                locAst.ref = {}
+            end
+            locAst.ref[#locAst.ref+1] = id
+        else
+            obj.type = 'setglobal'
+        end
+    end,
+}
+
+local vmMap2 = {
     ['goto'] = function (obj, id)
         local ast = State.ast
         local name = obj[1]
         local block = id
+        local labelAst
         for _ = 1, 1000 do
             block = guide.getParentBlock(State, block)
             if not block then
@@ -60,48 +112,65 @@ local vmMap = {
                 break
             end
             for i = 1, #blockAst do
-                local actionAst = ast[blockAst[i]]
+                local action = blockAst[i]
+                local actionAst = ast[action]
                 if actionAst.type == 'label' and actionAst[1] == name then
-                    return
+                    labelAst = actionAst
+                    obj.ref = action
+                    labelAst.ref = id
+                    break
                 end
             end
+            if labelAst then
+                break
+            end
         end
-        pushError {
-            type   = 'NO_VISIBLE_LABEL',
-            start  = obj.start,
-            finish = obj.finish,
-            info   = {
-                label = name,
+        if not labelAst then
+            pushError {
+                type   = 'NO_VISIBLE_LABEL',
+                start  = obj.start,
+                finish = obj.finish,
+                info   = {
+                    label = name,
+                }
             }
-        }
-    end,
-    ['getname'] = function (obj, id)
-        local ast = State.ast[id]
-        local loc = guide.getLocal(State, id)
-        if loc then
-            ast.type = 'getlocal'
-            ast.loc  = loc
-            local locAst = State.ast[loc]
-            if not locAst.gets then
-                locAst.gets = {}
-            end
-            locAst.gets[#locAst.gets+1] = id
-        else
-            ast.type = 'getglobal'
+            return
         end
-    end,
-    ['setname'] = function (obj, id)
-        local loc = guide.getLocal(State, id)
-        if loc then
-            obj.type = 'setlocal'
-            obj.loc  = loc
-            local locAst = State.ast[loc]
-            if not locAst.sets then
-                locAst.sets = {}
+        if labelAst.start < obj.start then
+            return
+        end
+        -- 检查在 goto 与 label 之间声明的局部变量
+        local blockAst = ast[block]
+        for i = 1, #blockAst do
+            local action = blockAst[i]
+            local actionAst = ast[action]
+            if actionAst == labelAst then
+                break
             end
-            locAst.sets[#locAst.sets+1] = id
-        else
-            obj.type = 'setglobal'
+            if actionAst.type == 'local' then
+                local locAst = checkJumpLocal(obj.start, labelAst.start, actionAst)
+                if locAst then
+                    pushError {
+                        type   = 'JUMP_LOCAL_SCOPE',
+                        start  = obj.start,
+                        finish = obj.finish,
+                        info   = {
+                            loc = locAst[1],
+                        },
+                        relative = {
+                            {
+                                start  = labelAst.start,
+                                finish = labelAst.finish,
+                            },
+                            {
+                                start  = locAst.start,
+                                finish = locAst.finish,
+                            }
+                        },
+                    }
+                    break
+                end
+            end
         end
     end,
 }
@@ -109,7 +178,14 @@ local vmMap = {
 local function compileVM()
     for i = 1, #Ast do
         local ast = Ast[i]
-        local vmMethod = vmMap[ast.type]
+        local vmMethod = vmMap1[ast.type]
+        if vmMethod then
+            vmMethod(ast, i)
+        end
+    end
+    for i = 1, #Ast do
+        local ast = Ast[i]
+        local vmMethod = vmMap2[ast.type]
         if vmMethod then
             vmMethod(ast, i)
         end

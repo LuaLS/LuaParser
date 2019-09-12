@@ -100,9 +100,9 @@ function m.getFunctionVarArgs(state, id)
     return nil
 end
 
-function m.getLocal(state, id)
+function m.getLocal(state, id, name)
     local astMap = state.ast
-    local name   = astMap[id][1]
+    local name   = name or astMap[id][1]
     local locals = state.loc[name]
     if not locals then
         return nil
