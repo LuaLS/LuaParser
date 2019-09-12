@@ -940,10 +940,17 @@ local Defs = {
             return
         end
 
-        nameAst.type = 'setname'
-        nameAst.value = func
+        local loc = createLocal(name)
+        Asts[#Asts+1] = {
+            type   = 'setname',
+            start  = nameAst.start,
+            finish = nameAst.finish,
+            value  = func,
+            [1]    = nameAst[1]
+        }
+        local set = #Asts
 
-        return createLocal(nameAst.name), name
+        return loc, set
     end,
     Table = function (start, tbl, finish)
         tbl.type   = 'table'

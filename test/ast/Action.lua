@@ -1627,40 +1627,34 @@ local function a()
 end]]
 {
     [1] = {
-        type   = "name",
+        type   = "local",
         start  = 16,
         finish = 16,
         [1]    = "a",
     },
     [2] = {
-        type   = "setname",
-        start  = 16,
-        finish = 16,
-        name   = 1,
-        value  = 5,
-    },
-    [3] = {
         type   = "funcargs",
         start  = 17,
         finish = 18,
     },
-    [4] = {
+    [3] = {
         type   = "return",
         start  = 24,
         finish = 30,
     },
-    [5] = {
+    [4] = {
         type   = "function",
         start  = 1,
         finish = 33,
-        args   = 3,
-        [1]    = 4,
+        args   = 2,
+        [1]    = 3,
     },
-    [6] = {
-        type   = "local",
+    [5] = {
+        type   = "setname",
         start  = 16,
         finish = 16,
-        loc    = 1,
+        value  = 4,
+        [1]    = "a",
     },
 }
 CHECK[[
@@ -1669,58 +1663,52 @@ local function a(b, c)
 end]]
 {
     [1] = {
-        type   = "name",
+        type   = "local",
         start  = 16,
         finish = 16,
         [1]    = "a",
     },
     [2] = {
-        type   = "setname",
-        start  = 16,
-        finish = 16,
-        name   = 1,
-        value  = 8,
-    },
-    [3] = {
         type   = "name",
         start  = 18,
         finish = 18,
         [1]    = "b",
     },
-    [4] = {
+    [3] = {
         type   = ",",
         start  = 19,
         finish = 19,
     },
-    [5] = {
+    [4] = {
         type   = "name",
         start  = 21,
         finish = 21,
         [1]    = "c",
     },
-    [6] = {
+    [5] = {
         type   = "funcargs",
         start  = 17,
         finish = 22,
-        [1]    = 3,
-        [2]    = 5,
+        [1]    = 2,
+        [2]    = 4,
     },
-    [7] = {
+    [6] = {
         type   = "return",
         start  = 28,
         finish = 34,
     },
-    [8] = {
+    [7] = {
         type   = "function",
         start  = 1,
         finish = 37,
-        args   = 6,
-        [1]    = 7,
+        args   = 5,
+        [1]    = 6,
     },
-    [9] = {
-        type   = "local",
+    [8] = {
+        type   = "setname",
         start  = 16,
         finish = 16,
-        loc    = 1,
+        value  = 7,
+        [1]    = "a",
     },
 }

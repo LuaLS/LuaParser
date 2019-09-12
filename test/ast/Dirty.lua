@@ -1,64 +1,52 @@
 CHECK'a.'
 {
     [1] = {
-        type   = "name",
+        type   = "getname",
         start  = 1,
         finish = 1,
         [1]    = "a",
     },
     [2] = {
-        type   = "getname",
-        start  = 1,
-        finish = 1,
-        name   = 1,
-    },
-    [3] = {
         type   = ".",
         start  = 2,
         finish = 2,
     },
-    [4] = {
+    [3] = {
         type   = "getfield",
         start  = 1,
         finish = 2,
-        parent = 2,
-        dot    = 3,
+        parent = 1,
+        dot    = 2,
     },
-    [5] = {
+    [4] = {
         type = "main",
-        [1]  = 4,
+        [1]  = 3,
     },
 }
 
 CHECK'a:'
 {
     [1] = {
-        type   = "name",
+        type   = "getname",
         start  = 1,
         finish = 1,
         [1]    = "a",
     },
     [2] = {
-        type   = "getname",
-        start  = 1,
-        finish = 1,
-        name   = 1,
-    },
-    [3] = {
         type   = ":",
         start  = 2,
         finish = 2,
     },
-    [4] = {
+    [3] = {
         type   = "getmethod",
         start  = 1,
         finish = 2,
-        parent = 2,
-        colon  = 3,
+        parent = 1,
+        colon  = 2,
     },
-    [5] = {
+    [4] = {
         type = "main",
-        [1]  = 4,
+        [1]  = 3,
     },
 }
 
@@ -74,33 +62,27 @@ a
         [1]    = true,
     },
     [2] = {
-        type   = "name",
+        type   = "getname",
         start  = 9,
         finish = 9,
         [1]    = "a",
     },
     [3] = {
-        type   = "getname",
-        start  = 9,
-        finish = 9,
-        name   = 2,
-    },
-    [4] = {
         type   = "ifblock",
         start  = 1,
         finish = 9,
         filter = 1,
-        [1]    = 3,
+        [1]    = 2,
     },
-    [5] = {
+    [4] = {
         type   = "if",
         start  = 1,
         finish = 9,
-        [1]    = 4,
+        [1]    = 3,
     },
-    [6] = {
+    [5] = {
         type = "main",
-        [1]  = 5,
+        [1]  = 4,
     },
 }
 
@@ -116,33 +98,27 @@ a
         [1]    = true,
     },
     [2] = {
-        type   = "name",
+        type   = "getname",
         start  = 14,
         finish = 14,
         [1]    = "a",
     },
     [3] = {
-        type   = "getname",
-        start  = 14,
-        finish = 14,
-        name   = 2,
-    },
-    [4] = {
         type   = "ifblock",
         start  = 1,
         finish = 14,
         filter = 1,
-        [1]    = 3,
+        [1]    = 2,
     },
-    [5] = {
+    [4] = {
         type   = "if",
         start  = 1,
         finish = 14,
-        [1]    = 4,
+        [1]    = 3,
     },
-    [6] = {
+    [5] = {
         type = "main",
-        [1]  = 5,
+        [1]  = 4,
     },
 }
 
@@ -151,20 +127,14 @@ x =
 ]]
 {
     [1] = {
-        type   = "name",
+        type   = "setname",
         start  = 1,
         finish = 1,
         [1]    = "x",
     },
     [2] = {
-        type   = "setname",
-        start  = 1,
-        finish = 1,
-        name   = 1,
-    },
-    [3] = {
         type = "main",
-        [1]  = 2,
+        [1]  = 1,
     },
 }
 
@@ -204,33 +174,27 @@ CHECK'1 == 2'
 CHECK 'local function a'
 {
     [1] = {
-        type   = "name",
+        type   = "local",
         start  = 16,
         finish = 16,
         [1]    = "a",
     },
     [2] = {
-        type   = "setname",
-        start  = 16,
-        finish = 16,
-        name   = 1,
-        value  = 3,
-    },
-    [3] = {
         type   = "function",
         start  = 1,
         finish = 16,
     },
-    [4] = {
-        type   = "local",
+    [3] = {
+        type   = "setname",
         start  = 16,
         finish = 16,
-        loc    = 1,
+        value  = 2,
+        [1]    = "a",
     },
-    [5] = {
+    [4] = {
         type = "main",
-        [1]  = 4,
-        [2]  = 2,
+        [1]  = 1,
+        [2]  = 3,
     },
 }
 
@@ -249,168 +213,144 @@ CHECK 'local function'
 CHECK 'local function a(v'
 {
     [1] = {
-        type   = "name",
+        type   = "local",
         start  = 16,
         finish = 16,
         [1]    = "a",
     },
     [2] = {
-        type   = "setname",
-        start  = 16,
-        finish = 16,
-        name   = 1,
-        value  = 5,
-    },
-    [3] = {
         type   = "name",
         start  = 18,
         finish = 18,
         [1]    = "v",
     },
-    [4] = {
+    [3] = {
         type   = "funcargs",
         start  = 17,
         finish = 18,
-        [1]    = 3,
+        [1]    = 2,
     },
-    [5] = {
+    [4] = {
         type   = "function",
         start  = 1,
         finish = 18,
-        args   = 4,
+        args   = 3,
     },
-    [6] = {
-        type   = "local",
+    [5] = {
+        type   = "setname",
         start  = 16,
         finish = 16,
-        loc    = 1,
+        value  = 4,
+        [1]    = "a",
     },
-    [7] = {
+    [6] = {
         type = "main",
-        [1]  = 6,
-        [2]  = 2,
+        [1]  = 1,
+        [2]  = 5,
     },
 }
 
 CHECK 'function a'
 {
     [1] = {
-        type   = "name",
-        start  = 10,
-        finish = 10,
-        [1]    = "a",
-    },
-    [2] = {
         type   = "setname",
         start  = 10,
         finish = 10,
-        name   = 1,
-        value  = 3,
+        value  = 2,
+        [1]    = "a",
     },
-    [3] = {
+    [2] = {
         type   = "function",
         start  = 1,
         finish = 10,
     },
-    [4] = {
+    [3] = {
         type = "main",
-        [1]  = 2,
+        [1]  = 1,
     },
 }
 
 CHECK 'function a:'
 {
     [1] = {
-        type   = "name",
+        type   = "getname",
         start  = 10,
         finish = 10,
         [1]    = "a",
     },
     [2] = {
-        type   = "getname",
-        start  = 10,
-        finish = 10,
-        name   = 1,
-    },
-    [3] = {
         type   = ":",
         start  = 11,
         finish = 11,
     },
-    [4] = {
+    [3] = {
         type   = "setmethod",
         start  = 10,
         finish = 11,
-        parent = 2,
-        colon  = 3,
-        value  = 5,
+        parent = 1,
+        colon  = 2,
+        value  = 4,
     },
-    [5] = {
+    [4] = {
         type   = "function",
         start  = 1,
         finish = 11,
     },
-    [6] = {
+    [5] = {
         type = "main",
-        [1]  = 4,
+        [1]  = 3,
     },
 }
 
 CHECK 'function a:b(v'
 {
     [1] = {
-        type   = "name",
+        type   = "getname",
         start  = 10,
         finish = 10,
         [1]    = "a",
     },
     [2] = {
-        type   = "getname",
-        start  = 10,
-        finish = 10,
-        name   = 1,
-    },
-    [3] = {
         type   = ":",
         start  = 11,
         finish = 11,
     },
-    [4] = {
+    [3] = {
         type   = "name",
         start  = 12,
         finish = 12,
         [1]    = "b",
     },
-    [5] = {
+    [4] = {
         type   = "setmethod",
         start  = 10,
         finish = 12,
-        parent = 2,
-        colon  = 3,
-        method = 4,
-        value  = 8,
+        parent = 1,
+        colon  = 2,
+        method = 3,
+        value  = 7,
     },
-    [6] = {
+    [5] = {
         type   = "name",
         start  = 14,
         finish = 14,
         [1]    = "v",
     },
-    [7] = {
+    [6] = {
         type   = "funcargs",
         start  = 13,
         finish = 14,
-        [1]    = 6,
+        [1]    = 5,
     },
-    [8] = {
+    [7] = {
         type   = "function",
         start  = 1,
         finish = 14,
-        args   = 7,
+        args   = 6,
     },
-    [9] = {
+    [8] = {
         type = "main",
-        [1]  = 5,
+        [1]  = 4,
     },
 }
 
@@ -422,18 +362,12 @@ CHECK 'return local a'
         finish = 7,
     },
     [2] = {
-        type   = "name",
+        type   = "local",
         start  = 14,
         finish = 14,
         [1]    = "a",
     },
     [3] = {
-        type   = "local",
-        start  = 14,
-        finish = 14,
-        loc    = 2,
-    },
-    [4] = {
         type = "main",
         [1]  = 1,
         [2]  = 2,
@@ -450,18 +384,12 @@ CHECK 'end'
 CHECK 'local x = ,'
 {
     [1] = {
-        type   = "name",
+        type   = "local",
         start  = 7,
         finish = 7,
         [1]    = "x",
     },
     [2] = {
-        type   = "local",
-        start  = 7,
-        finish = 7,
-        loc    = 1,
-    },
-    [3] = {
         type = "main",
         [1]  = 1,
     },
