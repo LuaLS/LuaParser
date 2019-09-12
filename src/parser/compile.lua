@@ -72,6 +72,9 @@ local vmMap = {
             }
         }
     end,
+    ['getname'] = function (obj, id)
+        
+    end,
 }
 
 local function compileVM()

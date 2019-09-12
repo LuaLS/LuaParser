@@ -239,3 +239,40 @@ do do do goto <!label!> end end end
         label = 'label',
     }
 }
+
+TEST[[
+goto <!label!>
+do
+    ::label::
+end
+]]
+{
+    type = 'NO_VISIBLE_LABEL',
+    info = {
+        label = 'label',
+    }
+}
+
+do return end
+TEST[[
+goto <!label!>
+local x = 1
+::label::
+x = 2
+]]
+{
+    type = 'JUMP_LOCAL_SCOPE',
+    info = {
+        loc = 'x',
+    },
+    relative = {
+        {
+            start = 26,
+            finish = 30,
+        },
+        {
+            start = 18,
+            finish = 18,
+        },
+    }
+}
