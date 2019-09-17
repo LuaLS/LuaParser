@@ -5,14 +5,11 @@ local stringChar  = string.char
 local utf8Char    = utf8.char
 local tableUnpack = table.unpack
 local mathType    = math.type
-local pairs       = pairs
 
 _ENV = nil
 
 local State
-local Asts
 local pushError
-local Loc
 
 -- goto 单独处理
 local RESERVED = {
@@ -49,8 +46,7 @@ local VersionOp = {
 }
 
 local function checkOpVersion(op)
-    local opAst = Asts[op]
-    local versions = VersionOp[opAst.type]
+    local versions = VersionOp[op.type]
     if not versions then
         return
     end
@@ -61,8 +57,8 @@ local function checkOpVersion(op)
     end
     pushError {
         type    = 'UNSUPPORT_SYMBOL',
-        start   = opAst.start,
-        finish  = opAst.finish,
+        start   = op.start,
+        finish  = op.finish,
         version = versions,
         info    = {
             version = State.version,
@@ -88,7 +84,7 @@ local function binaryForward(list, start, finish, level)
     local info = Exp[level]
     for i = finish-1, start+1, -1 do
         local op = list[i]
-        local opType = Asts[op].type
+        local opType = op.type
         if info[opType] then
             local e1 = expSplit(list, start, i-1, level)
             if not e1 then
@@ -99,15 +95,14 @@ local function binaryForward(list, start, finish, level)
                 goto CONTINUE
             end
             checkOpVersion(op)
-            Asts[#Asts+1] = {
+            return {
                 type   = 'binary',
                 op     = op,
-                start  = Asts[e1].start,
-                finish = Asts[e2].finish,
+                start  = e1.start,
+                finish = e2.finish,
                 [1]    = e1,
                 [2]    = e2,
             }
-            return #Asts
         end
         ::CONTINUE::
     end
@@ -118,7 +113,7 @@ local function binaryBackward(list, start, finish, level)
     local info = Exp[level]
     for i = start+1, finish-1 do
         local op = list[i]
-        local opType = Asts[op].type
+        local opType = op.type
         if info[opType] then
             local e1 = expSplit(list, start, i-1, level+1)
             if not e1 then
@@ -129,15 +124,14 @@ local function binaryBackward(list, start, finish, level)
                 goto CONTINUE
             end
             checkOpVersion(op)
-            Asts[#Asts+1] = {
+            return {
                 type   = 'binary',
                 op     = op,
-                start  = Asts[e1].start,
-                finish = Asts[e2].finish,
+                start  = e1.start,
+                finish = e2.finish,
                 [1]    = e1,
                 [2]    = e2,
             }
-            return #Asts
         end
         ::CONTINUE::
     end
@@ -147,19 +141,18 @@ end
 local function unary(list, start, finish, level)
     local info = Exp[level]
     local op = list[start]
-    local opType = Asts[op].type
+    local opType = op.type
     if info[opType] then
         local e1 = expSplit(list, start+1, finish, level)
         if e1 then
             checkOpVersion(op)
-            Asts[#Asts+1] = {
+            return {
                 type   = 'unary',
                 op     = op,
-                start  = Asts[op].start,
-                finish = Asts[e1].finish,
+                start  = op.start,
+                finish = e1.finish,
                 [1]    = e1,
             }
-            return #Asts
         end
     end
     return expSplit(list, start, finish, level+1)
@@ -184,12 +177,11 @@ local function checkMissEnd(start)
 end
 
 local function getSelect(vararg, index)
-    Asts[#Asts+1] = {
+    return {
         type   = 'select',
         vararg = vararg,
         index  = index,
     }
-    return #Asts
 end
 
 local function getValue(values, i)
@@ -202,32 +194,24 @@ local function getValue(values, i)
         if not last then
             return nil, nil
         end
-        local lastAst = Asts[last]
-        if lastAst.type == 'call' or lastAst.type == 'varargs' then
+        if last.type == 'call' or last.type == 'varargs' then
             return getSelect(last, i - #values + 1)
         end
         return nil, nil
     end
-    local valueAst = Asts[value]
-    if valueAst.type == 'call' or valueAst.type == 'varargs' then
+    if value.type == 'call' or value.type == 'varargs' then
         value = getSelect(value, 1)
     end
-    return value, valueAst
+    return value
 end
 
 local function createLocal(key, value, attrs)
     if not key then
         return nil
     end
-    local keyAst = Asts[key]
-    keyAst.type  = 'local'
-    keyAst.value = value
-    keyAst.attrs = attrs
-    local name = keyAst[1]
-    if not Loc[name] then
-        Loc[name] = {}
-    end
-    Loc[name][#Loc[name]+1] = key
+    key.type  = 'local'
+    key.value = value
+    key.attrs = attrs
     return key
 end
 
@@ -235,14 +219,12 @@ local function createCall(args, start, finish)
     args.type    = 'callargs'
     args.start   = start
     args.finish  = finish
-    Asts[#Asts+1] = args
-    Asts[#Asts+1] = {
+    return {
         type   = 'call',
         start  = start,
         finish = finish,
-        args   = #Asts,
+        args   = args,
     }
-    return #Asts
 end
 
 local function packList(start, list, finish)
@@ -250,7 +232,7 @@ local function packList(start, list, finish)
     local wantName = true
     local count = 0
     for i = 1, #list do
-        local ast = Asts[list[i]]
+        local ast = list[i]
         if ast.type == ',' then
             if wantName or i == #list then
                 pushError {
@@ -350,43 +332,29 @@ Exp = {
     },
 }
 
-local function parentList(list)
-    Asts[#Asts+1] = list
-    local id = #Asts
-    local parent = State.parent
-    for i = 1, #list do
-        local action = list[i]
-        parent[action] = id
-    end
-    return id
-end
-
 local Defs = {
     Nil = function (pos)
-        Asts[#Asts+1] = {
+        return {
             type   = 'nil',
             start  = pos,
             finish = pos + 2,
         }
-        return #Asts
     end,
     True = function (pos)
-        Asts[#Asts+1] = {
+        return {
             type   = 'boolean',
             start  = pos,
             finish = pos + 3,
             [1]    = true,
         }
-        return #Asts
     end,
     False = function (pos)
-        Asts[#Asts+1] = {
+        return {
             type   = 'boolean',
             start  = pos,
             finish = pos + 4,
             [1]    = false,
         }
-        return #Asts
     end,
     LongComment = function (beforeEq, afterEq, str, missPos)
         if missPos then
@@ -464,14 +432,13 @@ local Defs = {
         }
     end,
     String = function (start, quote, str, finish)
-        Asts[#Asts+1] = {
+        return {
             type   = 'string',
             start  = start,
             finish = finish - 1,
             [1]    = str,
             [2]    = quote,
         }
-        return #Asts
     end,
     LongString = function (beforeEq, afterEq, str, missPos)
         if missPos then
@@ -607,13 +574,12 @@ local Defs = {
     Number = function (start, number, finish)
         local n = tonumber(number)
         if n then
-            Asts[#Asts+1] = {
+            State.LastNumber = {
                 type   = 'number',
                 start  = start,
                 finish = finish - 1,
                 [1]    = n,
             }
-            State.LastNumber = #Asts
             return State.LastNumber
         else
             pushError {
@@ -621,18 +587,17 @@ local Defs = {
                 start  = start,
                 finish = finish - 1,
             }
-            Asts[#Asts+1] = {
+            State.LastNumber = {
                 type   = 'number',
                 start  = start,
                 finish = finish - 1,
                 [1]    = 0,
             }
-            State.LastNumber = #Asts
             return State.LastNumber
         end
     end,
     FFINumber = function (start, symbol)
-        local lastNumber = Asts[State.LastNumber]
+        local lastNumber = State.LastNumber
         if mathType(lastNumber[1]) == 'float' then
             pushError {
                 type = 'UNKNOWN_SYMBOL',
@@ -659,7 +624,7 @@ local Defs = {
         end
     end,
     ImaginaryNumber = function (start, symbol)
-        local lastNumber = Asts[State.LastNumber]
+        local lastNumber = State.LastNumber
         if State.version ~= 'LuaJIT' then
             pushError {
                 type = 'UNSUPPORT_SYMBOL',
@@ -689,84 +654,75 @@ local Defs = {
                 finish = finish - 1,
             }
         end
-        Asts[#Asts+1] = {
+        return {
             type   = 'name',
             start  = start,
             finish = finish - 1,
             [1]    = str,
         }
-        return #Asts
     end,
     GetField = function (dot, field)
-        Asts[#Asts+1] = {
+        return {
             type   = 'getfield',
             field  = field,
             dot    = dot,
-            start  = Asts[dot].start,
-            finish = Asts[field or dot].finish,
+            start  = dot.start,
+            finish = (field or dot).finish,
         }
-        return #Asts
     end,
     GetIndex = function (start, index, finish)
-        Asts[#Asts+1] = {
+        return {
             type   = 'getindex',
             start  = start,
             finish = finish - 1,
             index  = index,
         }
-        return #Asts
     end,
     GetMethod = function (colon, method)
-        Asts[#Asts+1] = {
+        return {
             type   = 'getmethod',
             method = method,
             colon  = colon,
-            start  = Asts[colon].start,
-            finish = Asts[method or colon].finish,
+            start  = colon.start,
+            finish = (method or colon).finish,
         }
-        return #Asts
     end,
     Single = function (unit)
-        local unitAst = Asts[unit]
-        unitAst.type  = 'getname'
+        unit.type  = 'getname'
         return unit
     end,
     Simple = function (units)
         local last = units[1]
         for i = 2, #units do
-            local current  = Asts[units[i]]
-            current.parent = last
-            current.start  = Asts[last].start
+            local current  = units[i]
+            current.start  = last.start
             last = units[i]
         end
         return last
     end,
     SimpleCall = function (call)
-        local callAst = Asts[call]
-        if callAst.type ~= 'call' and callAst.type ~= 'getmethod' then
+        if call.type ~= 'call' and call.type ~= 'getmethod' then
             pushError {
                 type   = 'EXP_IN_ACTION',
-                start  = callAst.start,
-                finish = callAst.finish,
+                start  = call.start,
+                finish = call.finish,
             }
         end
         return call
     end,
     BinaryOp = function (start, op)
-        Asts[#Asts+1] = {
+        return {
             type   = op,
             start  = start,
             finish = start + #op - 1,
         }
-        return #Asts
     end,
     UnaryOp = function (start, op)
-        Asts[#Asts+1] = {
+        return {
             type   = op,
             start  = start,
             finish = start + #op - 1,
         }
-        return #Asts
     end,
     Exp = function (first, ...)
         if not ... then
@@ -776,22 +732,20 @@ local Defs = {
         return expSplit(list, 1, #list, 1)
     end,
     Paren = function (start, exp, finish)
-        local expAst = Asts[exp]
-        if expAst and expAst.type == 'paren' then
-            expAst.start  = start
-            expAst.finish = finish - 1
-            return expAst
+        if exp and exp.type == 'paren' then
+            exp.start  = start
+            exp.finish = finish - 1
+            return exp
         end
-        Asts[#Asts+1] = {
+        return {
             type   = 'paren',
             start  = start,
             finish = finish - 1,
             exp    = exp
         }
-        return #Asts
     end,
     VarArgs = function (dots)
-        Asts[dots].type = 'varargs'
+        dots.type = 'varargs'
         return dots
     end,
     PackLoopArgs = function (start, list, finish)
@@ -845,44 +799,39 @@ local Defs = {
         return createCall(args, start, finish-1)
     end,
     COMMA = function (start)
-        Asts[#Asts+1] = {
+        return {
             type   = ',',
             start  = start,
             finish = start,
         }
-        return #Asts
     end,
     SEMICOLON = function (start)
-        Asts[#Asts+1] = {
+        return {
             type   = ';',
             start  = start,
             finish = start,
         }
-        return #Asts
     end,
     DOTS = function (start)
-        Asts[#Asts+1] = {
+        return {
             type   = '...',
             start  = start,
             finish = start + 2,
         }
-        return #Asts
     end,
     COLON = function (start)
-        Asts[#Asts+1] = {
+        return {
             type   = ':',
             start  = start,
             finish = start,
         }
-        return #Asts
     end,
     DOT = function (start)
-        Asts[#Asts+1] = {
+        return {
             type   = '.',
             start  = start,
             finish = start,
         }
-        return #Asts
     end,
     Function = function (start, args, actions, finish)
         actions.type   = 'function'
@@ -890,8 +839,7 @@ local Defs = {
         actions.finish = finish - 1
         actions.args   = args
         checkMissEnd(start)
-        parentList(actions)
-        return #Asts
+        return actions
     end,
     NamedFunction = function (start, name, args, actions, finish)
         actions.type   = 'function'
@@ -899,22 +847,20 @@ local Defs = {
         actions.finish = finish - 1
         actions.args   = args
         checkMissEnd(start)
-        local func = parentList(actions)
         if not name then
             return
         end
-        local nameAst = Asts[name]
-        if nameAst.type == 'getname' then
-            nameAst.type = 'setname'
-            nameAst.value = func
+        if name.type == 'getname' then
+            name.type = 'setname'
+            name.value = actions
             return name
-        elseif nameAst.type == 'getfield' then
-            nameAst.type = 'setfield'
-            nameAst.value = func
+        elseif name.type == 'getfield' then
+            name.type = 'setfield'
+            name.value = actions
             return name
-        elseif nameAst.type == 'getmethod' then
-            nameAst.type = 'setmethod'
-            nameAst.value = func
+        elseif name.type == 'getmethod' then
+            name.type = 'setmethod'
+            name.value = actions
             return name
         end
     end,
@@ -924,31 +870,28 @@ local Defs = {
         actions.finish = finish - 1
         actions.args   = args
         checkMissEnd(start)
-        local func = parentList(actions)
 
         if not name then
             return
         end
 
-        local nameAst = Asts[name]
-        if nameAst.type ~= 'getname' then
+        if name.type ~= 'getname' then
             pushError {
                 type = 'UNEXPECT_LFUNC_NAME',
-                start = nameAst.start,
-                finish = nameAst.finish,
+                start = name.start,
+                finish = name.finish,
             }
             return
         end
 
         local loc = createLocal(name)
-        Asts[#Asts+1] = {
+        local set = {
             type   = 'setname',
-            start  = nameAst.start,
-            finish = nameAst.finish,
-            value  = func,
-            [1]    = nameAst[1]
+            start  = name.start,
+            finish = name.finish,
+            value  = actions,
+            [1]    = name[1]
         }
-        local set = #Asts
 
         return loc, set
     end,
@@ -961,7 +904,7 @@ local Defs = {
         local fieldCount = 0
         for i = 1, #tbl do
             local field = tbl[i]
-            local fieldAst = Asts[field]
+            local fieldAst = field
             if fieldAst.type == ',' or fieldAst.type == ';' then
                 if wantField then
                     pushError {
@@ -989,37 +932,33 @@ local Defs = {
         for i = fieldCount + 1, #tbl do
             tbl[i] = nil
         end
-        Asts[#Asts+1] = tbl
-        return #Asts
+        return tbl
     end,
     NewField = function (start, field, value, finish)
-        Asts[#Asts+1] = {
+        return {
             type   = 'tablefield',
             start  = start,
             finish = finish-1,
             field  = field,
             value  = value,
         }
-        return #Asts
     end,
     Index = function (start, index, finish)
-        Asts[#Asts+1] = {
+        return {
             type   = 'index',
             start  = start,
             finish = finish - 1,
             index  = index,
         }
-        return #Asts
     end,
     NewIndex = function (start, index, value, finish)
-        Asts[#Asts+1] = {
+        return {
             type   = 'tableindex',
             start  = start,
             finish = finish-1,
             index  = index,
             value  = value,
         }
-        return #Asts
     end,
     FuncArgs = function (start, args, finish)
         args.type   = 'funcargs'
@@ -1030,7 +969,7 @@ local Defs = {
         local argCount = 0
         for i = 1, #args do
             local arg = args[i]
-            local argAst = Asts[arg]
+            local argAst = arg
             if argAst.type == ',' then
                 if wantName then
                     pushError {
@@ -1061,8 +1000,8 @@ local Defs = {
                         local b = args[#args]
                         pushError {
                             type   = 'ARGS_AFTER_DOTS',
-                            start  = Asts[a].start,
-                            finish = Asts[b].finish,
+                            start  = a.start,
+                            finish = b.finish,
                         }
                     end
                     break
@@ -1080,13 +1019,12 @@ local Defs = {
                 finish = finish - 1,
             }
         end
-        Asts[#Asts+1] = args
-        return #Asts
+        return args
     end,
     Set = function (start, keys, values, finish)
         for i = 1, #keys do
             local key = keys[i]
-            local keyAst = Asts[key]
+            local keyAst = key
             if keyAst.type == 'getname' then
                 keyAst.type = 'setname'
                 keyAst.value = getValue(values, i)
@@ -1100,7 +1038,7 @@ local Defs = {
     LocalAttr = function (attrs)
         for i = 1, #attrs do
             local attr = attrs[i]
-            local attrAst = Asts[attr]
+            local attrAst = attr
             attrAst.type = 'localattr'
             if State.version ~= 'Lua 5.4' then
                 pushError {
@@ -1138,13 +1076,13 @@ local Defs = {
         if not name then
             return name
         end
-        Asts[name].attrs = attrs
+        name.attrs = attrs
         return name
     end,
     Local = function (start, keys, values, finish)
         for i = 1, #keys do
             local key = keys[i]
-            local keyAst = Asts[key]
+            local keyAst = key
             local attrs = keyAst.attrs
             keyAst.attrs = nil
             local value = getValue(values, i)
@@ -1157,29 +1095,20 @@ local Defs = {
         actions.start  = start
         actions.finish = finish - 1
         checkMissEnd(start)
-        local block = parentList(actions)
-        return block
+        return actions
     end,
     Break = function (start, finish)
-        Asts[#Asts+1] = {
+        return {
             type   = 'break',
             start  = start,
             finish = finish - 1,
         }
-        return #Asts
     end,
     Return = function (start, exps, finish)
         exps.type   = 'return'
         exps.start  = start
         exps.finish = finish - 1
-        Asts[#Asts+1] = exps
-        local id = #Asts
-        local parents = State.parent
-        for i = 1, #exps do
-            local exp = exps[i]
-            parents[exp] = id
-        end
-        return #Asts
+        return exps
     end,
     Label = function (start, name, finish)
         if State.version == 'Lua 5.1' then
@@ -1197,8 +1126,7 @@ local Defs = {
         if not name then
             return nil
         end
-        local nameAst = Asts[name]
-        nameAst.type = 'label'
+        name.type = 'label'
         return name
     end,
     GoTo = function (start, name, finish)
@@ -1217,8 +1145,7 @@ local Defs = {
         if not name then
             return nil
         end
-        local nameAst = Asts[name]
-        nameAst.type = 'goto'
+        name.type = 'goto'
         return name
     end,
     IfBlock = function (start, exp, actions, finish)
@@ -1226,23 +1153,20 @@ local Defs = {
         actions.start  = start
         actions.finish = finish - 1
         actions.filter = exp
-        local block = parentList(actions)
-        return block
+        return actions
     end,
     ElseIfBlock = function (start, exp, actions, finish)
         actions.type   = 'elseifblock'
         actions.start  = start
         actions.finish = finish - 1
         actions.filter = exp
-        local block = parentList(actions)
-        return block
+        return actions
     end,
     ElseBlock = function (start, actions, finish)
         actions.type   = 'elseblock'
         actions.start  = start
         actions.finish = finish - 1
-        local block = parentList(actions)
-        return block
+        return actions
     end,
     If = function (start, blocks, finish)
         blocks.type   = 'if'
@@ -1251,12 +1175,11 @@ local Defs = {
         local hasElse
         for i = 1, #blocks do
             local block = blocks[i]
-            local blockAst = Asts[block]
-            if i == 1 and blockAst.type ~= 'ifblock' then
+            if i == 1 and block.type ~= 'ifblock' then
                 pushError {
                     type = 'MISS_SYMBOL',
-                    start = blockAst.start,
-                    finish = blockAst.start,
+                    start = block.start,
+                    finish = block.start,
                     info = {
                         symbol = 'if',
                     }
@@ -1265,74 +1188,67 @@ local Defs = {
             if hasElse then
                 pushError {
                     type   = 'BLOCK_AFTER_ELSE',
-                    start  = blockAst.start,
-                    finish = blockAst.finish,
+                    start  = block.start,
+                    finish = block.finish,
                 }
             end
-            if blockAst.type == 'elseblock' then
+            if block.type == 'elseblock' then
                 hasElse = true
             end
         end
         checkMissEnd(start)
-        Asts[#Asts+1] = blocks
-        return #Asts
+        return blocks
     end,
-    Loop = function (start, arg, steps, actions, finish)
+    Loop = function (start, arg, steps, block, finish)
         local loc = createLocal(arg, steps[1])
-        actions.type   = 'loop'
-        actions.start  = start
-        actions.finish = finish - 1
-        actions.loc    = loc
-        actions.max    = steps[2]
-        actions.step   = steps[3]
+        block.type   = 'loop'
+        block.start  = start
+        block.finish = finish - 1
+        block.loc    = loc
+        block.max    = steps[2]
+        block.step   = steps[3]
         checkMissEnd(start)
-        local block = parentList(actions)
         return block
     end,
-    In = function (start, locs, exp, actions, finish)
+    In = function (start, locs, exp, block, finish)
         local func = exp[#exp]
         exp[#exp] = nil
         local call
         if #exp == 0 then
             call = createCall(exp, 0, 0)
         else
-            call = createCall(exp, Asts[exp[1]].start, Asts[exp[#exp]].finish)
+            call = createCall(exp, exp[1].start, exp[#exp].finish)
         end
-        Asts[call].parent = func
-        actions.type   = 'in'
-        actions.start  = start
-        actions.finish = finish - 1
-        actions.locs = {}
+        block.type   = 'in'
+        block.start  = start
+        block.finish = finish - 1
+        block.locs = {}
         local values = {call}
         for i = 1, #locs do
             local loc = locs[i]
-            actions.locs[i] = createLocal(loc, getValue(values, i), nil)
+            block.locs[i] = createLocal(loc, getValue(values, i), nil)
         end
         checkMissEnd(start)
-        local id = parentList(actions)
-        return id
-    end,
-    While = function (start, filter, actions, finish)
-        actions.type   = 'while'
-        actions.start  = start
-        actions.finish = finish - 1
-        actions.filter = filter
-        checkMissEnd(start)
-        local block = parentList(actions)
         return block
     end,
-    Repeat = function (start, actions, filter, finish)
-        actions.type   = 'repeat'
-        actions.start  = start
-        actions.finish = finish
-        actions.filter = filter
-        local block = parentList(actions)
+    While = function (start, filter, block, finish)
+        block.type   = 'while'
+        block.start  = start
+        block.finish = finish - 1
+        block.filter = filter
+        checkMissEnd(start)
+        return block
+    end,
+    Repeat = function (start, block, filter, finish)
+        block.type   = 'repeat'
+        block.start  = start
+        block.finish = finish
+        block.filter = filter
         return block
     end,
     Lua = function (actions)
         actions.type = 'main'
-        local id = parentList(actions)
-        return id
+        return actions
     end,
 
     -- 捕获错误
@@ -1704,8 +1620,6 @@ local Defs = {
 local function init(state)
     State     = state
     pushError = state.pushError
-    Asts      = state.ast
-    Loc       = state.loc
     emmy.init(State)
 end
 
