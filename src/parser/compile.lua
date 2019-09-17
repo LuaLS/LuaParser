@@ -280,6 +280,20 @@ local vmMap = {
         method.parent = id
         return id
     end,
+    ['setmethod'] = function (obj)
+        local node = obj.node
+        local method = obj.method
+        local value = obj.value
+        Root[#Root+1] = obj
+        local id = #Root
+        obj.node = Compile(node)
+        obj.method = Compile(method)
+        obj.value = Compile(value)
+        node.parent = id
+        method.parent = id
+        value.parent = id
+        return id
+    end,
     ['method'] = function (obj)
         Root[#Root+1] = obj
         return #Root
@@ -290,6 +304,11 @@ local vmMap = {
         local id = #Root
         obj.args = Compile(args)
         args.parent = id
+        for i = 1, #obj do
+            local act = obj[i]
+            obj[i] = Compile(act)
+            act.parent = id
+        end
         return id
     end,
     ['funcargs'] = function (obj)
@@ -514,6 +533,36 @@ local vmMap = {
             act.parent = id
         end
         return id
+    end,
+    ['while'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        local filter = obj.filter
+        obj.filter = Compile(filter)
+        filter.parent = id
+        for i = 1, #obj do
+            local act = obj[i]
+            obj[i] = Compile(act)
+            act.parent = id
+        end
+        return id
+    end,
+    ['repeat'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        for i = 1, #obj do
+            local act = obj[i]
+            obj[i] = Compile(act)
+            act.parent = id
+        end
+        local filter = obj.filter
+        obj.filter = Compile(filter)
+        filter.parent = id
+        return id
+    end,
+    ['break'] = function (obj)
+        Root[#Root+1] = obj
+        return #Root
     end,
 }
 

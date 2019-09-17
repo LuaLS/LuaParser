@@ -1081,22 +1081,24 @@ while true do
 end]]
 {
     [1] = {
-        type   = "boolean",
-        start  = 7,
-        finish = 10,
-        [1]    = true,
-    },
-    [2] = {
-        type   = "return",
-        start  = 19,
-        finish = 25,
-    },
-    [3] = {
         type   = "while",
         start  = 1,
         finish = 28,
-        filter = 1,
-        [1]    = 2,
+        filter = 2,
+        [1]    = 3,
+    },
+    [2] = {
+        type   = "boolean",
+        start  = 7,
+        finish = 10,
+        parent = 1,
+        [1]    = true,
+    },
+    [3] = {
+        type   = "return",
+        start  = 19,
+        finish = 25,
+        parent = 1,
     },
 }
 CHECK[[
@@ -1105,21 +1107,23 @@ repeat
 until 1]]
 {
     [1] = {
-        type   = "break",
-        start  = 12,
-        finish = 16,
-    },
-    [2] = {
-        type   = "number",
-        start  = 24,
-        finish = 24,
-        [1]    = 1,
-    },
-    [3] = {
         type   = "repeat",
         start  = 1,
         finish = 25,
-        filter = 2,
+        filter = 3,
+        [1]    = 2,
+    },
+    [2] = {
+        type   = "break",
+        start  = 12,
+        finish = 16,
+        parent = 1,
+    },
+    [3] = {
+        type   = "number",
+        start  = 24,
+        finish = 24,
+        parent = 1,
         [1]    = 1,
     },
 }
@@ -1132,25 +1136,28 @@ end]]
         type   = "setname",
         start  = 10,
         finish = 13,
-        value  = 4,
+        value  = 2,
         [1]    = "test",
     },
     [2] = {
-        type   = "funcargs",
-        start  = 14,
-        finish = 15,
-    },
-    [3] = {
-        type   = "return",
-        start  = 21,
-        finish = 27,
-    },
-    [4] = {
         type   = "function",
         start  = 1,
         finish = 30,
-        args   = 2,
-        [1]    = 3,
+        parent = 1,
+        args   = 3,
+        [1]    = 4,
+    },
+    [3] = {
+        type   = "funcargs",
+        start  = 14,
+        finish = 15,
+        parent = 2,
+    },
+    [4] = {
+        type   = "return",
+        start  = 21,
+        finish = 27,
+        parent = 2,
     },
 }
 CHECK[[
@@ -1159,35 +1166,31 @@ function test(a)
 end]]
 {
     [1] = {
-        value  = 5,
         type   = "setname",
         start  = 10,
         finish = 13,
+        value  = 2,
         [1]    = "test",
     },
     [2] = {
-        type   = "name",
-        start  = 15,
-        finish = 15,
-        [1]    = "a",
+        type   = "function",
+        start  = 1,
+        finish = 31,
+        parent = 1,
+        args   = 3,
+        [1]    = 4,
     },
     [3] = {
         type   = "funcargs",
         start  = 14,
         finish = 16,
-        [1]    = 2,
+        parent = 2,
     },
     [4] = {
         type   = "return",
         start  = 22,
         finish = 28,
-    },
-    [5] = {
-        type   = "function",
-        start  = 1,
-        finish = 31,
-        args   = 3,
-        [1]    = 4,
+        parent = 2,
     },
 }
 CHECK[[
@@ -1195,188 +1198,69 @@ function a.b:c(a, b, c)
     return
 end]]
 {
-    [01] = {
-        type   = "getname",
+    [1] = {
+        type   = "setmethod",
         start  = 10,
-        finish = 10,
-        [1]    = "a",
+        finish = 14,
+        node   = 2,
+        colon  = {
+            type   = ":",
+            start  = 13,
+            finish = 13,
+        },
+        method = 4,
+        value  = 5,
     },
-    [02] = {
-        type   = ".",
-        start  = 11,
-        finish = 11,
-    },
-    [03] = {
-        type   = "name",
-        start  = 12,
-        finish = 12,
-        [1]    = "b",
-    },
-    [04] = {
+    [2] = {
         type   = "getfield",
         start  = 10,
         finish = 12,
         parent = 1,
-        dot    = 2,
-        field  = 3,
+        node   = 3,
+        dot    = {
+            type   = ".",
+            start  = 11,
+            finish = 11,
+        },
+        field  = {
+            type   = "field",
+            start  = 12,
+            finish = 12,
+            [1]    = "b",
+        },
     },
-    [05] = {
-        type   = ":",
-        start  = 13,
-        finish = 13,
-    },
-    [06] = {
-        type   = "name",
-        start  = 14,
-        finish = 14,
-        [1]    = "c",
-    },
-    [07] = {
-        type   = "setmethod",
+    [3] = {
+        type   = "getname",
         start  = 10,
-        finish = 14,
-        parent = 4,
-        colon  = 5,
-        method = 6,
-        value  = 15,
-    },
-    [08] = {
-        type   = "name",
-        start  = 16,
-        finish = 16,
+        finish = 10,
+        parent = 2,
         [1]    = "a",
     },
-    [09] = {
-        type   = ",",
-        start  = 17,
-        finish = 17,
-    },
-    [10] = {
-        type   = "name",
-        start  = 19,
-        finish = 19,
-        [1]    = "b",
-    },
-    [11] = {
-        type   = ",",
-        start  = 20,
-        finish = 20,
-    },
-    [12] = {
-        type   = "name",
-        start  = 22,
-        finish = 22,
+    [4] = {
+        type   = "method",
+        start  = 14,
+        finish = 14,
+        parent = 1,
         [1]    = "c",
     },
-    [13] = {
-        type   = "funcargs",
-        start  = 15,
-        finish = 23,
-        [1]    = 8,
-        [2]    = 10,
-        [3]    = 12,
-    },
-    [14] = {
-        type   = "return",
-        start  = 29,
-        finish = 35,
-    },
-    [15] = {
+    [5] = {
         type   = "function",
         start  = 1,
         finish = 38,
-        args   = 13,
-        [1]    = 14,
-    },
-}
-CHECK[[
-local function a()
-    return
-end]]
-{
-    [1] = {
-        type   = "local",
-        start  = 16,
-        finish = 16,
-        [1]    = "a",
-    },
-    [2] = {
-        type   = "funcargs",
-        start  = 17,
-        finish = 18,
-    },
-    [3] = {
-        type   = "return",
-        start  = 24,
-        finish = 30,
-    },
-    [4] = {
-        type   = "function",
-        start  = 1,
-        finish = 33,
-        args   = 2,
-        [1]    = 3,
-    },
-    [5] = {
-        type   = "setname",
-        start  = 16,
-        finish = 16,
-        value  = 4,
-        [1]    = "a",
-    },
-}
-CHECK[[
-local function a(b, c)
-    return
-end]]
-{
-    [1] = {
-        type   = "local",
-        start  = 16,
-        finish = 16,
-        [1]    = "a",
-    },
-    [2] = {
-        type   = "name",
-        start  = 18,
-        finish = 18,
-        [1]    = "b",
-    },
-    [3] = {
-        type   = ",",
-        start  = 19,
-        finish = 19,
-    },
-    [4] = {
-        type   = "name",
-        start  = 21,
-        finish = 21,
-        [1]    = "c",
-    },
-    [5] = {
-        type   = "funcargs",
-        start  = 17,
-        finish = 22,
-        [1]    = 2,
-        [2]    = 4,
+        parent = 1,
+        args   = 6,
+        [1]    = 7,
     },
     [6] = {
-        type   = "return",
-        start  = 28,
-        finish = 34,
+        type   = "funcargs",
+        start  = 15,
+        finish = 23,
+        parent = 5,
     },
     [7] = {
-        type   = "function",
-        start  = 1,
-        finish = 37,
-        args   = 5,
-        [1]    = 6,
-    },
-    [8] = {
-        type   = "setname",
-        start  = 16,
-        finish = 16,
-        value  = 7,
-        [1]    = "a",
+        type   = "return",
+        start  = 29,
+        finish = 35,
+        parent = 5,
     },
 }

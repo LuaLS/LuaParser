@@ -474,6 +474,98 @@ x, y = 1, 2
 }
 
 CHECK[[
+local function a()
+    return
+end]]
+{
+    [1] = {
+        type   = "local",
+        start  = 16,
+        finish = 16,
+        [1]    = "a",
+    },
+    [2] = {
+        type   = "funcargs",
+        start  = 17,
+        finish = 18,
+    },
+    [3] = {
+        type   = "return",
+        start  = 24,
+        finish = 30,
+    },
+    [4] = {
+        type   = "function",
+        start  = 1,
+        finish = 33,
+        args   = 2,
+        [1]    = 3,
+    },
+    [5] = {
+        type   = "setname",
+        start  = 16,
+        finish = 16,
+        value  = 4,
+        [1]    = "a",
+    },
+}
+CHECK[[
+local function a(b, c)
+    return
+end]]
+{
+    [1] = {
+        type   = "local",
+        start  = 16,
+        finish = 16,
+        [1]    = "a",
+    },
+    [2] = {
+        type   = "name",
+        start  = 18,
+        finish = 18,
+        [1]    = "b",
+    },
+    [3] = {
+        type   = ",",
+        start  = 19,
+        finish = 19,
+    },
+    [4] = {
+        type   = "name",
+        start  = 21,
+        finish = 21,
+        [1]    = "c",
+    },
+    [5] = {
+        type   = "funcargs",
+        start  = 17,
+        finish = 22,
+        [1]    = 2,
+        [2]    = 4,
+    },
+    [6] = {
+        type   = "return",
+        start  = 28,
+        finish = 34,
+    },
+    [7] = {
+        type   = "function",
+        start  = 1,
+        finish = 37,
+        args   = 5,
+        [1]    = 6,
+    },
+    [8] = {
+        type   = "setname",
+        start  = 16,
+        finish = 16,
+        value  = 7,
+        [1]    = "a",
+    },
+}
+
+CHECK[[
 local x, y, z = 1, 2
 local function f()
 end
