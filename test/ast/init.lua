@@ -1,5 +1,6 @@
 local parser = require 'parser'
 local fs = require 'bee.filesystem'
+local utility = require 'utility'
 
 local function eq(a, b)
     local tp1, tp2 = type(a), type(b)
@@ -36,8 +37,8 @@ local function test(type)
             end
             if not eq(state.root, target_ast) then
                 fs.create_directory(ROOT / 'test' / 'log')
-                io.save(ROOT / 'test' / 'log' / 'my_ast.ast', table.dump(state.root))
-                io.save(ROOT / 'test' / 'log' / 'target_ast.ast', table.dump(target_ast))
+                utility.saveFile((ROOT / 'test' / 'log' / 'my_ast.ast'):string(), utility.dump(state.root))
+                utility.saveFile((ROOT / 'test' / 'log' / 'target_ast.ast'):string(), utility.dump(target_ast))
                 error(('语法树不相等：%s\n%s'):format(type, buf))
             end
         end
