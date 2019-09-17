@@ -213,6 +213,35 @@ local vmMap = {
         return id
     end,
     ['binary'] = function (obj)
+        local e1 = obj[1]
+        local e2 = obj[2]
+        obj[1] = Compile(e1)
+        obj[2] = Compile(e2)
+        Root[#Root+1] = obj
+        local id = #Root
+        e1.parent = id
+        e2.parent = id
+        return id
+    end,
+    ['unary'] = function (obj)
+        local e = obj[1]
+        obj[1] = Compile(e)
+        Root[#Root+1] = obj
+        local id = #Root
+        e.parent = id
+        return id
+    end,
+    ['varargs'] = function (obj)
+        Root[#Root+1] = obj
+        return #Root
+    end,
+    ['paren'] = function (obj)
+        local exp = obj.exp
+        obj.exp = Compile(exp)
+        Root[#Root+1] = obj
+        local id = #Root
+        exp.parent = id
+        return #Root
     end,
 }
 

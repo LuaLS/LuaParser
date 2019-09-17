@@ -17,544 +17,558 @@ CHECK'a'
 }
 CHECK'a.b'
 {
-	[1] = {
-		type   = "getname",
-		start  = 1,
-		finish = 1,
-		child  = 2,
-		[1]    = "a",
-	},
-	[2] = {
-		type   = "getfield",
-		start  = 1,
-		finish = 3,
-		parent = 1,
-		dot    = {
-			type   = ".",
-			start  = 2,
-			finish = 2,
-		},
-		field  = {
-			type   = "field",
-			start  = 3,
-			finish = 3,
-			[1]    = "b",
-		},
-	},
+    [1] = {
+        type   = "getname",
+        start  = 1,
+        finish = 1,
+        child  = 2,
+        [1]    = "a",
+    },
+    [2] = {
+        type   = "getfield",
+        start  = 1,
+        finish = 3,
+        parent = 1,
+        dot    = {
+            type   = ".",
+            start  = 2,
+            finish = 2,
+        },
+        field  = {
+            type   = "field",
+            start  = 3,
+            finish = 3,
+            [1]    = "b",
+        },
+    },
 }
 CHECK'a.b.c'
 {
-	[1] = {
-		type   = "getname",
-		start  = 1,
-		finish = 1,
-		child  = 2,
-		[1]    = "a",
-	},
-	[2] = {
-		type   = "getfield",
-		start  = 1,
-		parent = 1,
-		child  = 3,
-		finish = 3,
-		dot    = {
-			type   = ".",
-			start  = 2,
-			finish = 2,
-		},
-		field  = {
-			type   = "field",
-			start  = 3,
-			finish = 3,
-			[1]    = "b",
-		},
-	},
-	[3] = {
-		type   = "getfield",
-		start  = 1,
-		finish = 5,
-		parent = 2,
-		dot    = {
-			type   = ".",
-			start  = 4,
-			finish = 4,
-		},
-		field  = {
-			type   = "field",
-			start  = 5,
-			finish = 5,
-			[1]    = "c",
-		},
-	},
+    [1] = {
+        type   = "getname",
+        start  = 1,
+        finish = 1,
+        child  = 2,
+        [1]    = "a",
+    },
+    [2] = {
+        type   = "getfield",
+        start  = 1,
+        parent = 1,
+        child  = 3,
+        finish = 3,
+        dot    = {
+            type   = ".",
+            start  = 2,
+            finish = 2,
+        },
+        field  = {
+            type   = "field",
+            start  = 3,
+            finish = 3,
+            [1]    = "b",
+        },
+    },
+    [3] = {
+        type   = "getfield",
+        start  = 1,
+        finish = 5,
+        parent = 2,
+        dot    = {
+            type   = ".",
+            start  = 4,
+            finish = 4,
+        },
+        field  = {
+            type   = "field",
+            start  = 5,
+            finish = 5,
+            [1]    = "c",
+        },
+    },
 }
 CHECK'func()'
 {
-	[1] = {
-		type   = "getname",
-		start  = 1,
-		finish = 4,
-		child  = 2,
-		[1]    = "func",
-	},
-	[2] = {
-		type   = "call",
-		start  = 1,
-		finish = 6,
-		parent = 1,
-		args   = {
-			type   = "callargs",
-			start  = 5,
-			finish = 6,
-		},
-	},
+    [1] = {
+        type   = "getname",
+        start  = 1,
+        finish = 4,
+        child  = 2,
+        [1]    = "func",
+    },
+    [2] = {
+        type   = "call",
+        start  = 1,
+        finish = 6,
+        parent = 1,
+        args   = {
+            type   = "callargs",
+            start  = 5,
+            finish = 6,
+        },
+    },
 }
 CHECK'a.b.c()'
 {
-	[1] = {
-		type   = "getname",
-		start  = 1,
-		finish = 1,
-		child  = 2,
-		[1]    = "a",
-	},
-	[2] = {
-		type   = "getfield",
-		start  = 1,
-		finish = 3,
-		parent = 1,
-		child  = 3,
-		field  = {
-			type   = "field",
-			start  = 3,
-			finish = 3,
-			[1]    = "b",
-		},
-		dot    = {
-			type   = ".",
-			start  = 2,
-			finish = 2,
-		},
-	},
-	[3] = {
-		type   = "getfield",
-		start  = 1,
-		finish = 5,
-		parent = 2,
-		child  = 4,
-		dot    = {
-			type   = ".",
-			start  = 4,
-			finish = 4,
-		},
-		field  = {
-			type   = "field",
-			start  = 5,
-			finish = 5,
-			[1]    = "c",
-		},
-	},
-	[4] = {
-		type   = "call",
-		start  = 1,
-		finish = 7,
-		parent = 3,
-		args   = {
-			type   = "callargs",
-			start  = 6,
-			finish = 7,
-		},
-	},
+    [1] = {
+        type   = "getname",
+        start  = 1,
+        finish = 1,
+        child  = 2,
+        [1]    = "a",
+    },
+    [2] = {
+        type   = "getfield",
+        start  = 1,
+        finish = 3,
+        parent = 1,
+        child  = 3,
+        field  = {
+            type   = "field",
+            start  = 3,
+            finish = 3,
+            [1]    = "b",
+        },
+        dot    = {
+            type   = ".",
+            start  = 2,
+            finish = 2,
+        },
+    },
+    [3] = {
+        type   = "getfield",
+        start  = 1,
+        finish = 5,
+        parent = 2,
+        child  = 4,
+        dot    = {
+            type   = ".",
+            start  = 4,
+            finish = 4,
+        },
+        field  = {
+            type   = "field",
+            start  = 5,
+            finish = 5,
+            [1]    = "c",
+        },
+    },
+    [4] = {
+        type   = "call",
+        start  = 1,
+        finish = 7,
+        parent = 3,
+        args   = {
+            type   = "callargs",
+            start  = 6,
+            finish = 7,
+        },
+    },
 }
 CHECK'1 or 2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = 'or',
-        start  = 3,
-        finish = 4,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 6,
         finish = 6,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 6,
-        op     = 2,
+        op     = {
+            type   = "or",
+            start  = 3,
+            finish = 4,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'1 and 2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = 'and',
-        start  = 3,
-        finish = 5,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 7,
         finish = 7,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 7,
-        op     = 2,
+        op     = {
+            type   = "and",
+            start  = 3,
+            finish = 5,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'1 < 2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = '<',
-        start  = 3,
-        finish = 3,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 5,
         finish = 5,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 5,
-        op     = 2,
+        op     = {
+            type   = "<",
+            start  = 3,
+            finish = 3,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'1 > 2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = '>',
-        start  = 3,
-        finish = 3,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 5,
         finish = 5,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 5,
-        op     = 2,
+        op     = {
+            type   = ">",
+            start  = 3,
+            finish = 3,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'1 <= 2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = '<=',
-        start  = 3,
-        finish = 4,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 6,
         finish = 6,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 6,
-        op     = 2,
+        op     = {
+            type   = "<=",
+            start  = 3,
+            finish = 4,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'1 >= 2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = '>=',
-        start  = 3,
-        finish = 4,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 6,
         finish = 6,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 6,
-        op     = 2,
+        op     = {
+            type   = ">=",
+            start  = 3,
+            finish = 4,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'1 ~= 2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = '~=',
-        start  = 3,
-        finish = 4,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 6,
         finish = 6,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 6,
-        op     = 2,
+        op     = {
+            type   = "~=",
+            start  = 3,
+            finish = 4,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'1 == 2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = '==',
-        start  = 3,
-        finish = 4,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 6,
         finish = 6,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 6,
-        op     = 2,
+        op     = {
+            type   = "==",
+            start  = 3,
+            finish = 4,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'1 | 2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = '|',
-        start  = 3,
-        finish = 3,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 5,
         finish = 5,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 5,
-        op     = 2,
+        op     = {
+            type   = "|",
+            start  = 3,
+            finish = 3,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'1 ~ 2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = '~',
-        start  = 3,
-        finish = 3,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 5,
         finish = 5,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 5,
-        op     = 2,
+        op     = {
+            type   = "~",
+            start  = 3,
+            finish = 3,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'1 & 2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = '&',
-        start  = 3,
-        finish = 3,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 5,
         finish = 5,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 5,
-        op     = 2,
+        op     = {
+            type   = "&",
+            start  = 3,
+            finish = 3,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'1 << 2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = '<<',
-        start  = 3,
-        finish = 4,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 6,
         finish = 6,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 6,
-        op     = 2,
+        op     = {
+            type   = "<<",
+            start  = 3,
+            finish = 4,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'1 >> 2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = '>>',
-        start  = 3,
-        finish = 4,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 6,
         finish = 6,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 6,
-        op     = 2,
+        op     = {
+            type   = ">>",
+            start  = 3,
+            finish = 4,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'1 .. 2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = '..',
-        start  = 3,
-        finish = 4,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 6,
         finish = 6,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 6,
-        op     = 2,
+        op     = {
+            type   = "..",
+            start  = 3,
+            finish = 4,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'a .. b'
@@ -563,379 +577,388 @@ CHECK'a .. b'
         type   = "getname",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = "a",
     },
     [2] = {
-        type   = "..",
-        start  = 3,
-        finish = 4,
-    },
-    [3] = {
         type   = "getname",
         start  = 6,
         finish = 6,
+        parent = 3,
         [1]    = "b",
     },
-    [4] = {
+    [3] = {
         type   = "binary",
         start  = 1,
         finish = 6,
-        op     = 2,
+        op     = {
+            type   = "..",
+            start  = 3,
+            finish = 4,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'1 + 2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = '+',
-        start  = 3,
-        finish = 3,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 5,
         finish = 5,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 5,
-        op     = 2,
+        op     = {
+            type   = "+",
+            start  = 3,
+            finish = 3,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'1 - 2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = '-',
-        start  = 3,
-        finish = 3,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 5,
         finish = 5,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 5,
-        op     = 2,
+        op     = {
+            type   = "-",
+            start  = 3,
+            finish = 3,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'1 * 2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = '*',
-        start  = 3,
-        finish = 3,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 5,
         finish = 5,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 5,
-        op     = 2,
+        op     = {
+            type   = "*",
+            start  = 3,
+            finish = 3,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'1 / 2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = '/',
-        start  = 3,
-        finish = 3,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 5,
         finish = 5,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 5,
-        op     = 2,
+        op     = {
+            type   = "/",
+            start  = 3,
+            finish = 3,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'1 // 2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = '//',
-        start  = 3,
-        finish = 4,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 6,
         finish = 6,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 6,
-        op     = 2,
+        op     = {
+            type   = "//",
+            start  = 3,
+            finish = 4,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'1 % 2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = '%',
-        start  = 3,
-        finish = 3,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 5,
         finish = 5,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 5,
-        op     = 2,
+        op     = {
+            type   = "%",
+            start  = 3,
+            finish = 3,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'- 1'
 {
     [1] = {
-        type   = '-',
-        start  = 1,
-        finish = 1,
-    },
-    [2] = {
-        type   = 'number',
+        type   = "number",
         start  = 3,
         finish = 3,
+        parent = 2,
         [1]    = 1,
     },
-    [3] = {
-        type   = 'unary',
+    [2] = {
+        type   = "unary",
         start  = 1,
         finish = 3,
-        op     = 1,
-        [1]    = 2,
+        op     = {
+            type   = "-",
+            start  = 1,
+            finish = 1,
+        },
+        [1]    = 1,
     },
 }
 CHECK'~ 1'
 {
     [1] = {
-        type   = '~',
-        start  = 1,
-        finish = 1,
-    },
-    [2] = {
-        type   = 'number',
+        type   = "number",
         start  = 3,
         finish = 3,
+        parent = 2,
         [1]    = 1,
     },
-    [3] = {
-        type   = 'unary',
+    [2] = {
+        type   = "unary",
         start  = 1,
         finish = 3,
-        op     = 1,
-        [1]    = 2,
+        op     = {
+            type   = "~",
+            start  = 1,
+            finish = 1,
+        },
+        [1]    = 1,
     },
 }
 CHECK'not 1'
 {
     [1] = {
-        type   = 'not',
-        start  = 1,
-        finish = 3,
-    },
-    [2] = {
-        type   = 'number',
+        type   = "number",
         start  = 5,
         finish = 5,
+        parent = 2,
         [1]    = 1,
     },
-    [3] = {
-        type   = 'unary',
+    [2] = {
+        type   = "unary",
         start  = 1,
         finish = 5,
-        op     = 1,
-        [1]    = 2,
+        op     = {
+            type   = "not",
+            start  = 1,
+            finish = 3,
+        },
+        [1]    = 1,
     },
 }
 CHECK'# 1'
 {
     [1] = {
-        type   = '#',
-        start  = 1,
-        finish = 1,
-    },
-    [2] = {
-        type   = 'number',
+        type   = "number",
         start  = 3,
         finish = 3,
+        parent = 2,
         [1]    = 1,
     },
-    [3] = {
-        type   = 'unary',
+    [2] = {
+        type   = "unary",
         start  = 1,
         finish = 3,
-        op     = 1,
-        [1]    = 2,
+        op     = {
+            type   = "#",
+            start  = 1,
+            finish = 1,
+        },
+        [1]    = 1,
     },
 }
 CHECK'not not true'
 {
     [1] = {
-        type   = 'not',
-        start  = 1,
-        finish = 3,
-    },
-    [2] = {
-        type   = 'not',
-        start  = 5,
-        finish = 7,
-    },
-    [3] = {
-        type   = 'boolean',
+        type   = "boolean",
         start  = 9,
         finish = 12,
+        parent = 2,
         [1]    = true,
     },
-    [4] = {
-        [1] = 3,
+    [2] = {
+        type   = "unary",
+        start  = 5,
+        parent = 3,
         finish = 12,
-        op = 2,
-        start = 5,
-        type = "unary",
+        op     = {
+            type   = "not",
+            start  = 5,
+            finish = 7,
+        },
+        [1]    = 1,
     },
-    [5] = {
-        [1] = 4,
+    [3] = {
+        type   = "unary",
+        start  = 1,
         finish = 12,
-        op = 1,
-        start = 1,
-        type = "unary",
+        op     = {
+            type   = "not",
+            start  = 1,
+            finish = 3,
+        },
+        [1]    = 2,
     },
 }
 CHECK'1 ^ 2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = '^',
-        start  = 3,
-        finish = 3,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 5,
         finish = 5,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 5,
-        op     = 2,
+        op     = {
+            type   = "^",
+            start  = 3,
+            finish = 3,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
 }
 CHECK'1 ^ -2'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 4,
         [1]    = 1,
     },
     [2] = {
-        type   = '^',
-        start  = 3,
-        finish = 3,
-    },
-    [3] = {
-        type   = '-',
-        start  = 5,
-        finish = 5,
-    },
-    [4] = {
-        type   = 'number',
+        type   = "number",
         start  = 6,
         finish = 6,
+        parent = 3,
         [1]    = 2,
     },
-    [5] = {
-        type   = 'unary',
+    [3] = {
+        type   = "unary",
         start  = 5,
+        parent = 4,
         finish = 6,
-        op     = 3,
-        [1]    = 4,
+        op     = {
+            type   = "-",
+            start  = 5,
+            finish = 5,
+        },
+        [1]    = 2,
     },
-    [6] = {
-        type   = 'binary',
+    [4] = {
+        type   = "binary",
         start  = 1,
         finish = 6,
-        op     = 2,
+        op     = {
+            type   = "^",
+            start  = 3,
+            finish = 3,
+        },
         [1]    = 1,
-        [2]    = 5,
+        [2]    = 3,
     },
 }
 CHECK'...'
@@ -949,250 +972,260 @@ CHECK'...'
 CHECK'1 + 2 + 3'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 3,
         [1]    = 1,
     },
     [2] = {
-        type   = '+',
-        start  = 3,
-        finish = 3,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 5,
         finish = 5,
+        parent = 3,
         [1]    = 2,
     },
-    [4] = {
-        type   = '+',
-        start  = 7,
-        finish = 7,
-    },
-    [5] = {
-        type   = 'number',
-        start  = 9,
-        finish = 9,
-        [1]    = 3,
-    },
-    [6] = {
-        type   = 'binary',
+    [3] = {
+        type   = "binary",
         start  = 1,
         finish = 5,
-        op     = 2,
+        parent = 5,
+        op     = {
+            type   = "+",
+            start  = 3,
+            finish = 3,
+        },
         [1]    = 1,
-        [2]    = 3,
+        [2]    = 2,
     },
-    [7] = {
-        type   = 'binary',
+    [4] = {
+        type   = "number",
+        start  = 9,
+        finish = 9,
+        parent = 5,
+        [1]    = 3,
+    },
+    [5] = {
+        type   = "binary",
         start  = 1,
         finish = 9,
-        op     = 4,
-        [1]    = 6,
-        [2]    = 5,
+        op     = {
+            type   = "+",
+            start  = 7,
+            finish = 7,
+        },
+        [1]    = 3,
+        [2]    = 4,
     },
 }
 CHECK'1 + 2 * 3'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 5,
         [1]    = 1,
     },
     [2] = {
-        type   = '+',
-        start  = 3,
-        finish = 3,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 5,
         finish = 5,
+        parent = 4,
         [1]    = 2,
     },
-    [4] = {
-        type   = '*',
-        start  = 7,
-        finish = 7,
-    },
-    [5] = {
-        type   = 'number',
+    [3] = {
+        type   = "number",
         start  = 9,
         finish = 9,
+        parent = 4,
         [1]    = 3,
     },
-    [6] = {
-        type   = 'binary',
+    [4] = {
+        type   = "binary",
         start  = 5,
         finish = 9,
-        op     = 4,
-        [1]    = 3,
-        [2]    = 5,
+        parent = 5,
+        op     = {
+            type   = "*",
+            start  = 7,
+            finish = 7,
+        },
+        [1]    = 2,
+        [2]    = 3,
     },
-    [7] = {
-        type   = 'binary',
+    [5] = {
+        type   = "binary",
         start  = 1,
         finish = 9,
-        op     = 2,
+        op     = {
+            type   = "+",
+            start  = 3,
+            finish = 3,
+        },
         [1]    = 1,
-        [2]    = 6,
+        [2]    = 4,
     },
 }
 CHECK'- 1 + 2 * 3'
 {
     [1] = {
-        type   = "-",
-        start  = 1,
-        finish = 1,
-    },
-    [2] = {
         type   = "number",
         start  = 3,
         finish = 3,
+        parent = 2,
         [1]    = 1,
     },
-    [3] = {
-        type   = "+",
-        start  = 5,
-        finish = 5,
-    },
-    [4] = {
-        type   = "number",
-        start  = 7,
-        finish = 7,
-        [1]    = 2,
-    },
-    [5] = {
-        type   = "*",
-        start  = 9,
-        finish = 9,
-    },
-    [6] = {
-        type   = "number",
-        start  = 11,
-        finish = 11,
-        [1]    = 3,
-    },
-    [7] = {
+    [2] = {
         type   = "unary",
         start  = 1,
         finish = 3,
-        op     = 1,
+        parent = 6,
+        op     = {
+            type   = "-",
+            start  = 1,
+            finish = 1,
+        },
+        [1]    = 1,
+    },
+    [3] = {
+        type   = "number",
+        start  = 7,
+        finish = 7,
+        parent = 5,
         [1]    = 2,
     },
-    [8] = {
+    [4] = {
+        type   = "number",
+        start  = 11,
+        finish = 11,
+        parent = 5,
+        [1]    = 3,
+    },
+    [5] = {
         type   = "binary",
         start  = 7,
         finish = 11,
-        op     = 5,
-        [1]    = 4,
-        [2]    = 6,
+        parent = 6,
+        op     = {
+            type   = "*",
+            start  = 9,
+            finish = 9,
+        },
+        [1]    = 3,
+        [2]    = 4,
     },
-    [9] = {
+    [6] = {
         type   = "binary",
         start  = 1,
         finish = 11,
-        op     = 3,
-        [1]    = 7,
-        [2]    = 8,
+        op     = {
+            type   = "+",
+            start  = 5,
+            finish = 5,
+        },
+        [1]    = 2,
+        [2]    = 5,
     },
 }
 -- 幂运算从右向左连接
 CHECK'1 ^ 2 ^ 3'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 5,
         [1]    = 1,
     },
     [2] = {
-        type   = '^',
-        start  = 3,
-        finish = 3,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 5,
         finish = 5,
+        parent = 4,
         [1]    = 2,
     },
-    [4] = {
-        type   = '^',
-        start  = 7,
-        finish = 7,
-    },
-    [5] = {
-        type   = 'number',
+    [3] = {
+        type   = "number",
         start  = 9,
         finish = 9,
+        parent = 4,
         [1]    = 3,
     },
-    [6] = {
-        type   = 'binary',
+    [4] = {
+        type   = "binary",
         start  = 5,
         finish = 9,
-        op     = 4,
-        [1]    = 3,
-        [2]    = 5,
+        parent = 5,
+        op     = {
+            type   = "^",
+            start  = 7,
+            finish = 7,
+        },
+        [1]    = 2,
+        [2]    = 3,
     },
-    [7] = {
-        type   = 'binary',
+    [5] = {
+        type   = "binary",
         start  = 1,
         finish = 9,
-        op     = 2,
+        op     = {
+            type   = "^",
+            start  = 3,
+            finish = 3,
+        },
         [1]    = 1,
-        [2]    = 6,
+        [2]    = 4,
     },
 }
 -- 连接运算从右向左连接
 CHECK'1 .. 2 .. 3'
 {
     [1] = {
-        type   = 'number',
+        type   = "number",
         start  = 1,
         finish = 1,
+        parent = 5,
         [1]    = 1,
     },
     [2] = {
-        type   = '..',
-        start  = 3,
-        finish = 4,
-    },
-    [3] = {
-        type   = 'number',
+        type   = "number",
         start  = 6,
         finish = 6,
+        parent = 4,
         [1]    = 2,
     },
-    [4] = {
-        type   = '..',
-        start  = 8,
-        finish = 9,
-    },
-    [5] = {
-        type   = 'number',
+    [3] = {
+        type   = "number",
         start  = 11,
         finish = 11,
+        parent = 4,
         [1]    = 3,
     },
-    [6] = {
-        type   = 'binary',
+    [4] = {
+        type   = "binary",
         start  = 6,
         finish = 11,
-        op     = 4,
-        [1]    = 3,
-        [2]    = 5,
+        parent = 5,
+        op     = {
+            type   = "..",
+            start  = 8,
+            finish = 9,
+        },
+        [1]    = 2,
+        [2]    = 3,
     },
-    [7] = {
-        type   = 'binary',
+    [5] = {
+        type   = "binary",
         start  = 1,
         finish = 11,
-        op     = 2,
+        op     = {
+            type   = "..",
+            start  = 3,
+            finish = 4,
+        },
         [1]    = 1,
-        [2]    = 6,
+        [2]    = 4,
     },
 }
 CHECK'(1)'
@@ -1201,6 +1234,7 @@ CHECK'(1)'
         type   = "number",
         start  = 2,
         finish = 2,
+        parent = 2,
         [1]    = 1,
     },
     [2] = {
