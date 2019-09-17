@@ -662,7 +662,9 @@ local Defs = {
         }
     end,
     GetField = function (dot, field)
-        field.type = 'field'
+        if field then
+            field.type = 'field'
+        end
         return {
             type   = 'getfield',
             field  = field,
@@ -680,7 +682,9 @@ local Defs = {
         }
     end,
     GetMethod = function (colon, method)
-        method.type = 'method'
+        if method then
+            method.type = 'method'
+        end
         return {
             type   = 'getmethod',
             method = method,

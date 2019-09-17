@@ -270,27 +270,31 @@ local vmMap = {
         return id
     end,
     ['getmethod'] = function (obj)
-        local node = obj.node
-        local method = obj.method
         Root[#Root+1] = obj
         local id = #Root
+        local node = obj.node
+        local method = obj.method
         obj.node = Compile(node)
-        obj.method = Compile(method)
         node.parent = id
-        method.parent = id
+        if method then
+            obj.method = Compile(method)
+            method.parent = id
+        end
         return id
     end,
     ['setmethod'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
         local node = obj.node
         local method = obj.method
         local value = obj.value
-        Root[#Root+1] = obj
-        local id = #Root
         obj.node = Compile(node)
-        obj.method = Compile(method)
-        obj.value = Compile(value)
         node.parent = id
-        method.parent = id
+        if method then
+            obj.method = Compile(method)
+            method.parent = id
+        end
+        obj.value = Compile(value)
         value.parent = id
         return id
     end,
@@ -299,11 +303,13 @@ local vmMap = {
         return #Root
     end,
     ['function'] = function (obj)
-        local args = obj.args
         Root[#Root+1] = obj
         local id = #Root
-        obj.args = Compile(args)
-        args.parent = id
+        local args = obj.args
+        if args then
+            obj.args = Compile(args)
+            args.parent = id
+        end
         for i = 1, #obj do
             local act = obj[i]
             obj[i] = Compile(act)
@@ -379,8 +385,10 @@ local vmMap = {
         Root[#Root+1] = obj
         local id = #Root
         local value = obj.value
-        obj.value = Compile(value)
-        value.parent = id
+        if value then
+            obj.value = Compile(value)
+            value.parent = id
+        end
         return id
     end,
     ['local'] = function (obj)
