@@ -942,7 +942,7 @@ CHECK'obj:remove()'
         start  = 1,
         finish = 12,
         node   = 2,
-        args   = 4,
+        args   = 5,
     },
     [2] = {
         type   = "getmethod",
@@ -955,6 +955,7 @@ CHECK'obj:remove()'
             start  = 4,
             finish = 4,
         },
+        method = 4,
     },
     [3] = {
         type   = "getname",
@@ -964,6 +965,13 @@ CHECK'obj:remove()'
         [1]    = "obj",
     },
     [4] = {
+        type   = "method",
+        start  = 5,
+        finish = 10,
+        parent = 2,
+        [1]    = "remove",
+    },
+    [5] = {
         type   = "callargs",
         start  = 11,
         finish = 12,

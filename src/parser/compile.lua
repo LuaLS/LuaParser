@@ -3,7 +3,7 @@ local print = print
 
 _ENV = nil
 
-local State, Errs, pushError, Root, Compile
+local State, Errs, pushError, Root, Compile, Cache
 
 local function checkJumpLocal(start, finish, obj)
     if obj.start < start then
@@ -205,13 +205,15 @@ local vmMap = {
         return id
     end,
     ['call'] = function (obj)
-        local node = obj.node
-        local args = obj.args
         Root[#Root+1] = obj
         local id = #Root
-        obj.node = Compile(node)
+        local node = obj.node
+        local args = obj.args
+        if node then
+            obj.node = Compile(node)
+            node.parent = id
+        end
         obj.args = Compile(args)
-        node.parent = id
         args.parent = id
         return id
     end,
@@ -278,6 +280,10 @@ local vmMap = {
         method.parent = id
         return id
     end,
+    ['method'] = function (obj)
+        Root[#Root+1] = obj
+        return #Root
+    end,
     ['function'] = function (obj)
         local args = obj.args
         Root[#Root+1] = obj
@@ -333,6 +339,23 @@ local vmMap = {
         index.parent = id
         return id
     end,
+    ['select'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        local vararg = obj.vararg
+        if not Cache[vararg] then
+            obj.vararg = Compile(vararg)
+            vararg.parent = id
+            Cache[vararg] = obj.vararg
+        else
+            obj.vararg = Cache[vararg]
+            if not vararg.extParent then
+                vararg.extParent = {}
+            end
+            vararg.extParent[#vararg.extParent+1] = id
+        end
+        return id
+    end,
     ['setname'] = function (obj)
         Root[#Root+1] = obj
         local id = #Root
@@ -363,6 +386,135 @@ local vmMap = {
         Root[#Root+1] = obj
         return #Root
     end,
+    ['setfield'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        local node  = obj.node
+        local field = obj.field
+        local value = obj.value
+        obj.node  = Compile(node)
+        obj.field = Compile(field)
+        obj.value = Compile(value)
+        node.parent  = id
+        field.parent = id
+        value.parent = id
+        return id
+    end,
+    ['do'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        for i = 1, #obj do
+            local act = obj[i]
+            obj[i] = Compile(act)
+            act.parent = id
+        end
+        return id
+    end,
+    ['return'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        for i = 1, #obj do
+            local act = obj[i]
+            obj[i] = Compile(act)
+            act.parent = id
+        end
+        return id
+    end,
+    ['label'] = function (obj)
+        Root[#Root+1] = obj
+        return #Root
+    end,
+    ['goto'] = function (obj)
+        Root[#Root+1] = obj
+        return #Root
+    end,
+    ['if'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        for i = 1, #obj do
+            local block = obj[i]
+            obj[i] = Compile(block)
+            block.parent = id
+        end
+        return id
+    end,
+    ['ifblock'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        local filter = obj.filter
+        obj.filter = Compile(filter)
+        filter.parent = id
+        for i = 1, #obj do
+            local act = obj[i]
+            obj[i] = Compile(act)
+            act.parent = id
+        end
+        return id
+    end,
+    ['elseifblock'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        local filter = obj.filter
+        obj.filter = Compile(filter)
+        filter.parent = id
+        for i = 1, #obj do
+            local act = obj[i]
+            obj[i] = Compile(act)
+            act.parent = id
+        end
+        return id
+    end,
+    ['elseblock'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        for i = 1, #obj do
+            local act = obj[i]
+            obj[i] = Compile(act)
+            act.parent = id
+        end
+        return id
+    end,
+    ['loop'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        local loc = obj.loc
+        local max = obj.max
+        local step = obj.step
+        if loc then
+            obj.loc = Compile(loc)
+            loc.parent = id
+        end
+        if max then
+            obj.max = Compile(max)
+            max.parent = id
+        end
+        if step then
+            obj.step = Compile(step)
+            step.parent = id
+        end
+        for i = 1, #obj do
+            local act = obj[i]
+            obj[i] = Compile(act)
+            act.parent = id
+        end
+        return id
+    end,
+    ['in'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        local locs = obj.locs
+        for i = 1, #locs do
+            local loc = locs[i]
+            locs[i] = Compile(loc)
+            loc.parent = id
+        end
+        for i = 1, #obj do
+            local act = obj[i]
+            obj[i] = Compile(act)
+            act.parent = id
+        end
+        return id
+    end,
 }
 
 function Compile(obj)
@@ -383,6 +535,7 @@ return function (self, lua, mode, version)
     end
     pushError = State.pushError
     Root = State.root
+    Cache = {}
     Compile(State.ast)
     return State, Errs
 end

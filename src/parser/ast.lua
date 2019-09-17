@@ -680,6 +680,7 @@ local Defs = {
         }
     end,
     GetMethod = function (colon, method)
+        method.type = 'method'
         return {
             type   = 'getmethod',
             method = method,
@@ -1217,7 +1218,7 @@ local Defs = {
         if #exp == 0 then
             call = createCall(exp, 0, 0)
         else
-            call = createCall(exp, exp[1].start, exp[#exp].finish)
+            call = createCall(exp, exp[1].start, func.finish)
         end
         block.type   = 'in'
         block.start  = start

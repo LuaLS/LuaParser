@@ -30,12 +30,14 @@ end
 
 local sortList = {
     'type', 'start', 'finish',
-    'parent', 'child',
+    'parent', 'extParent', 'child',
+    'filter',
     'node',
     'op', 'args',
+    'loc', 'max', 'step', 'locs',
     'dot', 'colon',
-    'field', 'index',
-    'exp', 'value',
+    'field', 'index', 'method',
+    'exp', 'value',  'vararg',
     'attrs',
 }
 for i, v in ipairs(sortList) do
