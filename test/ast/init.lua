@@ -31,8 +31,10 @@ end
 local sortList = {
     'type', 'start', 'finish',
     'parent',
-    'op',
-    'child',
+    'op', 'args',
+    'dot', 'colon',
+    'field', 'index',
+    'child', 'exp',
 }
 for i, v in ipairs(sortList) do
     sortList[v] = i
