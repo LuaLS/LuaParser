@@ -696,7 +696,7 @@ local Defs = {
         local last = units[1]
         for i = 2, #units do
             local current  = units[i]
-            current.parent = last
+            current.node = last
             current.start  = last.start
             last = units[i]
         end

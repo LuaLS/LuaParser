@@ -197,21 +197,21 @@ local vmMap = {
         return #Root
     end,
     ['getfield'] = function (obj)
-        local parent = obj.parent
+        local node = obj.node
         Root[#Root+1] = obj
         local id = #Root
-        obj.parent = Compile(parent)
-        parent.child = id
+        obj.node = Compile(node)
+        node.parent = id
         return id
     end,
     ['call'] = function (obj)
-        local parent = obj.parent
+        local node = obj.node
         local args = obj.args
         Root[#Root+1] = obj
         local id = #Root
-        obj.parent = Compile(parent)
+        obj.node = Compile(node)
         obj.args = Compile(args)
-        parent.child = id
+        node.parent = id
         args.parent = id
         return id
     end,
@@ -257,24 +257,24 @@ local vmMap = {
         return id
     end,
     ['getindex'] = function (obj)
-        local parent = obj.parent
+        local node = obj.node
         local index = obj.index
         Root[#Root+1] = obj
         local id = #Root
-        obj.parent = Compile(parent)
+        obj.node = Compile(node)
         obj.index = Compile(index)
-        parent.child = id
+        node.parent = id
         index.parent = id
         return id
     end,
     ['getmethod'] = function (obj)
-        local parent = obj.parent
+        local node = obj.node
         local method = obj.method
         Root[#Root+1] = obj
         local id = #Root
-        obj.parent = Compile(parent)
+        obj.node = Compile(node)
         obj.method = Compile(method)
-        parent.child = id
+        node.parent = id
         method.parent = id
         return id
     end,
