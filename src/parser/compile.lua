@@ -206,10 +206,23 @@ local vmMap = {
     end,
     ['call'] = function (obj)
         local parent = obj.parent
+        local args = obj.args
         obj.parent = Compile(parent)
+        obj.args = Compile(args)
         Root[#Root+1] = obj
         local id = #Root
         parent.child = id
+        args.parent = id
+        return id
+    end,
+    ['callargs'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        for i = 1, #obj do
+            local arg = obj[i]
+            obj[i] = Compile(arg)
+            arg.parent = id
+        end
         return id
     end,
     ['binary'] = function (obj)
