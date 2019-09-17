@@ -36,8 +36,9 @@ local sortList = {
     'op', 'args',
     'loc', 'max', 'step', 'locs',
     'dot', 'colon',
+    'vararg',
     'field', 'index', 'method',
-    'exp', 'value',  'vararg',
+    'exp', 'value',
     'attrs',
 }
 for i, v in ipairs(sortList) do

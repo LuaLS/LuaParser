@@ -564,6 +564,16 @@ local vmMap = {
         Root[#Root+1] = obj
         return #Root
     end,
+    ['main'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        for i = 1, #obj do
+            local act = obj[i]
+            obj[i] = Compile(act)
+            act.parent = id
+        end
+        return id
+    end,
 }
 
 function Compile(obj)
