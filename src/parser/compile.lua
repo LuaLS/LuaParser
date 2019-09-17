@@ -1,5 +1,5 @@
 local guide = require 'parser.guide'
-local print = print
+local type = type
 
 _ENV = nil
 
@@ -259,14 +259,16 @@ local vmMap = {
         return id
     end,
     ['getindex'] = function (obj)
-        local node = obj.node
-        local index = obj.index
         Root[#Root+1] = obj
         local id = #Root
+        local node = obj.node
         obj.node = Compile(node)
-        obj.index = Compile(index)
         node.parent = id
-        index.parent = id
+        local index = obj.index
+        if index then
+            obj.index = Compile(index)
+            index.parent = id
+        end
         return id
     end,
     ['getmethod'] = function (obj)
@@ -341,8 +343,10 @@ local vmMap = {
         Root[#Root+1] = obj
         local id = #Root
         local value = obj.value
-        obj.value = Compile(value)
-        value.parent = id
+        if value then
+            obj.value = Compile(value)
+            value.parent = id
+        end
         return id
     end,
     ['tableindex'] = function (obj)
@@ -482,8 +486,10 @@ local vmMap = {
         Root[#Root+1] = obj
         local id = #Root
         local filter = obj.filter
-        obj.filter = Compile(filter)
-        filter.parent = id
+        if filter then
+            obj.filter = Compile(filter)
+            filter.parent = id
+        end
         for i = 1, #obj do
             local act = obj[i]
             obj[i] = Compile(act)
@@ -603,6 +609,8 @@ return function (self, lua, mode, version)
     pushError = State.pushError
     Root = State.root
     Cache = {}
-    Compile(State.ast)
+    if type(State.ast) == 'table' then
+        Compile(State.ast)
+    end
     return State, Errs
 end

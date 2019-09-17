@@ -1,6 +1,8 @@
 
+local utility = require 'utility'
+
 local parser = require 'parser'
-local buf = io.load(ROOT / 'test' / 'perform' / 'lines.txt')
+local buf = utility.loadFile((ROOT / 'test' / 'perform' / 'lines.txt'):string())
 assert(buf)
 buf = buf:gsub('\r\n', '\n'):gsub('[\r\n]', '\r\n')
 local lines = parser:lines(buf)
