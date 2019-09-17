@@ -24,6 +24,7 @@ return function (self, lua, mode, version)
     }
     ast.init(state)
     local suc, res, err = xpcall(self.grammar, debug.traceback, self, lua, mode)
+    ast.close()
     if not suc then
         return nil, res
     end

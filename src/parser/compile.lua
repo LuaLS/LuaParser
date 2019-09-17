@@ -3,7 +3,7 @@ local type = type
 
 _ENV = nil
 
-local State, Errs, pushError, Root, Compile, Cache
+local pushError, Root, Compile, Cache
 
 local function checkJumpLocal(start, finish, obj)
     if obj.start < start then
@@ -604,15 +604,17 @@ function Compile(obj)
 end
 
 return function (self, lua, mode, version)
-    State, Errs = self:parse(lua, mode, version)
-    if not State then
-        return Errs
+    local state, errs = self:parse(lua, mode, version)
+    if not state then
+        return errs
     end
-    pushError = State.pushError
-    Root = State.root
+    pushError = state.pushError
+    Root = state.root
     Cache = {}
-    if type(State.ast) == 'table' then
-        Compile(State.ast)
+    if type(state.ast) == 'table' then
+        Compile(state.ast)
     end
-    return State, Errs
+    state.ast = nil
+    Cache = nil
+    return state, errs
 end

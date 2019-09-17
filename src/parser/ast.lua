@@ -9,7 +9,7 @@ local mathType    = math.type
 _ENV = nil
 
 local State
-local pushError
+local PushError
 
 -- goto 单独处理
 local RESERVED = {
@@ -55,7 +55,7 @@ local function checkOpVersion(op)
             return
         end
     end
-    pushError {
+    PushError {
         type    = 'UNSUPPORT_SYMBOL',
         start   = op.start,
         finish  = op.finish,
@@ -169,7 +169,7 @@ local function checkMissEnd(start)
         return
     end
     err.info.related = { start, finish }
-    pushError {
+    PushError {
         type   = 'MISS_END',
         start  = start,
         finish = finish,
@@ -237,7 +237,7 @@ local function packList(start, list, finish)
         local ast = list[i]
         if ast.type == ',' then
             if wantName or i == #list then
-                pushError {
+                PushError {
                     type   = 'UNEXPECT_SYMBOL',
                     start  = ast.start,
                     finish = ast.finish,
@@ -249,7 +249,7 @@ local function packList(start, list, finish)
             wantName = true
         else
             if not wantName then
-                pushError {
+                PushError {
                     type   = 'MISS_SYMBOL',
                     start  = lastFinish,
                     finish = ast.start - 1,
@@ -363,7 +363,7 @@ local Defs = {
             local endSymbol = ']' .. ('='):rep(afterEq-beforeEq) .. ']'
             local s, _, w = str:find('(%][%=]*%])[%c%s]*$')
             if s then
-                pushError {
+                PushError {
                     type   = 'ERR_LCOMMENT_END',
                     start  = missPos - #str + s - 1,
                     finish = missPos - #str + s + #w - 2,
@@ -380,7 +380,7 @@ local Defs = {
                     },
                 }
             end
-            pushError {
+            PushError {
                 type   = 'MISS_SYMBOL',
                 start  = missPos,
                 finish = missPos,
@@ -399,7 +399,7 @@ local Defs = {
         end
     end,
     CLongComment = function (start1, finish1, start2, finish2)
-        pushError {
+        PushError {
             type   = 'ERR_C_LONG_COMMENT',
             start  = start1,
             finish = finish2 - 1,
@@ -419,7 +419,7 @@ local Defs = {
         }
     end,
     CCommentPrefix = function (start, finish)
-        pushError {
+        PushError {
             type   = 'ERR_COMMENT_PREFIX',
             start  = start,
             finish = finish - 1,
@@ -447,7 +447,7 @@ local Defs = {
             local endSymbol = ']' .. ('='):rep(afterEq-beforeEq) .. ']'
             local s, _, w = str:find('(%][%=]*%])[%c%s]*$')
             if s then
-                pushError {
+                PushError {
                     type   = 'ERR_LSTRING_END',
                     start  = missPos - #str + s - 1,
                     finish = missPos - #str + s + #w - 2,
@@ -464,7 +464,7 @@ local Defs = {
                     },
                 }
             end
-            pushError {
+            PushError {
                 type   = 'MISS_SYMBOL',
                 start  = missPos,
                 finish = missPos,
@@ -492,7 +492,7 @@ local Defs = {
     end,
     Char16 = function (pos, char)
         if State.version == 'Lua 5.1' then
-            pushError {
+            PushError {
                 type = 'ERR_ESC',
                 start = pos-1,
                 finish = pos,
@@ -510,7 +510,7 @@ local Defs = {
         and State.version ~= 'Lua 5.4'
         and State.version ~= 'LuaJIT'
         then
-            pushError {
+            PushError {
                 type = 'ERR_ESC',
                 start = pos-3,
                 finish = pos-2,
@@ -522,7 +522,7 @@ local Defs = {
             return char
         end
         if #char == 0 then
-            pushError {
+            PushError {
                 type = 'UTF8_SMALL',
                 start = pos-3,
                 finish = pos,
@@ -533,7 +533,7 @@ local Defs = {
         if not v then
             for i = 1, #char do
                 if not tonumber(char:sub(i, i), 16) then
-                    pushError {
+                    PushError {
                         type = 'MUST_X16',
                         start = pos + i - 1,
                         finish = pos + i - 1,
@@ -544,7 +544,7 @@ local Defs = {
         end
         if State.version == 'Lua 5.4' then
             if v < 0 or v > 0x7FFFFFFF then
-                pushError {
+                PushError {
                     type = 'UTF8_MAX',
                     start = pos-3,
                     finish = pos+#char,
@@ -556,7 +556,7 @@ local Defs = {
             end
         else
             if v < 0 or v > 0x10FFFF then
-                pushError {
+                PushError {
                     type = 'UTF8_MAX',
                     start = pos-3,
                     finish = pos+#char,
@@ -584,7 +584,7 @@ local Defs = {
             }
             return State.LastNumber
         else
-            pushError {
+            PushError {
                 type   = 'MALFORMED_NUMBER',
                 start  = start,
                 finish = finish - 1,
@@ -601,7 +601,7 @@ local Defs = {
     FFINumber = function (start, symbol)
         local lastNumber = State.LastNumber
         if mathType(lastNumber[1]) == 'float' then
-            pushError {
+            PushError {
                 type = 'UNKNOWN_SYMBOL',
                 start = start,
                 finish = start + #symbol - 1,
@@ -613,7 +613,7 @@ local Defs = {
             return
         end
         if State.version ~= 'LuaJIT' then
-            pushError {
+            PushError {
                 type = 'UNSUPPORT_SYMBOL',
                 start = start,
                 finish = start + #symbol - 1,
@@ -628,7 +628,7 @@ local Defs = {
     ImaginaryNumber = function (start, symbol)
         local lastNumber = State.LastNumber
         if State.version ~= 'LuaJIT' then
-            pushError {
+            PushError {
                 type = 'UNSUPPORT_SYMBOL',
                 start = start,
                 finish = start + #symbol - 1,
@@ -650,7 +650,7 @@ local Defs = {
             end
         end
         if isKeyWord then
-            pushError {
+            PushError {
                 type = 'KEYWORD',
                 start = start,
                 finish = finish - 1,
@@ -711,7 +711,7 @@ local Defs = {
     end,
     SimpleCall = function (call)
         if call.type ~= 'call' and call.type ~= 'getmethod' then
-            pushError {
+            PushError {
                 type   = 'EXP_IN_ACTION',
                 start  = call.start,
                 finish = call.finish,
@@ -760,13 +760,13 @@ local Defs = {
     PackLoopArgs = function (start, list, finish)
         local list = packList(start, list, finish)
         if #list == 0 then
-            pushError {
+            PushError {
                 type   = 'MISS_LOOP_MIN',
                 start  = finish,
                 finish = finish,
             }
         elseif #list == 1 then
-            pushError {
+            PushError {
                 type   = 'MISS_LOOP_MAX',
                 start  = finish,
                 finish = finish,
@@ -777,7 +777,7 @@ local Defs = {
     PackInNameList = function (start, list, finish)
         local list = packList(start, list, finish)
         if #list == 0 then
-            pushError {
+            PushError {
                 type   = 'MISS_NAME',
                 start  = start,
                 finish = finish,
@@ -788,7 +788,7 @@ local Defs = {
     PackInExpList = function (start, list, finish)
         local list = packList(start, list, finish)
         if #list == 0 then
-            pushError {
+            PushError {
                 type   = 'MISS_EXP',
                 start  = start,
                 finish = finish,
@@ -885,7 +885,7 @@ local Defs = {
         end
 
         if name.type ~= 'getname' then
-            pushError {
+            PushError {
                 type = 'UNEXPECT_LFUNC_NAME',
                 start = name.start,
                 finish = name.finish,
@@ -915,7 +915,7 @@ local Defs = {
             local field = tbl[i]
             if field.type == ',' or field.type == ';' then
                 if wantField then
-                    pushError {
+                    PushError {
                         type = 'MISS_EXP',
                         start = lastStart,
                         finish = field.start - 1,
@@ -925,7 +925,7 @@ local Defs = {
                 lastStart = field.finish + 1
             else
                 if not wantField then
-                    pushError {
+                    PushError {
                         type = 'MISS_SEP_IN_TABLE',
                         start = lastStart,
                         finish = field.start - 1,
@@ -981,7 +981,7 @@ local Defs = {
             local argAst = arg
             if argAst.type == ',' then
                 if wantName then
-                    pushError {
+                    PushError {
                         type = 'MISS_NAME',
                         start = lastStart,
                         finish = argAst.start-1,
@@ -990,7 +990,7 @@ local Defs = {
                 wantName = true
             else
                 if not wantName then
-                    pushError {
+                    PushError {
                         type = 'MISS_SYMBOL',
                         start = lastStart-1,
                         finish = argAst.start-1,
@@ -1007,7 +1007,7 @@ local Defs = {
                     if i < #args then
                         local a = args[i+1]
                         local b = args[#args]
-                        pushError {
+                        PushError {
                             type   = 'ARGS_AFTER_DOTS',
                             start  = a.start,
                             finish = b.finish,
@@ -1022,7 +1022,7 @@ local Defs = {
             args[i] = nil
         end
         if wantName and argCount > 0 then
-            pushError {
+            PushError {
                 type   = 'MISS_NAME',
                 start  = lastStart,
                 finish = finish - 1,
@@ -1049,7 +1049,7 @@ local Defs = {
             local attrAst = attr
             attrAst.type = 'localattr'
             if State.version ~= 'Lua 5.4' then
-                pushError {
+                PushError {
                     type    = 'UNSUPPORT_SYMBOL',
                     start   = attrAst.start,
                     finish  = attrAst.finish,
@@ -1059,7 +1059,7 @@ local Defs = {
                     }
                 }
             elseif attrAst[1] ~= 'const' and attrAst[1] ~= 'close' then
-                pushError {
+                PushError {
                     type   = 'UNKNOWN_TAG',
                     start  = attrAst.start,
                     finish = attrAst.finish,
@@ -1068,7 +1068,7 @@ local Defs = {
                     }
                 }
             elseif i > 1 then
-                pushError {
+                PushError {
                     type   = 'MULTI_TAG',
                     start  = attrAst.start,
                     finish = attrAst.finish,
@@ -1119,7 +1119,7 @@ local Defs = {
     end,
     Label = function (start, name, finish)
         if State.version == 'Lua 5.1' then
-            pushError {
+            PushError {
                 type   = 'UNSUPPORT_SYMBOL',
                 start  = start,
                 finish = finish - 1,
@@ -1138,7 +1138,7 @@ local Defs = {
     end,
     GoTo = function (start, name, finish)
         if State.version == 'Lua 5.1' then
-            pushError {
+            PushError {
                 type    = 'UNSUPPORT_SYMBOL',
                 start   = start,
                 finish  = finish - 1,
@@ -1183,7 +1183,7 @@ local Defs = {
         for i = 1, #blocks do
             local block = blocks[i]
             if i == 1 and block.type ~= 'ifblock' then
-                pushError {
+                PushError {
                     type = 'MISS_SYMBOL',
                     start = block.start,
                     finish = block.start,
@@ -1193,7 +1193,7 @@ local Defs = {
                 }
             end
             if hasElse then
-                pushError {
+                PushError {
                     type   = 'BLOCK_AFTER_ELSE',
                     start  = block.start,
                     finish = block.finish,
@@ -1260,7 +1260,7 @@ local Defs = {
 
     -- 捕获错误
     UnknownSymbol = function (start, symbol)
-        pushError {
+        PushError {
             type = 'UNKNOWN_SYMBOL',
             start = start,
             finish = start + #symbol - 1,
@@ -1271,7 +1271,7 @@ local Defs = {
         return
     end,
     UnknownAction = function (start, symbol)
-        pushError {
+        PushError {
             type = 'UNKNOWN_SYMBOL',
             start = start,
             finish = start + #symbol - 1,
@@ -1281,7 +1281,7 @@ local Defs = {
         }
     end,
     DirtyName = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_NAME',
             start = pos,
             finish = pos,
@@ -1289,7 +1289,7 @@ local Defs = {
         return nil
     end,
     DirtyExp = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_EXP',
             start = pos,
             finish = pos,
@@ -1297,21 +1297,21 @@ local Defs = {
         return nil
     end,
     MissExp = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_EXP',
             start = pos,
             finish = pos,
         }
     end,
     MissExponent = function (start, finish)
-        pushError {
+        PushError {
             type = 'MISS_EXPONENT',
             start = start,
             finish = finish - 1,
         }
     end,
     MissQuote1 = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_SYMBOL',
             start = pos,
             finish = pos,
@@ -1321,7 +1321,7 @@ local Defs = {
         }
     end,
     MissQuote2 = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_SYMBOL',
             start = pos,
             finish = pos,
@@ -1331,14 +1331,14 @@ local Defs = {
         }
     end,
     MissEscX = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_ESC_X',
             start = pos-2,
             finish = pos+1,
         }
     end,
     MissTL = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_SYMBOL',
             start = pos,
             finish = pos,
@@ -1348,7 +1348,7 @@ local Defs = {
         }
     end,
     MissTR = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_SYMBOL',
             start = pos,
             finish = pos,
@@ -1358,7 +1358,7 @@ local Defs = {
         }
     end,
     MissBR = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_SYMBOL',
             start = pos,
             finish = pos,
@@ -1368,7 +1368,7 @@ local Defs = {
         }
     end,
     MissPL = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_SYMBOL',
             start = pos,
             finish = pos,
@@ -1378,7 +1378,7 @@ local Defs = {
         }
     end,
     MissPR = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_SYMBOL',
             start = pos,
             finish = pos,
@@ -1388,21 +1388,21 @@ local Defs = {
         }
     end,
     ErrEsc = function (pos)
-        pushError {
+        PushError {
             type = 'ERR_ESC',
             start = pos-1,
             finish = pos,
         }
     end,
     MustX16 = function (pos, str)
-        pushError {
+        PushError {
             type = 'MUST_X16',
             start = pos,
             finish = pos + #str - 1,
         }
     end,
     MissAssign = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_SYMBOL',
             start = pos,
             finish = pos,
@@ -1412,7 +1412,7 @@ local Defs = {
         }
     end,
     MissTableSep = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_SYMBOL',
             start = pos,
             finish = pos,
@@ -1422,21 +1422,21 @@ local Defs = {
         }
     end,
     MissField = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_FIELD',
             start = pos,
             finish = pos,
         }
     end,
     MissMethod = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_METHOD',
             start = pos,
             finish = pos,
         }
     end,
     MissLabel = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_SYMBOL',
             start = pos,
             finish = pos,
@@ -1446,7 +1446,7 @@ local Defs = {
         }
     end,
     MissEnd = function (pos)
-        State.MissEndErr = pushError {
+        State.MissEndErr = PushError {
             type = 'MISS_SYMBOL',
             start = pos,
             finish = pos,
@@ -1456,7 +1456,7 @@ local Defs = {
         }
     end,
     MissDo = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_SYMBOL',
             start = pos,
             finish = pos,
@@ -1466,7 +1466,7 @@ local Defs = {
         }
     end,
     MissComma = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_SYMBOL',
             start = pos,
             finish = pos,
@@ -1476,7 +1476,7 @@ local Defs = {
         }
     end,
     MissIn = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_SYMBOL',
             start = pos,
             finish = pos,
@@ -1486,7 +1486,7 @@ local Defs = {
         }
     end,
     MissUntil = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_SYMBOL',
             start = pos,
             finish = pos,
@@ -1496,7 +1496,7 @@ local Defs = {
         }
     end,
     MissThen = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_SYMBOL',
             start = pos,
             finish = pos,
@@ -1506,14 +1506,14 @@ local Defs = {
         }
     end,
     MissName = function (pos)
-        pushError {
+        PushError {
             type = 'MISS_NAME',
             start = pos,
             finish = pos,
         }
     end,
     ExpInAction = function (start, exp, finish)
-        pushError {
+        PushError {
             type = 'EXP_IN_ACTION',
             start = start,
             finish = finish - 1,
@@ -1521,7 +1521,7 @@ local Defs = {
         return exp
     end,
     MissIf = function (start, block)
-        pushError {
+        PushError {
             type = 'MISS_SYMBOL',
             start = start,
             finish = start,
@@ -1532,7 +1532,7 @@ local Defs = {
         return block
     end,
     MissGT = function (start)
-        pushError {
+        PushError {
             type = 'MISS_SYMBOL',
             start = start,
             finish = start,
@@ -1542,7 +1542,7 @@ local Defs = {
         }
     end,
     ErrAssign = function (start, finish)
-        pushError {
+        PushError {
             type = 'ERR_ASSIGN_AS_EQ',
             start = start,
             finish = finish - 1,
@@ -1557,7 +1557,7 @@ local Defs = {
         }
     end,
     ErrEQ = function (start, finish)
-        pushError {
+        PushError {
             type   = 'ERR_EQ_AS_ASSIGN',
             start  = start,
             finish = finish - 1,
@@ -1573,7 +1573,7 @@ local Defs = {
         return '=='
     end,
     ErrUEQ = function (start, finish)
-        pushError {
+        PushError {
             type   = 'ERR_UEQ',
             start  = start,
             finish = finish - 1,
@@ -1589,7 +1589,7 @@ local Defs = {
         return '=='
     end,
     ErrThen = function (start, finish)
-        pushError {
+        PushError {
             type = 'ERR_THEN_AS_DO',
             start = start,
             finish = finish - 1,
@@ -1604,7 +1604,7 @@ local Defs = {
         }
     end,
     ErrDo = function (start, finish)
-        pushError {
+        PushError {
             type = 'ERR_DO_AS_THEN',
             start = start,
             finish = finish - 1,
@@ -1626,11 +1626,17 @@ local Defs = {
 
 local function init(state)
     State     = state
-    pushError = state.pushError
+    PushError = state.pushError
     emmy.init(State)
 end
 
+local function close()
+    State     = nil
+    PushError = nil
+end
+
 return {
-    defs = Defs,
-    init = init,
+    defs  = Defs,
+    init  = init,
+    close = close,
 }
