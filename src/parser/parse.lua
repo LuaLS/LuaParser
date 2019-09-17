@@ -6,6 +6,7 @@ return function (self, lua, mode, version)
         version = version,
         lua = lua,
         emmy = {},
+        root = {},
         pushError = function (err)
             if err.finish < err.start then
                 err.finish = err.start
@@ -30,6 +31,6 @@ return function (self, lua, mode, version)
         state.pushError(err)
         return nil, errs
     end
-    state.tree = res
+    state.ast = res
     return state, errs
 end

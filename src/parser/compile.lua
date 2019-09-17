@@ -3,7 +3,7 @@ local print = print
 
 _ENV = nil
 
-local State, Errs, pushError, Ast
+local State, Errs, pushError, Root, Compile
 
 local function checkJumpLocal(start, finish, obj)
     if obj.start < start then
@@ -17,7 +17,7 @@ local function checkJumpLocal(start, finish, obj)
         return nil
     end
     for i = 1, #refs do
-        local ast = Ast[refs[i]]
+        local ast = Root[refs[i]]
         if ast.start > finish then
             return ast
         end
@@ -25,7 +25,7 @@ local function checkJumpLocal(start, finish, obj)
     return nil
 end
 
-local vmMap1 = {
+local vmMap = {
     ['varargs'] = function (obj, id)
         local func = guide.getParentFunction(State, id)
         if not func then
@@ -102,7 +102,7 @@ local vmMap1 = {
         local name = obj[1]
         local label = guide.getLabel(State, block, name, id)
         if label and label ~= id then
-            local labelAst = Ast[label]
+            local labelAst = Root[label]
             pushError {
                 type   = 'REDEFINED_LABEL',
                 start  = obj.start,
@@ -116,9 +116,6 @@ local vmMap1 = {
             }
         end
     end,
-}
-
-local vmMap2 = {
     ['goto'] = function (obj, id)
         local name = obj[1]
         local block = guide.getBlock(State, id)
@@ -135,7 +132,7 @@ local vmMap2 = {
             return
         end
 
-        local labelAst = Ast[label]
+        local labelAst = Root[label]
         obj.ref = label
         labelAst.ref = id
 
@@ -143,10 +140,10 @@ local vmMap2 = {
             return
         end
         -- 检查在 goto 与 label 之间声明的局部变量
-        local blockAst = Ast[block]
+        local blockAst = Root[block]
         for i = 1, #blockAst do
             local action = blockAst[i]
-            local actionAst = Ast[action]
+            local actionAst = Root[action]
             if actionAst == labelAst then
                 break
             end
@@ -178,21 +175,56 @@ local vmMap2 = {
     end,
 }
 
-local function compileVM()
-    for i = 1, #Ast do
-        local ast = Ast[i]
-        local vmMethod = vmMap1[ast.type]
-        if vmMethod then
-            vmMethod(ast, i)
-        end
+local vmMap = {
+    ['nil'] = function (obj)
+        Root[#Root+1] = obj
+        return #Root
+    end,
+    ['boolean'] = function (obj)
+        Root[#Root+1] = obj
+        return #Root
+    end,
+    ['string'] = function (obj)
+        Root[#Root+1] = obj
+        return #Root
+    end,
+    ['number'] = function (obj)
+        Root[#Root+1] = obj
+        return #Root
+    end,
+    ['getname'] = function (obj)
+        Root[#Root+1] = obj
+        return #Root
+    end,
+    ['getfield'] = function (obj)
+        local parent = obj.parent
+        obj.parent = Compile(parent)
+        Root[#Root+1] = obj
+        local id = #Root
+        parent.child = id
+        return id
+    end,
+    ['call'] = function (obj)
+        local parent = obj.parent
+        obj.parent = Compile(parent)
+        Root[#Root+1] = obj
+        local id = #Root
+        parent.child = id
+        return id
+    end,
+    ['binary'] = function (obj)
+    end,
+}
+
+function Compile(obj)
+    if not obj then
+        return nil
     end
-    for i = 1, #Ast do
-        local ast = Ast[i]
-        local vmMethod = vmMap2[ast.type]
-        if vmMethod then
-            vmMethod(ast, i)
-        end
+    local f = vmMap[obj.type]
+    if not f then
+        return nil
     end
+    return f(obj)
 end
 
 return function (self, lua, mode, version)
@@ -201,7 +233,7 @@ return function (self, lua, mode, version)
         return Errs
     end
     pushError = State.pushError
-    Ast = State.ast
-    compileVM()
+    Root = State.root
+    Compile(State.ast)
     return State, Errs
 end

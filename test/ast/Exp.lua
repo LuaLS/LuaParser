@@ -17,158 +17,153 @@ CHECK'a'
 }
 CHECK'a.b'
 {
-    [1] = {
-        type   = "getname",
-        start  = 1,
-        finish = 1,
-        [1]    = "a",
-    },
-    [2] = {
-        type   = ".",
-        start  = 2,
-        finish = 2,
-    },
-    [3] = {
-        type   = "name",
-        start  = 3,
-        finish = 3,
-        [1]    = "b",
-    },
-    [4] = {
-        type   = "getfield",
-        start  = 1,
-        finish = 3,
-        parent = 1,
-        dot    = 2,
-        field  = 3,
-    },
+	[1] = {
+		type   = "getname",
+		start  = 1,
+		finish = 1,
+		child  = 2,
+		[1]    = "a",
+	},
+	[2] = {
+		type   = "getfield",
+		start  = 1,
+		finish = 3,
+		parent = 1,
+		dot    = {
+			type   = ".",
+			start  = 2,
+			finish = 2,
+		},
+		field  = {
+			type   = "field",
+			start  = 3,
+			finish = 3,
+			[1]    = "b",
+		},
+	},
 }
 CHECK'a.b.c'
 {
-    [1] = {
-        type   = "getname",
-        start  = 1,
-        finish = 1,
-        [1]    = "a",
-    },
-    [2] = {
-        type   = ".",
-        start  = 2,
-        finish = 2,
-    },
-    [3] = {
-        type   = "name",
-        start  = 3,
-        finish = 3,
-        [1]    = "b",
-    },
-    [4] = {
-        type   = "getfield",
-        start  = 1,
-        finish = 3,
-        parent = 1,
-        dot    = 2,
-        field  = 3,
-    },
-    [5] = {
-        type   = ".",
-        start  = 4,
-        finish = 4,
-    },
-    [6] = {
-        type   = "name",
-        start  = 5,
-        finish = 5,
-        [1]    = "c",
-    },
-    [7] = {
-        type   = "getfield",
-        start  = 1,
-        finish = 5,
-        parent = 4,
-        dot    = 5,
-        field  = 6,
-    },
+	[1] = {
+		type   = "getname",
+		start  = 1,
+		finish = 1,
+		child  = 2,
+		[1]    = "a",
+	},
+	[2] = {
+		type   = "getfield",
+		start  = 1,
+		parent = 1,
+		child  = 3,
+		finish = 3,
+		dot    = {
+			type   = ".",
+			start  = 2,
+			finish = 2,
+		},
+		field  = {
+			type   = "field",
+			start  = 3,
+			finish = 3,
+			[1]    = "b",
+		},
+	},
+	[3] = {
+		type   = "getfield",
+		start  = 1,
+		finish = 5,
+		parent = 2,
+		dot    = {
+			type   = ".",
+			start  = 4,
+			finish = 4,
+		},
+		field  = {
+			type   = "field",
+			start  = 5,
+			finish = 5,
+			[1]    = "c",
+		},
+	},
 }
 CHECK'func()'
 {
-    [1] = {
-        type   = "getname",
-        start  = 1,
-        finish = 4,
-        [1]    = "func",
-    },
-    [2] = {
-        type   = "callargs",
-        start  = 5,
-        finish = 6,
-    },
-    [3] = {
-        type   = "call",
-        start  = 1,
-        finish = 6,
-        parent = 1,
-        args   = 2,
-    },
+	[1] = {
+		type   = "getname",
+		start  = 1,
+		finish = 4,
+		child  = 2,
+		[1]    = "func",
+	},
+	[2] = {
+		type   = "call",
+		start  = 1,
+		finish = 6,
+		parent = 1,
+		args   = {
+			type   = "callargs",
+			start  = 5,
+			finish = 6,
+		},
+	},
 }
 CHECK'a.b.c()'
 {
-    [1] = {
-        type   = "getname",
-        start  = 1,
-        finish = 1,
-        [1]    = "a",
-    },
-    [2] = {
-        type   = ".",
-        start  = 2,
-        finish = 2,
-    },
-    [3] = {
-        type   = "name",
-        start  = 3,
-        finish = 3,
-        [1]    = "b",
-    },
-    [4] = {
-        type   = "getfield",
-        start  = 1,
-        finish = 3,
-        parent = 1,
-        dot    = 2,
-        field  = 3,
-    },
-    [5] = {
-        type   = ".",
-        start  = 4,
-        finish = 4,
-    },
-    [6] = {
-        type   = "name",
-        start  = 5,
-        finish = 5,
-        [1]    = "c",
-    },
-    [7] = {
-        type   = "getfield",
-        start  = 1,
-        finish = 5,
-        parent = 4,
-        dot    = 5,
-        field  = 6,
-    },
-    [8] = {
-        type   = "callargs",
-        start  = 6,
-        finish = 7,
-    },
-    [9] = {
-        type   = "call",
-        start  = 1,
-        finish = 7,
-        parent = 7,
-        args   = 8,
-    },
+	[1] = {
+		type   = "getname",
+		start  = 1,
+		finish = 1,
+		child  = 2,
+		[1]    = "a",
+	},
+	[2] = {
+		type   = "getfield",
+		start  = 1,
+		finish = 3,
+		parent = 1,
+		child  = 3,
+		field  = {
+			type   = "field",
+			start  = 3,
+			finish = 3,
+			[1]    = "b",
+		},
+		dot    = {
+			type   = ".",
+			start  = 2,
+			finish = 2,
+		},
+	},
+	[3] = {
+		type   = "getfield",
+		start  = 1,
+		finish = 5,
+		parent = 2,
+		child  = 4,
+		dot    = {
+			type   = ".",
+			start  = 4,
+			finish = 4,
+		},
+		field  = {
+			type   = "field",
+			start  = 5,
+			finish = 5,
+			[1]    = "c",
+		},
+	},
+	[4] = {
+		type   = "call",
+		start  = 1,
+		finish = 7,
+		parent = 3,
+		args   = {
+			type   = "callargs",
+			start  = 6,
+			finish = 7,
+		},
+	},
 }
 CHECK'1 or 2'
 {

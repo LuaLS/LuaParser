@@ -30,13 +30,13 @@ end
 local function test(type)
     CHECK = function (buf)
         return function (target_ast)
-            local state, err = parser:parse(buf, type, 'Lua 5.4')
+            local state, err = parser:compile(buf, type, 'Lua 5.4')
             if not state then
                 error(('语法树生成失败：%s'):format(err))
             end
-            if not eq(state.ast, target_ast) then
+            if not eq(state.root, target_ast) then
                 fs.create_directory(ROOT / 'test' / 'log')
-                io.save(ROOT / 'test' / 'log' / 'my_ast.ast', table.dump(state.ast))
+                io.save(ROOT / 'test' / 'log' / 'my_ast.ast', table.dump(state.root))
                 io.save(ROOT / 'test' / 'log' / 'target_ast.ast', table.dump(target_ast))
                 error(('语法树不相等：%s\n%s'):format(type, buf))
             end
@@ -63,7 +63,6 @@ test 'Nil'
 test 'Boolean'
 test 'String'
 test 'Number'
-test 'Name'
 test 'Exp'
 test 'Action'
 test 'Lua'

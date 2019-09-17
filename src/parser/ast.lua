@@ -662,6 +662,7 @@ local Defs = {
         }
     end,
     GetField = function (dot, field)
+        field.type = 'field'
         return {
             type   = 'getfield',
             field  = field,
@@ -695,6 +696,7 @@ local Defs = {
         local last = units[1]
         for i = 2, #units do
             local current  = units[i]
+            current.parent = last
             current.start  = last.start
             last = units[i]
         end
