@@ -85,10 +85,11 @@ function m.dump(tbl, option)
         mark[tbl] = (mark[tbl] or 0) + 1
         local keys = {}
         local keymap = {}
-        local integerFormat = '[%d] = '
+        local integerFormat = '[%d]'
+        local alignment = 0
         if #tbl >= 10 then
             local width = #tostring(#tbl)
-            integerFormat = ('[%%0%dd] = '):format(mathCeil(width))
+            integerFormat = ('[%%0%dd]'):format(mathCeil(width))
         end
         for key in pairs(tbl) do
             if type(key) == 'string' then
@@ -96,16 +97,21 @@ function m.dump(tbl, option)
                 or RESERVED[key]
                 or option['longStringKey']
                 then
-                    keymap[key] = ('[%q] = '):format(key)
+                    keymap[key] = ('[%q]'):format(key)
                 else
-                    keymap[key] = ('%s = '):format(key)
+                    keymap[key] = ('%s'):format(key)
                 end
             elseif isInteger(key) then
                 keymap[key] = integerFormat:format(key)
             else
-                keymap[key] = ('["<%s>"] = '):format(tostring(key))
+                keymap[key] = ('["<%s>"]'):format(tostring(key))
             end
             keys[#keys+1] = key
+            if option['alignment'] then
+                if #keymap[key] > alignment then
+                    alignment = #keymap[key]
+                end
+            end
         end
         local mt = getmetatable(tbl)
         if not mt or not mt.__pairs then
@@ -124,6 +130,12 @@ function m.dump(tbl, option)
                 and key <= #tbl
             then
                 keyWord = ''
+            else
+                if #keyWord < alignment then
+                    keyWord = keyWord .. (' '):rep(alignment - #keyWord) .. ' = '
+                else
+                    keyWord = keyWord .. ' = '
+                end
             end
             local value = tbl[key]
             local tp = type(value)

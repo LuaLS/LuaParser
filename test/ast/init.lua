@@ -28,6 +28,47 @@ local function eq(a, b)
     return a == b
 end
 
+local sortList = {
+    'type', 'start', 'finish',
+    'parent',
+    'op',
+    'child',
+}
+for i, v in ipairs(sortList) do
+    sortList[v] = i
+end
+
+local option = {
+    alignment = true,
+    sorter = function (keys, keymap)
+        table.sort(keys, function (a, b)
+            local tp1 = type(a)
+            local tp2 = type(b)
+            if tp1 == 'number' and tp2 ~= 'number' then
+                return false
+            end
+            if tp1 ~= 'number' and tp2 == 'number' then
+                return true
+            end
+            if tp1 == 'number' and tp2 == 'number' then
+                return a < b
+            end
+            local s1 = sortList[a]
+            local s2 = sortList[b]
+            if s1 and not s2 then
+                return false
+            end
+            if s2 and not s1 then
+                return true
+            end
+            if s1 and s2 then
+                return s1 < s2
+            end
+            return a < b
+        end)
+    end,
+}
+
 local function test(type)
     CHECK = function (buf)
         return function (target_ast)
@@ -37,8 +78,8 @@ local function test(type)
             end
             if not eq(state.root, target_ast) then
                 fs.create_directory(ROOT / 'test' / 'log')
-                utility.saveFile((ROOT / 'test' / 'log' / 'my_ast.ast'):string(), utility.dump(state.root))
-                utility.saveFile((ROOT / 'test' / 'log' / 'target_ast.ast'):string(), utility.dump(target_ast))
+                utility.saveFile((ROOT / 'test' / 'log' / 'my_ast.ast'):string(), utility.dump(state.root, option))
+                utility.saveFile((ROOT / 'test' / 'log' / 'target_ast.ast'):string(), utility.dump(target_ast, option))
                 error(('语法树不相等：%s\n%s'):format(type, buf))
             end
         end

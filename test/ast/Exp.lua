@@ -17,175 +17,161 @@ CHECK'a'
 }
 CHECK'a.b'
 {
-    [1] = {
-        type   = "getname",
-        start  = 1,
-        finish = 1,
-        child  = 2,
-        [1]    = "a",
-    },
-    [2] = {
-        type   = "getfield",
-        start  = 1,
-        finish = 3,
-        parent = 1,
-        dot    = {
-            type   = ".",
-            start  = 2,
-            finish = 2,
-        },
-        field  = {
-            type   = "field",
-            start  = 3,
-            finish = 3,
-            [1]    = "b",
-        },
-    },
+	[1] = {
+		type   = "getfield",
+		start  = 1,
+		finish = 3,
+		parent = 2,
+		dot    = {
+			type   = ".",
+			start  = 2,
+			finish = 2,
+		},
+		field  = {
+			type   = "field",
+			start  = 3,
+			finish = 3,
+			[1]    = "b",
+		},
+	},
+	[2] = {
+		type   = "getname",
+		start  = 1,
+		finish = 1,
+		child  = 1,
+		[1]    = "a",
+	},
 }
 CHECK'a.b.c'
 {
-    [1] = {
-        type   = "getname",
-        start  = 1,
-        finish = 1,
-        child  = 2,
-        [1]    = "a",
-    },
-    [2] = {
-        type   = "getfield",
-        start  = 1,
-        parent = 1,
-        child  = 3,
-        finish = 3,
-        dot    = {
-            type   = ".",
-            start  = 2,
-            finish = 2,
-        },
-        field  = {
-            type   = "field",
-            start  = 3,
-            finish = 3,
-            [1]    = "b",
-        },
-    },
-    [3] = {
-        type   = "getfield",
-        start  = 1,
-        finish = 5,
-        parent = 2,
-        dot    = {
-            type   = ".",
-            start  = 4,
-            finish = 4,
-        },
-        field  = {
-            type   = "field",
-            start  = 5,
-            finish = 5,
-            [1]    = "c",
-        },
-    },
+	[1] = {
+		type   = "getfield",
+		start  = 1,
+		finish = 5,
+		parent = 2,
+		dot    = {
+			type   = ".",
+			start  = 4,
+			finish = 4,
+		},
+		field  = {
+			type   = "field",
+			start  = 5,
+			finish = 5,
+			[1]    = "c",
+		},
+	},
+	[2] = {
+		type   = "getfield",
+		start  = 1,
+		finish = 3,
+		parent = 3,
+		dot    = {
+			type   = ".",
+			start  = 2,
+			finish = 2,
+		},
+		field  = {
+			type   = "field",
+			start  = 3,
+			finish = 3,
+			[1]    = "b",
+		},
+		child  = 1,
+	},
+	[3] = {
+		type   = "getname",
+		start  = 1,
+		finish = 1,
+		child  = 2,
+		[1]    = "a",
+	},
 }
 CHECK'func()'
 {
 	[1] = {
-		type   = "getname",
-		start  = 1,
-		finish = 4,
-		child  = 3,
-		[1]    = "func",
-	},
-	[2] = {
-		type   = "callargs",
-		start  = 5,
-		finish = 6,
-		parent = 3,
-	},
-	[3] = {
 		type   = "call",
 		start  = 1,
 		finish = 6,
+		parent = 2,
+		args   = 3,
+	},
+	[2] = {
+		type   = "getname",
+		start  = 1,
+		finish = 4,
+		child  = 1,
+		[1]    = "func",
+	},
+	[3] = {
+		type   = "callargs",
+		start  = 5,
+		finish = 6,
 		parent = 1,
-		args   = 2,
 	},
 }
 CHECK'a.b.c()'
 {
-    [1] = {
-        type   = "getname",
-        start  = 1,
-        finish = 1,
-        child  = 2,
-        [1]    = "a",
-    },
-    [2] = {
-        type   = "getfield",
-        start  = 1,
-        finish = 3,
-        parent = 1,
-        child  = 3,
-        field  = {
-            type   = "field",
-            start  = 3,
-            finish = 3,
-            [1]    = "b",
-        },
-        dot    = {
-            type   = ".",
-            start  = 2,
-            finish = 2,
-        },
-    },
-    [3] = {
-        type   = "getfield",
-        start  = 1,
-        finish = 5,
-        parent = 2,
-        child  = 5,
-        dot    = {
-            type   = ".",
-            start  = 4,
-            finish = 4,
-        },
-        field  = {
-            type   = "field",
-            start  = 5,
-            finish = 5,
-            [1]    = "c",
-        },
-    },
-	[4] = {
-		type   = "callargs",
-		start  = 6,
-		finish = 7,
-		parent = 5,
-	},
-	[5] = {
+	[1] = {
 		type   = "call",
 		start  = 1,
 		finish = 7,
+		parent = 2,
+		args   = 5,
+	},
+	[2] = {
+		type   = "getfield",
+		start  = 1,
+		finish = 5,
 		parent = 3,
-		args   = 4,
+		field  = {
+			type   = "field",
+			start  = 5,
+			finish = 5,
+			[1]    = "c",
+		},
+		dot    = {
+			type   = ".",
+			start  = 4,
+			finish = 4,
+		},
+		child  = 1,
+	},
+	[3] = {
+		type   = "getfield",
+		start  = 1,
+		parent = 4,
+		finish = 3,
+		field  = {
+			type   = "field",
+			start  = 3,
+			finish = 3,
+			[1]    = "b",
+		},
+		dot    = {
+			type   = ".",
+			start  = 2,
+			finish = 2,
+		},
+		child  = 2,
+	},
+	[4] = {
+		type   = "getname",
+		start  = 1,
+		finish = 1,
+		child  = 3,
+		[1]    = "a",
+	},
+	[5] = {
+		type   = "callargs",
+		start  = 6,
+		parent = 1,
+		finish = 7,
 	},
 }
 CHECK'1 or 2'
 {
     [1] = {
-        type   = "number",
-        start  = 1,
-        finish = 1,
-        parent = 3,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "number",
-        start  = 6,
-        finish = 6,
-        parent = 3,
-        [1]    = 2,
-    },
-    [3] = {
         type   = "binary",
         start  = 1,
         finish = 6,
@@ -194,56 +180,27 @@ CHECK'1 or 2'
             start  = 3,
             finish = 4,
         },
-        [1]    = 1,
-        [2]    = 2,
-    },
-}
-CHECK'1 and 2'
-{
-    [1] = {
-        type   = "number",
-        start  = 1,
-        finish = 1,
-        parent = 3,
-        [1]    = 1,
+        [1]    = 2,
+        [2]    = 3,
     },
     [2] = {
         type   = "number",
-        start  = 7,
-        finish = 7,
-        parent = 3,
-        [1]    = 2,
+        start  = 1,
+        finish = 1,
+        parent = 1,
+        [1]    = 1,
     },
     [3] = {
-        type   = "binary",
-        start  = 1,
-        finish = 7,
-        op     = {
-            type   = "and",
-            start  = 3,
-            finish = 5,
-        },
-        [1]    = 1,
-        [2]    = 2,
+        type   = "number",
+        start  = 6,
+        finish = 6,
+        parent = 1,
+        [1]    = 2,
     },
 }
 CHECK'1 < 2'
 {
     [1] = {
-        type   = "number",
-        start  = 1,
-        finish = 1,
-        parent = 3,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "number",
-        start  = 5,
-        finish = 5,
-        parent = 3,
-        [1]    = 2,
-    },
-    [3] = {
         type   = "binary",
         start  = 1,
         finish = 5,
@@ -252,542 +209,27 @@ CHECK'1 < 2'
             start  = 3,
             finish = 3,
         },
-        [1]    = 1,
-        [2]    = 2,
+        [1]    = 2,
+        [2]    = 3,
     },
-}
-CHECK'1 > 2'
-{
-    [1] = {
+    [2] = {
         type   = "number",
         start  = 1,
         finish = 1,
-        parent = 3,
+        parent = 1,
         [1]    = 1,
     },
-    [2] = {
+    [3] = {
         type   = "number",
         start  = 5,
         finish = 5,
-        parent = 3,
+        parent = 1,
         [1]    = 2,
-    },
-    [3] = {
-        type   = "binary",
-        start  = 1,
-        finish = 5,
-        op     = {
-            type   = ">",
-            start  = 3,
-            finish = 3,
-        },
-        [1]    = 1,
-        [2]    = 2,
-    },
-}
-CHECK'1 <= 2'
-{
-    [1] = {
-        type   = "number",
-        start  = 1,
-        finish = 1,
-        parent = 3,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "number",
-        start  = 6,
-        finish = 6,
-        parent = 3,
-        [1]    = 2,
-    },
-    [3] = {
-        type   = "binary",
-        start  = 1,
-        finish = 6,
-        op     = {
-            type   = "<=",
-            start  = 3,
-            finish = 4,
-        },
-        [1]    = 1,
-        [2]    = 2,
-    },
-}
-CHECK'1 >= 2'
-{
-    [1] = {
-        type   = "number",
-        start  = 1,
-        finish = 1,
-        parent = 3,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "number",
-        start  = 6,
-        finish = 6,
-        parent = 3,
-        [1]    = 2,
-    },
-    [3] = {
-        type   = "binary",
-        start  = 1,
-        finish = 6,
-        op     = {
-            type   = ">=",
-            start  = 3,
-            finish = 4,
-        },
-        [1]    = 1,
-        [2]    = 2,
-    },
-}
-CHECK'1 ~= 2'
-{
-    [1] = {
-        type   = "number",
-        start  = 1,
-        finish = 1,
-        parent = 3,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "number",
-        start  = 6,
-        finish = 6,
-        parent = 3,
-        [1]    = 2,
-    },
-    [3] = {
-        type   = "binary",
-        start  = 1,
-        finish = 6,
-        op     = {
-            type   = "~=",
-            start  = 3,
-            finish = 4,
-        },
-        [1]    = 1,
-        [2]    = 2,
-    },
-}
-CHECK'1 == 2'
-{
-    [1] = {
-        type   = "number",
-        start  = 1,
-        finish = 1,
-        parent = 3,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "number",
-        start  = 6,
-        finish = 6,
-        parent = 3,
-        [1]    = 2,
-    },
-    [3] = {
-        type   = "binary",
-        start  = 1,
-        finish = 6,
-        op     = {
-            type   = "==",
-            start  = 3,
-            finish = 4,
-        },
-        [1]    = 1,
-        [2]    = 2,
-    },
-}
-CHECK'1 | 2'
-{
-    [1] = {
-        type   = "number",
-        start  = 1,
-        finish = 1,
-        parent = 3,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "number",
-        start  = 5,
-        finish = 5,
-        parent = 3,
-        [1]    = 2,
-    },
-    [3] = {
-        type   = "binary",
-        start  = 1,
-        finish = 5,
-        op     = {
-            type   = "|",
-            start  = 3,
-            finish = 3,
-        },
-        [1]    = 1,
-        [2]    = 2,
-    },
-}
-CHECK'1 ~ 2'
-{
-    [1] = {
-        type   = "number",
-        start  = 1,
-        finish = 1,
-        parent = 3,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "number",
-        start  = 5,
-        finish = 5,
-        parent = 3,
-        [1]    = 2,
-    },
-    [3] = {
-        type   = "binary",
-        start  = 1,
-        finish = 5,
-        op     = {
-            type   = "~",
-            start  = 3,
-            finish = 3,
-        },
-        [1]    = 1,
-        [2]    = 2,
-    },
-}
-CHECK'1 & 2'
-{
-    [1] = {
-        type   = "number",
-        start  = 1,
-        finish = 1,
-        parent = 3,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "number",
-        start  = 5,
-        finish = 5,
-        parent = 3,
-        [1]    = 2,
-    },
-    [3] = {
-        type   = "binary",
-        start  = 1,
-        finish = 5,
-        op     = {
-            type   = "&",
-            start  = 3,
-            finish = 3,
-        },
-        [1]    = 1,
-        [2]    = 2,
-    },
-}
-CHECK'1 << 2'
-{
-    [1] = {
-        type   = "number",
-        start  = 1,
-        finish = 1,
-        parent = 3,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "number",
-        start  = 6,
-        finish = 6,
-        parent = 3,
-        [1]    = 2,
-    },
-    [3] = {
-        type   = "binary",
-        start  = 1,
-        finish = 6,
-        op     = {
-            type   = "<<",
-            start  = 3,
-            finish = 4,
-        },
-        [1]    = 1,
-        [2]    = 2,
-    },
-}
-CHECK'1 >> 2'
-{
-    [1] = {
-        type   = "number",
-        start  = 1,
-        finish = 1,
-        parent = 3,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "number",
-        start  = 6,
-        finish = 6,
-        parent = 3,
-        [1]    = 2,
-    },
-    [3] = {
-        type   = "binary",
-        start  = 1,
-        finish = 6,
-        op     = {
-            type   = ">>",
-            start  = 3,
-            finish = 4,
-        },
-        [1]    = 1,
-        [2]    = 2,
-    },
-}
-CHECK'1 .. 2'
-{
-    [1] = {
-        type   = "number",
-        start  = 1,
-        finish = 1,
-        parent = 3,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "number",
-        start  = 6,
-        finish = 6,
-        parent = 3,
-        [1]    = 2,
-    },
-    [3] = {
-        type   = "binary",
-        start  = 1,
-        finish = 6,
-        op     = {
-            type   = "..",
-            start  = 3,
-            finish = 4,
-        },
-        [1]    = 1,
-        [2]    = 2,
-    },
-}
-CHECK'a .. b'
-{
-    [1] = {
-        type   = "getname",
-        start  = 1,
-        finish = 1,
-        parent = 3,
-        [1]    = "a",
-    },
-    [2] = {
-        type   = "getname",
-        start  = 6,
-        finish = 6,
-        parent = 3,
-        [1]    = "b",
-    },
-    [3] = {
-        type   = "binary",
-        start  = 1,
-        finish = 6,
-        op     = {
-            type   = "..",
-            start  = 3,
-            finish = 4,
-        },
-        [1]    = 1,
-        [2]    = 2,
-    },
-}
-CHECK'1 + 2'
-{
-    [1] = {
-        type   = "number",
-        start  = 1,
-        finish = 1,
-        parent = 3,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "number",
-        start  = 5,
-        finish = 5,
-        parent = 3,
-        [1]    = 2,
-    },
-    [3] = {
-        type   = "binary",
-        start  = 1,
-        finish = 5,
-        op     = {
-            type   = "+",
-            start  = 3,
-            finish = 3,
-        },
-        [1]    = 1,
-        [2]    = 2,
-    },
-}
-CHECK'1 - 2'
-{
-    [1] = {
-        type   = "number",
-        start  = 1,
-        finish = 1,
-        parent = 3,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "number",
-        start  = 5,
-        finish = 5,
-        parent = 3,
-        [1]    = 2,
-    },
-    [3] = {
-        type   = "binary",
-        start  = 1,
-        finish = 5,
-        op     = {
-            type   = "-",
-            start  = 3,
-            finish = 3,
-        },
-        [1]    = 1,
-        [2]    = 2,
-    },
-}
-CHECK'1 * 2'
-{
-    [1] = {
-        type   = "number",
-        start  = 1,
-        finish = 1,
-        parent = 3,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "number",
-        start  = 5,
-        finish = 5,
-        parent = 3,
-        [1]    = 2,
-    },
-    [3] = {
-        type   = "binary",
-        start  = 1,
-        finish = 5,
-        op     = {
-            type   = "*",
-            start  = 3,
-            finish = 3,
-        },
-        [1]    = 1,
-        [2]    = 2,
-    },
-}
-CHECK'1 / 2'
-{
-    [1] = {
-        type   = "number",
-        start  = 1,
-        finish = 1,
-        parent = 3,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "number",
-        start  = 5,
-        finish = 5,
-        parent = 3,
-        [1]    = 2,
-    },
-    [3] = {
-        type   = "binary",
-        start  = 1,
-        finish = 5,
-        op     = {
-            type   = "/",
-            start  = 3,
-            finish = 3,
-        },
-        [1]    = 1,
-        [2]    = 2,
-    },
-}
-CHECK'1 // 2'
-{
-    [1] = {
-        type   = "number",
-        start  = 1,
-        finish = 1,
-        parent = 3,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "number",
-        start  = 6,
-        finish = 6,
-        parent = 3,
-        [1]    = 2,
-    },
-    [3] = {
-        type   = "binary",
-        start  = 1,
-        finish = 6,
-        op     = {
-            type   = "//",
-            start  = 3,
-            finish = 4,
-        },
-        [1]    = 1,
-        [2]    = 2,
-    },
-}
-CHECK'1 % 2'
-{
-    [1] = {
-        type   = "number",
-        start  = 1,
-        finish = 1,
-        parent = 3,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "number",
-        start  = 5,
-        finish = 5,
-        parent = 3,
-        [1]    = 2,
-    },
-    [3] = {
-        type   = "binary",
-        start  = 1,
-        finish = 5,
-        op     = {
-            type   = "%",
-            start  = 3,
-            finish = 3,
-        },
-        [1]    = 1,
-        [2]    = 2,
     },
 }
 CHECK'- 1'
 {
     [1] = {
-        type   = "number",
-        start  = 3,
-        finish = 3,
-        parent = 2,
-        [1]    = 1,
-    },
-    [2] = {
         type   = "unary",
         start  = 1,
         finish = 3,
@@ -796,94 +238,19 @@ CHECK'- 1'
             start  = 1,
             finish = 1,
         },
-        [1]    = 1,
+        [1]    = 2,
     },
-}
-CHECK'~ 1'
-{
-    [1] = {
+    [2] = {
         type   = "number",
         start  = 3,
         finish = 3,
-        parent = 2,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "unary",
-        start  = 1,
-        finish = 3,
-        op     = {
-            type   = "~",
-            start  = 1,
-            finish = 1,
-        },
-        [1]    = 1,
-    },
-}
-CHECK'not 1'
-{
-    [1] = {
-        type   = "number",
-        start  = 5,
-        finish = 5,
-        parent = 2,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "unary",
-        start  = 1,
-        finish = 5,
-        op     = {
-            type   = "not",
-            start  = 1,
-            finish = 3,
-        },
-        [1]    = 1,
-    },
-}
-CHECK'# 1'
-{
-    [1] = {
-        type   = "number",
-        start  = 3,
-        finish = 3,
-        parent = 2,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "unary",
-        start  = 1,
-        finish = 3,
-        op     = {
-            type   = "#",
-            start  = 1,
-            finish = 1,
-        },
+        parent = 1,
         [1]    = 1,
     },
 }
 CHECK'not not true'
 {
     [1] = {
-        type   = "boolean",
-        start  = 9,
-        finish = 12,
-        parent = 2,
-        [1]    = true,
-    },
-    [2] = {
-        type   = "unary",
-        start  = 5,
-        parent = 3,
-        finish = 12,
-        op     = {
-            type   = "not",
-            start  = 5,
-            finish = 7,
-        },
-        [1]    = 1,
-    },
-    [3] = {
         type   = "unary",
         start  = 1,
         finish = 12,
@@ -894,24 +261,29 @@ CHECK'not not true'
         },
         [1]    = 2,
     },
+    [2] = {
+        type   = "unary",
+        start  = 5,
+        finish = 12,
+        parent = 1,
+        op     = {
+            type   = "not",
+            start  = 5,
+            finish = 7,
+        },
+        [1]    = 3,
+    },
+    [3] = {
+        type   = "boolean",
+        start  = 9,
+        finish = 12,
+        parent = 2,
+        [1]    = true,
+    },
 }
 CHECK'1 ^ 2'
 {
     [1] = {
-        type   = "number",
-        start  = 1,
-        finish = 1,
-        parent = 3,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "number",
-        start  = 5,
-        finish = 5,
-        parent = 3,
-        [1]    = 2,
-    },
-    [3] = {
         type   = "binary",
         start  = 1,
         finish = 5,
@@ -920,39 +292,27 @@ CHECK'1 ^ 2'
             start  = 3,
             finish = 3,
         },
+        [1]    = 2,
+        [2]    = 3,
+    },
+    [2] = {
+        type   = "number",
+        start  = 1,
+        finish = 1,
+        parent = 1,
         [1]    = 1,
-        [2]    = 2,
+    },
+    [3] = {
+        type   = "number",
+        start  = 5,
+        finish = 5,
+        parent = 1,
+        [1]    = 2,
     },
 }
 CHECK'1 ^ -2'
 {
     [1] = {
-        type   = "number",
-        start  = 1,
-        finish = 1,
-        parent = 4,
-        [1]    = 1,
-    },
-    [2] = {
-        type   = "number",
-        start  = 6,
-        finish = 6,
-        parent = 3,
-        [1]    = 2,
-    },
-    [3] = {
-        type   = "unary",
-        start  = 5,
-        parent = 4,
-        finish = 6,
-        op     = {
-            type   = "-",
-            start  = 5,
-            finish = 5,
-        },
-        [1]    = 2,
-    },
-    [4] = {
         type   = "binary",
         start  = 1,
         finish = 6,
@@ -961,8 +321,34 @@ CHECK'1 ^ -2'
             start  = 3,
             finish = 3,
         },
-        [1]    = 1,
+        [1]    = 2,
         [2]    = 3,
+    },
+    [2] = {
+        type   = "number",
+        start  = 1,
+        finish = 1,
+        parent = 1,
+        [1]    = 1,
+    },
+    [3] = {
+        type   = "unary",
+        start  = 5,
+        finish = 6,
+        parent = 1,
+        op     = {
+            type   = "-",
+            start  = 5,
+            finish = 5,
+        },
+        [1]    = 4,
+    },
+    [4] = {
+        type   = "number",
+        start  = 6,
+        finish = 6,
+        parent = 3,
+        [1]    = 2,
     },
 }
 CHECK'...'
@@ -1483,12 +869,14 @@ CHECK'table[1]'
         type   = "getname",
         start  = 1,
         finish = 5,
+		child  = 3,
         [1]    = "table",
     },
     [2] = {
         type   = "number",
         start  = 7,
         finish = 7,
+		parent = 3,
         [1]    = 1,
     },
     [3] = {
@@ -1501,110 +889,109 @@ CHECK'table[1]'
 }
 CHECK'get_point().x'
 {
-    [1] = {
-        type   = "getname",
-        start  = 1,
-        finish = 9,
-        [1]    = "get_point",
-    },
-    [2] = {
-        type   = "callargs",
-        start  = 10,
-        finish = 11,
-    },
-    [3] = {
-        type   = "call",
-        start  = 1,
-        finish = 11,
-        parent = 1,
-        args   = 2,
-    },
-    [4] = {
-        type   = ".",
-        start  = 12,
-        finish = 12,
-    },
-    [5] = {
-        type   = "name",
-        start  = 13,
-        finish = 13,
-        [1]    = "x",
-    },
-    [6] = {
-        type   = "getfield",
-        start  = 1,
-        finish = 13,
-        parent = 3,
-        dot    = 4,
-        field  = 5,
-    },
+	[1] = {
+		type   = "getname",
+		start  = 1,
+		finish = 9,
+		child  = 3,
+		[1]    = "get_point",
+	},
+	[2] = {
+		type   = "callargs",
+		start  = 10,
+		finish = 11,
+		parent = 3,
+	},
+	[3] = {
+		type   = "call",
+		start  = 1,
+		finish = 11,
+		parent = 1,
+		args   = 2,
+		child  = 4,
+	},
+	[4] = {
+		type   = "getfield",
+		start  = 1,
+		finish = 13,
+		parent = 3,
+		dot    = {
+			type   = ".",
+			start  = 12,
+			finish = 12,
+		},
+		field  = {
+			type   = "field",
+			start  = 13,
+			finish = 13,
+			[1]    = "x",
+		},
+	},
 }
 CHECK'obj:remove()'
 {
-    [1] = {
-        type   = "getname",
-        start  = 1,
-        finish = 3,
-        [1]    = "obj",
-    },
-    [2] = {
-        type   = ":",
-        start  = 4,
-        finish = 4,
-    },
-    [3] = {
-        type   = "name",
-        start  = 5,
-        finish = 10,
-        [1]    = "remove",
-    },
-    [4] = {
-        type   = "getmethod",
-        start  = 1,
-        finish = 10,
-        parent = 1,
-        colon  = 2,
-        method = 3,
-    },
-    [5] = {
-        type   = "callargs",
-        start  = 11,
-        finish = 12,
-    },
-    [6] = {
-        type   = "call",
-        start  = 1,
-        finish = 12,
-        parent = 4,
-        args   = 5,
-    },
+	[1] = {
+		type   = "getname",
+		start  = 1,
+		finish = 3,
+		child  = 2,
+		[1]    = "obj",
+	},
+	[2] = {
+		type   = "getmethod",
+		start  = 1,
+		finish = 10,
+		parent = 1,
+        child  = 4,
+		colon  = {
+			type   = ":",
+			start  = 4,
+			finish = 4,
+		},
+	},
+	[3] = {
+		type   = "callargs",
+		start  = 11,
+		finish = 12,
+		parent = 4,
+	},
+	[4] = {
+		type   = "call",
+		start  = 1,
+		finish = 12,
+		parent = 2,
+		args   = 3,
+	},
 }
 CHECK'(...)[1]'
 {
-    [1] = {
-        type   = "varargs",
-        start  = 2,
-        finish = 4,
-    },
-    [2] = {
-        type   = "paren",
-        start  = 1,
-        finish = 5,
-        exp    = 1,
-    },
-    [3] = {
-        type   = "number",
-        start  = 7,
-        finish = 7,
-        [1]    = 1,
-    },
-    [4] = {
-        type   = "getindex",
-        start  = 1,
-        finish = 8,
-        parent = 2,
-        index  = 3,
-    },
+	[1] = {
+		type   = "varargs",
+		start  = 2,
+		finish = 4,
+		parent = 2,
+	},
+	[2] = {
+		type   = "paren",
+		start  = 1,
+		finish = 5,
+		exp    = 1,
+		child  = 4,
+	},
+	[3] = {
+		type   = "number",
+		start  = 7,
+		finish = 7,
+		parent = 4,
+		[1]    = 1,
+	},
+	[4] = {
+		type   = "getindex",
+		start  = 1,
+		finish = 8,
+		parent = 2,
+		index  = 3,
+	},
 }
 CHECK'function () end'
 {

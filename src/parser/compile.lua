@@ -198,19 +198,19 @@ local vmMap = {
     end,
     ['getfield'] = function (obj)
         local parent = obj.parent
-        obj.parent = Compile(parent)
         Root[#Root+1] = obj
         local id = #Root
+        obj.parent = Compile(parent)
         parent.child = id
         return id
     end,
     ['call'] = function (obj)
         local parent = obj.parent
         local args = obj.args
-        obj.parent = Compile(parent)
-        obj.args = Compile(args)
         Root[#Root+1] = obj
         local id = #Root
+        obj.parent = Compile(parent)
+        obj.args = Compile(args)
         parent.child = id
         args.parent = id
         return id
@@ -228,19 +228,19 @@ local vmMap = {
     ['binary'] = function (obj)
         local e1 = obj[1]
         local e2 = obj[2]
-        obj[1] = Compile(e1)
-        obj[2] = Compile(e2)
         Root[#Root+1] = obj
         local id = #Root
+        obj[1] = Compile(e1)
+        obj[2] = Compile(e2)
         e1.parent = id
         e2.parent = id
         return id
     end,
     ['unary'] = function (obj)
         local e = obj[1]
-        obj[1] = Compile(e)
         Root[#Root+1] = obj
         local id = #Root
+        obj[1] = Compile(e)
         e.parent = id
         return id
     end,
@@ -250,11 +250,36 @@ local vmMap = {
     end,
     ['paren'] = function (obj)
         local exp = obj.exp
-        obj.exp = Compile(exp)
         Root[#Root+1] = obj
         local id = #Root
+        obj.exp = Compile(exp)
         exp.parent = id
-        return #Root
+        return id
+    end,
+    ['getindex'] = function (obj)
+        local parent = obj.parent
+        local index = obj.index
+        Root[#Root+1] = obj
+        local id = #Root
+        obj.parent = Compile(parent)
+        obj.index = Compile(index)
+        parent.child = id
+        index.parent = id
+        return id
+    end,
+    ['getmethod'] = function (obj)
+        local parent = obj.parent
+        local method = obj.method
+        Root[#Root+1] = obj
+        local id = #Root
+        obj.parent = Compile(parent)
+        obj.method = Compile(method)
+        parent.child = id
+        method.parent = id
+        return id
+    end,
+    ['function'] = function (obj)
+        --local args = obj.args
     end,
 }
 

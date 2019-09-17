@@ -4,7 +4,6 @@ package.path = package.path .. ';' .. root .. '\\src\\?.lua'
                             .. ';' .. root .. '\\test\\?.lua'
                             .. ';' .. root .. '\\test\\?\\init.lua'
 
-require 'utility'
 local parser = require 'parser'
 local fs = require 'bee.filesystem'
 
