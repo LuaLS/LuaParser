@@ -333,6 +333,36 @@ local vmMap = {
         index.parent = id
         return id
     end,
+    ['setname'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        local value = obj.value
+        obj.value = Compile(value)
+        value.parent = id
+        return id
+    end,
+    ['local'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        local attrs = obj.attrs
+        if attrs then
+            for i = 1, #attrs do
+                local attr = attrs[i]
+                attrs[i] = Compile(attr)
+                attr.parent = id
+            end
+        end
+        local value = obj.value
+        if value then
+            obj.value = Compile(value)
+            value.parent = id
+        end
+        return id
+    end,
+    ['localattr'] = function (obj)
+        Root[#Root+1] = obj
+        return #Root
+    end,
 }
 
 function Compile(obj)

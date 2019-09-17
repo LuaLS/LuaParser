@@ -1026,13 +1026,12 @@ local Defs = {
     Set = function (start, keys, values, finish)
         for i = 1, #keys do
             local key = keys[i]
-            local keyAst = key
-            if keyAst.type == 'getname' then
-                keyAst.type = 'setname'
-                keyAst.value = getValue(values, i)
-            elseif keyAst.type == 'getfield' then
-                keyAst.type = 'setfield'
-                keyAst.value = getValue(values, i)
+            if key.type == 'getname' then
+                key.type = 'setname'
+                key.value = getValue(values, i)
+            elseif key.type == 'getfield' then
+                key.type = 'setfield'
+                key.value = getValue(values, i)
             end
         end
         return tableUnpack(keys)
@@ -1084,9 +1083,8 @@ local Defs = {
     Local = function (start, keys, values, finish)
         for i = 1, #keys do
             local key = keys[i]
-            local keyAst = key
-            local attrs = keyAst.attrs
-            keyAst.attrs = nil
+            local attrs = key.attrs
+            key.attrs = nil
             local value = getValue(values, i)
             createLocal(key, value, attrs)
         end

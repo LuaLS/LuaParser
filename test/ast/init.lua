@@ -36,6 +36,7 @@ local sortList = {
     'dot', 'colon',
     'field', 'index',
     'exp', 'value',
+    'attrs',
 }
 for i, v in ipairs(sortList) do
     sortList[v] = i
