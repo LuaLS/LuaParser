@@ -1,13 +1,36 @@
 local fs = require 'bee.filesystem'
 local parser = require 'parser'
+local utility = require 'utility'
+
+local function scanDirectory(path)
+    local files = {}
+
+    local function scan(path)
+        if fs.is_directory(path) then
+            for path in path:list_directory() do
+                scan(path)
+            end
+        else
+            files[#files+1] = path
+        end
+    end
+
+    scan(path)
+
+    local i = 0
+    return function ()
+        i = i + 1
+        return files[i]
+    end
+end
 
 local function performTest()
     local targetPath = ROOT
     local files = {}
     local size = 0
-    for path in io.scan(targetPath) do
+    for path in scanDirectory(targetPath) do
         if path:extension():string() == '.lua' then
-            local buf = io.load(path)
+            local buf = utility.loadFile(path:string())
             files[path] = buf
             size = size + #buf
         end
@@ -28,7 +51,7 @@ local function performTest()
 end
 
 local function test(path)
-    local buf = io.load(fs.path(path))
+    local buf = utility.loadFile(path)
     if not buf then
         return
     end

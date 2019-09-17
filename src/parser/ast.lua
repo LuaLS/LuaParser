@@ -216,9 +216,11 @@ local function createLocal(key, value, attrs)
 end
 
 local function createCall(args, start, finish)
-    args.type    = 'callargs'
-    args.start   = start
-    args.finish  = finish
+    if args then
+        args.type    = 'callargs'
+        args.start   = start
+        args.finish  = finish
+    end
     return {
         type   = 'call',
         start  = start,

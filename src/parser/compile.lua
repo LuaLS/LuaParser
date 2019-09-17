@@ -213,8 +213,10 @@ local vmMap = {
             obj.node = Compile(node)
             node.parent = id
         end
-        obj.args = Compile(args)
-        args.parent = id
+        if args then
+            obj.args = Compile(args)
+            args.parent = id
+        end
         return id
     end,
     ['callargs'] = function (obj)

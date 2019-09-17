@@ -320,7 +320,7 @@ Suffix      <-  SuffixWithoutCall
             ->  Call
 SuffixCall  <-  Sp ({} {| (COMMA / Exp)+ |} {})
             ->  PackExpList
-            /   {| %nil |}
+            /   %nil
 SuffixWithoutCall
             <-  (DOT (Name / MissField))
             ->  GetField

@@ -177,7 +177,7 @@ CHECK'local x, y = f()'
     [1] = {
         type = "main",
         [1]  = 2,
-        [2]  = 7,
+        [2]  = 6,
     },
     [2] = {
         type   = "local",
@@ -190,8 +190,8 @@ CHECK'local x, y = f()'
     [3] = {
         type   = "select",
         parent = 2,
-        index  = 1,
         vararg = 4,
+        index  = 1,
     },
     [4] = {
         type      = "call",
@@ -199,10 +199,9 @@ CHECK'local x, y = f()'
         finish    = 16,
         parent    = 3,
         extParent = {
-            [1] = 8,
+            [1] = 7,
         },
         node      = 5,
-        args      = 6,
     },
     [5] = {
         type   = "getname",
@@ -212,24 +211,18 @@ CHECK'local x, y = f()'
         [1]    = "f",
     },
     [6] = {
-        type   = "callargs",
-        start  = 15,
-        finish = 16,
-        parent = 4,
-    },
-    [7] = {
         type   = "local",
         start  = 10,
         finish = 10,
         parent = 1,
-        value  = 8,
+        value  = 7,
         [1]    = "y",
     },
-    [8] = {
+    [7] = {
         type   = "select",
-        parent = 7,
-        index  = 2,
+        parent = 6,
         vararg = 4,
+        index  = 2,
     },
 }
 CHECK'local x, y = (f())'
@@ -237,7 +230,7 @@ CHECK'local x, y = (f())'
     [1] = {
         type = "main",
         [1]  = 2,
-        [2]  = 7,
+        [2]  = 6,
     },
     [2] = {
         type   = "local",
@@ -260,7 +253,6 @@ CHECK'local x, y = (f())'
         finish = 17,
         parent = 3,
         node   = 5,
-        args   = 6,
     },
     [5] = {
         type   = "getname",
@@ -270,12 +262,6 @@ CHECK'local x, y = (f())'
         [1]    = "f",
     },
     [6] = {
-        type   = "callargs",
-        start  = 16,
-        finish = 17,
-        parent = 4,
-    },
-    [7] = {
         type   = "local",
         start  = 10,
         finish = 10,
@@ -288,7 +274,7 @@ CHECK'local x, y = f(), nil'
     [1] = {
         type = "main",
         [1]  = 2,
-        [2]  = 7,
+        [2]  = 6,
     },
     [2] = {
         type   = "local",
@@ -310,7 +296,6 @@ CHECK'local x, y = f(), nil'
         finish = 16,
         parent = 3,
         node   = 5,
-        args   = 6,
     },
     [5] = {
         type   = "getname",
@@ -320,24 +305,18 @@ CHECK'local x, y = f(), nil'
         [1]    = "f",
     },
     [6] = {
-        type   = "callargs",
-        start  = 15,
-        finish = 16,
-        parent = 4,
-    },
-    [7] = {
         type   = "local",
         start  = 10,
         finish = 10,
         parent = 1,
-        value  = 8,
+        value  = 7,
         [1]    = "y",
     },
-    [8] = {
+    [7] = {
         type   = "nil",
         start  = 19,
         finish = 21,
-        parent = 7,
+        parent = 6,
     },
 }
 CHECK'local x, y = ...'

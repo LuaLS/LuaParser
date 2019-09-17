@@ -94,7 +94,6 @@ CHECK'func()'
         start  = 1,
         finish = 6,
         node   = 2,
-        args   = 3,
     },
     [2] = {
         type   = "getname",
@@ -102,12 +101,6 @@ CHECK'func()'
         finish = 4,
         parent = 1,
         [1]    = "func",
-    },
-    [3] = {
-        type   = "callargs",
-        start  = 5,
-        finish = 6,
-        parent = 1,
     },
 }
 CHECK'a.b.c()'
@@ -117,7 +110,6 @@ CHECK'a.b.c()'
         start  = 1,
         finish = 7,
         node   = 2,
-        args   = 5,
     },
     [2] = {
         type   = "getfield",
@@ -161,12 +153,6 @@ CHECK'a.b.c()'
         finish = 1,
         parent = 3,
         [1]    = "a",
-    },
-    [5] = {
-        type   = "callargs",
-        start  = 6,
-        finish = 7,
-        parent = 1,
     },
 }
 CHECK'1 or 2'
@@ -919,7 +905,6 @@ CHECK'get_point().x'
         finish = 11,
         parent = 1,
         node   = 3,
-        args   = 4,
     },
     [3] = {
         type   = "getname",
@@ -927,12 +912,6 @@ CHECK'get_point().x'
         finish = 9,
         parent = 2,
         [1]    = "get_point",
-    },
-    [4] = {
-        type   = "callargs",
-        start  = 10,
-        finish = 11,
-        parent = 2,
     },
 }
 CHECK'obj:remove()'
@@ -942,7 +921,6 @@ CHECK'obj:remove()'
         start  = 1,
         finish = 12,
         node   = 2,
-        args   = 5,
     },
     [2] = {
         type   = "getmethod",
@@ -970,12 +948,6 @@ CHECK'obj:remove()'
         finish = 10,
         parent = 2,
         [1]    = "remove",
-    },
-    [5] = {
-        type   = "callargs",
-        start  = 11,
-        finish = 12,
-        parent = 1,
     },
 }
 CHECK'(...)[1]'
