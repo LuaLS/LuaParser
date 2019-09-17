@@ -366,9 +366,10 @@ NewField    <-  Sp ({} MustName ASSIGN DirtyExp {})
 
 Function    <-  Sp ({} FunctionBody {})
             ->  Function
-FuncArgs    <-  Sp ({} PL {| FuncArg* |} DirtyPR {})
+FuncArgs    <-  Sp ({} PL {| FuncArg+ |} DirtyPR {})
             ->  FuncArgs
-            /   {} -> MissPL %nil
+            /   PL DirtyPR %nil 
+            /   {} -> MissPL DirtyPR %nil
 FuncArg     <-  DOTS
             /   Name
             /   COMMA

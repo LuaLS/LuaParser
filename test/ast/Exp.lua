@@ -986,13 +986,6 @@ CHECK'function () end'
         type   = "function",
         start  = 1,
         finish = 15,
-        args   = 2,
-    },
-    [2] = {
-        type   = "funcargs",
-        start  = 10,
-        finish = 11,
-        parent = 1,
     },
 }
 CHECK'function (...) end'

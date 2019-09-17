@@ -117,13 +117,6 @@ CHECK'x = function () end'
         start  = 5,
         finish = 19,
         parent = 1,
-        args   = 3,
-    },
-    [3] = {
-        type   = "funcargs",
-        start  = 14,
-        finish = 15,
-        parent = 2,
     },
 }
 CHECK'x.y = function () end'
@@ -152,13 +145,6 @@ CHECK'x.y = function () end'
         start  = 7,
         finish = 21,
         parent = 1,
-        args   = 4,
-    },
-    [4] = {
-        type   = "funcargs",
-        start  = 16,
-        finish = 17,
-        parent = 3,
     },
 }
 CHECK'func.x(1, 2)'
@@ -1144,16 +1130,9 @@ end]]
         start  = 1,
         finish = 30,
         parent = 1,
-        args   = 3,
-        [1]    = 4,
+        [1]    = 3,
     },
     [3] = {
-        type   = "funcargs",
-        start  = 14,
-        finish = 15,
-        parent = 2,
-    },
-    [4] = {
         type   = "return",
         start  = 21,
         finish = 27,

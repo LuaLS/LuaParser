@@ -605,16 +605,9 @@ end]]
         start  = 1,
         finish = 33,
         parent = 3,
-        args   = 5,
-        [1]    = 6,
+        [1]    = 5,
     },
     [5] = {
-        type   = "funcargs",
-        start  = 17,
-        finish = 18,
-        parent = 4,
-    },
-    [6] = {
         type   = "return",
         start  = 24,
         finish = 30,
@@ -682,8 +675,8 @@ y, z = 3, 4
         [3]  = 6,
         [4]  = 7,
         [5]  = 8,
-        [6]  = 11,
-        [7]  = 13,
+        [6]  = 10,
+        [7]  = 12,
     },
     [02] = {
         type   = "local",
@@ -742,42 +735,35 @@ y, z = 3, 4
         start  = 22,
         finish = 43,
         parent = 8,
-        args   = 10,
     },
     [10] = {
-        type   = "funcargs",
-        start  = 38,
-        finish = 39,
-        parent = 9,
-    },
-    [11] = {
         type   = "setname",
         start  = 45,
         finish = 45,
         parent = 1,
-        value  = 12,
+        value  = 11,
         [1]    = "y",
     },
-    [12] = {
+    [11] = {
         type   = "number",
         start  = 52,
         finish = 52,
-        parent = 11,
+        parent = 10,
         [1]    = 3,
     },
-    [13] = {
+    [12] = {
         type   = "setname",
         start  = 48,
         finish = 48,
         parent = 1,
-        value  = 14,
+        value  = 13,
         [1]    = "z",
     },
-    [14] = {
+    [13] = {
         type   = "number",
         start  = 55,
         finish = 55,
-        parent = 13,
+        parent = 12,
         [1]    = 4,
     },
 }
