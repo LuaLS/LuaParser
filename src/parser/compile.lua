@@ -279,7 +279,59 @@ local vmMap = {
         return id
     end,
     ['function'] = function (obj)
-        --local args = obj.args
+        local args = obj.args
+        Root[#Root+1] = obj
+        local id = #Root
+        obj.args = Compile(args)
+        args.parent = id
+        return id
+    end,
+    ['funcargs'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        for i = 1, #obj do
+            local arg = obj[i]
+            obj[i] = Compile(arg)
+            arg.parent = id
+        end
+        return id
+    end,
+    ['table'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        for i = 1, #obj do
+            local v = obj[i]
+            obj[i] = Compile(v)
+            v.parent = id
+        end
+        return id
+    end,
+    ['tablefield'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        local value = obj.value
+        obj.value = Compile(value)
+        value.parent = id
+        return id
+    end,
+    ['tableindex'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        local index = obj.index
+        local value = obj.value
+        obj.index = Compile(index)
+        obj.value = Compile(value)
+        index.parent = id
+        value.parent = id
+        return id
+    end,
+    ['index'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        local index = obj.index
+        obj.index = Compile(index)
+        index.parent = id
+        return id
     end,
 }
 

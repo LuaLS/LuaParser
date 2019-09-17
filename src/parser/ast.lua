@@ -906,27 +906,26 @@ local Defs = {
         local fieldCount = 0
         for i = 1, #tbl do
             local field = tbl[i]
-            local fieldAst = field
-            if fieldAst.type == ',' or fieldAst.type == ';' then
+            if field.type == ',' or field.type == ';' then
                 if wantField then
                     pushError {
                         type = 'MISS_EXP',
                         start = lastStart,
-                        finish = fieldAst.start - 1,
+                        finish = field.start - 1,
                     }
                 end
                 wantField = true
-                lastStart = fieldAst.finish + 1
+                lastStart = field.finish + 1
             else
                 if not wantField then
                     pushError {
                         type = 'MISS_SEP_IN_TABLE',
                         start = lastStart,
-                        finish = fieldAst.start - 1,
+                        finish = field.start - 1,
                     }
                 end
                 wantField = false
-                lastStart = fieldAst.finish + 1
+                lastStart = field.finish + 1
                 fieldCount = fieldCount + 1
                 tbl[fieldCount] = field
             end
@@ -937,6 +936,7 @@ local Defs = {
         return tbl
     end,
     NewField = function (start, field, value, finish)
+        field.type = 'field'
         return {
             type   = 'tablefield',
             start  = start,
