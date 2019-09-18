@@ -117,7 +117,7 @@ end
 ---@param name string {comment = '变量名'}
 ---@param pos integer {comment = '可见位置'}
 function m.getLocal(root, block, name, pos)
-    block = m.getBlock(block)
+    block = m.getBlock(root, block)
     for _ = 1, 1000 do
         if not block then
             return nil
@@ -142,7 +142,7 @@ function m.getLocal(root, block, name, pos)
             return res
         end
         ::CONTINUE::
-        block = m.getParentBlock(block)
+        block = m.getParentBlock(root, block)
     end
     error('guide.getLocal overstack')
 end
