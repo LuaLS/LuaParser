@@ -21,6 +21,7 @@ CHECK'local x'
         type   = "local",
         start  = 7,
         finish = 7,
+        effect = 8,
         [1]    = "x",
     },
 }
@@ -31,6 +32,7 @@ CHECK'local x = 1'
         type   = "local",
         start  = 7,
         finish = 7,
+        effect = 12,
         [1]    = "x",
     },
     [2] = {
@@ -41,12 +43,31 @@ CHECK'local x = 1'
         [1]    = 1,
     },
 }
+CHECK'local x = x'
+{
+    [1] = {
+        value  = 2,
+        type   = "local",
+        start  = 7,
+        finish = 7,
+        effect = 12,
+        [1]    = "x",
+    },
+    [2] = {
+        type   = "getglobal",
+        start  = 11,
+        finish = 11,
+        parent = 1,
+        [1]    = "x",
+    },
+}
 CHECK'local x <close> <const> = 1'
 {
     [1] = {
         type   = "local",
         start  = 7,
         finish = 7,
+        effect = 28,
         value  = 4,
         attrs  = {
             [1] = 2,
@@ -82,6 +103,7 @@ CHECK'local x < const > = 1'
         type   = "local",
         start  = 7,
         finish = 7,
+        effect = 22,
         value  = 3,
         attrs  = {
             [1] = 2,
@@ -824,25 +846,26 @@ end]]
     },
 }
 CHECK[[
-for i = 1, 10 do
+for i = 1, i do
     return
 end]]
 {
     [1] = {
-        type   = "loop",
-        start  = 1,
-        finish = 31,
-        loc    = 2,
-        max    = 4,
-        locals   = {
+        locals = {
             [1] = 2,
         },
+        type   = "loop",
+        start  = 1,
+        finish = 30,
+        loc    = 2,
+        max    = 4,
         [1]    = 5,
     },
     [2] = {
         type   = "local",
         start  = 5,
         finish = 5,
+        effect = 16,
         parent = 1,
         value  = 3,
         [1]    = "i",
@@ -855,40 +878,41 @@ end]]
         [1]    = 1,
     },
     [4] = {
-        type   = "number",
+        type   = "getglobal",
         start  = 12,
-        finish = 13,
+        finish = 12,
         parent = 1,
-        [1]    = 10,
+        [1]    = "i",
     },
     [5] = {
         type   = "return",
-        start  = 22,
-        finish = 28,
+        start  = 21,
+        finish = 27,
         parent = 1,
     },
 }
 CHECK[[
-for i = 1, 10, 1 do
+for i = 1, 10, i do
     return
 end]]
 {
     [1] = {
+        locals = {
+            [1] = 2,
+        },
         type   = "loop",
         start  = 1,
         finish = 34,
         loc    = 2,
         max    = 4,
         step   = 5,
-        locals   = {
-            [1] = 2,
-        },
         [1]    = 6,
     },
     [2] = {
         type   = "local",
         start  = 5,
         finish = 5,
+        effect = 20,
         parent = 1,
         value  = 3,
         [1]    = "i",
@@ -908,11 +932,11 @@ end]]
         [1]    = 10,
     },
     [5] = {
-        type   = "number",
+        type   = "getglobal",
         start  = 16,
         finish = 16,
         parent = 1,
-        [1]    = 1,
+        [1]    = "i",
     },
     [6] = {
         type   = "return",
@@ -942,6 +966,7 @@ end]]
         type   = "local",
         start  = 5,
         finish = 5,
+        effect = 14,
         parent = 1,
         value  = 3,
         [1]    = "a",
@@ -978,15 +1003,15 @@ for a, b, c in a, b, c do
 end]]
 {
     [01] = {
-        type   = "in",
-        start  = 1,
-        finish = 40,
-        keys   = {
+        locals = {
             [1] = 2,
             [2] = 8,
             [3] = 10,
         },
-        locals   = {
+        type   = "in",
+        start  = 1,
+        finish = 40,
+        keys   = {
             [1] = 2,
             [2] = 8,
             [3] = 10,
@@ -997,6 +1022,7 @@ end]]
         type   = "local",
         start  = 5,
         finish = 5,
+        effect = 26,
         parent = 1,
         value  = 3,
         [1]    = "a",
@@ -1004,8 +1030,8 @@ end]]
     [03] = {
         type   = "select",
         parent = 2,
-        index  = 1,
         vararg = 4,
+        index  = 1,
     },
     [04] = {
         type      = "call",
@@ -1044,6 +1070,7 @@ end]]
         type   = "local",
         start  = 8,
         finish = 8,
+        effect = 26,
         parent = 1,
         value  = 9,
         [1]    = "b",
@@ -1051,13 +1078,14 @@ end]]
     [09] = {
         type   = "select",
         parent = 8,
-        index  = 2,
         vararg = 4,
+        index  = 2,
     },
     [10] = {
         type   = "local",
         start  = 11,
         finish = 11,
+        effect = 26,
         parent = 1,
         value  = 11,
         [1]    = "c",
@@ -1065,8 +1093,8 @@ end]]
     [11] = {
         type   = "select",
         parent = 10,
-        index  = 3,
         vararg = 4,
+        index  = 3,
     },
     [12] = {
         type   = "return",
@@ -1187,6 +1215,7 @@ end]]
         type   = "local",
         start  = 15,
         finish = 15,
+        effect = 15,
         parent = 3,
         [1]    = "a",
     },
@@ -1273,6 +1302,7 @@ end]]
         type   = "local",
         start  = 16,
         finish = 16,
+        effect = 16,
         parent = 6,
         [1]    = "a",
     },
@@ -1280,6 +1310,7 @@ end]]
         type   = "local",
         start  = 19,
         finish = 19,
+        effect = 19,
         parent = 6,
         [1]    = "b",
     },
@@ -1287,6 +1318,7 @@ end]]
         type   = "local",
         start  = 22,
         finish = 22,
+        effect = 22,
         parent = 6,
         [1]    = "c",
     },

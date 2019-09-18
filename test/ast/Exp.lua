@@ -1017,7 +1017,7 @@ CHECK'function (a, ...) end'
         start  = 1,
         finish = 21,
         args   = 2,
-        locals   = {
+        locals = {
             [1] = 3,
         },
     },
@@ -1033,6 +1033,7 @@ CHECK'function (a, ...) end'
         type   = "local",
         start  = 11,
         finish = 11,
+        effect = 11,
         parent = 2,
         [1]    = "a",
     },

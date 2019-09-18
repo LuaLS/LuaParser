@@ -129,11 +129,11 @@ function m.getLocal(root, block, name, pos)
         end
         for i = 1, #locals do
             local loc = root[locals[i]]
-            if loc.start > pos then
+            if loc.effect > pos then
                 break
             end
             if loc[1] == name then
-                if not res or res.start < loc.start then
+                if not res or res.effect < loc.effect then
                     res = loc
                 end
             end

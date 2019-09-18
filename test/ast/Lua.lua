@@ -105,6 +105,7 @@ CHECK'local x, y, z'
         type   = "local",
         start  = 7,
         finish = 7,
+        effect = 14,
         parent = 1,
         [1]    = "x",
     },
@@ -112,6 +113,7 @@ CHECK'local x, y, z'
         type   = "local",
         start  = 10,
         finish = 10,
+        effect = 14,
         parent = 1,
         [1]    = "y",
     },
@@ -119,6 +121,7 @@ CHECK'local x, y, z'
         type   = "local",
         start  = 13,
         finish = 13,
+        effect = 14,
         parent = 1,
         [1]    = "z",
     },
@@ -140,6 +143,7 @@ CHECK'local x, y, z = 1, 2, 3'
         type   = "local",
         start  = 7,
         finish = 7,
+        effect = 24,
         parent = 1,
         value  = 3,
         [1]    = "x",
@@ -155,6 +159,7 @@ CHECK'local x, y, z = 1, 2, 3'
         type   = "local",
         start  = 10,
         finish = 10,
+        effect = 24,
         parent = 1,
         value  = 5,
         [1]    = "y",
@@ -170,6 +175,7 @@ CHECK'local x, y, z = 1, 2, 3'
         type   = "local",
         start  = 13,
         finish = 13,
+        effect = 24,
         parent = 1,
         value  = 7,
         [1]    = "z",
@@ -182,21 +188,66 @@ CHECK'local x, y, z = 1, 2, 3'
         [1]    = 3,
     },
 }
-CHECK'local x, y = f()'
+CHECK'local x, y = y, x'
 {
     [1] = {
-        type = "main",
         locals = {
             [1] = 2,
-            [2] = 6,
+            [2] = 4,
         },
-        [1]  = 2,
-        [2]  = 6,
+        type   = "main",
+        [1]    = 2,
+        [2]    = 4,
     },
     [2] = {
         type   = "local",
         start  = 7,
         finish = 7,
+        effect = 18,
+        parent = 1,
+        value  = 3,
+        [1]    = "x",
+    },
+    [3] = {
+        type   = "getglobal",
+        start  = 14,
+        finish = 14,
+        parent = 2,
+        [1]    = "y",
+    },
+    [4] = {
+        type   = "local",
+        start  = 10,
+        finish = 10,
+        effect = 18,
+        parent = 1,
+        value  = 5,
+        [1]    = "y",
+    },
+    [5] = {
+        type   = "getglobal",
+        start  = 17,
+        finish = 17,
+        parent = 4,
+        [1]    = "x",
+    },
+}
+CHECK'local x, y = f()'
+{
+    [1] = {
+        locals = {
+            [1] = 2,
+            [2] = 6,
+        },
+        type   = "main",
+        [1]    = 2,
+        [2]    = 6,
+    },
+    [2] = {
+        type   = "local",
+        start  = 7,
+        finish = 7,
+        effect = 17,
         parent = 1,
         value  = 3,
         [1]    = "x",
@@ -228,6 +279,7 @@ CHECK'local x, y = f()'
         type   = "local",
         start  = 10,
         finish = 10,
+        effect = 17,
         parent = 1,
         value  = 7,
         [1]    = "y",
@@ -242,18 +294,19 @@ CHECK'local x, y = f()'
 CHECK'local x, y = (f())'
 {
     [1] = {
-        type = "main",
         locals = {
             [1] = 2,
             [2] = 6,
         },
-        [1]  = 2,
-        [2]  = 6,
+        type   = "main",
+        [1]    = 2,
+        [2]    = 6,
     },
     [2] = {
         type   = "local",
         start  = 7,
         finish = 7,
+        effect = 19,
         parent = 1,
         value  = 3,
         [1]    = "x",
@@ -283,6 +336,7 @@ CHECK'local x, y = (f())'
         type   = "local",
         start  = 10,
         finish = 10,
+        effect = 19,
         parent = 1,
         [1]    = "y",
     },
@@ -290,18 +344,19 @@ CHECK'local x, y = (f())'
 CHECK'local x, y = f(), nil'
 {
     [1] = {
-        type = "main",
         locals = {
             [1] = 2,
             [2] = 6,
         },
-        [1]  = 2,
-        [2]  = 6,
+        type   = "main",
+        [1]    = 2,
+        [2]    = 6,
     },
     [2] = {
         type   = "local",
         start  = 7,
         finish = 7,
+        effect = 22,
         parent = 1,
         value  = 3,
         [1]    = "x",
@@ -330,6 +385,7 @@ CHECK'local x, y = f(), nil'
         type   = "local",
         start  = 10,
         finish = 10,
+        effect = 22,
         parent = 1,
         value  = 7,
         [1]    = "y",
@@ -344,18 +400,19 @@ CHECK'local x, y = f(), nil'
 CHECK'local x, y = ...'
 {
     [1] = {
-        type = "main",
         locals = {
             [1] = 2,
             [2] = 5,
         },
-        [1]  = 2,
-        [2]  = 5,
+        type   = "main",
+        [1]    = 2,
+        [2]    = 5,
     },
     [2] = {
         type   = "local",
         start  = 7,
         finish = 7,
+        effect = 17,
         parent = 1,
         value  = 3,
         [1]    = "x",
@@ -379,6 +436,7 @@ CHECK'local x, y = ...'
         type   = "local",
         start  = 10,
         finish = 10,
+        effect = 17,
         parent = 1,
         value  = 6,
         [1]    = "y",
@@ -393,18 +451,19 @@ CHECK'local x, y = ...'
 CHECK'local x, y = (...)'
 {
     [1] = {
-        type = "main",
         locals = {
             [1] = 2,
             [2] = 5,
         },
-        [1]  = 2,
-        [2]  = 5,
+        type   = "main",
+        [1]    = 2,
+        [2]    = 5,
     },
     [2] = {
         type   = "local",
         start  = 7,
         finish = 7,
+        effect = 19,
         parent = 1,
         value  = 3,
         [1]    = "x",
@@ -426,6 +485,7 @@ CHECK'local x, y = (...)'
         type   = "local",
         start  = 10,
         finish = 10,
+        effect = 19,
         parent = 1,
         [1]    = "y",
     },
@@ -433,18 +493,19 @@ CHECK'local x, y = (...)'
 CHECK'local x, y = ..., nil'
 {
     [1] = {
-        type = "main",
         locals = {
             [1] = 2,
             [2] = 5,
         },
-        [1]  = 2,
-        [2]  = 5,
+        type   = "main",
+        [1]    = 2,
+        [2]    = 5,
     },
     [2] = {
         type   = "local",
         start  = 7,
         finish = 7,
+        effect = 22,
         parent = 1,
         value  = 3,
         [1]    = "x",
@@ -465,6 +526,7 @@ CHECK'local x, y = ..., nil'
         type   = "local",
         start  = 10,
         finish = 10,
+        effect = 22,
         parent = 1,
         value  = 6,
         [1]    = "y",
@@ -479,18 +541,19 @@ CHECK'local x, y = ..., nil'
 CHECK'local x <const>, y <close> = 1'
 {
     [1] = {
-        type = "main",
         locals = {
             [1] = 2,
             [2] = 5,
         },
-        [1]  = 2,
-        [2]  = 5,
+        type   = "main",
+        [1]    = 2,
+        [2]    = 5,
     },
     [2] = {
         type   = "local",
         start  = 7,
         finish = 7,
+        effect = 31,
         parent = 1,
         value  = 4,
         attrs  = {
@@ -516,6 +579,7 @@ CHECK'local x <const>, y <close> = 1'
         type   = "local",
         start  = 18,
         finish = 18,
+        effect = 31,
         parent = 1,
         attrs  = {
             [1] = 6,
@@ -630,6 +694,7 @@ end]]
         type   = "local",
         start  = 16,
         finish = 16,
+        effect = 1,
         parent = 1,
         ref    = {
             [1] = 3,
@@ -676,6 +741,7 @@ end]]
         type   = "local",
         start  = 16,
         finish = 16,
+        effect = 1,
         parent = 1,
         ref    = {
             [1] = 3,
@@ -715,6 +781,7 @@ end]]
         type   = "local",
         start  = 18,
         finish = 18,
+        effect = 18,
         parent = 5,
         [1]    = "b",
     },
@@ -722,6 +789,7 @@ end]]
         type   = "local",
         start  = 21,
         finish = 21,
+        effect = 21,
         parent = 5,
         [1]    = "c",
     },
@@ -741,25 +809,26 @@ y, z = 3, 4
 ]]
 {
     [01] = {
-        type = "main",
         locals = {
             [1] = 2,
             [2] = 4,
             [3] = 6,
             [4] = 7,
         },
-        [1]  = 2,
-        [2]  = 4,
-        [3]  = 6,
-        [4]  = 7,
-        [5]  = 8,
-        [6]  = 10,
-        [7]  = 12,
+        type   = "main",
+        [1]    = 2,
+        [2]    = 4,
+        [3]    = 6,
+        [4]    = 7,
+        [5]    = 8,
+        [6]    = 10,
+        [7]    = 12,
     },
     [02] = {
         type   = "local",
         start  = 7,
         finish = 7,
+        effect = 21,
         parent = 1,
         value  = 3,
         [1]    = "x",
@@ -775,6 +844,7 @@ y, z = 3, 4
         type   = "local",
         start  = 10,
         finish = 10,
+        effect = 21,
         parent = 1,
         value  = 5,
         ref    = {
@@ -793,6 +863,7 @@ y, z = 3, 4
         type   = "local",
         start  = 13,
         finish = 13,
+        effect = 21,
         parent = 1,
         ref    = {
             [1] = 12,
@@ -803,6 +874,7 @@ y, z = 3, 4
         type   = "local",
         start  = 37,
         finish = 37,
+        effect = 22,
         parent = 1,
         ref    = {
             [1] = 8,

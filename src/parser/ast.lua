@@ -205,13 +205,14 @@ local function getValue(values, i)
     return value
 end
 
-local function createLocal(key, value, attrs)
+local function createLocal(key, effect, value, attrs)
     if not key then
         return nil
     end
-    key.type  = 'local'
-    key.value = value
-    key.attrs = attrs
+    key.type   = 'local'
+    key.effect = effect
+    key.value  = value
+    key.attrs  = attrs
     return key
 end
 
@@ -893,7 +894,7 @@ local Defs = {
             return
         end
 
-        local loc = createLocal(name)
+        local loc = createLocal(name, start)
         local set = {
             type   = 'setname',
             start  = name.start,
@@ -1015,7 +1016,7 @@ local Defs = {
                     end
                     break
                 else
-                    args[argCount] = createLocal(arg)
+                    args[argCount] = createLocal(arg, arg.start)
                 end
             end
             lastStart = argAst.finish + 1
@@ -1095,7 +1096,7 @@ local Defs = {
             local attrs = key.attrs
             key.attrs = nil
             local value = getValue(values, i)
-            createLocal(key, value, attrs)
+            createLocal(key, finish, value, attrs)
         end
         return tableUnpack(keys)
     end,
@@ -1208,8 +1209,8 @@ local Defs = {
         checkMissEnd(start)
         return blocks
     end,
-    Loop = function (start, arg, steps, block, finish)
-        local loc = createLocal(arg, steps[1])
+    Loop = function (start, arg, steps, blockStart, block, finish)
+        local loc = createLocal(arg, blockStart, steps[1])
         block.type   = 'loop'
         block.start  = start
         block.finish = finish - 1
@@ -1219,7 +1220,7 @@ local Defs = {
         checkMissEnd(start)
         return block
     end,
-    In = function (start, keys, exp, block, finish)
+    In = function (start, keys, exp, blockStart, block, finish)
         local func = exp[#exp]
         exp[#exp] = nil
         local call
@@ -1232,10 +1233,10 @@ local Defs = {
         block.start  = start
         block.finish = finish - 1
         block.keys = {}
-        local values = {call}
+        local values = { call }
         for i = 1, #keys do
             local loc = keys[i]
-            block.keys[i] = createLocal(loc, getValue(values, i), nil)
+            block.keys[i] = createLocal(loc, blockStart, getValue(values, i), nil)
         end
         checkMissEnd(start)
         return block

@@ -454,7 +454,7 @@ For         <-  Loop / In
 Loop        <-  Sp ({} LoopBody {})
             ->  Loop
 LoopBody    <-  FOR LoopArgs NeedDo
-                    {| (!END Action)* |}
+                    {} {| (!END Action)* |}
                 NeedEnd
 LoopArgs    <-  MustName AssignOrEQ
                 ({} {| (COMMA / !DO !END Exp)* |} {})
@@ -463,7 +463,7 @@ LoopArgs    <-  MustName AssignOrEQ
 In          <-  Sp ({} InBody {})
             ->  In
 InBody      <-  FOR InNameList NeedIn InExpList NeedDo
-                    {| (!END Action)* |}
+                    {} {| (!END Action)* |}
                 NeedEnd
 InNameList  <-  ({} {| (COMMA / !IN !DO !END Name)* |} {})
             ->  PackInNameList

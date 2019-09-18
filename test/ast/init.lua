@@ -29,7 +29,7 @@ local function eq(a, b)
 end
 
 local sortList = {
-    'type', 'start', 'finish',
+    'type', 'start', 'finish', 'effect',
     'parent', 'extParent', 'child',
     'filter',
     'node',
