@@ -111,7 +111,7 @@ function m.getFunctionVarArgs(root, func)
     return nil, nil
 end
 
---- 寻找指定区块中的局部变量
+--- 获取指定区块中可见的局部变量
 ---@param root table
 ---@param block table
 ---@param name string {comment = '变量名'}
@@ -122,13 +122,13 @@ function m.getLocal(root, block, name, pos)
         if not block then
             return nil
         end
-        local locs = block.locs
+        local locals = block.locals
         local res
-        if not locs then
+        if not locals then
             goto CONTINUE
         end
-        for i = 1, #locs do
-            local loc = root[locs[i]]
+        for i = 1, #locals do
+            local loc = root[locals[i]]
             if loc.start > pos then
                 break
             end
@@ -147,29 +147,29 @@ function m.getLocal(root, block, name, pos)
     error('guide.getLocal overstack')
 end
 
-function m.getLabel(state, block, name, exclude)
-    local astMap = state.ast
+--- 获取指定区块中可见的标签
+---@param root table
+---@param block table
+---@param name string {comment = '标签名'}
+function m.getLabel(root, block, name)
+    block = m.getBlock(root, block)
     for _ = 1, 1000 do
-        local blockAst = astMap[block]
-        for i = 1, #blockAst do
-            local action = blockAst[i]
-            if action == exclude then
-                goto CONTINUE
-            end
-            local actionAst = astMap[action]
-            if actionAst.type == 'label' and actionAst[1] == name then
-                return action
-            end
-            ::CONTINUE::
-        end
-        if blockAst.type == 'function' then
-            return nil
-        end
-        block = m.getBlock(state, block)
         if not block then
             return nil
         end
+        local labels = block.labels
+        if labels then
+            local label = labels[name]
+            if label then
+                return root[label]
+            end
+        end
+        if block.type == 'function' then
+            return nil
+        end
+        block = m.getParentBlock(root, block)
     end
+    error('guide.getLocal overstack')
 end
 
 return m

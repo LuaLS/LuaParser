@@ -3,137 +3,7 @@ local type = type
 
 _ENV = nil
 
-local pushError, Root, Compile, Cache, Block
-
-local function checkJumpLocal(start, finish, obj)
-    if obj.start < start then
-        return nil
-    end
-    if obj.finish > finish then
-        return nil
-    end
-    local refs = obj.ref
-    if not refs then
-        return nil
-    end
-    for i = 1, #refs do
-        local ast = Root[refs[i]]
-        if ast.start > finish then
-            return ast
-        end
-    end
-    return nil
-end
-
-local vmMap = {
-    ['getname'] = function (obj, id)
-        local loc = guide.getLocal(State, guide.getBlock(State, id), obj[1])
-        if loc then
-            obj.type = 'getlocal'
-            obj.loc  = loc
-            local locAst = State.ast[loc]
-            if not locAst.ref then
-                locAst.ref = {}
-            end
-            locAst.ref[#locAst.ref+1] = id
-        else
-            obj.type = 'getglobal'
-        end
-    end,
-    ['setname'] = function (obj, id)
-        local loc = guide.getLocal(State, guide.getBlock(State, id), obj[1])
-        if loc then
-            obj.type = 'setlocal'
-            obj.loc  = loc
-            local locAst = State.ast[loc]
-            if not locAst.ref then
-                locAst.ref = {}
-            end
-            locAst.ref[#locAst.ref+1] = id
-        else
-            obj.type = 'setglobal'
-        end
-    end,
-    ['label'] = function (obj, id)
-        local block = guide.getBlock(State, id)
-        if not block then
-            return
-        end
-        local name = obj[1]
-        local label = guide.getLabel(State, block, name, id)
-        if label and label ~= id then
-            local labelAst = Root[label]
-            pushError {
-                type   = 'REDEFINED_LABEL',
-                start  = obj.start,
-                finish = obj.finish,
-                relative = {
-                    {
-                        labelAst.start,
-                        labelAst.finish,
-                    }
-                }
-            }
-        end
-    end,
-    ['goto'] = function (obj, id)
-        local name = obj[1]
-        local block = guide.getBlock(State, id)
-        local label = guide.getLabel(State, block, name)
-        if not label then
-            pushError {
-                type   = 'NO_VISIBLE_LABEL',
-                start  = obj.start,
-                finish = obj.finish,
-                info   = {
-                    label = name,
-                }
-            }
-            return
-        end
-
-        local labelAst = Root[label]
-        obj.ref = label
-        labelAst.ref = id
-
-        if labelAst.start < obj.start then
-            return
-        end
-        -- 检查在 goto 与 label 之间声明的局部变量
-        local blockAst = Root[block]
-        for i = 1, #blockAst do
-            local action = blockAst[i]
-            local actionAst = Root[action]
-            if actionAst == labelAst then
-                break
-            end
-            if actionAst.type == 'local' then
-                local locAst = checkJumpLocal(obj.start, labelAst.start, actionAst)
-                if locAst then
-                    pushError {
-                        type   = 'JUMP_LOCAL_SCOPE',
-                        start  = obj.start,
-                        finish = obj.finish,
-                        info   = {
-                            loc = locAst[1],
-                        },
-                        relative = {
-                            {
-                                start  = labelAst.start,
-                                finish = labelAst.finish,
-                            },
-                            {
-                                start  = locAst.start,
-                                finish = locAst.finish,
-                            }
-                        },
-                    }
-                    break
-                end
-            end
-        end
-    end,
-}
+local pushError, Root, Compile, CompileBlock, Cache, Block, GoToTag
 
 local vmMap = {
     ['nil'] = function (obj)
@@ -388,10 +258,10 @@ local vmMap = {
             obj.value = Compile(value, id)
         end
         if Block then
-            if not Block.locs then
-                Block.locs = {}
+            if not Block.locals then
+                Block.locals = {}
             end
-            Block.locs[#Block.locs+1] = id
+            Block.locals[#Block.locals+1] = id
         end
         Cache[obj] = id
         return id
@@ -416,10 +286,7 @@ local vmMap = {
         Block = obj
         Root[#Root+1] = obj
         local id = #Root
-        for i = 1, #obj do
-            local act = obj[i]
-            obj[i] = Compile(act, id)
-        end
+        CompileBlock(obj, id)
         Block = lastBlock
         return id
     end,
@@ -441,11 +308,36 @@ local vmMap = {
     end,
     ['label'] = function (obj)
         Root[#Root+1] = obj
-        return #Root
+        local id = #Root
+        local block = guide.getBlock(Root, obj)
+        if block then
+            if not block.labels then
+                block.labels = {}
+            end
+            local name = obj[1]
+            local label = guide.getLabel(Root, block, name)
+            if label then
+                pushError {
+                    type   = 'REDEFINED_LABEL',
+                    start  = obj.start,
+                    finish = obj.finish,
+                    relative = {
+                        {
+                            label.start,
+                            label.finish,
+                        }
+                    }
+                }
+            end
+            block.labels[name] = id
+        end
+        return id
     end,
     ['goto'] = function (obj)
         Root[#Root+1] = obj
-        return #Root
+        local id = #Root
+        GoToTag[#GoToTag+1] = obj
+        return id
     end,
     ['if'] = function (obj)
         Root[#Root+1] = obj
@@ -463,10 +355,7 @@ local vmMap = {
         local id = #Root
         local filter = obj.filter
         obj.filter = Compile(filter, id)
-        for i = 1, #obj do
-            local act = obj[i]
-            obj[i] = Compile(act, id)
-        end
+        CompileBlock(obj, id)
         Block = lastBlock
         return id
     end,
@@ -479,10 +368,7 @@ local vmMap = {
         if filter then
             obj.filter = Compile(filter, id)
         end
-        for i = 1, #obj do
-            local act = obj[i]
-            obj[i] = Compile(act, id)
-        end
+        CompileBlock(obj, id)
         Block = lastBlock
         return id
     end,
@@ -491,10 +377,7 @@ local vmMap = {
         Block = obj
         Root[#Root+1] = obj
         local id = #Root
-        for i = 1, #obj do
-            local act = obj[i]
-            obj[i] = Compile(act, id)
-        end
+        CompileBlock(obj, id)
         Block = lastBlock
         return id
     end,
@@ -515,10 +398,7 @@ local vmMap = {
         if step then
             obj.step = Compile(step, id)
         end
-        for i = 1, #obj do
-            local act = obj[i]
-            obj[i] = Compile(act, id)
-        end
+        CompileBlock(obj, id)
         Block = lastBlock
         return id
     end,
@@ -532,10 +412,7 @@ local vmMap = {
             local loc = keys[i]
             keys[i] = Compile(loc, id)
         end
-        for i = 1, #obj do
-            local act = obj[i]
-            obj[i] = Compile(act, id)
-        end
+        CompileBlock(obj, id)
         Block = lastBlock
         return id
     end,
@@ -546,10 +423,7 @@ local vmMap = {
         local id = #Root
         local filter = obj.filter
         obj.filter = Compile(filter, id)
-        for i = 1, #obj do
-            local act = obj[i]
-            obj[i] = Compile(act, id)
-        end
+        CompileBlock(obj, id)
         Block = lastBlock
         return id
     end,
@@ -558,10 +432,7 @@ local vmMap = {
         Block = obj
         Root[#Root+1] = obj
         local id = #Root
-        for i = 1, #obj do
-            local act = obj[i]
-            obj[i] = Compile(act, id)
-        end
+        CompileBlock(obj, id)
         local filter = obj.filter
         obj.filter = Compile(filter, id)
         Block = lastBlock
@@ -582,14 +453,22 @@ local vmMap = {
         Block = obj
         Root[#Root+1] = obj
         local id = #Root
-        for i = 1, #obj do
-            local act = obj[i]
-            obj[i] = Compile(act, id)
-        end
+        CompileBlock(obj, id)
         Block = nil
         return id
     end,
 }
+
+function CompileBlock(obj, parent)
+    for i = 1, #obj do
+        local act = obj[i]
+        local f = vmMap[act.type]
+        if f then
+            act.parent = parent
+            obj[i] = f(act)
+        end
+    end
+end
 
 function Compile(obj, parent)
     if not obj then
@@ -603,6 +482,79 @@ function Compile(obj, parent)
     return f(obj)
 end
 
+local function compileGoTo(obj)
+    local name = obj[1]
+    local label = guide.getLabel(Root, obj, name)
+    if not label then
+        pushError {
+            type   = 'NO_VISIBLE_LABEL',
+            start  = obj.start,
+            finish = obj.finish,
+            info   = {
+                label = name,
+            }
+        }
+        return
+    end
+    -- 如果有局部变量在 goto 与 label 之间声明，
+    -- 并在 label 之后使用，则算作语法错误
+
+    -- 如果 label 在 goto 之前声明，那么不会有中间声明的局部变量
+    if obj.start > label.start then
+        return
+    end
+
+    local block = guide.getBlock(Root, obj)
+    local locals = block and block.locals
+    if not locals then
+        return
+    end
+
+    for i = 1, #locals do
+        local loc = Root[locals[i]]
+        -- 检查局部变量声明位置为 goto 与 label 之间
+        if loc.start < obj.start or loc.finish > label.finish then
+            goto CONTINUE
+        end
+        -- 检查局部变量的使用位置在 label 之后
+        local refs = loc.ref
+        if not refs then
+            goto CONTINUE
+        end
+        for j = 1, #refs do
+            local ref = Root[refs[j]]
+            if ref.finish > label.finish then
+                pushError {
+                    type   = 'JUMP_LOCAL_SCOPE',
+                    start  = obj.start,
+                    finish = obj.finish,
+                    info   = {
+                        loc = loc[1],
+                    },
+                    relative = {
+                        {
+                            start  = label.start,
+                            finish = label.finish,
+                        },
+                        {
+                            start  = loc.start,
+                            finish = loc.finish,
+                        }
+                    },
+                }
+                return
+            end
+        end
+        ::CONTINUE::
+    end
+end
+
+local function PostCompile()
+    for i = 1, #GoToTag do
+        compileGoTo(GoToTag[i])
+    end
+end
+
 return function (self, lua, mode, version)
     local state, errs = self:parse(lua, mode, version)
     if not state then
@@ -611,9 +563,11 @@ return function (self, lua, mode, version)
     pushError = state.pushError
     Root = state.root
     Cache = {}
+    GoToTag = {}
     if type(state.ast) == 'table' then
         Compile(state.ast)
     end
+    PostCompile()
     state.ast = nil
     Cache = nil
     return state, errs

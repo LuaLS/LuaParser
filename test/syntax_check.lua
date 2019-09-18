@@ -313,7 +313,6 @@ TEST[[
 ::<!label!>::
 ]]
 {
-    multi = 2,
     type = 'REDEFINED_LABEL',
     relative = {
         {

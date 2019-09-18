@@ -92,7 +92,7 @@ CHECK'local x, y, z'
 {
     [1] = {
         type = "main",
-        locs = {
+        locals = {
             [1] = 2,
             [2] = 3,
             [3] = 4,
@@ -127,7 +127,7 @@ CHECK'local x, y, z = 1, 2, 3'
 {
     [1] = {
         type = "main",
-        locs = {
+        locals = {
             [1] = 2,
             [2] = 4,
             [3] = 6,
@@ -186,7 +186,7 @@ CHECK'local x, y = f()'
 {
     [1] = {
         type = "main",
-        locs = {
+        locals = {
             [1] = 2,
             [2] = 6,
         },
@@ -243,7 +243,7 @@ CHECK'local x, y = (f())'
 {
     [1] = {
         type = "main",
-        locs = {
+        locals = {
             [1] = 2,
             [2] = 6,
         },
@@ -291,7 +291,7 @@ CHECK'local x, y = f(), nil'
 {
     [1] = {
         type = "main",
-        locs = {
+        locals = {
             [1] = 2,
             [2] = 6,
         },
@@ -345,7 +345,7 @@ CHECK'local x, y = ...'
 {
     [1] = {
         type = "main",
-        locs = {
+        locals = {
             [1] = 2,
             [2] = 5,
         },
@@ -394,7 +394,7 @@ CHECK'local x, y = (...)'
 {
     [1] = {
         type = "main",
-        locs = {
+        locals = {
             [1] = 2,
             [2] = 5,
         },
@@ -434,7 +434,7 @@ CHECK'local x, y = ..., nil'
 {
     [1] = {
         type = "main",
-        locs = {
+        locals = {
             [1] = 2,
             [2] = 5,
         },
@@ -480,7 +480,7 @@ CHECK'local x <const>, y <close> = 1'
 {
     [1] = {
         type = "main",
-        locs = {
+        locals = {
             [1] = 2,
             [2] = 5,
         },
@@ -620,7 +620,7 @@ end]]
 {
     [1] = {
         type = "main",
-        locs = {
+        locals = {
             [1] = 2,
         },
         [1]  = 2,
@@ -666,7 +666,7 @@ end]]
 {
     [1] = {
         type = "main",
-        locs = {
+        locals = {
             [1] = 2,
         },
         [1]  = 2,
@@ -697,7 +697,7 @@ end]]
         finish = 37,
         parent = 3,
         args   = 5,
-        locs   = {
+        locals   = {
             [1] = 6,
             [2] = 7,
         },
@@ -742,7 +742,7 @@ y, z = 3, 4
 {
     [01] = {
         type = "main",
-        locs = {
+        locals = {
             [1] = 2,
             [2] = 4,
             [3] = 6,

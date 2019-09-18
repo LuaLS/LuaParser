@@ -1017,7 +1017,7 @@ CHECK'function (a, ...) end'
         start  = 1,
         finish = 21,
         args   = 2,
-        locs   = {
+        locals   = {
             [1] = 3,
         },
     },

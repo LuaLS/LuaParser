@@ -834,7 +834,7 @@ end]]
         finish = 31,
         loc    = 2,
         max    = 4,
-        locs   = {
+        locals   = {
             [1] = 2,
         },
         [1]    = 5,
@@ -880,7 +880,7 @@ end]]
         loc    = 2,
         max    = 4,
         step   = 5,
-        locs   = {
+        locals   = {
             [1] = 2,
         },
         [1]    = 6,
@@ -933,7 +933,7 @@ end]]
         keys   = {
             [1] = 2,
         },
-        locs   = {
+        locals   = {
             [1] = 2,
         },
         [1]    = 6,
@@ -986,7 +986,7 @@ end]]
             [2] = 8,
             [3] = 10,
         },
-        locs   = {
+        locals   = {
             [1] = 2,
             [2] = 8,
             [3] = 10,
@@ -1171,7 +1171,7 @@ end]]
         finish = 31,
         parent = 1,
         args   = 3,
-        locs   = {
+        locals   = {
             [1] = 4,
         },
         [1]    = 5,
@@ -1253,7 +1253,7 @@ end]]
         finish = 38,
         parent = 1,
         args   = 6,
-        locs   = {
+        locals   = {
             [1] = 7,
             [2] = 8,
             [3] = 9,

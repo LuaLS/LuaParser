@@ -188,7 +188,7 @@ CHECK 'local function a'
 {
     [1] = {
         type = "main",
-        locs = {
+        locals = {
             [1] = 2,
         },
         [1]  = 2,
@@ -232,7 +232,7 @@ CHECK 'local function a(v'
 {
     [1] = {
         type = "main",
-        locs = {
+        locals = {
             [1] = 2,
         },
         [1]  = 2,
@@ -263,7 +263,7 @@ CHECK 'local function a(v'
         finish = 18,
         parent = 3,
         args   = 5,
-        locs   = {
+        locals   = {
             [1] = 6,
         },
     },
@@ -379,7 +379,7 @@ CHECK 'function a:b(v'
         finish = 14,
         parent = 2,
         args   = 6,
-        locs   = {
+        locals   = {
             [1] = 7,
         },
     },
@@ -403,7 +403,7 @@ CHECK 'return local a'
 {
     [1] = {
         type = "main",
-        locs = {
+        locals = {
             [1] = 3,
         },
         [1]  = 2,
@@ -435,7 +435,7 @@ CHECK 'local x = ,'
 {
     [1] = {
         type = "main",
-        locs = {
+        locals = {
             [1] = 2,
         },
         [1]  = 2,
