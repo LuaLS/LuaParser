@@ -894,16 +894,9 @@ local Defs = {
             return
         end
 
-        local loc = createLocal(name, start)
-        local set = {
-            type   = 'setname',
-            start  = name.start,
-            finish = name.finish,
-            value  = actions,
-            [1]    = name[1]
-        }
+        local loc = createLocal(name, start, actions)
 
-        return loc, set
+        return loc
     end,
     Table = function (start, tbl, finish)
         tbl.type   = 'table'

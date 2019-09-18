@@ -187,12 +187,11 @@ CHECK'1 == 2'
 CHECK 'local function a'
 {
     [1] = {
-        type = "main",
         locals = {
             [1] = 2,
         },
-        [1]  = 2,
-        [2]  = 3,
+        type   = "main",
+        [1]    = 2,
     },
     [2] = {
         type   = "local",
@@ -200,25 +199,14 @@ CHECK 'local function a'
         finish = 16,
         effect = 1,
         parent = 1,
-        ref    = {
-            [1] = 3,
-        },
+        value  = 3,
         [1]    = "a",
     },
     [3] = {
-        type   = "setlocal",
-        start  = 16,
-        finish = 16,
-        parent = 1,
-        loc    = 2,
-        value  = 4,
-        [1]    = "a",
-    },
-    [4] = {
         type   = "function",
         start  = 1,
         finish = 16,
-        parent = 3,
+        parent = 2,
     },
 }
 
@@ -232,12 +220,11 @@ CHECK 'local function'
 CHECK 'local function a(v'
 {
     [1] = {
-        type = "main",
         locals = {
             [1] = 2,
         },
-        [1]  = 2,
-        [2]  = 3,
+        type   = "main",
+        [1]    = 2,
     },
     [2] = {
         type   = "local",
@@ -245,43 +232,32 @@ CHECK 'local function a(v'
         finish = 16,
         effect = 1,
         parent = 1,
-        ref    = {
-            [1] = 3,
-        },
+        value  = 3,
         [1]    = "a",
     },
     [3] = {
-        type   = "setlocal",
-        start  = 16,
-        finish = 16,
-        parent = 1,
-        loc    = 2,
-        value  = 4,
-        [1]    = "a",
-    },
-    [4] = {
+        locals = {
+            [1] = 5,
+        },
         type   = "function",
         start  = 1,
         finish = 18,
-        parent = 3,
-        args   = 5,
-        locals   = {
-            [1] = 6,
-        },
+        parent = 2,
+        args   = 4,
     },
-    [5] = {
+    [4] = {
         type   = "funcargs",
         start  = 17,
         finish = 18,
-        parent = 4,
-        [1]    = 6,
+        parent = 3,
+        [1]    = 5,
     },
-    [6] = {
+    [5] = {
         type   = "local",
         start  = 18,
         finish = 18,
         effect = 18,
-        parent = 5,
+        parent = 4,
         [1]    = "v",
     },
 }

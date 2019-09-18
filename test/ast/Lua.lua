@@ -676,19 +676,17 @@ x, y = 1, 2
         [1]    = 2,
     },
 }
-
 CHECK[[
 local function a()
     return
 end]]
 {
     [1] = {
-        type = "main",
         locals = {
             [1] = 2,
         },
-        [1]  = 2,
-        [2]  = 3,
+        type   = "main",
+        [1]    = 2,
     },
     [2] = {
         type   = "local",
@@ -696,32 +694,74 @@ end]]
         finish = 16,
         effect = 1,
         parent = 1,
-        ref    = {
-            [1] = 3,
-        },
+        value  = 3,
         [1]    = "a",
     },
     [3] = {
-        type   = "setlocal",
-        start  = 16,
-        finish = 16,
-        parent = 1,
-        loc    = 2,
-        value  = 4,
-        [1]    = "a",
-    },
-    [4] = {
         type   = "function",
         start  = 1,
+        finish = 33,
+        parent = 2,
+        [1]    = 4,
+    },
+    [4] = {
+        type   = "return",
+        start  = 24,
+        finish = 30,
+        parent = 3,
+    },
+}
+CHECK[[
+local function f()
+    return f()
+end]]
+{
+    [1] = {
+        locals = {
+            [1] = 2,
+        },
+        type   = "main",
+        [1]    = 2,
+    },
+    [2] = {
+        type   = "local",
+        start  = 16,
+        finish = 16,
+        effect = 1,
+        parent = 1,
+        value  = 3,
+        ref    = {
+            [1] = 6,
+        },
+        [1]    = "f",
+    },
+    [3] = {
+        type   = "function",
+        start  = 1,
+        finish = 37,
+        parent = 2,
+        [1]    = 4,
+    },
+    [4] = {
+        type   = "return",
+        start  = 24,
         finish = 33,
         parent = 3,
         [1]    = 5,
     },
     [5] = {
-        type   = "return",
-        start  = 24,
-        finish = 30,
+        type   = "call",
+        start  = 31,
+        finish = 33,
         parent = 4,
+        node   = 6,
+    },
+    [6] = {
+        type   = "getlocal",
+        start  = 31,
+        finish = 31,
+        parent = 5,
+        [1]    = "f",
     },
 }
 CHECK[[
@@ -730,12 +770,11 @@ local function a(b, c)
 end]]
 {
     [1] = {
-        type = "main",
         locals = {
             [1] = 2,
         },
-        [1]  = 2,
-        [2]  = 3,
+        type   = "main",
+        [1]    = 2,
     },
     [2] = {
         type   = "local",
@@ -743,61 +782,50 @@ end]]
         finish = 16,
         effect = 1,
         parent = 1,
-        ref    = {
-            [1] = 3,
-        },
+        value  = 3,
         [1]    = "a",
     },
     [3] = {
-        type   = "setlocal",
-        start  = 16,
-        finish = 16,
-        parent = 1,
-        loc    = 2,
-        value  = 4,
-        [1]    = "a",
-    },
-    [4] = {
+        locals = {
+            [1] = 5,
+            [2] = 6,
+        },
         type   = "function",
         start  = 1,
         finish = 37,
-        parent = 3,
-        args   = 5,
-        locals   = {
-            [1] = 6,
-            [2] = 7,
-        },
-        [1]    = 8,
+        parent = 2,
+        args   = 4,
+        [1]    = 7,
     },
-    [5] = {
+    [4] = {
         type   = "funcargs",
         start  = 17,
         finish = 22,
-        parent = 4,
-        [1]    = 6,
-        [2]    = 7,
+        parent = 3,
+        [1]    = 5,
+        [2]    = 6,
     },
-    [6] = {
+    [5] = {
         type   = "local",
         start  = 18,
         finish = 18,
         effect = 18,
-        parent = 5,
+        parent = 4,
         [1]    = "b",
     },
-    [7] = {
+    [6] = {
         type   = "local",
         start  = 21,
         finish = 21,
         effect = 21,
-        parent = 5,
+        parent = 4,
         [1]    = "c",
     },
-    [8] = {
+    [7] = {
         type   = "return",
         start  = 28,
         finish = 34,
-        parent = 4,
+        parent = 3,
     },
 }
 
@@ -820,9 +848,8 @@ y, z = 3, 4
         [2]    = 4,
         [3]    = 6,
         [4]    = 7,
-        [5]    = 8,
-        [6]    = 10,
-        [7]    = 12,
+        [5]    = 9,
+        [6]    = 11,
     },
     [02] = {
         type   = "local",
@@ -848,7 +875,7 @@ y, z = 3, 4
         parent = 1,
         value  = 5,
         ref    = {
-            [1] = 10,
+            [1] = 9,
         },
         [1]    = "y",
     },
@@ -866,7 +893,7 @@ y, z = 3, 4
         effect = 21,
         parent = 1,
         ref    = {
-            [1] = 12,
+            [1] = 11,
         },
         [1]    = "z",
     },
@@ -876,56 +903,45 @@ y, z = 3, 4
         finish = 37,
         effect = 22,
         parent = 1,
-        ref    = {
-            [1] = 8,
-        },
+        value  = 8,
         [1]    = "f",
     },
     [08] = {
-        type   = "setlocal",
-        start  = 37,
-        finish = 37,
-        parent = 1,
-        loc    = 7,
-        value  = 9,
-        [1]    = "f",
-    },
-    [09] = {
         type   = "function",
         start  = 22,
         finish = 43,
-        parent = 8,
+        parent = 7,
     },
-    [10] = {
+    [09] = {
         type   = "setlocal",
         start  = 45,
         finish = 45,
         parent = 1,
         loc    = 4,
-        value  = 11,
+        value  = 10,
         [1]    = "y",
     },
-    [11] = {
+    [10] = {
         type   = "number",
         start  = 52,
         finish = 52,
-        parent = 10,
+        parent = 9,
         [1]    = 3,
     },
-    [12] = {
+    [11] = {
         type   = "setlocal",
         start  = 48,
         finish = 48,
         parent = 1,
         loc    = 6,
-        value  = 13,
+        value  = 12,
         [1]    = "z",
     },
-    [13] = {
+    [12] = {
         type   = "number",
         start  = 55,
         finish = 55,
-        parent = 12,
+        parent = 11,
         [1]    = 4,
     },
 }

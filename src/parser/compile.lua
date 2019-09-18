@@ -253,15 +253,15 @@ local vmMap = {
                 attrs[i] = Compile(attr, id)
             end
         end
-        local value = obj.value
-        if value then
-            obj.value = Compile(value, id)
-        end
         if Block then
             if not Block.locals then
                 Block.locals = {}
             end
             Block.locals[#Block.locals+1] = id
+        end
+        local value = obj.value
+        if value then
+            obj.value = Compile(value, id)
         end
         Cache[obj] = id
         return id
