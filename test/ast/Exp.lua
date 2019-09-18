@@ -1001,6 +1001,13 @@ CHECK'function (...) end'
         start  = 10,
         finish = 14,
         parent = 1,
+        [1]    = 3,
+    },
+    [3] = {
+        type   = "...",
+        start  = 11,
+        finish = 13,
+        parent = 2,
     },
 }
 CHECK'function (a, ...) end'
@@ -1016,6 +1023,21 @@ CHECK'function (a, ...) end'
         start  = 10,
         finish = 17,
         parent = 1,
+        [1]    = 3,
+        [2]    = 4,
+    },
+    [3] = {
+        type   = "local",
+        start  = 11,
+        finish = 11,
+        parent = 2,
+        [1]    = "a",
+    },
+    [4] = {
+        type   = "...",
+        start  = 14,
+        finish = 16,
+        parent = 2,
     },
 }
 CHECK'{}'

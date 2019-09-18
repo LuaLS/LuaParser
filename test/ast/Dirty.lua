@@ -255,6 +255,14 @@ CHECK 'local function a(v'
         start  = 17,
         finish = 18,
         parent = 4,
+        [1]    = 6,
+    },
+    [6] = {
+        type   = "local",
+        start  = 18,
+        finish = 18,
+        parent = 5,
+        [1]    = "v",
     },
 }
 
@@ -360,6 +368,14 @@ CHECK 'function a:b(v'
         start  = 13,
         finish = 14,
         parent = 5,
+        [1]    = 7,
+    },
+    [7] = {
+        type   = "local",
+        start  = 14,
+        finish = 14,
+        parent = 6,
+        [1]    = "v",
     },
 }
 

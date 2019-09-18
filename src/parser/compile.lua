@@ -3,7 +3,7 @@ local type = type
 
 _ENV = nil
 
-local pushError, Root, Compile, Cache
+local pushError, Root, Compile, Cache, Block
 
 local function checkJumpLocal(start, finish, obj)
     if obj.start < start then
@@ -26,31 +26,6 @@ local function checkJumpLocal(start, finish, obj)
 end
 
 local vmMap = {
-    ['varargs'] = function (obj, id)
-        local func = guide.getParentFunction(State, id)
-        if not func then
-            return
-        end
-        local dots = guide.getFunctionVarArgs(State, func)
-        if not dots then
-            pushError {
-                type   = 'UNEXPECT_DOTS',
-                start  = obj.start,
-                finish = obj.finish,
-            }
-        end
-    end,
-    ['break'] = function (obj, id)
-        local block = guide.getBreakBlock(State, id)
-        if not block then
-            pushError {
-                type   = 'BREAK_OUTSIDE',
-                start  = obj.start,
-                finish = obj.finish,
-            }
-            return
-        end
-    end,
     ['return'] = function (obj, id)
         local list = State.parent[id]
         if not list then
@@ -192,6 +167,10 @@ local vmMap = {
         Root[#Root+1] = obj
         return #Root
     end,
+    ['...'] = function (obj)
+        Root[#Root+1] = obj
+        return #Root
+    end,
     ['getname'] = function (obj)
         Root[#Root+1] = obj
         return #Root
@@ -200,8 +179,7 @@ local vmMap = {
         local node = obj.node
         Root[#Root+1] = obj
         local id = #Root
-        obj.node = Compile(node)
-        node.parent = id
+        obj.node = Compile(node, id)
         return id
     end,
     ['call'] = function (obj)
@@ -210,12 +188,10 @@ local vmMap = {
         local node = obj.node
         local args = obj.args
         if node then
-            obj.node = Compile(node)
-            node.parent = id
+            obj.node = Compile(node, id)
         end
         if args then
-            obj.args = Compile(args)
-            args.parent = id
+            obj.args = Compile(args, id)
         end
         return id
     end,
@@ -224,8 +200,7 @@ local vmMap = {
         local id = #Root
         for i = 1, #obj do
             local arg = obj[i]
-            obj[i] = Compile(arg)
-            arg.parent = id
+            obj[i] = Compile(arg, id)
         end
         return id
     end,
@@ -234,21 +209,29 @@ local vmMap = {
         local e2 = obj[2]
         Root[#Root+1] = obj
         local id = #Root
-        obj[1] = Compile(e1)
-        obj[2] = Compile(e2)
-        e1.parent = id
-        e2.parent = id
+        obj[1] = Compile(e1, id)
+        obj[2] = Compile(e2, id)
         return id
     end,
     ['unary'] = function (obj)
         local e = obj[1]
         Root[#Root+1] = obj
         local id = #Root
-        obj[1] = Compile(e)
-        e.parent = id
+        obj[1] = Compile(e, id)
         return id
     end,
     ['varargs'] = function (obj)
+        local func = guide.getParentFunction(Root, obj)
+        if func then
+            local index = guide.getFunctionVarArgs(Root, func)
+            if not index then
+                pushError {
+                    type   = 'UNEXPECT_DOTS',
+                    start  = obj.start,
+                    finish = obj.finish,
+                }
+            end
+        end
         Root[#Root+1] = obj
         return #Root
     end,
@@ -256,20 +239,17 @@ local vmMap = {
         local exp = obj.exp
         Root[#Root+1] = obj
         local id = #Root
-        obj.exp = Compile(exp)
-        exp.parent = id
+        obj.exp = Compile(exp, id)
         return id
     end,
     ['getindex'] = function (obj)
         Root[#Root+1] = obj
         local id = #Root
         local node = obj.node
-        obj.node = Compile(node)
-        node.parent = id
+        obj.node = Compile(node, id)
         local index = obj.index
         if index then
-            obj.index = Compile(index)
-            index.parent = id
+            obj.index = Compile(index, id)
         end
         return id
     end,
@@ -278,11 +258,9 @@ local vmMap = {
         local id = #Root
         local node = obj.node
         local method = obj.method
-        obj.node = Compile(node)
-        node.parent = id
+        obj.node = Compile(node, id)
         if method then
-            obj.method = Compile(method)
-            method.parent = id
+            obj.method = Compile(method, id)
         end
         return id
     end,
@@ -292,14 +270,11 @@ local vmMap = {
         local node = obj.node
         local method = obj.method
         local value = obj.value
-        obj.node = Compile(node)
-        node.parent = id
+        obj.node = Compile(node, id)
         if method then
-            obj.method = Compile(method)
-            method.parent = id
+            obj.method = Compile(method, id)
         end
-        obj.value = Compile(value)
-        value.parent = id
+        obj.value = Compile(value, id)
         return id
     end,
     ['method'] = function (obj)
@@ -311,13 +286,11 @@ local vmMap = {
         local id = #Root
         local args = obj.args
         if args then
-            obj.args = Compile(args)
-            args.parent = id
+            obj.args = Compile(args, id)
         end
         for i = 1, #obj do
             local act = obj[i]
-            obj[i] = Compile(act)
-            act.parent = id
+            obj[i] = Compile(act, id)
         end
         return id
     end,
@@ -326,8 +299,7 @@ local vmMap = {
         local id = #Root
         for i = 1, #obj do
             local arg = obj[i]
-            obj[i] = Compile(arg)
-            arg.parent = id
+            obj[i] = Compile(arg, id)
         end
         return id
     end,
@@ -336,8 +308,7 @@ local vmMap = {
         local id = #Root
         for i = 1, #obj do
             local v = obj[i]
-            obj[i] = Compile(v)
-            v.parent = id
+            obj[i] = Compile(v, id)
         end
         return id
     end,
@@ -346,8 +317,7 @@ local vmMap = {
         local id = #Root
         local value = obj.value
         if value then
-            obj.value = Compile(value)
-            value.parent = id
+            obj.value = Compile(value, id)
         end
         return id
     end,
@@ -356,18 +326,15 @@ local vmMap = {
         local id = #Root
         local index = obj.index
         local value = obj.value
-        obj.index = Compile(index)
-        obj.value = Compile(value)
-        index.parent = id
-        value.parent = id
+        obj.index = Compile(index, id)
+        obj.value = Compile(value, id)
         return id
     end,
     ['index'] = function (obj)
         Root[#Root+1] = obj
         local id = #Root
         local index = obj.index
-        obj.index = Compile(index)
-        index.parent = id
+        obj.index = Compile(index, id)
         return id
     end,
     ['select'] = function (obj)
@@ -375,8 +342,7 @@ local vmMap = {
         local id = #Root
         local vararg = obj.vararg
         if not Cache[vararg] then
-            obj.vararg = Compile(vararg)
-            vararg.parent = id
+            obj.vararg = Compile(vararg, id)
             Cache[vararg] = obj.vararg
         else
             obj.vararg = Cache[vararg]
@@ -392,8 +358,7 @@ local vmMap = {
         local id = #Root
         local value = obj.value
         if value then
-            obj.value = Compile(value)
-            value.parent = id
+            obj.value = Compile(value, id)
         end
         return id
     end,
@@ -404,14 +369,12 @@ local vmMap = {
         if attrs then
             for i = 1, #attrs do
                 local attr = attrs[i]
-                attrs[i] = Compile(attr)
-                attr.parent = id
+                attrs[i] = Compile(attr, id)
             end
         end
         local value = obj.value
         if value then
-            obj.value = Compile(value)
-            value.parent = id
+            obj.value = Compile(value, id)
         end
         return id
     end,
@@ -425,12 +388,9 @@ local vmMap = {
         local node  = obj.node
         local field = obj.field
         local value = obj.value
-        obj.node  = Compile(node)
-        obj.field = Compile(field)
-        obj.value = Compile(value)
-        node.parent  = id
-        field.parent = id
-        value.parent = id
+        obj.node  = Compile(node, id)
+        obj.field = Compile(field, id)
+        obj.value = Compile(value, id)
         return id
     end,
     ['do'] = function (obj)
@@ -438,8 +398,7 @@ local vmMap = {
         local id = #Root
         for i = 1, #obj do
             local act = obj[i]
-            obj[i] = Compile(act)
-            act.parent = id
+            obj[i] = Compile(act, id)
         end
         return id
     end,
@@ -448,8 +407,7 @@ local vmMap = {
         local id = #Root
         for i = 1, #obj do
             local act = obj[i]
-            obj[i] = Compile(act)
-            act.parent = id
+            obj[i] = Compile(act, id)
         end
         return id
     end,
@@ -466,133 +424,146 @@ local vmMap = {
         local id = #Root
         for i = 1, #obj do
             local block = obj[i]
-            obj[i] = Compile(block)
-            block.parent = id
+            obj[i] = Compile(block, id)
         end
         return id
     end,
     ['ifblock'] = function (obj)
+        local lastBlock = Block
+        Block = obj
         Root[#Root+1] = obj
         local id = #Root
         local filter = obj.filter
-        obj.filter = Compile(filter)
-        filter.parent = id
+        obj.filter = Compile(filter, id)
         for i = 1, #obj do
             local act = obj[i]
-            obj[i] = Compile(act)
-            act.parent = id
+            obj[i] = Compile(act, id)
         end
+        Block = lastBlock
         return id
     end,
     ['elseifblock'] = function (obj)
+        local lastBlock = Block
+        Block = obj
         Root[#Root+1] = obj
         local id = #Root
         local filter = obj.filter
         if filter then
-            obj.filter = Compile(filter)
-            filter.parent = id
+            obj.filter = Compile(filter, id)
         end
         for i = 1, #obj do
             local act = obj[i]
-            obj[i] = Compile(act)
-            act.parent = id
+            obj[i] = Compile(act, id)
         end
+        Block = lastBlock
         return id
     end,
     ['elseblock'] = function (obj)
+        local lastBlock = Block
+        Block = obj
         Root[#Root+1] = obj
         local id = #Root
         for i = 1, #obj do
             local act = obj[i]
-            obj[i] = Compile(act)
-            act.parent = id
+            obj[i] = Compile(act, id)
         end
+        Block = lastBlock
         return id
     end,
     ['loop'] = function (obj)
+        local lastBlock = Block
+        Block = obj
         Root[#Root+1] = obj
         local id = #Root
         local loc = obj.loc
         local max = obj.max
         local step = obj.step
         if loc then
-            obj.loc = Compile(loc)
-            loc.parent = id
+            obj.loc = Compile(loc, id)
         end
         if max then
-            obj.max = Compile(max)
-            max.parent = id
+            obj.max = Compile(max, id)
         end
         if step then
-            obj.step = Compile(step)
-            step.parent = id
+            obj.step = Compile(step, id)
         end
         for i = 1, #obj do
             local act = obj[i]
-            obj[i] = Compile(act)
-            act.parent = id
+            obj[i] = Compile(act, id)
         end
+        Block = lastBlock
         return id
     end,
     ['in'] = function (obj)
+        local lastBlock = Block
+        Block = obj
         Root[#Root+1] = obj
         local id = #Root
         local locs = obj.locs
         for i = 1, #locs do
             local loc = locs[i]
-            locs[i] = Compile(loc)
-            loc.parent = id
+            locs[i] = Compile(loc, id)
         end
         for i = 1, #obj do
             local act = obj[i]
-            obj[i] = Compile(act)
-            act.parent = id
+            obj[i] = Compile(act, id)
         end
+        Block = lastBlock
         return id
     end,
     ['while'] = function (obj)
+        local lastBlock = Block
+        Block = obj
         Root[#Root+1] = obj
         local id = #Root
         local filter = obj.filter
-        obj.filter = Compile(filter)
-        filter.parent = id
+        obj.filter = Compile(filter, id)
         for i = 1, #obj do
             local act = obj[i]
-            obj[i] = Compile(act)
-            act.parent = id
+            obj[i] = Compile(act, id)
         end
+        Block = lastBlock
         return id
     end,
     ['repeat'] = function (obj)
+        local lastBlock = Block
+        Block = obj
         Root[#Root+1] = obj
         local id = #Root
         for i = 1, #obj do
             local act = obj[i]
-            obj[i] = Compile(act)
-            act.parent = id
+            obj[i] = Compile(act, id)
         end
         local filter = obj.filter
-        obj.filter = Compile(filter)
-        filter.parent = id
+        obj.filter = Compile(filter, id)
+        Block = lastBlock
         return id
     end,
     ['break'] = function (obj)
+        if not guide.getBreakBlock(Root, obj) then
+            pushError {
+                type   = 'BREAK_OUTSIDE',
+                start  = obj.start,
+                finish = obj.finish,
+            }
+        end
         Root[#Root+1] = obj
         return #Root
     end,
     ['main'] = function (obj)
+        Block = obj
         Root[#Root+1] = obj
         local id = #Root
         for i = 1, #obj do
             local act = obj[i]
-            obj[i] = Compile(act)
-            act.parent = id
+            obj[i] = Compile(act, id)
         end
+        Block = nil
         return id
     end,
 }
 
-function Compile(obj)
+function Compile(obj, parent)
     if not obj then
         return nil
     end
@@ -600,6 +571,7 @@ function Compile(obj)
     if not f then
         return nil
     end
+    obj.parent = parent
     return f(obj)
 end
 

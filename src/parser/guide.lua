@@ -1,3 +1,5 @@
+_ENV = nil
+
 local m = {}
 
 local blockTypes = {
@@ -21,16 +23,15 @@ local breakBlockTypes = {
 }
 
 --- 寻找所在函数
-function m.getParentFunction(state, id)
-    local parent = state.parent
-    local ast = state.ast
+function m.getParentFunction(root, obj)
     for _ = 1, 1000 do
-        id = parent[id]
-        if not id then
+        obj = root[obj.parent]
+        if not obj then
             break
         end
-        if ast[id].type == 'function' then
-            return id
+        local tp = obj.type
+        if tp == 'function' then
+            return obj
         end
     end
     return nil
@@ -54,17 +55,15 @@ function m.getBlock(state, id)
 end
 
 --- 寻找所在可break的父区块
-function m.getBreakBlock(state, id)
-    local parent = state.parent
-    local ast = state.ast
+function m.getBreakBlock(root, obj)
     for _ = 1, 1000 do
-        id = parent[id]
-        if not id then
+        obj = root[obj.parent]
+        if not obj then
             break
         end
-        local tp = ast[id].type
+        local tp = obj.type
         if breakBlockTypes[tp] then
-            return id
+            return obj
         end
         if tp == 'function' then
             return nil
@@ -73,31 +72,28 @@ function m.getBreakBlock(state, id)
     return nil
 end
 
---- 寻找函数的不定参数，返回不定参数的`id`以及它是第`n`个参数。
---- 如果函数时主函数，则返回`0, 0`。
+--- 寻找函数的不定参数，返回不定参在第几个参数上，以及该参数对象。
+--- 如果函数是主函数，则返回`0, nil`。
+---@return table
 ---@return integer
----@return integer
-function m.getFunctionVarArgs(state, id)
-    local astMap  = state.ast
-    local funcAst = astMap[id]
-    if funcAst.type == 'main' then
-        return 0, 0
+function m.getFunctionVarArgs(root, func)
+    if func.type == 'main' then
+        return 0, nil
     end
-    if funcAst.type ~= 'function' then
-        return nil
+    if func.type ~= 'function' then
+        return nil, nil
     end
-    local argsAst = astMap[funcAst.args]
-    if not argsAst then
-        return nil
+    local args = root[func.args]
+    if not args then
+        return nil, nil
     end
-    for i = 1, #argsAst do
-        local arg = argsAst[i]
-        local argAst = astMap[arg]
-        if argAst.type == '...' then
-            return arg, i
+    for i = 1, #args do
+        local arg = root[args[i]]
+        if arg.type == '...' then
+            return i, arg
         end
     end
-    return nil
+    return nil, nil
 end
 
 function m.getLocal(state, block, name)

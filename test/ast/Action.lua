@@ -1157,15 +1157,23 @@ end]]
         finish = 31,
         parent = 1,
         args   = 3,
-        [1]    = 4,
+        [1]    = 5,
     },
     [3] = {
         type   = "funcargs",
         start  = 14,
         finish = 16,
         parent = 2,
+        [1]    = 4,
     },
     [4] = {
+        type   = "local",
+        start  = 15,
+        finish = 15,
+        parent = 3,
+        [1]    = "a",
+    },
+    [5] = {
         type   = "return",
         start  = 22,
         finish = 28,
@@ -1177,7 +1185,7 @@ function a.b:c(a, b, c)
     return
 end]]
 {
-    [1] = {
+    [01] = {
         type   = "setmethod",
         start  = 10,
         finish = 14,
@@ -1190,7 +1198,7 @@ end]]
         method = 4,
         value  = 5,
     },
-    [2] = {
+    [02] = {
         type   = "getfield",
         start  = 10,
         finish = 12,
@@ -1208,35 +1216,59 @@ end]]
             [1]    = "b",
         },
     },
-    [3] = {
+    [03] = {
         type   = "getname",
         start  = 10,
         finish = 10,
         parent = 2,
         [1]    = "a",
     },
-    [4] = {
+    [04] = {
         type   = "method",
         start  = 14,
         finish = 14,
         parent = 1,
         [1]    = "c",
     },
-    [5] = {
+    [05] = {
         type   = "function",
         start  = 1,
         finish = 38,
         parent = 1,
         args   = 6,
-        [1]    = 7,
+        [1]    = 10,
     },
-    [6] = {
+    [06] = {
         type   = "funcargs",
         start  = 15,
         finish = 23,
         parent = 5,
+        [1]    = 7,
+        [2]    = 8,
+        [3]    = 9,
     },
-    [7] = {
+    [07] = {
+        type   = "local",
+        start  = 16,
+        finish = 16,
+        parent = 6,
+        [1]    = "a",
+    },
+    [08] = {
+        type   = "local",
+        start  = 19,
+        finish = 19,
+        parent = 6,
+        [1]    = "b",
+    },
+    [09] = {
+        type   = "local",
+        start  = 22,
+        finish = 22,
+        parent = 6,
+        [1]    = "c",
+    },
+    [10] = {
         type   = "return",
         start  = 29,
         finish = 35,

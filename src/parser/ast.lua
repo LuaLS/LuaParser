@@ -1001,9 +1001,9 @@ local Defs = {
                 end
                 wantName = false
                 argCount = argCount + 1
-                args[argCount] = arg
 
                 if argAst.type == '...' then
+                    args[argCount] = arg
                     if i < #args then
                         local a = args[i+1]
                         local b = args[#args]
@@ -1014,6 +1014,8 @@ local Defs = {
                         }
                     end
                     break
+                else
+                    args[argCount] = createLocal(arg)
                 end
             end
             lastStart = argAst.finish + 1
