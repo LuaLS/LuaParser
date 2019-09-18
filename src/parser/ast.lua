@@ -1219,7 +1219,7 @@ local Defs = {
         checkMissEnd(start)
         return block
     end,
-    In = function (start, locs, exp, block, finish)
+    In = function (start, keys, exp, block, finish)
         local func = exp[#exp]
         exp[#exp] = nil
         local call
@@ -1231,11 +1231,11 @@ local Defs = {
         block.type   = 'in'
         block.start  = start
         block.finish = finish - 1
-        block.locs = {}
+        block.keys = {}
         local values = {call}
-        for i = 1, #locs do
-            local loc = locs[i]
-            block.locs[i] = createLocal(loc, getValue(values, i), nil)
+        for i = 1, #keys do
+            local loc = keys[i]
+            block.keys[i] = createLocal(loc, getValue(values, i), nil)
         end
         checkMissEnd(start)
         return block

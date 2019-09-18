@@ -1,3 +1,5 @@
+local error = error
+
 _ENV = nil
 
 local m = {}
@@ -37,21 +39,34 @@ function m.getParentFunction(root, obj)
     return nil
 end
 
---- 寻找所在父区块
-function m.getBlock(state, id)
-    local parent = state.parent
-    local ast = state.ast
+--- 寻找所在区块
+function m.getBlock(root, obj)
     for _ = 1, 1000 do
-        id = parent[id]
-        if not id then
-            break
+        if not obj then
+            return nil
         end
-        local tp = ast[id].type
+        local tp = obj.type
         if blockTypes[tp] then
-            return id
+            return obj
+        end
+        obj = root[obj.parent]
+    end
+    error('guide.getBlock overstack')
+end
+
+--- 寻找所在父区块
+function m.getParentBlock(root, obj)
+    for _ = 1, 1000 do
+        obj = root[obj.parent]
+        if not obj then
+            return nil
+        end
+        local tp = obj.type
+        if blockTypes[tp] then
+            return obj
         end
     end
-    return nil
+    error('guide.getParentBlock overstack')
 end
 
 --- 寻找所在可break的父区块
@@ -59,7 +74,7 @@ function m.getBreakBlock(root, obj)
     for _ = 1, 1000 do
         obj = root[obj.parent]
         if not obj then
-            break
+            return nil
         end
         local tp = obj.type
         if breakBlockTypes[tp] then
@@ -69,7 +84,7 @@ function m.getBreakBlock(root, obj)
             return nil
         end
     end
-    return nil
+    error('guide.getBreakBlock overstack')
 end
 
 --- 寻找函数的不定参数，返回不定参在第几个参数上，以及该参数对象。
@@ -96,37 +111,40 @@ function m.getFunctionVarArgs(root, func)
     return nil, nil
 end
 
-function m.getLocal(state, block, name)
-    local astMap = state.ast
-    local locals = state.loc[name]
-    if not locals then
-        return nil
-    end
+--- 寻找指定区块中的局部变量
+---@param root table
+---@param block table
+---@param name string {comment = '变量名'}
+---@param pos integer {comment = '可见位置'}
+function m.getLocal(root, block, name, pos)
+    block = m.getBlock(block)
     for _ = 1, 1000 do
-        local result
-        for i = 1, #locals do
-            local loc = locals[i]
-            if m.getBlock(state, loc) == block then
-                if result then
-                    local lastLocAst = astMap[result]
-                    local newLocAst  = astMap[loc]
-                    if lastLocAst.start < newLocAst.start then
-                        result = loc
-                    end
-                else
-                    result = loc
-                end
-            end
-        end
-        if result then
-            return result
-        end
-        block = m.getBlock(state, block)
         if not block then
             return nil
         end
+        local locs = block.locs
+        local res
+        if not locs then
+            goto CONTINUE
+        end
+        for i = 1, #locs do
+            local loc = root[locs[i]]
+            if loc.start > pos then
+                break
+            end
+            if loc[1] == name then
+                if not res or res.start < loc.start then
+                    res = loc
+                end
+            end
+        end
+        if res then
+            return res
+        end
+        ::CONTINUE::
+        block = m.getParentBlock(block)
     end
-    return nil
+    error('guide.getLocal overstack')
 end
 
 function m.getLabel(state, block, name, exclude)

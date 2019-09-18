@@ -19,7 +19,7 @@ CHECK';;;x = 1'
         [1]  = 2,
     },
     [2] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 4,
         finish = 4,
         parent = 1,
@@ -43,7 +43,7 @@ CHECK'x, y, z = 1, 2, 3'
         [3]  = 6,
     },
     [2] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 1,
         finish = 1,
         parent = 1,
@@ -58,7 +58,7 @@ CHECK'x, y, z = 1, 2, 3'
         [1]    = 1,
     },
     [4] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 4,
         finish = 4,
         parent = 1,
@@ -73,7 +73,7 @@ CHECK'x, y, z = 1, 2, 3'
         [1]    = 2,
     },
     [6] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 7,
         finish = 7,
         parent = 1,
@@ -92,6 +92,11 @@ CHECK'local x, y, z'
 {
     [1] = {
         type = "main",
+        locs = {
+            [1] = 2,
+            [2] = 3,
+            [3] = 4,
+        },
         [1]  = 2,
         [2]  = 3,
         [3]  = 4,
@@ -122,6 +127,11 @@ CHECK'local x, y, z = 1, 2, 3'
 {
     [1] = {
         type = "main",
+        locs = {
+            [1] = 2,
+            [2] = 4,
+            [3] = 6,
+        },
         [1]  = 2,
         [2]  = 4,
         [3]  = 6,
@@ -176,6 +186,10 @@ CHECK'local x, y = f()'
 {
     [1] = {
         type = "main",
+        locs = {
+            [1] = 2,
+            [2] = 6,
+        },
         [1]  = 2,
         [2]  = 6,
     },
@@ -204,7 +218,7 @@ CHECK'local x, y = f()'
         node      = 5,
     },
     [5] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 14,
         finish = 14,
         parent = 4,
@@ -229,6 +243,10 @@ CHECK'local x, y = (f())'
 {
     [1] = {
         type = "main",
+        locs = {
+            [1] = 2,
+            [2] = 6,
+        },
         [1]  = 2,
         [2]  = 6,
     },
@@ -255,7 +273,7 @@ CHECK'local x, y = (f())'
         node   = 5,
     },
     [5] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 15,
         finish = 15,
         parent = 4,
@@ -273,6 +291,10 @@ CHECK'local x, y = f(), nil'
 {
     [1] = {
         type = "main",
+        locs = {
+            [1] = 2,
+            [2] = 6,
+        },
         [1]  = 2,
         [2]  = 6,
     },
@@ -298,7 +320,7 @@ CHECK'local x, y = f(), nil'
         node   = 5,
     },
     [5] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 14,
         finish = 14,
         parent = 4,
@@ -323,6 +345,10 @@ CHECK'local x, y = ...'
 {
     [1] = {
         type = "main",
+        locs = {
+            [1] = 2,
+            [2] = 5,
+        },
         [1]  = 2,
         [2]  = 5,
     },
@@ -368,6 +394,10 @@ CHECK'local x, y = (...)'
 {
     [1] = {
         type = "main",
+        locs = {
+            [1] = 2,
+            [2] = 5,
+        },
         [1]  = 2,
         [2]  = 5,
     },
@@ -404,6 +434,10 @@ CHECK'local x, y = ..., nil'
 {
     [1] = {
         type = "main",
+        locs = {
+            [1] = 2,
+            [2] = 5,
+        },
         [1]  = 2,
         [2]  = 5,
     },
@@ -446,6 +480,10 @@ CHECK'local x <const>, y <close> = 1'
 {
     [1] = {
         type = "main",
+        locs = {
+            [1] = 2,
+            [2] = 5,
+        },
         [1]  = 2,
         [2]  = 5,
     },
@@ -503,7 +541,7 @@ y = 2
         [2]  = 4,
     },
     [2] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 1,
         finish = 1,
         parent = 1,
@@ -518,7 +556,7 @@ y = 2
         [1]    = 1,
     },
     [4] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 7,
         finish = 7,
         parent = 1,
@@ -544,7 +582,7 @@ x, y = 1, 2
         [2]  = 4,
     },
     [2] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 1,
         finish = 1,
         parent = 1,
@@ -559,7 +597,7 @@ x, y = 1, 2
         [1]    = 1,
     },
     [4] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 4,
         finish = 4,
         parent = 1,
@@ -582,6 +620,9 @@ end]]
 {
     [1] = {
         type = "main",
+        locs = {
+            [1] = 2,
+        },
         [1]  = 2,
         [2]  = 3,
     },
@@ -593,7 +634,7 @@ end]]
         [1]    = "a",
     },
     [3] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 16,
         finish = 16,
         parent = 1,
@@ -621,6 +662,9 @@ end]]
 {
     [1] = {
         type = "main",
+        locs = {
+            [1] = 2,
+        },
         [1]  = 2,
         [2]  = 3,
     },
@@ -632,7 +676,7 @@ end]]
         [1]    = "a",
     },
     [3] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 16,
         finish = 16,
         parent = 1,
@@ -645,6 +689,10 @@ end]]
         finish = 37,
         parent = 3,
         args   = 5,
+        locs   = {
+            [1] = 6,
+            [2] = 7,
+        },
         [1]    = 8,
     },
     [5] = {
@@ -686,6 +734,12 @@ y, z = 3, 4
 {
     [01] = {
         type = "main",
+        locs = {
+            [1] = 2,
+            [2] = 4,
+            [3] = 6,
+            [4] = 7,
+        },
         [1]  = 2,
         [2]  = 4,
         [3]  = 6,
@@ -739,7 +793,7 @@ y, z = 3, 4
         [1]    = "f",
     },
     [08] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 37,
         finish = 37,
         parent = 1,
@@ -753,7 +807,7 @@ y, z = 3, 4
         parent = 8,
     },
     [10] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 45,
         finish = 45,
         parent = 1,
@@ -768,7 +822,7 @@ y, z = 3, 4
         [1]    = 3,
     },
     [12] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 48,
         finish = 48,
         parent = 1,

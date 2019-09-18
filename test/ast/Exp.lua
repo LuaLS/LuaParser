@@ -9,7 +9,7 @@ CHECK'nil'
 CHECK'a'
 {
     [1] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 1,
         finish = 1,
         [1]    = 'a',
@@ -35,7 +35,7 @@ CHECK'a.b'
         },
     },
     [2] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 1,
         finish = 1,
         parent = 1,
@@ -80,7 +80,7 @@ CHECK'a.b.c'
         },
     },
     [3] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 1,
         finish = 1,
         parent = 2,
@@ -96,7 +96,7 @@ CHECK'func()'
         node   = 2,
     },
     [2] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 1,
         finish = 4,
         parent = 1,
@@ -148,7 +148,7 @@ CHECK'a.b.c()'
         },
     },
     [4] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 1,
         finish = 1,
         parent = 3,
@@ -666,7 +666,7 @@ CHECK'func(1)'
         args   = 3,
     },
     [2] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 1,
         finish = 4,
         parent = 1,
@@ -697,7 +697,7 @@ CHECK'func(1, 2)'
         args   = 3,
     },
     [2] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 1,
         finish = 4,
         parent = 1,
@@ -736,7 +736,7 @@ CHECK'func(...)'
         args   = 3,
     },
     [2] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 1,
         finish = 4,
         parent = 1,
@@ -766,7 +766,7 @@ CHECK'func(1, ...)'
         args   = 3,
     },
     [2] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 1,
         finish = 4,
         parent = 1,
@@ -804,7 +804,7 @@ CHECK'func ""'
         args   = 3,
     },
     [2] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 1,
         finish = 4,
         parent = 1,
@@ -836,7 +836,7 @@ CHECK'func {}'
         args   = 3,
     },
     [2] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 1,
         finish = 4,
         parent = 1,
@@ -866,7 +866,7 @@ CHECK'table[1]'
         index  = 3,
     },
     [2] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 1,
         finish = 5,
         parent = 1,
@@ -907,7 +907,7 @@ CHECK'get_point().x'
         node   = 3,
     },
     [3] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 1,
         finish = 9,
         parent = 2,
@@ -936,7 +936,7 @@ CHECK'obj:remove()'
         method = 4,
     },
     [3] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 1,
         finish = 3,
         parent = 2,
@@ -1017,6 +1017,9 @@ CHECK'function (a, ...) end'
         start  = 1,
         finish = 21,
         args   = 2,
+        locs   = {
+            [1] = 3,
+        },
     },
     [2] = {
         type   = "funcargs",
@@ -1240,7 +1243,7 @@ CHECK'{[x] = 1, [y] = 2}'
         index  = 4,
     },
     [4] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 3,
         finish = 3,
         parent = 3,
@@ -1269,7 +1272,7 @@ CHECK'{[x] = 1, [y] = 2}'
         index  = 8,
     },
     [8] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 12,
         finish = 12,
         parent = 7,
@@ -1445,7 +1448,7 @@ CHECK'{1, 2, 3,}'
 CHECK 'notify'
 {
     [1] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 1,
         finish = 6,
         [1]    = "notify",

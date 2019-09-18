@@ -26,21 +26,6 @@ local function checkJumpLocal(start, finish, obj)
 end
 
 local vmMap = {
-    ['return'] = function (obj, id)
-        local list = State.parent[id]
-        if not list then
-            return
-        end
-        local listAst = State.ast[list]
-        local last = listAst[#listAst]
-        if last ~= id then
-            pushError {
-                type   = 'ACTION_AFTER_RETURN',
-                start  = obj.start,
-                finish = obj.finish,
-            }
-        end
-    end,
     ['getname'] = function (obj, id)
         local loc = guide.getLocal(State, guide.getBlock(State, id), obj[1])
         if loc then
@@ -173,7 +158,19 @@ local vmMap = {
     end,
     ['getname'] = function (obj)
         Root[#Root+1] = obj
-        return #Root
+        local id = #Root
+        local loc = guide.getLocal(Root, obj, obj[1], obj.start)
+        if loc then
+            obj.type = 'getlocal'
+            obj.loc  = Cache[loc]
+            if not loc.ref then
+                loc.ref = {}
+            end
+            loc.ref[#loc.ref+1] = id
+        else
+            obj.type = 'getglobal'
+        end
+        return id
     end,
     ['getfield'] = function (obj)
         local node = obj.node
@@ -282,6 +279,8 @@ local vmMap = {
         return #Root
     end,
     ['function'] = function (obj)
+        local lastBlock = Block
+        Block = obj
         Root[#Root+1] = obj
         local id = #Root
         local args = obj.args
@@ -292,6 +291,7 @@ local vmMap = {
             local act = obj[i]
             obj[i] = Compile(act, id)
         end
+        Block = lastBlock
         return id
     end,
     ['funcargs'] = function (obj)
@@ -360,6 +360,17 @@ local vmMap = {
         if value then
             obj.value = Compile(value, id)
         end
+        local loc = guide.getLocal(Root, obj, obj[1], obj.start)
+        if loc then
+            obj.type = 'setlocal'
+            obj.loc  = Cache[loc]
+            if not loc.ref then
+                loc.ref = {}
+            end
+            loc.ref[#loc.ref+1] = id
+        else
+            obj.type = 'setglobal'
+        end
         return id
     end,
     ['local'] = function (obj)
@@ -376,6 +387,13 @@ local vmMap = {
         if value then
             obj.value = Compile(value, id)
         end
+        if Block then
+            if not Block.locs then
+                Block.locs = {}
+            end
+            Block.locs[#Block.locs+1] = id
+        end
+        Cache[obj] = id
         return id
     end,
     ['localattr'] = function (obj)
@@ -394,12 +412,15 @@ local vmMap = {
         return id
     end,
     ['do'] = function (obj)
+        local lastBlock = Block
+        Block = obj
         Root[#Root+1] = obj
         local id = #Root
         for i = 1, #obj do
             local act = obj[i]
             obj[i] = Compile(act, id)
         end
+        Block = lastBlock
         return id
     end,
     ['return'] = function (obj)
@@ -408,6 +429,13 @@ local vmMap = {
         for i = 1, #obj do
             local act = obj[i]
             obj[i] = Compile(act, id)
+        end
+        if Block and Block[#Block] ~= obj then
+            pushError {
+                type   = 'ACTION_AFTER_RETURN',
+                start  = obj.start,
+                finish = obj.finish,
+            }
         end
         return id
     end,
@@ -499,10 +527,10 @@ local vmMap = {
         Block = obj
         Root[#Root+1] = obj
         local id = #Root
-        local locs = obj.locs
-        for i = 1, #locs do
-            local loc = locs[i]
-            locs[i] = Compile(loc, id)
+        local keys = obj.keys
+        for i = 1, #keys do
+            local loc = keys[i]
+            keys[i] = Compile(loc, id)
         end
         for i = 1, #obj do
             local act = obj[i]

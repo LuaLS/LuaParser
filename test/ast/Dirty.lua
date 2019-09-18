@@ -17,7 +17,7 @@ CHECK'a.'
         },
     },
     [3] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 1,
         finish = 1,
         parent = 2,
@@ -44,7 +44,7 @@ CHECK'a:'
         },
     },
     [3] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 1,
         finish = 1,
         parent = 2,
@@ -84,7 +84,7 @@ a
         [1]    = true,
     },
     [5] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 9,
         finish = 9,
         parent = 3,
@@ -124,7 +124,7 @@ a
         [1]    = true,
     },
     [5] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 14,
         finish = 14,
         parent = 3,
@@ -141,7 +141,7 @@ x =
         [1]  = 2,
     },
     [2] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 1,
         finish = 1,
         parent = 1,
@@ -188,6 +188,9 @@ CHECK 'local function a'
 {
     [1] = {
         type = "main",
+        locs = {
+            [1] = 2,
+        },
         [1]  = 2,
         [2]  = 3,
     },
@@ -199,7 +202,7 @@ CHECK 'local function a'
         [1]    = "a",
     },
     [3] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 16,
         finish = 16,
         parent = 1,
@@ -225,6 +228,9 @@ CHECK 'local function a(v'
 {
     [1] = {
         type = "main",
+        locs = {
+            [1] = 2,
+        },
         [1]  = 2,
         [2]  = 3,
     },
@@ -236,7 +242,7 @@ CHECK 'local function a(v'
         [1]    = "a",
     },
     [3] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 16,
         finish = 16,
         parent = 1,
@@ -249,6 +255,9 @@ CHECK 'local function a(v'
         finish = 18,
         parent = 3,
         args   = 5,
+        locs   = {
+            [1] = 6,
+        },
     },
     [5] = {
         type   = "funcargs",
@@ -273,7 +282,7 @@ CHECK 'function a'
         [1]  = 2,
     },
     [2] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 10,
         finish = 10,
         parent = 1,
@@ -308,7 +317,7 @@ CHECK 'function a:'
         value  = 4,
     },
     [3] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 10,
         finish = 10,
         parent = 2,
@@ -343,7 +352,7 @@ CHECK 'function a:b(v'
         value  = 5,
     },
     [3] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 10,
         finish = 10,
         parent = 2,
@@ -362,6 +371,9 @@ CHECK 'function a:b(v'
         finish = 14,
         parent = 2,
         args   = 6,
+        locs   = {
+            [1] = 7,
+        },
     },
     [6] = {
         type   = "funcargs",
@@ -383,6 +395,9 @@ CHECK 'return local a'
 {
     [1] = {
         type = "main",
+        locs = {
+            [1] = 3,
+        },
         [1]  = 2,
         [2]  = 3,
     },
@@ -412,6 +427,9 @@ CHECK 'local x = ,'
 {
     [1] = {
         type = "main",
+        locs = {
+            [1] = 2,
+        },
         [1]  = 2,
     },
     [2] = {

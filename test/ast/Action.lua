@@ -1,7 +1,7 @@
 CHECK'x = 1'
 {
     [1] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 1,
         finish = 1,
         value  = 2,
@@ -106,7 +106,7 @@ CHECK'local x < const > = 1'
 CHECK'x = function () end'
 {
     [1] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 1,
         finish = 1,
         value  = 2,
@@ -134,7 +134,7 @@ CHECK'x.y = function () end'
         value  = 3,
     },
     [2] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 1,
         finish = 1,
         parent = 1,
@@ -175,7 +175,7 @@ CHECK'func.x(1, 2)'
         },
     },
     [3] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 1,
         finish = 4,
         parent = 2,
@@ -227,7 +227,7 @@ CHECK'func:x(1, 2)'
         method = 4,
     },
     [3] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 1,
         finish = 4,
         parent = 2,
@@ -339,7 +339,7 @@ CHECK'do x = 1 end'
         [1]    = 2,
     },
     [2] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 4,
         finish = 4,
         parent = 1,
@@ -834,6 +834,9 @@ end]]
         finish = 31,
         loc    = 2,
         max    = 4,
+        locs   = {
+            [1] = 2,
+        },
         [1]    = 5,
     },
     [2] = {
@@ -877,6 +880,9 @@ end]]
         loc    = 2,
         max    = 4,
         step   = 5,
+        locs   = {
+            [1] = 2,
+        },
         [1]    = 6,
     },
     [2] = {
@@ -924,6 +930,9 @@ end]]
         type   = "in",
         start  = 1,
         finish = 28,
+        keys   = {
+            [1] = 2,
+        },
         locs   = {
             [1] = 2,
         },
@@ -972,6 +981,11 @@ end]]
         type   = "in",
         start  = 1,
         finish = 40,
+        keys   = {
+            [1] = 2,
+            [2] = 8,
+            [3] = 10,
+        },
         locs   = {
             [1] = 2,
             [2] = 8,
@@ -1013,14 +1027,14 @@ end]]
         [2]    = 7,
     },
     [06] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 16,
         finish = 16,
         parent = 5,
         [1]    = "a",
     },
     [07] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 19,
         finish = 19,
         parent = 5,
@@ -1119,7 +1133,7 @@ function test()
 end]]
 {
     [1] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 10,
         finish = 13,
         value  = 2,
@@ -1145,7 +1159,7 @@ function test(a)
 end]]
 {
     [1] = {
-        type   = "setname",
+        type   = "setglobal",
         start  = 10,
         finish = 13,
         value  = 2,
@@ -1157,6 +1171,9 @@ end]]
         finish = 31,
         parent = 1,
         args   = 3,
+        locs   = {
+            [1] = 4,
+        },
         [1]    = 5,
     },
     [3] = {
@@ -1217,7 +1234,7 @@ end]]
         },
     },
     [03] = {
-        type   = "getname",
+        type   = "getglobal",
         start  = 10,
         finish = 10,
         parent = 2,
@@ -1236,6 +1253,11 @@ end]]
         finish = 38,
         parent = 1,
         args   = 6,
+        locs   = {
+            [1] = 7,
+            [2] = 8,
+            [3] = 9,
+        },
         [1]    = 10,
     },
     [06] = {

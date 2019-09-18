@@ -34,12 +34,13 @@ local sortList = {
     'filter',
     'node',
     'op', 'args',
-    'loc', 'max', 'step', 'locs',
+    'loc', 'max', 'step', 'keys',
     'dot', 'colon',
     'vararg',
     'field', 'index', 'method',
     'exp', 'value',
     'attrs',
+    'locs',
 }
 for i, v in ipairs(sortList) do
     sortList[v] = i
