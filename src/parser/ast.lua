@@ -5,6 +5,7 @@ local stringChar  = string.char
 local utf8Char    = utf8.char
 local tableUnpack = table.unpack
 local mathType    = math.type
+local tableRemove = table.remove
 
 _ENV = nil
 
@@ -268,6 +269,8 @@ local function packList(start, list, finish)
     for i = count + 1, #list do
         list[i] = nil
     end
+    list.start = start
+    list.finish = finish - 1
     return list
 end
 
@@ -1214,22 +1217,25 @@ local Defs = {
         return block
     end,
     In = function (start, keys, exp, blockStart, block, finish)
-        local func = exp[#exp]
-        exp[#exp] = nil
-        local call
-        if #exp == 0 then
-            call = createCall(exp, 0, 0)
-        else
-            call = createCall(exp, exp[1].start, func.finish)
-        end
+        local func = tableRemove(exp, 1)
         block.type   = 'in'
         block.start  = start
         block.finish = finish - 1
         block.keys = {}
-        local values = { call }
+
+        local values
+        if func then
+            local call = createCall(exp, func.finish + 1, exp.finish)
+            call.node = func
+            values = { call }
+        end
         for i = 1, #keys do
             local loc = keys[i]
-            block.keys[i] = createLocal(loc, blockStart, getValue(values, i), nil)
+            if values then
+                block.keys[i] = createLocal(loc, blockStart, getValue(values, i))
+            else
+                block.keys[i] = createLocal(loc, blockStart)
+            end
         end
         checkMissEnd(start)
         return block

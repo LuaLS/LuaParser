@@ -951,16 +951,16 @@ for a in a do
 end]]
 {
     [1] = {
+        locals = {
+            [1] = 2,
+        },
         type   = "in",
         start  = 1,
         finish = 28,
         keys   = {
             [1] = 2,
         },
-        locals   = {
-            [1] = 2,
-        },
-        [1]    = 6,
+        [1]    = 7,
     },
     [2] = {
         type   = "local",
@@ -979,18 +979,26 @@ end]]
     },
     [4] = {
         type   = "call",
-        start  = 0,
-        finish = 0,
+        start  = 11,
+        finish = 10,
         parent = 3,
-        args   = 5,
+        node   = 5,
+        args   = 6,
     },
     [5] = {
-        type   = "callargs",
-        start  = 0,
-        finish = 0,
+        type   = "getglobal",
+        start  = 10,
+        finish = 10,
         parent = 4,
+        [1]    = "a",
     },
     [6] = {
+        type   = "callargs",
+        start  = 11,
+        finish = 10,
+        parent = 4,
+    },
+    [7] = {
         type   = "return",
         start  = 19,
         finish = 25,
@@ -1003,20 +1011,20 @@ for a, b, c in a, b, c do
 end]]
 {
     [01] = {
-        locals = {
-            [1] = 2,
-            [2] = 8,
-            [3] = 10,
-        },
         type   = "in",
         start  = 1,
         finish = 40,
         keys   = {
             [1] = 2,
-            [2] = 8,
-            [3] = 10,
+            [2] = 9,
+            [3] = 11,
         },
-        [1]    = 12,
+        locals = {
+            [1] = 2,
+            [2] = 9,
+            [3] = 11,
+        },
+        [1]    = 13,
     },
     [02] = {
         type   = "local",
@@ -1035,68 +1043,76 @@ end]]
     },
     [04] = {
         type      = "call",
-        start     = 16,
+        start     = 17,
         finish    = 22,
         parent    = 3,
         extParent = {
-            [1] = 9,
-            [2] = 11,
+            [1] = 10,
+            [2] = 12,
         },
-        args      = 5,
+        node      = 5,
+        args      = 6,
     },
     [05] = {
-        type   = "callargs",
-        start  = 16,
-        finish = 22,
-        parent = 4,
-        [1]    = 6,
-        [2]    = 7,
-    },
-    [06] = {
         type   = "getglobal",
         start  = 16,
         finish = 16,
-        parent = 5,
+        parent = 4,
         [1]    = "a",
+    },
+    [06] = {
+        type   = "callargs",
+        start  = 17,
+        finish = 22,
+        parent = 4,
+        [1]    = 7,
+        [2]    = 8,
     },
     [07] = {
         type   = "getglobal",
         start  = 19,
         finish = 19,
-        parent = 5,
+        parent = 6,
         [1]    = "b",
     },
     [08] = {
+        type   = "getglobal",
+        start  = 22,
+        finish = 22,
+        parent = 6,
+        [1]    = "c",
+    },
+    [09] = {
         type   = "local",
         start  = 8,
         finish = 8,
         effect = 26,
         parent = 1,
-        value  = 9,
+        value  = 10,
         [1]    = "b",
     },
-    [09] = {
+    [10] = {
         type   = "select",
-        parent = 8,
+        parent = 9,
         vararg = 4,
         index  = 2,
     },
-    [10] = {
+    [11] = {
         type   = "local",
         start  = 11,
         finish = 11,
         effect = 26,
         parent = 1,
-        value  = 11,
+        value  = 12,
         [1]    = "c",
     },
-    [11] = {
+    [12] = {
         type   = "select",
-        parent = 10,
+        parent = 11,
         vararg = 4,
         index  = 3,
     },
-    [12] = {
+    [13] = {
         type   = "return",
         start  = 31,
         finish = 37,
