@@ -50,9 +50,9 @@ local Version
 local function TEST(script)
     return function (expect)
         local newScript, list = catchTarget(script, '!')
-        local ast, errs = parser:compile(newScript, 'lua', Version)
+        local ast, err = parser:compile(newScript, 'lua', Version)
         assert(ast)
-        assert(errs)
+        local errs = ast.errs
         local first = errs[1]
         local target = list[1]
         if not expect then

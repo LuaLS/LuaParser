@@ -3,7 +3,7 @@ local parser = require 'parser'
 local function check_str(str, name, mode)
     local ast, err = parser:compile(str, mode, 'Lua 5.3')
     assert(ast)
-    if #err > 0 and mode ~= 'Dirty' then
+    if #ast.errs > 0 and mode ~= 'Dirty' then
         error(([[
 [%s]测试失败:
 %s
