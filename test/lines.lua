@@ -1,123 +1,115 @@
-
 local utility = require 'utility'
 
 local parser = require 'parser'
 local buf = utility.loadFile((ROOT / 'test' / 'perform' / 'lines.txt'):string())
 assert(buf)
 buf = buf:gsub('\r\n', '\n'):gsub('[\r\n]', '\r\n')
-local lines = parser:lines(buf)
 
-assert(#lines          == 365)
-assert(lines[2].start  == 58)
-assert(lines[3].start  == 60)
-assert(lines[358].sp   == 2)
-assert(lines[358].tab == 0)
-assert(lines[359].sp == 0)
-assert(lines[359].tab == 1)
+do
+    local lines = parser:lines(buf)
+    local row, col = parser.guide.positionOf(lines, 0)
+    assert(row == 0)
+    assert(col == 0)
 
-local row, col = lines:rowcol(618)
-assert(row == 22)
-assert(col == 19)
+    local row, col = parser.guide.positionOf(lines, 1)
+    assert(row == 0)
+    assert(col == 1)
 
-local pos = lines:position(22, 19)
-assert(pos == 618)
+    local row, col = parser.guide.positionOf(lines, 55)
+    assert(row == 0)
+    assert(col == 55)
 
-local row, col = lines:rowcol(9999999)
-assert(row == 365)
-assert(col == 1)
+    local row, col = parser.guide.positionOf(lines, 56)
+    assert(row == 0)
+    assert(col == 56)
 
-local row, col = lines:rowcol(-100)
-assert(row == 1)
-assert(col == 1)
+    local row, col = parser.guide.positionOf(lines, 57)
+    assert(row == 1)
+    assert(col == 0)
 
-local pos = lines:position(8, 999)
-assert(pos == 293)
+    local row, col = parser.guide.positionOf(lines, 58)
+    assert(row == 1)
+    assert(col == 1)
 
-local pos = lines:position(8, -100)
-assert(pos == 270)
+    local row, col = parser.guide.positionOf(lines, 59)
+    assert(row == 2)
+    assert(col == 0)
 
-local pos = lines:position(-100, 1)
-assert(pos == 1)
+    local row, col = parser.guide.positionOf(lines, 60)
+    assert(row == 2)
+    assert(col == 1)
+end
 
-local pos = lines:position(9999, 1)
-assert(pos == 10373)
+do
+    local lines = parser:lines(buf)
+    local offset = parser.guide.offsetOf(lines, 0, 0)
+    assert(offset == 0)
 
-local pos = lines:position(365, 1)
-assert(pos == 10373)
+    local offset = parser.guide.offsetOf(lines, 0, 1)
+    assert(offset == 1)
 
-local row, col = lines:rowcol(10373)
-assert(row == 365)
-assert(col == 1)
+    local offset = parser.guide.offsetOf(lines, 0, 55)
+    assert(offset == 55)
 
-local pos = lines:position(9999, 1, 'utf8')
-assert(pos == 10337)
+    local offset = parser.guide.offsetOf(lines, 0, 56)
+    assert(offset == 56)
 
-local pos = lines:position(191, 16, 'utf8')
-assert(pos == 4863)
+    local offset = parser.guide.offsetOf(lines, 0, 57)
+    assert(offset == 57)
 
-local row, col = lines:rowcol(4863, 'utf8')
-assert(row == 191)
-assert(col == 16)
+    local offset = parser.guide.offsetOf(lines, 1, 0)
+    assert(offset == 57)
 
-local row, col = lines:rowcol(4863)
-assert(col ~= 16)
+    local offset = parser.guide.offsetOf(lines, 1, 1)
+    assert(offset == 58)
 
-lines:set_code 'utf8'
-local row, col = lines:rowcol(4863)
-assert(row == 191)
-assert(col == 16)
+    local offset = parser.guide.offsetOf(lines, 2, 0)
+    assert(offset == 59)
 
+    local offset = parser.guide.offsetOf(lines, 2, 1)
+    assert(offset == 60)
+end
 
-local buf = [[
-local xx]]
-local lines = parser:lines(buf)
+do
+    local lines = parser:lines 'abc\r\nabc\r\n' -- len = 10
 
-local row, col = lines:rowcol(7)
-assert(row == 1)
-assert(col == 7)
+    local pos = parser.guide.offsetOf(lines, 9999, 1)
+    assert(pos == 10)
 
-local row, col = lines:rowcol(8)
-assert(row == 1)
-assert(col == 8)
+    local pos = parser.guide.offsetOf(lines, 2, 9999)
+    assert(pos == 10)
 
-local row, col = lines:rowcol(9)
-assert(row == 1)
-assert(col == 9)
+    local pos = parser.guide.offsetOf(lines, 2, 2)
+    assert(pos == 10)
 
-local row, col = lines:rowcol(10)
-assert(row == 1)
-assert(col == 9)
+    local pos = parser.guide.offsetOf(lines, 2, 1)
+    assert(pos == 10)
 
-local buf = [[
-local xx
-local xx]]
+    local pos = parser.guide.offsetOf(lines, 2, 0)
+    assert(pos == 10)
 
-local lines = parser:lines(buf)
+    local pos = parser.guide.offsetOf(lines, 1, 9999)
+    assert(pos == 10)
 
-local row, col = lines:rowcol(14)
-assert(row == 2)
-assert(col == 5)
+    local pos = parser.guide.offsetOf(lines, 1, 5)
+    assert(pos == 10)
 
-local row, col = lines:rowcol(15)
-assert(row == 2)
-assert(col == 6)
+    local pos = parser.guide.offsetOf(lines, 1, 4)
+    assert(pos == 9)
 
-local row, col = lines:rowcol(16)
-assert(row == 2)
-assert(col == 7)
+    local row, col = parser.guide.positionOf(lines, 9999)
+    assert(row == 2)
+    assert(col == 0)
 
-local row, col = lines:rowcol(17)
-assert(row == 2)
-assert(col == 8)
+    local row, col = parser.guide.positionOf(lines, 11)
+    assert(row == 2)
+    assert(col == 0)
 
-local row, col = lines:rowcol(18)
-assert(row == 2)
-assert(col == 9)
+    local row, col = parser.guide.positionOf(lines, 10)
+    assert(row == 2)
+    assert(col == 0)
 
-local row, col = lines:rowcol(19)
-assert(row == 2)
-assert(col == 9)
-
-local row, col = lines:rowcol(20)
-assert(row == 2)
-assert(col == 9)
+    local row, col = parser.guide.positionOf(lines, 9)
+    assert(row == 1)
+    assert(col == 4)
+end

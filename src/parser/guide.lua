@@ -1,4 +1,6 @@
-local error = error
+local error      = error
+local utf8Len    = utf8.len
+local utf8Offset = utf8.offset
 
 _ENV = nil
 
@@ -23,6 +25,14 @@ local breakBlockTypes = {
     ['loop']        = true,
     ['repeat']      = true,
 }
+
+local function safeUtf8Len(str, start, finish)
+    local len, pos = utf8Len(str, start, finish)
+    if len then
+        return len
+    end
+    return 1 + safeUtf8Len(str, start, pos-1) + safeUtf8Len(str, pos+1, finish)
+end
 
 --- 寻找所在函数
 function m.getParentFunction(root, obj)
@@ -170,6 +180,85 @@ function m.getLabel(root, block, name)
         block = m.getParentBlock(root, block)
     end
     error('guide.getLocal overstack')
+end
+
+--- 获取偏移对应的坐标（row从0开始，col为光标位置）
+---@param lines table
+---@return integer {name = 'row'}
+---@return integer {name = 'col'}
+function m.positionOf(lines, offset)
+    if offset < 1 then
+        return 0, 0
+    end
+    local lastLine = lines[#lines]
+    if offset > lastLine.finish then
+        return #lines - 1, lastLine.finish - lastLine.start
+    end
+    local min = 1
+    local max = #lines
+    for _ = 1, 100 do
+        if max <= min then
+            local line = lines[min]
+            return min - 1, offset - line.start
+        end
+        local row = (max - min) // 2 + min
+        local line = lines[row]
+        if offset < line.start then
+            max = row - 1
+        elseif offset >= line.finish then
+            min = row + 1
+        else
+            return row - 1, offset - line.start
+        end
+    end
+    error('Stack overflow!')
+end
+
+--- 获取坐标对应的偏移（row从0开始，col为光标位置）
+---@param lines table
+---@param row integer
+---@param col integer
+---@return integer {name = 'offset'}
+function m.offsetOf(lines, row, col)
+    if row < 0 then
+        return 0
+    end
+    if row > #lines - 1 then
+        local lastLine = lines[#lines]
+        return lastLine.finish
+    end
+    local line = lines[row + 1]
+    local len = line.finish - line.start
+    if col < 0 then
+        return line.start
+    elseif col > len then
+        return line.finish
+    else
+        return line.start + col
+    end
+end
+
+local function isCharByte(byte)
+    if not byte then
+        return false
+    end
+    -- [0-9]
+    if byte >= 48 and byte <= 57 then
+        return true
+    end
+    -- [A-Z]
+    if byte >= 65 and byte <= 90 then
+        return true
+    end
+    -- [a-z]
+    if byte >= 97 and byte <= 122 then
+        return true
+    end
+    -- <utf8>
+    if byte >= 128 then
+        return true
+    end
+    return false
 end
 
 return m

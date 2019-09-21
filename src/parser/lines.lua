@@ -3,16 +3,8 @@ local utf8Len = utf8.len
 
 _ENV = nil
 
-local function safeUtf8Len(str, start, finish)
-    local len, pos = utf8Len(str, start, finish)
-    if len then
-        return len
-    end
-    return 1 + safeUtf8Len(str, start, pos-1) + safeUtf8Len(str, pos+1, finish)
-end
-
 local function Line(start, line, finish)
-    line.start  = start
+    line.start  = start - 1
     line.finish = finish - 1
     return line
 end
@@ -37,7 +29,7 @@ end
 local parser = m.P{
 'Lines',
 Lines   = m.Ct(m.V'Line'^0 * m.V'LastLine'),
-Line    = m.Cp() * m.V'Indent' * (1 - m.V'Nl')^0 * m.Cp() / Line * m.V'Nl',
+Line    = m.Cp() * m.V'Indent' * (1 - m.V'Nl')^0 * m.V'Nl' * m.Cp() / Line,
 LastLine= m.Cp() * m.V'Indent' * (1 - m.V'Nl')^0 * m.Cp() / Line,
 Nl      = m.P'\r\n' + m.S'\r\n',
 Indent  = m.C(m.S' \t')^0 / Space,
