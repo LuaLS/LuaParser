@@ -43,29 +43,11 @@ Nl      = m.P'\r\n' + m.S'\r\n',
 Indent  = m.C(m.S' \t')^0 / Space,
 }
 
-local function convertCode(lines, text, code)
-    if code ~= 'utf8' then
-        return
-    end
-    local delta = 0
-    for i = 1, #lines do
-        local line   = lines[i]
-        local len    = safeUtf8Len(text, line.start, line.finish)
-
-        line.ustart  = line.start - delta
-        line.ufinish = line.utart + len - 1
-
-        delta = line.finish - line.ufinish
-    end
-end
-
 return function (self, text)
     local lines, err = parser:match(text)
     if not lines then
         return nil, err
     end
-
-    convertCode(lines, text)
 
     return lines
 end
