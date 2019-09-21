@@ -26,14 +26,6 @@ local breakBlockTypes = {
     ['repeat']      = true,
 }
 
-local function safeUtf8Len(str, start, finish)
-    local len, pos = utf8Len(str, start, finish)
-    if len then
-        return len
-    end
-    return 1 + safeUtf8Len(str, start, pos-1) + safeUtf8Len(str, pos+1, finish)
-end
-
 --- 寻找所在函数
 function m.getParentFunction(root, obj)
     for _ = 1, 1000 do
@@ -236,29 +228,6 @@ function m.offsetOf(lines, row, col)
     else
         return line.start + col
     end
-end
-
-local function isCharByte(byte)
-    if not byte then
-        return false
-    end
-    -- [0-9]
-    if byte >= 48 and byte <= 57 then
-        return true
-    end
-    -- [A-Z]
-    if byte >= 65 and byte <= 90 then
-        return true
-    end
-    -- [a-z]
-    if byte >= 97 and byte <= 122 then
-        return true
-    end
-    -- <utf8>
-    if byte >= 128 then
-        return true
-    end
-    return false
 end
 
 return m
