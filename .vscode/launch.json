@@ -8,11 +8,6 @@
             "stopOnEntry": false,
             "program": "${workspaceRoot}/test/main.lua",
             "cwd": "${workspaceRoot}",
-            "env": {
-                "PATH": "${workspaceRoot}\\bin\\"
-            },
-            //"luaexe": "${workspaceRoot}\\bin\\lua-language-server.exe",
-            //"luadll": "${workspaceRoot}\\bin\\lua54.dll",
             "path": "${workspaceRoot}/bin/?.lua",
             "cpath": "${workspaceRoot}/bin/?.dll;",
             "arg0": [
@@ -33,9 +28,6 @@
             "stopOnEntry": false,
             "program": "${workspaceRoot}/test/performance.lua",
             "cwd": "${workspaceRoot}",
-            "env": {
-                "PATH": "${workspaceRoot}\\bin\\"
-            },
             "path": "${workspaceRoot}/bin/?.lua",
             "cpath": "${workspaceRoot}/bin/?.dll;",
             "arg0": [
