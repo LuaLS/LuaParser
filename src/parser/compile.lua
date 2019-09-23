@@ -274,10 +274,8 @@ local vmMap = {
         Root[#Root+1] = obj
         local id = #Root
         local node  = obj.node
-        local field = obj.field
         local value = obj.value
         obj.node  = Compile(node, id)
-        obj.field = Compile(field, id)
         obj.value = Compile(value, id)
         return id
     end,

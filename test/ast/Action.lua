@@ -125,6 +125,41 @@ CHECK'local x < const > = 1'
         [1]    = 1,
     },
 }
+CHECK 'x.y = 1'
+{
+    [1] = {
+        type   = "setfield",
+        start  = 1,
+        finish = 3,
+        node   = 2,
+        dot    = {
+            type   = ".",
+            start  = 2,
+            finish = 2,
+        },
+        field  = {
+            type   = "field",
+            start  = 3,
+            finish = 3,
+            [1]    = "y",
+        },
+        value  = 3,
+    },
+    [2] = {
+        type   = "getglobal",
+        start  = 1,
+        finish = 1,
+        parent = 1,
+        [1]    = "x",
+    },
+    [3] = {
+        type   = "number",
+        start  = 7,
+        finish = 7,
+        parent = 1,
+        [1]    = 1,
+    },
+}
 CHECK'x = function () end'
 {
     [1] = {
@@ -152,6 +187,12 @@ CHECK'x.y = function () end'
             type   = ".",
             start  = 2,
             finish = 2,
+        },
+        field  = {
+            type   = "field",
+            start  = 3,
+            finish = 3,
+            [1]    = "y",
         },
         value  = 3,
     },
