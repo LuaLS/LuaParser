@@ -75,7 +75,7 @@ local function expSplit(list, start, finish, level)
     end
     local info = Exp[level]
     if not info then
-        return
+        return nil
     end
     local func = info[1]
     return func(list, start, finish, level)

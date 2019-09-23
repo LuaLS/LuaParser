@@ -460,3 +460,59 @@ CHECK 'local x = ,'
         [1]    = "x",
     },
 }
+
+CHECK 'local x = (a && b)'
+{
+    [1] = {
+        type   = "main",
+        start  = 1,
+        finish = 18,
+        locals = {
+            [1] = 2,
+        },
+        [1]    = 2,
+    },
+    [2] = {
+        type   = "local",
+        start  = 7,
+        finish = 7,
+        effect = 19,
+        parent = 1,
+        value  = 3,
+        [1]    = "x",
+    },
+    [3] = {
+        type   = "paren",
+        start  = 11,
+        finish = 18,
+        parent = 2,
+        exp    = 4,
+    },
+    [4] = {
+        type   = "binary",
+        start  = 12,
+        finish = 17,
+        parent = 3,
+        op     = {
+            type   = "&",
+            start  = 15,
+            finish = 15,
+        },
+        [1]    = 5,
+        [2]    = 6,
+    },
+    [5] = {
+        type   = "getglobal",
+        start  = 12,
+        finish = 12,
+        parent = 4,
+        [1]    = "a",
+    },
+    [6] = {
+        type   = "getglobal",
+        start  = 17,
+        finish = 17,
+        parent = 4,
+        [1]    = "b",
+    },
+}
