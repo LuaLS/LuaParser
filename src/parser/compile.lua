@@ -120,6 +120,21 @@ local vmMap = {
         end
         return id
     end,
+    ['setindex'] = function (obj)
+        Root[#Root+1] = obj
+        local id = #Root
+        local node = obj.node
+        obj.node = Compile(node, id)
+        local index = obj.index
+        if index then
+            obj.index = Compile(index, id)
+        end
+        local value = obj.value
+        if value then
+            obj.value = Compile(value, id)
+        end
+        return id
+    end,
     ['getmethod'] = function (obj)
         Root[#Root+1] = obj
         local id = #Root

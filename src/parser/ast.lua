@@ -1038,6 +1038,9 @@ local Defs = {
             elseif key.type == 'getfield' then
                 key.type = 'setfield'
                 key.value = getValue(values, i)
+            elseif key.type == 'getindex' then
+                key.type = 'setindex'
+                key.value = getValue(values, i)
             end
         end
         return tableUnpack(keys)

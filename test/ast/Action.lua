@@ -160,6 +160,38 @@ CHECK 'x.y = 1'
         [1]    = 1,
     },
 }
+CHECK 'x[y] = 1'
+{
+    [1] = {
+        type   = "setindex",
+        start  = 1,
+        finish = 4,
+        node   = 2,
+        index  = 3,
+        value  = 4,
+    },
+    [2] = {
+        type   = "getglobal",
+        start  = 1,
+        finish = 1,
+        parent = 1,
+        [1]    = "x",
+    },
+    [3] = {
+        type   = "getglobal",
+        start  = 3,
+        finish = 3,
+        parent = 1,
+        [1]    = "y",
+    },
+    [4] = {
+        type   = "number",
+        start  = 8,
+        finish = 8,
+        parent = 1,
+        [1]    = 1,
+    },
+}
 CHECK'x = function () end'
 {
     [1] = {
