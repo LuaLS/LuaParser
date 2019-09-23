@@ -274,11 +274,20 @@ local vmMap = {
             end
             Block.locals[#Block.locals+1] = id
         end
-        local value = obj.value
-        if value then
-            obj.value = Compile(value, id)
+        if obj.localfunction then
+            obj.localfunction = nil
+            Cache[obj] = id
+            local value = obj.value
+            if value then
+                obj.value = Compile(value, id)
+            end
+        else
+            local value = obj.value
+            if value then
+                obj.value = Compile(value, id)
+            end
+            Cache[obj] = id
         end
-        Cache[obj] = id
         return id
     end,
     ['localattr'] = function (obj)

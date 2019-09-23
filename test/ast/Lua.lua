@@ -797,6 +797,7 @@ end]]
         start  = 31,
         finish = 31,
         parent = 5,
+        loc    = 2,
         [1]    = "f",
     },
 }
