@@ -176,6 +176,9 @@ end
 
 --- 判断source是否包含offset
 function m.isContain(source, offset)
+    if not source.start then
+        return false
+    end
     return source.start <= offset and source.finish >= offset - 1
 end
 
@@ -249,7 +252,7 @@ function m.offsetOf(lines, row, col)
 end
 
 function m.lineContent(lines, text, row)
-    local line = lines[row]
+    local line = lines[row + 1]
     if not line then
         return ''
     end
@@ -257,7 +260,7 @@ function m.lineContent(lines, text, row)
 end
 
 function m.lineRange(lines, row)
-    local line = lines[row]
+    local line = lines[row + 1]
     if not line then
         return 0, 0
     end
