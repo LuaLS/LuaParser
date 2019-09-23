@@ -691,6 +691,7 @@ local Defs = {
             }
             list[n-1] = exp
             list[n+1] = exp
+            checkOpVersion(op)
         end
         local final = ops[1]
         return list[final-1]
