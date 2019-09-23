@@ -1,8 +1,10 @@
 CHECK'a.'
 {
     [1] = {
-        type = "main",
-        [1]  = 2,
+        type   = "main",
+        start  = 1,
+        finish = 2,
+        [1]    = 2,
     },
     [2] = {
         type   = "getfield",
@@ -28,8 +30,10 @@ CHECK'a.'
 CHECK'a:'
 {
     [1] = {
-        type = "main",
-        [1]  = 2,
+        type   = "main",
+        start  = 1,
+        finish = 2,
+        [1]    = 2,
     },
     [2] = {
         type   = "getmethod",
@@ -58,8 +62,10 @@ a
 ]]
 {
     [1] = {
-        type = "main",
-        [1]  = 2,
+        type   = "main",
+        start  = 1,
+        finish = 9,
+        [1]    = 2,
     },
     [2] = {
         type   = "if",
@@ -98,8 +104,10 @@ a
 ]]
 {
     [1] = {
-        type = "main",
-        [1]  = 2,
+        type   = "main",
+        start  = 1,
+        finish = 14,
+        [1]    = 2,
     },
     [2] = {
         type   = "if",
@@ -137,8 +145,10 @@ x =
 ]]
 {
     [1] = {
-        type = "main",
-        [1]  = 2,
+        type   = "main",
+        start  = 1,
+        finish = 4,
+        [1]    = 2,
     },
     [2] = {
         type   = "setglobal",
@@ -152,8 +162,10 @@ x =
 CHECK'1 == 2'
 {
     [1] = {
-        type = "main",
-        [1]  = 2,
+        type   = "main",
+        start  = 1,
+        finish = 6,
+        [1]    = 2,
     },
     [2] = {
         type   = "binary",
@@ -187,10 +199,12 @@ CHECK'1 == 2'
 CHECK 'local function a'
 {
     [1] = {
+        type   = "main",
+        start  = 1,
+        finish = 16,
         locals = {
             [1] = 2,
         },
-        type   = "main",
         [1]    = 2,
     },
     [2] = {
@@ -213,17 +227,21 @@ CHECK 'local function a'
 CHECK 'local function'
 {
     [1] = {
-        type = "main",
+        type   = "main",
+        start  = 1,
+        finish = 14,
     },
 }
 
 CHECK 'local function a(v'
 {
     [1] = {
+        type   = "main",
+        start  = 1,
+        finish = 18,
         locals = {
             [1] = 2,
         },
-        type   = "main",
         [1]    = 2,
     },
     [2] = {
@@ -265,8 +283,10 @@ CHECK 'local function a(v'
 CHECK 'function a'
 {
     [1] = {
-        type = "main",
-        [1]  = 2,
+        type   = "main",
+        start  = 1,
+        finish = 10,
+        [1]    = 2,
     },
     [2] = {
         type   = "setglobal",
@@ -287,8 +307,10 @@ CHECK 'function a'
 CHECK 'function a:'
 {
     [1] = {
-        type = "main",
-        [1]  = 2,
+        type   = "main",
+        start  = 1,
+        finish = 11,
+        [1]    = 2,
     },
     [2] = {
         type   = "setmethod",
@@ -321,8 +343,10 @@ CHECK 'function a:'
 CHECK 'function a:b(v'
 {
     [1] = {
-        type = "main",
-        [1]  = 2,
+        type   = "main",
+        start  = 1,
+        finish = 14,
+        [1]    = 2,
     },
     [2] = {
         type   = "setmethod",
@@ -382,12 +406,14 @@ CHECK 'function a:b(v'
 CHECK 'return local a'
 {
     [1] = {
-        type = "main",
+        type   = "main",
+        start  = 1,
+        finish = 14,
         locals = {
             [1] = 3,
         },
-        [1]  = 2,
-        [2]  = 3,
+        [1]    = 2,
+        [2]    = 3,
     },
     [2] = {
         type   = "return",
@@ -408,18 +434,22 @@ CHECK 'return local a'
 CHECK 'end'
 {
     [1] = {
-        type = "main",
+        type   = "main",
+        start  = 1,
+        finish = 3,
     },
 }
 
 CHECK 'local x = ,'
 {
     [1] = {
-        type = "main",
+        type   = "main",
+        start  = 1,
+        finish = 11,
         locals = {
             [1] = 2,
         },
-        [1]  = 2,
+        [1]    = 2,
     },
     [2] = {
         type   = "local",
