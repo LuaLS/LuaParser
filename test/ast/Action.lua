@@ -1370,51 +1370,129 @@ end]]
         start  = 1,
         finish = 38,
         parent = 1,
-        args   = 6,
-        locals   = {
-            [1] = 7,
+        args   = 7,
+        locals = {
+            [1] = 6,
             [2] = 8,
             [3] = 9,
+            [4] = 10,
         },
-        [1]    = 10,
+        [1]    = 11,
     },
     [06] = {
+        type   = "local",
+        start  = 0,
+        finish = 0,
+        effect = 14,
+        parent = 5,
+        [1]    = "self",
+    },
+    [07] = {
         type   = "funcargs",
         start  = 15,
         finish = 23,
         parent = 5,
-        [1]    = 7,
-        [2]    = 8,
-        [3]    = 9,
+        [1]    = 8,
+        [2]    = 9,
+        [3]    = 10,
     },
-    [07] = {
+    [08] = {
         type   = "local",
         start  = 16,
         finish = 16,
         effect = 16,
-        parent = 6,
+        parent = 7,
         [1]    = "a",
     },
-    [08] = {
+    [09] = {
         type   = "local",
         start  = 19,
         finish = 19,
         effect = 19,
-        parent = 6,
+        parent = 7,
         [1]    = "b",
     },
-    [09] = {
+    [10] = {
         type   = "local",
         start  = 22,
         finish = 22,
         effect = 22,
-        parent = 6,
+        parent = 7,
         [1]    = "c",
     },
-    [10] = {
+    [11] = {
         type   = "return",
         start  = 29,
         finish = 35,
         parent = 5,
+    },
+}
+CHECK[[
+function m:f()
+    return self
+end]]
+{
+    [1] = {
+        type   = "setmethod",
+        start  = 10,
+        finish = 12,
+        node   = 2,
+        colon  = {
+            type   = ":",
+            start  = 11,
+            finish = 11,
+        },
+        method = 3,
+        value  = 4,
+    },
+    [2] = {
+        type   = "getglobal",
+        start  = 10,
+        finish = 10,
+        parent = 1,
+        [1]    = "m",
+    },
+    [3] = {
+        type   = "method",
+        start  = 12,
+        finish = 12,
+        parent = 1,
+        [1]    = "f",
+    },
+    [4] = {
+        type   = "function",
+        start  = 1,
+        finish = 34,
+        parent = 1,
+        locals = {
+            [1] = 5,
+        },
+        [1]    = 6,
+    },
+    [5] = {
+        type   = "local",
+        start  = 0,
+        finish = 0,
+        effect = 12,
+        parent = 4,
+        ref    = {
+            [1] = 7,
+        },
+        [1]    = "self",
+    },
+    [6] = {
+        type   = "return",
+        start  = 20,
+        finish = 30,
+        parent = 4,
+        [1]    = 7,
+    },
+    [7] = {
+        type   = "getlocal",
+        start  = 27,
+        finish = 30,
+        parent = 6,
+        loc    = 5,
+        [1]    = "self",
     },
 }

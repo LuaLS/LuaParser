@@ -454,6 +454,17 @@ CHECK 'function a:'
         start  = 1,
         finish = 11,
         parent = 3,
+        locals = {
+            [1] = 6,
+        },
+    },
+    [6] = {
+        type   = "local",
+        start  = 0,
+        finish = 0,
+        effect = 11,
+        parent = 5,
+        [1]    = "self",
     },
 }
 
@@ -509,24 +520,33 @@ CHECK 'function a:b(v'
         start  = 1,
         finish = 14,
         parent = 3,
-        args   = 7,
+        args   = 8,
         locals = {
-            [1] = 8,
+            [1] = 7,
+            [2] = 9,
         },
     },
     [7] = {
+        type   = "local",
+        start  = 0,
+        finish = 0,
+        effect = 12,
+        parent = 6,
+        [1]    = "self",
+    },
+    [8] = {
         type   = "funcargs",
         start  = 13,
         finish = 14,
         parent = 6,
-        [1]    = 8,
+        [1]    = 9,
     },
-    [8] = {
+    [9] = {
         type   = "local",
         start  = 14,
         finish = 14,
         effect = 14,
-        parent = 7,
+        parent = 8,
         [1]    = "v",
     },
 }
