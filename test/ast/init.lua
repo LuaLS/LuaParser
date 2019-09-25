@@ -80,22 +80,13 @@ local option = {
 local function autoFix(myAst, targetAst)
     local myBuf = utility.dump(myAst, option)
     local targetBuf = utility.dump(targetAst, option)
-    for i = 2, 10 do
-        local info = debug.getinfo(i, 'S')
-        if not info then
-            return
-        end
-        local filename = info.source:sub(2)
-        local fileBuf = utility.loadFile(filename)
-        if fileBuf then
-            local pos = fileBuf:find(myBuf, 1, true)
-            if pos then
-                local newFileBuf = fileBuf:sub(1, pos-1) .. targetBuf .. fileBuf:suub(pos + #myBuf)
-                utility.saveFile(filename, newFileBuf)
-                return
-            end
-        end
-    end
+    local info = debug.getinfo(3, 'Sl')
+    local filename = info.source:sub(2)
+    local fileBuf = utility.loadFile(filename)
+    local pos = fileBuf:find(targetBuf, 1, true)
+    local newFileBuf = fileBuf:sub(1, pos-1) .. myBuf .. fileBuf:sub(pos + #targetBuf)
+    utility.saveFile(filename, newFileBuf)
+    return
 end
 
 local function test(type)
@@ -110,7 +101,7 @@ local function test(type)
                 utility.saveFile((ROOT / 'test' / 'log' / 'my_ast.ast'):string(), utility.dump(state.root, option))
                 utility.saveFile((ROOT / 'test' / 'log' / 'target_ast.ast'):string(), utility.dump(target_ast, option))
                 autoFix(state.root, target_ast)
-                error(('语法树不相等：%s\n%s'):format(type, buf))
+                --error(('语法树不相等：%s\n%s'):format(type, buf))
             end
         end
     end
