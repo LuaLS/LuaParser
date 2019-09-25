@@ -160,6 +160,7 @@ local vmMap = {
             type   = 'local',
             start  = 0,
             finish = 0,
+            method = id,
             effect = obj.finish,
             [1]    = 'self',
         }

@@ -464,6 +464,7 @@ CHECK 'function a:'
         finish = 0,
         effect = 11,
         parent = 5,
+        method = 3,
         [1]    = "self",
     },
 }
@@ -532,6 +533,7 @@ CHECK 'function a:b(v'
         finish = 0,
         effect = 12,
         parent = 6,
+        method = 3,
         [1]    = "self",
     },
     [8] = {

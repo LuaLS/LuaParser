@@ -1385,6 +1385,7 @@ end]]
         finish = 0,
         effect = 14,
         parent = 5,
+        method = 1,
         [1]    = "self",
     },
     [07] = {
@@ -1475,6 +1476,7 @@ end]]
         finish = 0,
         effect = 12,
         parent = 4,
+        method = 1,
         ref    = {
             [1] = 7,
         },
