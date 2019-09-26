@@ -15,6 +15,9 @@ CHECK'a.'
         finish = 0,
         effect = 0,
         parent = 1,
+        ref    = {
+            [1] = 4,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -34,6 +37,7 @@ CHECK'a.'
         start  = 1,
         finish = 1,
         parent = 3,
+        node   = 2,
         [1]    = "a",
     },
 }
@@ -55,6 +59,9 @@ CHECK'a:'
         finish = 0,
         effect = 0,
         parent = 1,
+        ref    = {
+            [1] = 4,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -74,6 +81,7 @@ CHECK'a:'
         start  = 1,
         finish = 1,
         parent = 3,
+        node   = 2,
         [1]    = "a",
     },
 }
@@ -98,6 +106,9 @@ a
         finish = 0,
         effect = 0,
         parent = 1,
+        ref    = {
+            [1] = 6,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -127,6 +138,7 @@ a
         start  = 9,
         finish = 9,
         parent = 4,
+        node   = 2,
         [1]    = "a",
     },
 }
@@ -151,6 +163,9 @@ a
         finish = 0,
         effect = 0,
         parent = 1,
+        ref    = {
+            [1] = 6,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -180,6 +195,7 @@ a
         start  = 14,
         finish = 14,
         parent = 4,
+        node   = 2,
         [1]    = "a",
     },
 }
@@ -203,6 +219,9 @@ x =
         finish = 0,
         effect = 0,
         parent = 1,
+        ref    = {
+            [1] = 3,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -210,6 +229,7 @@ x =
         start  = 1,
         finish = 1,
         parent = 1,
+        node   = 2,
         [1]    = "x",
     },
 }
@@ -392,6 +412,9 @@ CHECK 'function a'
         finish = 0,
         effect = 0,
         parent = 1,
+        ref    = {
+            [1] = 3,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -399,6 +422,7 @@ CHECK 'function a'
         start  = 10,
         finish = 10,
         parent = 1,
+        node   = 2,
         value  = 4,
         [1]    = "a",
     },
@@ -427,6 +451,9 @@ CHECK 'function a:'
         finish = 0,
         effect = 0,
         parent = 1,
+        ref    = {
+            [1] = 4,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -447,6 +474,7 @@ CHECK 'function a:'
         start  = 10,
         finish = 10,
         parent = 3,
+        node   = 2,
         [1]    = "a",
     },
     [5] = {
@@ -486,6 +514,9 @@ CHECK 'function a:b(v'
         finish = 0,
         effect = 0,
         parent = 1,
+        ref    = {
+            [1] = 4,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -507,6 +538,7 @@ CHECK 'function a:b(v'
         start  = 10,
         finish = 10,
         parent = 3,
+        node   = 2,
         [1]    = "a",
     },
     [5] = {
@@ -658,6 +690,10 @@ CHECK 'local x = (a && b)'
         finish = 0,
         effect = 0,
         parent = 1,
+        ref    = {
+            [1] = 6,
+            [2] = 7,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -694,6 +730,7 @@ CHECK 'local x = (a && b)'
         start  = 12,
         finish = 12,
         parent = 5,
+        node   = 2,
         [1]    = "a",
     },
     [7] = {
@@ -701,6 +738,7 @@ CHECK 'local x = (a && b)'
         start  = 17,
         finish = 17,
         parent = 5,
+        node   = 2,
         [1]    = "b",
     },
 }

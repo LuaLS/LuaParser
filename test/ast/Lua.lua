@@ -55,6 +55,9 @@ CHECK';;;x = 1'
         finish = 0,
         effect = 0,
         parent = 1,
+        ref    = {
+            [1] = 3,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -62,6 +65,7 @@ CHECK';;;x = 1'
         start  = 4,
         finish = 4,
         parent = 1,
+        node   = 2,
         value  = 4,
         [1]    = "x",
     },
@@ -92,6 +96,11 @@ CHECK'x, y, z = 1, 2, 3'
         finish = 0,
         effect = 0,
         parent = 1,
+        ref    = {
+            [1] = 3,
+            [2] = 5,
+            [3] = 7,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -99,6 +108,7 @@ CHECK'x, y, z = 1, 2, 3'
         start  = 1,
         finish = 1,
         parent = 1,
+        node   = 2,
         value  = 4,
         [1]    = "x",
     },
@@ -114,6 +124,7 @@ CHECK'x, y, z = 1, 2, 3'
         start  = 4,
         finish = 4,
         parent = 1,
+        node   = 2,
         value  = 6,
         [1]    = "y",
     },
@@ -129,6 +140,7 @@ CHECK'x, y, z = 1, 2, 3'
         start  = 7,
         finish = 7,
         parent = 1,
+        node   = 2,
         value  = 8,
         [1]    = "z",
     },
@@ -282,6 +294,10 @@ CHECK'local x, y = y, x'
         finish = 0,
         effect = 0,
         parent = 1,
+        ref    = {
+            [1] = 4,
+            [2] = 6,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -298,6 +314,7 @@ CHECK'local x, y = y, x'
         start  = 14,
         finish = 14,
         parent = 3,
+        node   = 2,
         [1]    = "y",
     },
     [5] = {
@@ -314,6 +331,7 @@ CHECK'local x, y = y, x'
         start  = 17,
         finish = 17,
         parent = 5,
+        node   = 2,
         [1]    = "x",
     },
 }
@@ -337,6 +355,9 @@ CHECK'local x, y = f()'
         finish = 0,
         effect = 0,
         parent = 1,
+        ref    = {
+            [1] = 6,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -369,6 +390,7 @@ CHECK'local x, y = f()'
         start  = 14,
         finish = 14,
         parent = 5,
+        node   = 2,
         [1]    = "f",
     },
     [7] = {
@@ -407,6 +429,9 @@ CHECK'local x, y = (f())'
         finish = 0,
         effect = 0,
         parent = 1,
+        ref    = {
+            [1] = 6,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -437,6 +462,7 @@ CHECK'local x, y = (f())'
         start  = 15,
         finish = 15,
         parent = 5,
+        node   = 2,
         [1]    = "f",
     },
     [7] = {
@@ -468,6 +494,9 @@ CHECK'local x, y = f(), nil'
         finish = 0,
         effect = 0,
         parent = 1,
+        ref    = {
+            [1] = 6,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -497,6 +526,7 @@ CHECK'local x, y = f(), nil'
         start  = 14,
         finish = 14,
         parent = 5,
+        node   = 2,
         [1]    = "f",
     },
     [7] = {
@@ -777,6 +807,10 @@ y = 2
         finish = 0,
         effect = 0,
         parent = 1,
+        ref    = {
+            [1] = 3,
+            [2] = 5,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -784,6 +818,7 @@ y = 2
         start  = 1,
         finish = 1,
         parent = 1,
+        node   = 2,
         value  = 4,
         [1]    = "x",
     },
@@ -799,6 +834,7 @@ y = 2
         start  = 7,
         finish = 7,
         parent = 1,
+        node   = 2,
         value  = 6,
         [1]    = "y",
     },
@@ -831,6 +867,10 @@ x, y = 1, 2
         finish = 0,
         effect = 0,
         parent = 1,
+        ref    = {
+            [1] = 3,
+            [2] = 5,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -838,6 +878,7 @@ x, y = 1, 2
         start  = 1,
         finish = 1,
         parent = 1,
+        node   = 2,
         value  = 4,
         [1]    = "x",
     },
@@ -853,6 +894,7 @@ x, y = 1, 2
         start  = 4,
         finish = 4,
         parent = 1,
+        node   = 2,
         value  = 6,
         [1]    = "y",
     },
