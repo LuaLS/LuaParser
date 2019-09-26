@@ -79,7 +79,7 @@ function m.dump(tbl, option)
     lines[#lines+1] = '{'
     local function unpack(tbl, tab)
         if mark[tbl] and mark[tbl] > 0 then
-            lines[#lines+1] = TAB[tab+1] .. '"<Loop>"'
+            lines[#lines+1] = TAB[tab+1] .. (option.loop or '"<Loop>"')
             return
         end
         mark[tbl] = (mark[tbl] or 0) + 1

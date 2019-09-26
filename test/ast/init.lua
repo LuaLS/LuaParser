@@ -2,10 +2,18 @@ local parser = require 'parser'
 local fs = require 'bee.filesystem'
 local utility = require 'utility'
 
+EXISTS = {}
+
 local function eq(a, b)
     local tp1, tp2 = type(a), type(b)
     if tp1 ~= tp2 then
         return false
+    end
+    if a == EXISTS and b ~= nil then
+        return true
+    end
+    if b == EXISTS and a ~= nil then
+        return true
     end
     if tp1 == 'table' then
         local checked = {}
@@ -76,6 +84,7 @@ local option = {
             return a < b
         end)
     end,
+    loop = 'EXISTS',
 }
 
 local function autoFix(myAst, targetAst)
