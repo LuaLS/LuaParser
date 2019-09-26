@@ -97,11 +97,11 @@ local function test(type)
             if not state then
                 error(('语法树生成失败：%s'):format(err))
             end
-            if not eq(state.root, target_ast) then
+            if not eq(state.ast, target_ast) then
                 fs.create_directory(ROOT / 'test' / 'log')
-                utility.saveFile((ROOT / 'test' / 'log' / 'my_ast.ast'):string(), utility.dump(state.root, option))
+                utility.saveFile((ROOT / 'test' / 'log' / 'my_ast.ast'):string(), utility.dump(state.ast, option))
                 utility.saveFile((ROOT / 'test' / 'log' / 'target_ast.ast'):string(), utility.dump(target_ast, option))
-                autoFix(state.root, target_ast)
+                autoFix(state.ast, target_ast)
                 --error(('语法树不相等：%s\n%s'):format(type, buf))
             end
         end

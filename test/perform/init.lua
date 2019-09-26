@@ -80,7 +80,7 @@ local function test(path)
     local passed = os.clock() - clock
 
     local clock = os.clock()
-    local dump = utility.unpack(state.root)
+    local dump = utility.unpack(state.ast)
     utility.pack(dump)
     local unpackPassed = os.clock() - clock
 

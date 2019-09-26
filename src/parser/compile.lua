@@ -3,7 +3,7 @@ local type = type
 
 _ENV = nil
 
-local pushError, Root, Compile, CompileBlock, Cache, Block, GoToTag, Version, ENVMode
+local pushError, Compile, CompileBlock, Cache, Block, GoToTag, Version, ENVMode
 
 --[[
 -- value 类右字面量创建，在set get call中传递
@@ -17,8 +17,7 @@ Value
     func    -> 函数对象
 --]]
 
-local function addValue(objID, value)
-    local obj = Root[objID]
+local function addValue(obj, value)
     local vref = obj.vref
     if not vref then
         vref = {}
@@ -36,22 +35,19 @@ local function addValue(objID, value)
         valueRef = {}
         value.ref = valueRef
     end
-    valueRef[#valueRef+1] = objID
+    valueRef[#valueRef+1] = obj
 end
 
-local function getValue(objID)
-    local obj = Root[objID]
+local function getValue(obj)
     local vref = obj.vref
     if vref then
         return vref
     end
-    addValue(objID, {})
+    addValue(obj, {})
     return obj.vref
 end
 
-local function mergeValue(objID1, objID2)
-    local obj1  = Root[objID1]
-    local obj2  = Root[objID2]
+local function mergeValue(obj1, obj2)
     local vref1 = obj1.vref
     local vref2 = obj2.vref
     if not vref2 then
@@ -73,18 +69,18 @@ local function mergeValue(objID1, objID2)
                 valueRef = {}
                 value.ref = valueRef
             end
-            valueRef[#valueRef+1] = objID1
+            valueRef[#valueRef+1] = obj1
         end
     end
 end
 
-local function setChildValue(objID, keyID, valueID)
-    if not valueID then
+local function setChildValue(obj, key, value)
+    if not value then
         return
     end
-    local objVref   = getValue(objID)
-    local key       = guide.getKeyName(Root[keyID])
-    local valueVref = getValue(valueID)
+    local objVref   = getValue(obj)
+    local key       = guide.getKeyName(key)
+    local valueVref = getValue(value)
     for i = 1, #objVref do
         local value = objVref[i]
         if not value.child then
@@ -94,108 +90,74 @@ local function setChildValue(objID, keyID, valueID)
     end
 end
 
-local function addLocalRef(nodeID, objID)
-    local node = Root[nodeID]
-    local obj  = Root[objID]
+local function addLocalRef(node, obj)
     if not node.ref then
         node.ref = {}
     end
-    node.ref[#node.ref+1] = objID
-    obj.node = nodeID
+    node.ref[#node.ref+1] = obj
+    obj.node = node
 end
 
 local vmMap = {
-    ['nil'] = function (obj)
-        Root[#Root+1] = obj
-        return #Root
-    end,
-    ['boolean'] = function (obj)
-        Root[#Root+1] = obj
-        return #Root
-    end,
-    ['string'] = function (obj)
-        Root[#Root+1] = obj
-        return #Root
-    end,
-    ['number'] = function (obj)
-        Root[#Root+1] = obj
-        return #Root
-    end,
-    ['...'] = function (obj)
-        Root[#Root+1] = obj
-        return #Root
-    end,
     ['getname'] = function (obj)
-        Root[#Root+1] = obj
-        local id = #Root
-        local loc = guide.getLocal(Root, obj, obj[1], obj.start)
+        local loc = guide.getLocal(obj, obj[1], obj.start)
         if loc then
             obj.type = 'getlocal'
-            obj.loc  = Cache[loc]
+            obj.loc  = loc
             if not loc.ref then
                 loc.ref = {}
             end
-            loc.ref[#loc.ref+1] = id
+            loc.ref[#loc.ref+1] = obj
         else
             obj.type = 'getglobal'
             if ENVMode == '_ENV' then
-                local node, nodeID = guide.getLocal(Root, obj, '_ENV', obj.start)
+                local node = guide.getLocal(obj, '_ENV', obj.start)
                 if node then
-                    addLocalRef(nodeID, id)
+                    addLocalRef(node, obj)
                 end
             end
         end
-        return id
+        return obj
     end,
     ['getfield'] = function (obj)
         local node = obj.node
-        Root[#Root+1] = obj
-        local id = #Root
-        obj.node = Compile(node, id)
-        return id
+        obj.node = Compile(node, obj)
+        return obj
     end,
     ['call'] = function (obj)
-        Root[#Root+1] = obj
-        local id = #Root
         local node = obj.node
         local args = obj.args
         if node then
-            obj.node = Compile(node, id)
+            obj.node = Compile(node, obj)
         end
         if args then
-            obj.args = Compile(args, id)
+            obj.args = Compile(args, obj)
         end
-        return id
+        return obj
     end,
     ['callargs'] = function (obj)
-        Root[#Root+1] = obj
-        local id = #Root
         for i = 1, #obj do
             local arg = obj[i]
-            obj[i] = Compile(arg, id)
+            obj[i] = Compile(arg, obj)
         end
-        return id
+        return obj
     end,
     ['binary'] = function (obj)
         local e1 = obj[1]
         local e2 = obj[2]
-        Root[#Root+1] = obj
-        local id = #Root
-        obj[1] = Compile(e1, id)
-        obj[2] = Compile(e2, id)
-        return id
+        obj[1] = Compile(e1, obj)
+        obj[2] = Compile(e2, obj)
+        return obj
     end,
     ['unary'] = function (obj)
         local e = obj[1]
-        Root[#Root+1] = obj
-        local id = #Root
-        obj[1] = Compile(e, id)
-        return id
+        obj[1] = Compile(e, obj)
+        return obj
     end,
     ['varargs'] = function (obj)
-        local func = guide.getParentFunction(Root, obj)
+        local func = guide.getParentFunction(obj)
         if func then
-            local index = guide.getFunctionVarArgs(Root, func)
+            local index = guide.getFunctionVarArgs(func)
             if not index then
                 pushError {
                     type   = 'UNEXPECT_DOTS',
@@ -204,244 +166,199 @@ local vmMap = {
                 }
             end
         end
-        Root[#Root+1] = obj
-        return #Root
+        return obj
     end,
     ['paren'] = function (obj)
         local exp = obj.exp
-        Root[#Root+1] = obj
-        local id = #Root
-        obj.exp = Compile(exp, id)
-        return id
+        obj.exp = Compile(exp, obj)
+        return obj
     end,
     ['getindex'] = function (obj)
-        Root[#Root+1] = obj
-        local id = #Root
         local node = obj.node
-        obj.node = Compile(node, id)
+        obj.node = Compile(node, obj)
         local index = obj.index
         if index then
-            obj.index = Compile(index, id)
+            obj.index = Compile(index, obj)
         end
-        return id
+        return obj
     end,
     ['setindex'] = function (obj)
-        Root[#Root+1] = obj
-        local id = #Root
         local node = obj.node
-        obj.node = Compile(node, id)
+        obj.node = Compile(node, obj)
         local index = obj.index
         if index then
-            obj.index = Compile(index, id)
+            obj.index = Compile(index, obj)
         end
         local value = obj.value
         if value then
-            obj.value = Compile(value, id)
+            obj.value = Compile(value, obj)
         end
-        return id
+        return obj
     end,
     ['getmethod'] = function (obj)
-        Root[#Root+1] = obj
-        local id = #Root
         local node = obj.node
         local method = obj.method
-        obj.node = Compile(node, id)
+        obj.node = Compile(node, obj)
         if method then
-            obj.method = Compile(method, id)
+            obj.method = Compile(method, obj)
         end
-        return id
+        return obj
     end,
     ['setmethod'] = function (obj)
-        Root[#Root+1] = obj
-        local id = #Root
         local node = obj.node
         local method = obj.method
         local value = obj.value
-        obj.node = Compile(node, id)
+        obj.node = Compile(node, obj)
         if method then
-            obj.method = Compile(method, id)
+            obj.method = Compile(method, obj)
         end
         value.localself = {
             type   = 'local',
             start  = 0,
             finish = 0,
-            method = id,
+            method = obj,
             effect = obj.finish,
             [1]    = 'self',
         }
-        obj.value = Compile(value, id)
-        return id
-    end,
-    ['method'] = function (obj)
-        Root[#Root+1] = obj
-        return #Root
+        obj.value = Compile(value, obj)
+        return obj
     end,
     ['function'] = function (obj)
         local lastBlock = Block
         Block = obj
-        Root[#Root+1] = obj
-        local id = #Root
         if obj.localself then
-            Compile(obj.localself, id)
+            Compile(obj.localself, obj)
             obj.localself = nil
         end
         local args = obj.args
         if args then
-            obj.args = Compile(args, id)
+            obj.args = Compile(args, obj)
         end
         for i = 1, #obj do
             local act = obj[i]
-            obj[i] = Compile(act, id)
+            obj[i] = Compile(act, obj)
         end
         Block = lastBlock
-        return id
+        return obj
     end,
     ['funcargs'] = function (obj)
-        Root[#Root+1] = obj
-        local id = #Root
         for i = 1, #obj do
             local arg = obj[i]
-            obj[i] = Compile(arg, id)
+            obj[i] = Compile(arg, obj)
         end
-        return id
+        return obj
     end,
     ['table'] = function (obj)
-        Root[#Root+1] = obj
-        local id = #Root
         for i = 1, #obj do
             local v = obj[i]
-            obj[i] = Compile(v, id)
+            obj[i] = Compile(v, obj)
         end
-        return id
+        return obj
     end,
     ['tablefield'] = function (obj)
-        Root[#Root+1] = obj
-        local id = #Root
         local value = obj.value
         if value then
-            obj.value = Compile(value, id)
+            obj.value = Compile(value, obj)
         end
-        return id
+        return obj
     end,
     ['tableindex'] = function (obj)
-        Root[#Root+1] = obj
-        local id = #Root
         local index = obj.index
         local value = obj.value
-        obj.index = Compile(index, id)
-        obj.value = Compile(value, id)
-        return id
+        obj.index = Compile(index, obj)
+        obj.value = Compile(value, obj)
+        return obj
     end,
     ['index'] = function (obj)
-        Root[#Root+1] = obj
-        local id = #Root
         local index = obj.index
-        obj.index = Compile(index, id)
-        return id
+        obj.index = Compile(index, obj)
+        return obj
     end,
     ['select'] = function (obj)
-        Root[#Root+1] = obj
-        local id = #Root
         local vararg = obj.vararg
         if not Cache[vararg] then
-            obj.vararg = Compile(vararg, id)
+            obj.vararg = Compile(vararg, obj)
             Cache[vararg] = obj.vararg
         else
             obj.vararg = Cache[vararg]
             if not vararg.extParent then
                 vararg.extParent = {}
             end
-            vararg.extParent[#vararg.extParent+1] = id
+            vararg.extParent[#vararg.extParent+1] = obj
         end
-        return id
+        return obj
     end,
     ['setname'] = function (obj)
-        Root[#Root+1] = obj
-        local id = #Root
         local value = obj.value
         if value then
-            obj.value = Compile(value, id)
+            obj.value = Compile(value, obj)
         end
-        local loc = guide.getLocal(Root, obj, obj[1], obj.start)
+        local loc = guide.getLocal(obj, obj[1], obj.start)
         if loc then
             obj.type = 'setlocal'
-            obj.loc  = Cache[loc]
+            obj.loc  = loc
             if not loc.ref then
                 loc.ref = {}
             end
-            loc.ref[#loc.ref+1] = id
+            loc.ref[#loc.ref+1] = obj
         else
             obj.type = 'setglobal'
             if ENVMode == '_ENV' then
-                local node, nodeID = guide.getLocal(Root, obj, '_ENV', obj.start)
+                local node = guide.getLocal(obj, '_ENV', obj.start)
                 if node then
-                    addLocalRef(nodeID, id)
-                    setChildValue(nodeID, id, obj.value)
+                    addLocalRef(node, obj)
+                    setChildValue(node, obj, obj.value)
                 end
             end
         end
-        return id
+        return obj
     end,
     ['local'] = function (obj)
-        Root[#Root+1] = obj
-        local id = #Root
         local attrs = obj.attrs
         if attrs then
             for i = 1, #attrs do
                 local attr = attrs[i]
-                attrs[i] = Compile(attr, id)
+                attrs[i] = Compile(attr, obj)
             end
         end
         if Block then
             if not Block.locals then
                 Block.locals = {}
             end
-            Block.locals[#Block.locals+1] = id
+            Block.locals[#Block.locals+1] = obj
         end
         if obj.localfunction then
             obj.localfunction = nil
-            Cache[obj] = id
             local value = obj.value
             if value then
-                obj.value = Compile(value, id)
+                obj.value = Compile(value, obj)
             end
         else
             local value = obj.value
             if value then
-                obj.value = Compile(value, id)
+                obj.value = Compile(value, obj)
             end
-            Cache[obj] = id
         end
-        return id
-    end,
-    ['localattr'] = function (obj)
-        Root[#Root+1] = obj
-        return #Root
+        return obj
     end,
     ['setfield'] = function (obj)
-        Root[#Root+1] = obj
-        local id = #Root
         local node  = obj.node
         local value = obj.value
-        obj.node  = Compile(node, id)
-        obj.value = Compile(value, id)
-        return id
+        obj.node  = Compile(node, obj)
+        obj.value = Compile(value, obj)
+        return obj
     end,
     ['do'] = function (obj)
         local lastBlock = Block
         Block = obj
-        Root[#Root+1] = obj
-        local id = #Root
-        CompileBlock(obj, id)
+        CompileBlock(obj, obj)
         Block = lastBlock
-        return id
+        return obj
     end,
     ['return'] = function (obj)
-        Root[#Root+1] = obj
-        local id = #Root
         for i = 1, #obj do
             local act = obj[i]
-            obj[i] = Compile(act, id)
+            obj[i] = Compile(act, obj)
         end
         if Block and Block[#Block] ~= obj then
             pushError {
@@ -450,18 +367,16 @@ local vmMap = {
                 finish = obj.finish,
             }
         end
-        return id
+        return obj
     end,
     ['label'] = function (obj)
-        Root[#Root+1] = obj
-        local id = #Root
-        local block = guide.getBlock(Root, obj)
+        local block = guide.getBlock(obj)
         if block then
             if not block.labels then
                 block.labels = {}
             end
             local name = obj[1]
-            local label = guide.getLabel(Root, block, name)
+            local label = guide.getLabel(block, name)
             if label then
                 pushError {
                     type   = 'REDEFINED_LABEL',
@@ -475,130 +390,109 @@ local vmMap = {
                     }
                 }
             end
-            block.labels[name] = id
+            block.labels[name] = obj
         end
-        return id
+        return obj
     end,
     ['goto'] = function (obj)
-        Root[#Root+1] = obj
-        local id = #Root
         GoToTag[#GoToTag+1] = obj
-        return id
+        return obj
     end,
     ['if'] = function (obj)
-        Root[#Root+1] = obj
-        local id = #Root
         for i = 1, #obj do
             local block = obj[i]
-            obj[i] = Compile(block, id)
+            obj[i] = Compile(block, obj)
         end
-        return id
+        return obj
     end,
     ['ifblock'] = function (obj)
         local lastBlock = Block
         Block = obj
-        Root[#Root+1] = obj
-        local id = #Root
         local filter = obj.filter
-        obj.filter = Compile(filter, id)
-        CompileBlock(obj, id)
+        obj.filter = Compile(filter, obj)
+        CompileBlock(obj, obj)
         Block = lastBlock
-        return id
+        return obj
     end,
     ['elseifblock'] = function (obj)
         local lastBlock = Block
         Block = obj
-        Root[#Root+1] = obj
-        local id = #Root
         local filter = obj.filter
         if filter then
-            obj.filter = Compile(filter, id)
+            obj.filter = Compile(filter, obj)
         end
-        CompileBlock(obj, id)
+        CompileBlock(obj, obj)
         Block = lastBlock
-        return id
+        return obj
     end,
     ['elseblock'] = function (obj)
         local lastBlock = Block
         Block = obj
-        Root[#Root+1] = obj
-        local id = #Root
-        CompileBlock(obj, id)
+        CompileBlock(obj, obj)
         Block = lastBlock
-        return id
+        return obj
     end,
     ['loop'] = function (obj)
         local lastBlock = Block
         Block = obj
-        Root[#Root+1] = obj
-        local id = #Root
         local loc = obj.loc
         local max = obj.max
         local step = obj.step
         if loc then
-            obj.loc = Compile(loc, id)
+            obj.loc = Compile(loc, obj)
         end
         if max then
-            obj.max = Compile(max, id)
+            obj.max = Compile(max, obj)
         end
         if step then
-            obj.step = Compile(step, id)
+            obj.step = Compile(step, obj)
         end
-        CompileBlock(obj, id)
+        CompileBlock(obj, obj)
         Block = lastBlock
-        return id
+        return obj
     end,
     ['in'] = function (obj)
         local lastBlock = Block
         Block = obj
-        Root[#Root+1] = obj
-        local id = #Root
         local keys = obj.keys
         for i = 1, #keys do
             local loc = keys[i]
-            keys[i] = Compile(loc, id)
+            keys[i] = Compile(loc, obj)
         end
-        CompileBlock(obj, id)
+        CompileBlock(obj, obj)
         Block = lastBlock
-        return id
+        return obj
     end,
     ['while'] = function (obj)
         local lastBlock = Block
         Block = obj
-        Root[#Root+1] = obj
-        local id = #Root
         local filter = obj.filter
-        obj.filter = Compile(filter, id)
-        CompileBlock(obj, id)
+        obj.filter = Compile(filter, obj)
+        CompileBlock(obj, obj)
         Block = lastBlock
-        return id
+        return obj
     end,
     ['repeat'] = function (obj)
         local lastBlock = Block
         Block = obj
-        Root[#Root+1] = obj
-        local id = #Root
-        CompileBlock(obj, id)
+        CompileBlock(obj, obj)
         local filter = obj.filter
-        obj.filter = Compile(filter, id)
+        obj.filter = Compile(filter, obj)
         Block = lastBlock
-        return id
+        return obj
     end,
     ['break'] = function (obj)
-        if not guide.getBreakBlock(Root, obj) then
+        if not guide.getBreakBlock(obj) then
             pushError {
                 type   = 'BREAK_OUTSIDE',
                 start  = obj.start,
                 finish = obj.finish,
             }
         end
-        Root[#Root+1] = obj
-        return #Root
+        return obj
     end,
     ['main'] = function (obj)
         Block = obj
-        Root[#Root+1] = obj
-        local id = #Root
         if ENVMode == '_ENV' then
             local envID = Compile({
                 type   = 'local',
@@ -606,15 +500,15 @@ local vmMap = {
                 finish = 0,
                 effect = 0,
                 [1]    = '_ENV',
-            }, id)
+            }, obj)
             addValue(envID, {
                 type = 'table',
                 tag  = '_ENV',
             })
         end
-        CompileBlock(obj, id)
+        CompileBlock(obj, obj)
         Block = nil
-        return id
+        return obj
     end,
 }
 
@@ -635,7 +529,7 @@ function Compile(obj, parent)
     end
     local f = vmMap[obj.type]
     if not f then
-        return nil
+        return obj
     end
     obj.parent = parent
     return f(obj)
@@ -643,7 +537,7 @@ end
 
 local function compileGoTo(obj)
     local name = obj[1]
-    local label = guide.getLabel(Root, obj, name)
+    local label = guide.getLabel(obj, name)
     if not label then
         pushError {
             type   = 'NO_VISIBLE_LABEL',
@@ -663,14 +557,14 @@ local function compileGoTo(obj)
         return
     end
 
-    local block = guide.getBlock(Root, obj)
+    local block = guide.getBlock(obj)
     local locals = block and block.locals
     if not locals then
         return
     end
 
     for i = 1, #locals do
-        local loc = Root[locals[i]]
+        local loc = locals[i]
         -- 检查局部变量声明位置为 goto 与 label 之间
         if loc.start < obj.start or loc.finish > label.finish then
             goto CONTINUE
@@ -681,7 +575,7 @@ local function compileGoTo(obj)
             goto CONTINUE
         end
         for j = 1, #refs do
-            local ref = Root[refs[j]]
+            local ref = refs[j]
             if ref.finish > label.finish then
                 pushError {
                     type   = 'JUMP_LOCAL_SCOPE',
@@ -720,7 +614,6 @@ return function (self, lua, mode, version)
         return nil, err
     end
     pushError = state.pushError
-    Root = state.root
     Version = version
     if version == 'Lua 5.1' or version == 'LuaJIT' then
         ENVMode = 'fenv'
@@ -733,7 +626,6 @@ return function (self, lua, mode, version)
         Compile(state.ast)
     end
     PostCompile()
-    state.ast = nil
     Cache = nil
     return state
 end
