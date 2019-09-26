@@ -14,6 +14,7 @@ CHECK'a.'
         start  = 0,
         finish = 0,
         effect = 0,
+        tag    = "_ENV",
         parent = 1,
         ref    = {
             [1] = 4,
@@ -58,6 +59,7 @@ CHECK'a:'
         start  = 0,
         finish = 0,
         effect = 0,
+        tag    = "_ENV",
         parent = 1,
         ref    = {
             [1] = 4,
@@ -105,6 +107,7 @@ a
         start  = 0,
         finish = 0,
         effect = 0,
+        tag    = "_ENV",
         parent = 1,
         ref    = {
             [1] = 6,
@@ -162,6 +165,7 @@ a
         start  = 0,
         finish = 0,
         effect = 0,
+        tag    = "_ENV",
         parent = 1,
         ref    = {
             [1] = 6,
@@ -218,6 +222,7 @@ x =
         start  = 0,
         finish = 0,
         effect = 0,
+        tag    = "_ENV",
         parent = 1,
         ref    = {
             [1] = 3,
@@ -250,6 +255,7 @@ CHECK'1 == 2'
         start  = 0,
         finish = 0,
         effect = 0,
+        tag    = "_ENV",
         parent = 1,
         [1]    = "_ENV",
     },
@@ -299,6 +305,7 @@ CHECK 'local function a'
         start  = 0,
         finish = 0,
         effect = 0,
+        tag    = "_ENV",
         parent = 1,
         [1]    = "_ENV",
     },
@@ -334,6 +341,7 @@ CHECK 'local function'
         start  = 0,
         finish = 0,
         effect = 0,
+        tag    = "_ENV",
         parent = 1,
         [1]    = "_ENV",
     },
@@ -356,6 +364,7 @@ CHECK 'local function a(v'
         start  = 0,
         finish = 0,
         effect = 0,
+        tag    = "_ENV",
         parent = 1,
         [1]    = "_ENV",
     },
@@ -411,6 +420,7 @@ CHECK 'function a'
         start  = 0,
         finish = 0,
         effect = 0,
+        tag    = "_ENV",
         parent = 1,
         ref    = {
             [1] = 3,
@@ -450,6 +460,7 @@ CHECK 'function a:'
         start  = 0,
         finish = 0,
         effect = 0,
+        tag    = "_ENV",
         parent = 1,
         ref    = {
             [1] = 4,
@@ -513,6 +524,7 @@ CHECK 'function a:b(v'
         start  = 0,
         finish = 0,
         effect = 0,
+        tag    = "_ENV",
         parent = 1,
         ref    = {
             [1] = 4,
@@ -603,6 +615,7 @@ CHECK 'return local a'
         start  = 0,
         finish = 0,
         effect = 0,
+        tag    = "_ENV",
         parent = 1,
         [1]    = "_ENV",
     },
@@ -637,6 +650,7 @@ CHECK 'end'
         start  = 0,
         finish = 0,
         effect = 0,
+        tag    = "_ENV",
         parent = 1,
         [1]    = "_ENV",
     },
@@ -659,6 +673,7 @@ CHECK 'local x = ,'
         start  = 0,
         finish = 0,
         effect = 0,
+        tag    = "_ENV",
         parent = 1,
         [1]    = "_ENV",
     },
@@ -689,6 +704,7 @@ CHECK 'local x = (a && b)'
         start  = 0,
         finish = 0,
         effect = 0,
+        tag    = "_ENV",
         parent = 1,
         ref    = {
             [1] = 6,

@@ -30,6 +30,7 @@ end
 
 local sortList = {
     'type', 'start', 'finish', 'effect',
+    'tag',
     'parent', 'extParent', 'child',
     'filter',
     'node',

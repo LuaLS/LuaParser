@@ -513,6 +513,7 @@ local vmMap = {
                 start  = 0,
                 finish = 0,
                 effect = 0,
+                tag    = '_ENV',
                 [1]    = '_ENV',
             }, id)
         end
