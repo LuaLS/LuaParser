@@ -287,4 +287,12 @@ function m.lineRange(lines, row)
     return line.start + 1, line.finish
 end
 
+function m.getKeyName(obj)
+    if obj.type == 'getglobal' or obj.type == 'setglobal' then
+        return 'string|' .. obj[1]
+    elseif obj.type == 'getfield' or obj.type == 'getglobal' then
+        return 'string|' .. obj[1]
+    end
+end
+
 return m

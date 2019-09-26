@@ -37,14 +37,16 @@ local function performTest()
     end
     local clock = os.clock()
     for path, buf in pairs(files) do
-        local suc, err = parser:parse(buf, 'lua', 'Lua 5.4')
-        if not suc then
+        local state, err = parser:compile(buf, 'lua', 'Lua 5.4')
+        if not state then
             error(('文件解析失败：%s'):format(path:string()))
         end
         local lines, err = parser:lines(buf)
-        if not suc then
+        if not lines then
             error(('行号解析失败：%s'):format(path:string()))
         end
+        local dump = utility.unpack(state.root)
+        utility.pack(dump)
     end
     local passed = os.clock() - clock
     print(('综合性能测试完成，总大小[%.3f]kb，速度[%.3f]mb/s，用时[%.3f]秒'):format(size / 1000, size / passed / 1000 / 1000, passed))
@@ -56,10 +58,11 @@ local function test(path)
         return
     end
     local testTimes = 10
+    local state, err
     local clock = os.clock()
     for i = 1, testTimes do
-        local suc, err = parser:compile(buf, 'lua', 'Lua 5.4')
-        if not suc then
+        state, err = parser:compile(buf, 'lua', 'Lua 5.4')
+        if not state then
             error(('文件解析失败：%s'):format(path:string()))
         end
         if os.clock() - clock > 1.0 then
@@ -68,8 +71,12 @@ local function test(path)
         end
     end
     local passed = os.clock() - clock
+    local clock = os.clock()
+    local dump = utility.unpack(state.root)
+    utility.pack(dump)
+    local unpackPassed = os.clock() - clock
     local size = #buf * testTimes
-    print(('[%s]测试完成，大小[%.3f]kb，速度[%.3f]mb/s，用时[%.3f]秒'):format(path, size / 1000, size / passed / 1000 / 1000, passed))
+    print(('[%s]测试完成，大小[%.3f]kb，速度[%.3f]mb/s，平均用时[%.3f]毫秒，序列化用时[%.f]毫秒'):format(path, size / 1000, size / passed / 1000 / 1000, passed / testTimes * 1000, unpackPassed * 1000))
 end
 
 collectgarbage 'stop'

@@ -333,4 +333,55 @@ function m.deepCopy(source, target)
     return copy(source, target)
 end
 
+--- 序列化
+function m.unpack(t)
+    local result = {}
+    local tid = 0
+    local cache = {}
+    local function unpack(o)
+        local id = cache[o]
+        if not id then
+            tid = tid + 1
+            id = tid
+            cache[o] = tid
+            if type(o) == 'table' then
+                local new = {}
+                result[tid] = new
+                for k, v in next, o do
+                    new[unpack(k)] = unpack(v)
+                end
+            else
+                result[id] = o
+            end
+        end
+        return id
+    end
+    unpack(t)
+    return result
+end
+
+--- 反序列化
+function m.pack(t)
+    local cache = {}
+    local function pack(id)
+        local o = cache[id]
+        if o then
+            return o
+        end
+        o = t[id]
+        if type(o) == 'table' then
+            local new = {}
+            cache[id] = new
+            for k, v in next, o do
+                new[pack(k)] = pack(v)
+            end
+            return new
+        else
+            cache[id] = o
+            return o
+        end
+    end
+    return pack(1)
+end
+
 return m

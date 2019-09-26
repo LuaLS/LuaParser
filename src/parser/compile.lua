@@ -77,21 +77,12 @@ local function mergeValue(objID1, objID2)
     end
 end
 
-local function getKey(objID)
-    local obj = Root[objID]
-    if obj.type == 'getglobal' or obj.type == 'setglobal' then
-        return 'string|' .. obj[1]
-    elseif obj.type == 'getfield' or obj.type == 'getglobal' then
-        return 'string|' .. obj[1]
-    end
-end
-
 local function setChildValue(objID, keyID, valueID)
     if not valueID then
         return
     end
     local objVref   = getValue(objID)
-    local key       = getKey(keyID)
+    local key       = guide.getKeyName(Root[keyID])
     local valueVref = getValue(valueID)
     for i = 1, #objVref do
         local value = Value[objVref[i]]
