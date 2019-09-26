@@ -3,7 +3,41 @@ local type = type
 
 _ENV = nil
 
-local pushError, Root, Compile, CompileBlock, Cache, Block, GoToTag, Version, ENVMode
+local pushError, Root, Compile, CompileBlock, Cache, Block, GoToTag, Version, ENVMode, Value
+
+--[[
+Value
+    type    -> 确定类型
+    literal -> 字面量
+    tag     -> 特殊标记
+    ref     -> 值的引用者
+    source  -> 值的创建者
+--]]
+
+local function createValue(data)
+    local id = #Value+1
+    Value[id] = data
+    data.ref = {}
+    return id
+end
+
+local function addValue(objID, valueID)
+    local obj = Root[objID]
+    local vref = obj.vref
+    if not vref then
+        vref = {}
+        obj.vref = vref
+        Cache[vref] = {}
+    end
+    local cache = Cache[vref]
+    if cache[valueID] then
+        return
+    end
+    cache[valueID] = true
+    vref[#vref+1] = valueID
+    local valueRef = Value[valueID].ref
+    valueRef[#valueRef+1] = objID
+end
 
 local vmMap = {
     ['nil'] = function (obj)
@@ -508,14 +542,17 @@ local vmMap = {
         Root[#Root+1] = obj
         local id = #Root
         if ENVMode == '_ENV' then
-            Compile({
+            local envID = Compile({
                 type   = 'local',
                 start  = 0,
                 finish = 0,
                 effect = 0,
-                tag    = '_ENV',
                 [1]    = '_ENV',
             }, id)
+            addValue(envID, createValue {
+                type = 'table',
+                tag  = '_ENV',
+            })
         end
         CompileBlock(obj, id)
         Block = nil
@@ -634,11 +671,14 @@ return function (self, lua, mode, version)
     end
     Cache = {}
     GoToTag = {}
+    Value = {}
     if type(state.ast) == 'table' then
         Compile(state.ast)
     end
     PostCompile()
     state.ast = nil
+    state.value = Value
     Cache = nil
+    Value = nil
     return state
 end

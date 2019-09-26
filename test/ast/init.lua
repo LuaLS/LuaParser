@@ -39,7 +39,7 @@ local sortList = {
     'dot', 'colon',
     'vararg',
     'field', 'index', 'method',
-    'exp', 'value',
+    'exp', 'value', 'vref',
     'attrs',
     'locals', 'ref',
 }

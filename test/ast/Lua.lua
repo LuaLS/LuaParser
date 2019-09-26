@@ -13,8 +13,10 @@ CHECK''
         start  = 0,
         finish = 0,
         effect = 0,
-        tag    = "_ENV",
         parent = 1,
+        vref   = {
+            [1] = 1,
+        },
         [1]    = "_ENV",
     },
 }
@@ -34,8 +36,10 @@ CHECK';;;'
         start  = 0,
         finish = 0,
         effect = 0,
-        tag    = "_ENV",
         parent = 1,
+        vref   = {
+            [1] = 1,
+        },
         [1]    = "_ENV",
     },
 }
@@ -56,8 +60,10 @@ CHECK';;;x = 1'
         start  = 0,
         finish = 0,
         effect = 0,
-        tag    = "_ENV",
         parent = 1,
+        vref   = {
+            [1] = 1,
+        },
         ref    = {
             [1] = 3,
         },
@@ -98,8 +104,10 @@ CHECK'x, y, z = 1, 2, 3'
         start  = 0,
         finish = 0,
         effect = 0,
-        tag    = "_ENV",
         parent = 1,
+        vref   = {
+            [1] = 1,
+        },
         ref    = {
             [1] = 3,
             [2] = 5,
@@ -177,8 +185,10 @@ CHECK'local x, y, z'
         start  = 0,
         finish = 0,
         effect = 0,
-        tag    = "_ENV",
         parent = 1,
+        vref   = {
+            [1] = 1,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -227,8 +237,10 @@ CHECK'local x, y, z = 1, 2, 3'
         start  = 0,
         finish = 0,
         effect = 0,
-        tag    = "_ENV",
         parent = 1,
+        vref   = {
+            [1] = 1,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -299,8 +311,10 @@ CHECK'local x, y = y, x'
         start  = 0,
         finish = 0,
         effect = 0,
-        tag    = "_ENV",
         parent = 1,
+        vref   = {
+            [1] = 1,
+        },
         ref    = {
             [1] = 4,
             [2] = 6,
@@ -361,8 +375,10 @@ CHECK'local x, y = f()'
         start  = 0,
         finish = 0,
         effect = 0,
-        tag    = "_ENV",
         parent = 1,
+        vref   = {
+            [1] = 1,
+        },
         ref    = {
             [1] = 6,
         },
@@ -436,8 +452,10 @@ CHECK'local x, y = (f())'
         start  = 0,
         finish = 0,
         effect = 0,
-        tag    = "_ENV",
         parent = 1,
+        vref   = {
+            [1] = 1,
+        },
         ref    = {
             [1] = 6,
         },
@@ -502,8 +520,10 @@ CHECK'local x, y = f(), nil'
         start  = 0,
         finish = 0,
         effect = 0,
-        tag    = "_ENV",
         parent = 1,
+        vref   = {
+            [1] = 1,
+        },
         ref    = {
             [1] = 6,
         },
@@ -574,8 +594,10 @@ CHECK'local x, y = ...'
         start  = 0,
         finish = 0,
         effect = 0,
-        tag    = "_ENV",
         parent = 1,
+        vref   = {
+            [1] = 1,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -637,8 +659,10 @@ CHECK'local x, y = (...)'
         start  = 0,
         finish = 0,
         effect = 0,
-        tag    = "_ENV",
         parent = 1,
+        vref   = {
+            [1] = 1,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -691,8 +715,10 @@ CHECK'local x, y = ..., nil'
         start  = 0,
         finish = 0,
         effect = 0,
-        tag    = "_ENV",
         parent = 1,
+        vref   = {
+            [1] = 1,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -751,8 +777,10 @@ CHECK'local x <const>, y <close> = 1'
         start  = 0,
         finish = 0,
         effect = 0,
-        tag    = "_ENV",
         parent = 1,
+        vref   = {
+            [1] = 1,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -820,8 +848,10 @@ y = 2
         start  = 0,
         finish = 0,
         effect = 0,
-        tag    = "_ENV",
         parent = 1,
+        vref   = {
+            [1] = 1,
+        },
         ref    = {
             [1] = 3,
             [2] = 5,
@@ -881,8 +911,10 @@ x, y = 1, 2
         start  = 0,
         finish = 0,
         effect = 0,
-        tag    = "_ENV",
         parent = 1,
+        vref   = {
+            [1] = 1,
+        },
         ref    = {
             [1] = 3,
             [2] = 5,
@@ -942,8 +974,10 @@ end]]
         start  = 0,
         finish = 0,
         effect = 0,
-        tag    = "_ENV",
         parent = 1,
+        vref   = {
+            [1] = 1,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -989,8 +1023,10 @@ end]]
         start  = 0,
         finish = 0,
         effect = 0,
-        tag    = "_ENV",
         parent = 1,
+        vref   = {
+            [1] = 1,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -1055,8 +1091,10 @@ end]]
         start  = 0,
         finish = 0,
         effect = 0,
-        tag    = "_ENV",
         parent = 1,
+        vref   = {
+            [1] = 1,
+        },
         [1]    = "_ENV",
     },
     [3] = {
@@ -1142,8 +1180,10 @@ y, z = 3, 4
         start  = 0,
         finish = 0,
         effect = 0,
-        tag    = "_ENV",
         parent = 1,
+        vref   = {
+            [1] = 1,
+        },
         [1]    = "_ENV",
     },
     [03] = {
