@@ -49,11 +49,11 @@ local function performTest()
         if not lines then
             error(('行号解析失败：%s'):format(path:string()))
         end
-        local dump = utility.unpack(state.root)
-        utility.pack(dump)
+        --local dump = utility.unpack(state.root)
+        --utility.pack(dump)
 
-        ch:push(dump)
-        ch:pop()
+        --ch:push(dump)
+        --ch:pop()
     end
     local passed = os.clock() - clock
     print(('综合性能测试完成，总大小[%.3f]kb，速度[%.3f]mb/s，用时[%.3f]秒'):format(size / 1000, size / passed / 1000 / 1000, passed))

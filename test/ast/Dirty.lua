@@ -16,7 +16,13 @@ CHECK'a.'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         ref    = {
             [1] = 4,
@@ -63,7 +69,13 @@ CHECK'a:'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         ref    = {
             [1] = 4,
@@ -113,7 +125,13 @@ a
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         ref    = {
             [1] = 6,
@@ -173,7 +191,13 @@ a
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         ref    = {
             [1] = 6,
@@ -232,7 +256,13 @@ x =
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         ref    = {
             [1] = 3,
@@ -267,7 +297,13 @@ CHECK'1 == 2'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         [1]    = "_ENV",
     },
@@ -319,7 +355,13 @@ CHECK 'local function a'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         [1]    = "_ENV",
     },
@@ -357,7 +399,13 @@ CHECK 'local function'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         [1]    = "_ENV",
     },
@@ -382,7 +430,13 @@ CHECK 'local function a(v'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         [1]    = "_ENV",
     },
@@ -440,7 +494,22 @@ CHECK 'function a'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type  = "table",
+                tag   = "_ENV",
+                child = {
+                    ["string|a"] = {
+                        [1] = {
+                            ref = {
+                                [1] = 4,
+                            },
+                        },
+                    },
+                },
+                ref   = {
+                    [1] = 2,
+                },
+            },
         },
         ref    = {
             [1] = 3,
@@ -462,7 +531,11 @@ CHECK 'function a'
         finish = 10,
         parent = 3,
         vref   = {
-            [1] = 2,
+            [1] = {
+                ref = {
+                    [1] = 4,
+                },
+            },
         },
     },
 }
@@ -485,7 +558,13 @@ CHECK 'function a:'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         ref    = {
             [1] = 4,
@@ -551,7 +630,13 @@ CHECK 'function a:b(v'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         ref    = {
             [1] = 4,
@@ -644,7 +729,13 @@ CHECK 'return local a'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         [1]    = "_ENV",
     },
@@ -681,7 +772,13 @@ CHECK 'end'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         [1]    = "_ENV",
     },
@@ -706,7 +803,13 @@ CHECK 'local x = ,'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         [1]    = "_ENV",
     },
@@ -739,7 +842,13 @@ CHECK 'local x = (a && b)'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         ref    = {
             [1] = 6,

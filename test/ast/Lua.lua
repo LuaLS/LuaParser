@@ -15,7 +15,13 @@ CHECK''
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         [1]    = "_ENV",
     },
@@ -38,7 +44,13 @@ CHECK';;;'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         [1]    = "_ENV",
     },
@@ -62,7 +74,22 @@ CHECK';;;x = 1'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type  = "table",
+                tag   = "_ENV",
+                child = {
+                    ["string|x"] = {
+                        [1] = {
+                            ref = {
+                                [1] = 4,
+                            },
+                        },
+                    },
+                },
+                ref   = {
+                    [1] = 2,
+                },
+            },
         },
         ref    = {
             [1] = 3,
@@ -84,7 +111,11 @@ CHECK';;;x = 1'
         finish = 8,
         parent = 3,
         vref   = {
-            [1] = 2,
+            [1] = {
+                ref = {
+                    [1] = 4,
+                },
+            },
         },
         [1]    = 1,
     },
@@ -109,7 +140,36 @@ CHECK'x, y, z = 1, 2, 3'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type  = "table",
+                tag   = "_ENV",
+                child = {
+                    ["string|x"] = {
+                        [1] = {
+                            ref = {
+                                [1] = 4,
+                            },
+                        },
+                    },
+                    ["string|y"] = {
+                        [1] = {
+                            ref = {
+                                [1] = 6,
+                            },
+                        },
+                    },
+                    ["string|z"] = {
+                        [1] = {
+                            ref = {
+                                [1] = 8,
+                            },
+                        },
+                    },
+                },
+                ref   = {
+                    [1] = 2,
+                },
+            },
         },
         ref    = {
             [1] = 3,
@@ -133,7 +193,11 @@ CHECK'x, y, z = 1, 2, 3'
         finish = 11,
         parent = 3,
         vref   = {
-            [1] = 2,
+            [1] = {
+                ref = {
+                    [1] = 4,
+                },
+            },
         },
         [1]    = 1,
     },
@@ -152,7 +216,11 @@ CHECK'x, y, z = 1, 2, 3'
         finish = 14,
         parent = 5,
         vref   = {
-            [1] = 3,
+            [1] = {
+                ref = {
+                    [1] = 6,
+                },
+            },
         },
         [1]    = 2,
     },
@@ -171,7 +239,11 @@ CHECK'x, y, z = 1, 2, 3'
         finish = 17,
         parent = 7,
         vref   = {
-            [1] = 4,
+            [1] = {
+                ref = {
+                    [1] = 8,
+                },
+            },
         },
         [1]    = 3,
     },
@@ -199,7 +271,13 @@ CHECK'local x, y, z'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         [1]    = "_ENV",
     },
@@ -251,7 +329,13 @@ CHECK'local x, y, z = 1, 2, 3'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         [1]    = "_ENV",
     },
@@ -325,7 +409,13 @@ CHECK'local x, y = y, x'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         ref    = {
             [1] = 4,
@@ -389,7 +479,13 @@ CHECK'local x, y = f()'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         ref    = {
             [1] = 6,
@@ -466,7 +562,13 @@ CHECK'local x, y = (f())'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         ref    = {
             [1] = 6,
@@ -534,7 +636,13 @@ CHECK'local x, y = f(), nil'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         ref    = {
             [1] = 6,
@@ -608,7 +716,13 @@ CHECK'local x, y = ...'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         [1]    = "_ENV",
     },
@@ -673,7 +787,13 @@ CHECK'local x, y = (...)'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         [1]    = "_ENV",
     },
@@ -729,7 +849,13 @@ CHECK'local x, y = ..., nil'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         [1]    = "_ENV",
     },
@@ -791,7 +917,13 @@ CHECK'local x <const>, y <close> = 1'
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         [1]    = "_ENV",
     },
@@ -862,7 +994,29 @@ y = 2
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type  = "table",
+                tag   = "_ENV",
+                child = {
+                    ["string|x"] = {
+                        [1] = {
+                            ref = {
+                                [1] = 4,
+                            },
+                        },
+                    },
+                    ["string|y"] = {
+                        [1] = {
+                            ref = {
+                                [1] = 6,
+                            },
+                        },
+                    },
+                },
+                ref   = {
+                    [1] = 2,
+                },
+            },
         },
         ref    = {
             [1] = 3,
@@ -885,7 +1039,11 @@ y = 2
         finish = 5,
         parent = 3,
         vref   = {
-            [1] = 2,
+            [1] = {
+                ref = {
+                    [1] = 4,
+                },
+            },
         },
         [1]    = 1,
     },
@@ -904,7 +1062,11 @@ y = 2
         finish = 11,
         parent = 5,
         vref   = {
-            [1] = 3,
+            [1] = {
+                ref = {
+                    [1] = 6,
+                },
+            },
         },
         [1]    = 2,
     },
@@ -931,7 +1093,29 @@ x, y = 1, 2
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type  = "table",
+                tag   = "_ENV",
+                child = {
+                    ["string|x"] = {
+                        [1] = {
+                            ref = {
+                                [1] = 4,
+                            },
+                        },
+                    },
+                    ["string|y"] = {
+                        [1] = {
+                            ref = {
+                                [1] = 6,
+                            },
+                        },
+                    },
+                },
+                ref   = {
+                    [1] = 2,
+                },
+            },
         },
         ref    = {
             [1] = 3,
@@ -954,7 +1138,11 @@ x, y = 1, 2
         finish = 8,
         parent = 3,
         vref   = {
-            [1] = 2,
+            [1] = {
+                ref = {
+                    [1] = 4,
+                },
+            },
         },
         [1]    = 1,
     },
@@ -973,7 +1161,11 @@ x, y = 1, 2
         finish = 11,
         parent = 5,
         vref   = {
-            [1] = 3,
+            [1] = {
+                ref = {
+                    [1] = 6,
+                },
+            },
         },
         [1]    = 2,
     },
@@ -1000,7 +1192,13 @@ end]]
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         [1]    = "_ENV",
     },
@@ -1049,7 +1247,13 @@ end]]
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         [1]    = "_ENV",
     },
@@ -1117,7 +1321,13 @@ end]]
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         [1]    = "_ENV",
     },
@@ -1206,7 +1416,13 @@ y, z = 3, 4
         effect = 0,
         parent = 1,
         vref   = {
-            [1] = 1,
+            [1] = {
+                type = "table",
+                tag  = "_ENV",
+                ref  = {
+                    [1] = 2,
+                },
+            },
         },
         [1]    = "_ENV",
     },
