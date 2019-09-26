@@ -461,6 +461,9 @@ CHECK 'function a'
         start  = 1,
         finish = 10,
         parent = 3,
+        vref   = {
+            [1] = 2,
+        },
     },
 }
 

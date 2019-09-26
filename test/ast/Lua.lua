@@ -83,6 +83,9 @@ CHECK';;;x = 1'
         start  = 8,
         finish = 8,
         parent = 3,
+        vref   = {
+            [1] = 2,
+        },
         [1]    = 1,
     },
 }
@@ -129,6 +132,9 @@ CHECK'x, y, z = 1, 2, 3'
         start  = 11,
         finish = 11,
         parent = 3,
+        vref   = {
+            [1] = 2,
+        },
         [1]    = 1,
     },
     [5] = {
@@ -145,6 +151,9 @@ CHECK'x, y, z = 1, 2, 3'
         start  = 14,
         finish = 14,
         parent = 5,
+        vref   = {
+            [1] = 3,
+        },
         [1]    = 2,
     },
     [7] = {
@@ -161,6 +170,9 @@ CHECK'x, y, z = 1, 2, 3'
         start  = 17,
         finish = 17,
         parent = 7,
+        vref   = {
+            [1] = 4,
+        },
         [1]    = 3,
     },
 }
@@ -872,6 +884,9 @@ y = 2
         start  = 5,
         finish = 5,
         parent = 3,
+        vref   = {
+            [1] = 2,
+        },
         [1]    = 1,
     },
     [5] = {
@@ -888,6 +903,9 @@ y = 2
         start  = 11,
         finish = 11,
         parent = 5,
+        vref   = {
+            [1] = 3,
+        },
         [1]    = 2,
     },
 }
@@ -935,6 +953,9 @@ x, y = 1, 2
         start  = 8,
         finish = 8,
         parent = 3,
+        vref   = {
+            [1] = 2,
+        },
         [1]    = 1,
     },
     [5] = {
@@ -951,6 +972,9 @@ x, y = 1, 2
         start  = 11,
         finish = 11,
         parent = 5,
+        vref   = {
+            [1] = 3,
+        },
         [1]    = 2,
     },
 }

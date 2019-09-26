@@ -129,18 +129,19 @@ function m.getLocal(root, block, name, pos)
             goto CONTINUE
         end
         for i = 1, #locals do
-            local loc = root[locals[i]]
+            local locID = locals[i]
+            local loc = root[locID]
             if loc.effect > pos then
                 break
             end
             if loc[1] == name then
-                if not res or res.effect < loc.effect then
-                    res = loc
+                if not res or root[res].effect < loc.effect then
+                    res = locID
                 end
             end
         end
         if res then
-            return res
+            return root[res], res
         end
         ::CONTINUE::
         block = m.getParentBlock(root, block)
