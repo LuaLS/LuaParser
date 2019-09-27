@@ -79,14 +79,14 @@ local function setChildValue(obj, key, value)
         return
     end
     local objVref   = getValue(obj)
-    local key       = guide.getKeyName(key)
+    local keyName   = guide.getKeyName(key)
     local valueVref = getValue(value)
     for i = 1, #objVref do
-        local value = objVref[i]
-        if not value.child then
-            value.child = {}
+        local v = objVref[i]
+        if not v.child then
+            v.child = {}
         end
-        value.child[key] = valueVref
+        v.child[keyName] = valueVref
     end
 end
 
@@ -120,39 +120,23 @@ local vmMap = {
         return obj
     end,
     ['getfield'] = function (obj)
-        local node = obj.node
-        obj.node = Compile(node, obj)
-        return obj
+        Compile(obj.node, obj)
     end,
     ['call'] = function (obj)
-        local node = obj.node
-        local args = obj.args
-        if node then
-            obj.node = Compile(node, obj)
-        end
-        if args then
-            obj.args = Compile(args, obj)
-        end
-        return obj
+        Compile(obj.node, obj)
+        Compile(obj.args, obj)
     end,
     ['callargs'] = function (obj)
         for i = 1, #obj do
-            local arg = obj[i]
-            obj[i] = Compile(arg, obj)
+            Compile(obj[i], obj)
         end
-        return obj
     end,
     ['binary'] = function (obj)
-        local e1 = obj[1]
-        local e2 = obj[2]
-        obj[1] = Compile(e1, obj)
-        obj[2] = Compile(e2, obj)
-        return obj
+        Compile(obj[1], obj)
+        Compile( obj[2], obj)
     end,
     ['unary'] = function (obj)
-        local e = obj[1]
-        obj[1] = Compile(e, obj)
-        return obj
+        Compile(obj[1], obj)
     end,
     ['varargs'] = function (obj)
         local func = guide.getParentFunction(obj)
@@ -166,52 +150,27 @@ local vmMap = {
                 }
             end
         end
-        return obj
     end,
     ['paren'] = function (obj)
-        local exp = obj.exp
-        obj.exp = Compile(exp, obj)
-        return obj
+        Compile(obj.exp, obj)
     end,
     ['getindex'] = function (obj)
-        local node = obj.node
-        obj.node = Compile(node, obj)
-        local index = obj.index
-        if index then
-            obj.index = Compile(index, obj)
-        end
-        return obj
+        Compile(obj.node, obj)
+        Compile(obj.index, obj)
     end,
     ['setindex'] = function (obj)
-        local node = obj.node
-        obj.node = Compile(node, obj)
-        local index = obj.index
-        if index then
-            obj.index = Compile(index, obj)
-        end
-        local value = obj.value
-        if value then
-            obj.value = Compile(value, obj)
-        end
-        return obj
+        Compile(obj.node, obj)
+        Compile(obj.index, obj)
+        Compile(obj.value, obj)
     end,
     ['getmethod'] = function (obj)
-        local node = obj.node
-        local method = obj.method
-        obj.node = Compile(node, obj)
-        if method then
-            obj.method = Compile(method, obj)
-        end
-        return obj
+        Compile(obj.node, obj)
+        Compile(obj.method, obj)
     end,
     ['setmethod'] = function (obj)
-        local node = obj.node
-        local method = obj.method
+        Compile(obj.node, obj)
+        Compile(obj.method, obj)
         local value = obj.value
-        obj.node = Compile(node, obj)
-        if method then
-            obj.method = Compile(method, obj)
-        end
         value.localself = {
             type   = 'local',
             start  = 0,
@@ -220,8 +179,7 @@ local vmMap = {
             effect = obj.finish,
             [1]    = 'self',
         }
-        obj.value = Compile(value, obj)
-        return obj
+        Compile(value, obj)
     end,
     ['function'] = function (obj)
         local lastBlock = Block
@@ -230,69 +188,45 @@ local vmMap = {
             Compile(obj.localself, obj)
             obj.localself = nil
         end
-        local args = obj.args
-        if args then
-            obj.args = Compile(args, obj)
-        end
+        Compile(obj.args, obj)
         for i = 1, #obj do
-            local act = obj[i]
-            obj[i] = Compile(act, obj)
+            Compile(obj[i], obj)
         end
         Block = lastBlock
-        return obj
     end,
     ['funcargs'] = function (obj)
         for i = 1, #obj do
-            local arg = obj[i]
-            obj[i] = Compile(arg, obj)
+            Compile(obj[i], obj)
         end
-        return obj
     end,
     ['table'] = function (obj)
         for i = 1, #obj do
-            local v = obj[i]
-            obj[i] = Compile(v, obj)
+            Compile(obj[i], obj)
         end
-        return obj
     end,
     ['tablefield'] = function (obj)
-        local value = obj.value
-        if value then
-            obj.value = Compile(value, obj)
-        end
-        return obj
+        Compile(obj.value, obj)
     end,
     ['tableindex'] = function (obj)
-        local index = obj.index
-        local value = obj.value
-        obj.index = Compile(index, obj)
-        obj.value = Compile(value, obj)
-        return obj
+        Compile(obj.index, obj)
+        Compile(obj.value, obj)
     end,
     ['index'] = function (obj)
-        local index = obj.index
-        obj.index = Compile(index, obj)
-        return obj
+        Compile(obj.index, obj)
     end,
     ['select'] = function (obj)
         local vararg = obj.vararg
-        if not Cache[vararg] then
-            obj.vararg = Compile(vararg, obj)
-            Cache[vararg] = obj.vararg
-        else
-            obj.vararg = Cache[vararg]
+        if vararg.parent then
             if not vararg.extParent then
                 vararg.extParent = {}
             end
             vararg.extParent[#vararg.extParent+1] = obj
+        else
+            Compile(vararg, obj)
         end
-        return obj
     end,
     ['setname'] = function (obj)
-        local value = obj.value
-        if value then
-            obj.value = Compile(value, obj)
-        end
+        Compile(obj.value, obj)
         local loc = guide.getLocal(obj, obj[1], obj.start)
         if loc then
             obj.type = 'setlocal'
@@ -311,14 +245,12 @@ local vmMap = {
                 end
             end
         end
-        return obj
     end,
     ['local'] = function (obj)
         local attrs = obj.attrs
         if attrs then
             for i = 1, #attrs do
-                local attr = attrs[i]
-                attrs[i] = Compile(attr, obj)
+                Compile(attrs[i], obj)
             end
         end
         if Block then
@@ -329,36 +261,22 @@ local vmMap = {
         end
         if obj.localfunction then
             obj.localfunction = nil
-            local value = obj.value
-            if value then
-                obj.value = Compile(value, obj)
-            end
-        else
-            local value = obj.value
-            if value then
-                obj.value = Compile(value, obj)
-            end
         end
-        return obj
+        Compile(obj.value, obj)
     end,
     ['setfield'] = function (obj)
-        local node  = obj.node
-        local value = obj.value
-        obj.node  = Compile(node, obj)
-        obj.value = Compile(value, obj)
-        return obj
+        Compile(obj.node, obj)
+        Compile(obj.value, obj)
     end,
     ['do'] = function (obj)
         local lastBlock = Block
         Block = obj
         CompileBlock(obj, obj)
         Block = lastBlock
-        return obj
     end,
     ['return'] = function (obj)
         for i = 1, #obj do
-            local act = obj[i]
-            obj[i] = Compile(act, obj)
+            Compile(obj[i], obj)
         end
         if Block and Block[#Block] ~= obj then
             pushError {
@@ -367,7 +285,6 @@ local vmMap = {
                 finish = obj.finish,
             }
         end
-        return obj
     end,
     ['label'] = function (obj)
         local block = guide.getBlock(obj)
@@ -392,94 +309,67 @@ local vmMap = {
             end
             block.labels[name] = obj
         end
-        return obj
     end,
     ['goto'] = function (obj)
         GoToTag[#GoToTag+1] = obj
-        return obj
     end,
     ['if'] = function (obj)
         for i = 1, #obj do
-            local block = obj[i]
-            obj[i] = Compile(block, obj)
+            Compile(obj[i], obj)
         end
-        return obj
     end,
     ['ifblock'] = function (obj)
         local lastBlock = Block
         Block = obj
-        local filter = obj.filter
-        obj.filter = Compile(filter, obj)
+        Compile(obj.filter, obj)
         CompileBlock(obj, obj)
         Block = lastBlock
-        return obj
     end,
     ['elseifblock'] = function (obj)
         local lastBlock = Block
         Block = obj
-        local filter = obj.filter
-        if filter then
-            obj.filter = Compile(filter, obj)
-        end
+        Compile(obj.filter, obj)
         CompileBlock(obj, obj)
         Block = lastBlock
-        return obj
     end,
     ['elseblock'] = function (obj)
         local lastBlock = Block
         Block = obj
         CompileBlock(obj, obj)
         Block = lastBlock
-        return obj
     end,
     ['loop'] = function (obj)
         local lastBlock = Block
         Block = obj
-        local loc = obj.loc
-        local max = obj.max
-        local step = obj.step
-        if loc then
-            obj.loc = Compile(loc, obj)
-        end
-        if max then
-            obj.max = Compile(max, obj)
-        end
-        if step then
-            obj.step = Compile(step, obj)
-        end
+        Compile(obj.loc, obj)
+        Compile(obj.max, obj)
+        Compile(obj.step, obj)
         CompileBlock(obj, obj)
         Block = lastBlock
-        return obj
     end,
     ['in'] = function (obj)
         local lastBlock = Block
         Block = obj
         local keys = obj.keys
         for i = 1, #keys do
-            local loc = keys[i]
-            keys[i] = Compile(loc, obj)
+            Compile(keys[i], obj)
         end
         CompileBlock(obj, obj)
         Block = lastBlock
-        return obj
     end,
     ['while'] = function (obj)
         local lastBlock = Block
         Block = obj
-        local filter = obj.filter
-        obj.filter = Compile(filter, obj)
+        Compile(obj.filter, obj)
         CompileBlock(obj, obj)
         Block = lastBlock
-        return obj
     end,
     ['repeat'] = function (obj)
         local lastBlock = Block
         Block = obj
         CompileBlock(obj, obj)
-        local filter = obj.filter
-        obj.filter = Compile(filter, obj)
+        Compile(obj.filter, obj)
         Block = lastBlock
-        return obj
     end,
     ['break'] = function (obj)
         if not guide.getBreakBlock(obj) then
@@ -489,26 +379,25 @@ local vmMap = {
                 finish = obj.finish,
             }
         end
-        return obj
     end,
     ['main'] = function (obj)
         Block = obj
         if ENVMode == '_ENV' then
-            local envID = Compile({
+            local env = {
                 type   = 'local',
                 start  = 0,
                 finish = 0,
                 effect = 0,
                 [1]    = '_ENV',
-            }, obj)
-            addValue(envID, {
+            }
+            Compile(env, obj)
+            addValue(env, {
                 type = 'table',
                 tag  = '_ENV',
             })
         end
         CompileBlock(obj, obj)
         Block = nil
-        return obj
     end,
 }
 
@@ -518,7 +407,7 @@ function CompileBlock(obj, parent)
         local f = vmMap[act.type]
         if f then
             act.parent = parent
-            obj[i] = f(act)
+            f(act)
         end
     end
 end
@@ -529,10 +418,10 @@ function Compile(obj, parent)
     end
     local f = vmMap[obj.type]
     if not f then
-        return obj
+        return
     end
     obj.parent = parent
-    return f(obj)
+    f(obj)
 end
 
 local function compileGoTo(obj)
