@@ -9,10 +9,10 @@ local function eq(a, b)
     if tp1 ~= tp2 then
         return false
     end
-    if a == EXISTS and b ~= nil then
+    if a == '<LOOP>' and tp1 == 'table' then
         return true
     end
-    if b == EXISTS and a ~= nil then
+    if b == '<LOOP>' and tp2 == 'table' then
         return true
     end
     if tp1 == 'table' then
@@ -84,7 +84,10 @@ local option = {
             return a < b
         end)
     end,
-    loop = 'EXISTS',
+    loop = ('%q'):format('<LOOP>'),
+    number = function (n)
+        return ('%q'):format(n)
+    end,
 }
 
 local function autoFix(myAst, targetAst)
