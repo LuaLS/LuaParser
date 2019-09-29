@@ -865,7 +865,9 @@ end]]
     start  = 1,
     finish = 28,
     keys   = {
-        [1] = {
+        start  = 4,
+        finish = 5,
+        [1]    = {
             type   = "local",
             start  = 5,
             finish = 5,
@@ -948,7 +950,9 @@ end]]
     start  = 1,
     finish = 40,
     keys   = {
-        [1] = {
+        start  = 4,
+        finish = 11,
+        [1]    = {
             type   = "local",
             start  = 5,
             finish = 5,
@@ -1024,7 +1028,7 @@ end]]
             },
             [1]    = "a",
         },
-        [2] = {
+        [2]    = {
             type   = "local",
             start  = 8,
             finish = 8,
@@ -1100,7 +1104,7 @@ end]]
             },
             [1]    = "b",
         },
-        [3] = {
+        [3]    = {
             type   = "local",
             start  = 11,
             finish = 11,

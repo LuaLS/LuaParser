@@ -26,25 +26,33 @@ local breakBlockTypes = {
 }
 
 m.childMap = {
+    ['main']        = {'#'},
     ['repeat']      = {'#', 'filter'},
     ['while']       = {'filter', '#'},
     ['in']          = {'keys', '#'},
     ['loop']        = {'loc', 'max', 'step', '#'},
+    ['if']          = {'#'},
     ['ifblock']     = {'filter', '#'},
     ['elseifblock'] = {'filter', '#'},
+    ['elseblock']   = {'#'},
     ['setfield']    = {'node', 'value'},
     ['local']       = {'attrs', 'value'},
     ['setlocal']    = {'value'},
+    ['return']      = {'#'},
+    ['do']          = {'#'},
     ['index']       = {'index'},
+    ['table']       = {'#'},
     ['tableindex']  = {'index', 'value'},
     ['tablefield']  = {'value'},
     ['function']    = {'args'},
+    ['funcargs']    = {'#'},
     ['setmethod']   = {'node', 'method', 'value'},
     ['getmethod']   = {'node', 'method'},
     ['setindex']    = {'node', 'index', 'value'},
     ['getindex']    = {'node', 'index'},
     ['paren']       = {'exp'},
     ['call']        = {'node', 'args'},
+    ['callargs']    = {'#'},
     ['getfield']    = {'node'},
 }
 
@@ -196,9 +204,6 @@ end
 
 --- 判断source是否包含offset
 function m.isContain(source, offset)
-    if not source.start then
-        return false
-    end
     return source.start <= offset and source.finish >= offset - 1
 end
 
@@ -226,10 +231,6 @@ function m.eachSource(ast, offset, callback)
                     else
                         list[#list+1] = obj[key]
                     end
-                end
-            else
-                for i = 1, #obj do
-                    list[#list+1] = obj[i]
                 end
             end
         end

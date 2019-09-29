@@ -1177,7 +1177,7 @@ local Defs = {
         block.type   = 'in'
         block.start  = start
         block.finish = finish - 1
-        block.keys = {}
+        block.keys   = keys
 
         local values
         if func then
@@ -1188,9 +1188,9 @@ local Defs = {
         for i = 1, #keys do
             local loc = keys[i]
             if values then
-                block.keys[i] = createLocal(loc, blockStart, getValue(values, i))
+                createLocal(loc, blockStart, getValue(values, i))
             else
-                block.keys[i] = createLocal(loc, blockStart)
+                createLocal(loc, blockStart)
             end
         end
         checkMissEnd(start)
