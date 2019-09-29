@@ -29,7 +29,7 @@ m.childMap = {
     ['main']        = {'#'},
     ['repeat']      = {'#', 'filter'},
     ['while']       = {'filter', '#'},
-    ['in']          = {'keys', '#'},
+    ['in']          = {'keys', 'exps', '#'},
     ['loop']        = {'loc', 'max', 'step', '#'},
     ['if']          = {'#'},
     ['ifblock']     = {'filter', '#'},
@@ -54,6 +54,7 @@ m.childMap = {
     ['call']        = {'node', 'args'},
     ['callargs']    = {'#'},
     ['getfield']    = {'node'},
+    ['list']        = {'#'},
 }
 
 --- 寻找所在函数
@@ -218,6 +219,9 @@ function m.eachSource(ast, offset, callback)
         end
         local obj = list[len]
         list[len] = nil
+        if obj.value then
+            list[len] = obj.value
+        end
         if m.isContain(obj, offset) then
             callback(obj)
             local keys = map[obj.type]

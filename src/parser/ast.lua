@@ -179,7 +179,8 @@ local function packList(start, list, finish)
     for i = count + 1, #list do
         list[i] = nil
     end
-    list.start = start
+    list.type   = 'list'
+    list.start  = start
     list.finish = finish - 1
     return list
 end
@@ -1178,6 +1179,7 @@ local Defs = {
         block.start  = start
         block.finish = finish - 1
         block.keys   = keys
+        block.exps   = exp
 
         local values
         if func then

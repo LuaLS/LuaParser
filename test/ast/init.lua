@@ -43,7 +43,7 @@ local sortList = {
     'filter',
     'node',
     'op', 'args',
-    'loc', 'max', 'step', 'keys',
+    'loc', 'max', 'step', 'keys', 'exps',
     'dot', 'colon',
     'vararg',
     'field', 'index', 'method',
