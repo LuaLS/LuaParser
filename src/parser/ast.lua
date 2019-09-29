@@ -1179,12 +1179,12 @@ local Defs = {
         block.start  = start
         block.finish = finish - 1
         block.keys   = keys
-        block.exps   = exp
 
         local values
         if func then
             local call = createCall(exp, func.finish + 1, exp.finish)
             call.node = func
+            block.call = call
             values = { call }
         end
         for i = 1, #keys do
