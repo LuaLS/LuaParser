@@ -236,9 +236,6 @@ function m.eachSource(ast, offset, callback)
         end
         local obj = list[len]
         list[len] = nil
-        if obj.value then
-            list[len] = obj.value
-        end
         if m.isInRange(obj, offset) then
             if m.isContain(obj, offset) then
                 callback(obj)
@@ -367,7 +364,7 @@ function m.eachField(obj, callback)
     if not vref then
         return
     end
-    for i = 1, vref do
+    for i = 1, #vref do
         local v = vref[i]
         local child = v.child
         if child then
@@ -386,7 +383,7 @@ function m.eachFieldOf(obj, field, callback)
     if not vref then
         return
     end
-    for i = 1, vref do
+    for i = 1, #vref do
         local v = vref[i]
         local child = v.child
         if child then
