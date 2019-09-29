@@ -1,5 +1,6 @@
 local error      = error
 local type       = type
+local next       = next
 
 _ENV = nil
 
@@ -40,11 +41,12 @@ m.childMap = {
     ['setlocal']    = {'value'},
     ['return']      = {'#'},
     ['do']          = {'#'},
+    ['select']      = {'vararg'},
     ['index']       = {'index'},
     ['table']       = {'#'},
     ['tableindex']  = {'index', 'value'},
     ['tablefield']  = {'value'},
-    ['function']    = {'args'},
+    ['function']    = {'args', '#'},
     ['funcargs']    = {'#'},
     ['setmethod']   = {'node', 'method', 'value'},
     ['getmethod']   = {'node', 'method'},
@@ -369,6 +371,31 @@ function m.eachField(obj, callback)
         local v = vref[i]
         local child = v.child
         if child then
+            for fieldName, cvref in next, child do
+                for j = 1, #cvref do
+                    callback(fieldName, cvref[j])
+                end
+            end
+        end
+    end
+end
+
+--- 获取对象所有指定field的key与valueObj
+function m.eachFieldOf(obj, field, callback)
+    local vref = obj.vref
+    if not vref then
+        return
+    end
+    for i = 1, vref do
+        local v = vref[i]
+        local child = v.child
+        if child then
+            local cvref = child[field]
+            if cvref then
+                for j = 1, #cvref do
+                    callback(cvref[j])
+                end
+            end
         end
     end
 end

@@ -3,7 +3,7 @@ local type = type
 
 _ENV = nil
 
-local pushError, Compile, CompileBlock, Cache, Block, GoToTag, Version, ENVMode, Compiled
+local pushError, Compile, CompileBlock, Cache, Block, GoToTag, Version, ENVMode, Compiled, ValueID
 
 --[[
 -- value 类右字面量创建，在set get call中传递
@@ -28,7 +28,9 @@ local function addValue(obj, value)
     if cache[value] then
         return
     end
-    cache[value] = true
+    ValueID = ValueID + 1
+    cache[value] = ValueID
+    value.id = ValueID
     vref[#vref+1] = value
     local valueRef = value.ref
     if not valueRef then
@@ -520,6 +522,7 @@ return function (self, lua, mode, version)
     Cache = {}
     Compiled = {}
     GoToTag = {}
+    ValueID = 0
     if type(state.ast) == 'table' then
         Compile(state.ast)
     end
