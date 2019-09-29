@@ -79,18 +79,18 @@ local function test(path)
     end
     local passed = os.clock() - clock
 
-    local clock = os.clock()
-    local dump = utility.unpack(state.ast)
-    utility.pack(dump)
-    local unpackPassed = os.clock() - clock
+    --local clock = os.clock()
+    --local dump = utility.unpack(state.ast)
+    --utility.pack(dump)
+    --local unpackPassed = os.clock() - clock
 
-    local clock = os.clock()
-    ch:push(dump)
-    ch:pop()
-    local channelPassed = os.clock() - clock
+    --local clock = os.clock()
+    --ch:push(dump)
+    --ch:pop()
+    --local channelPassed = os.clock() - clock
 
     local size = #buf * testTimes
-    print(('[%s]测试完成，大小[%.3f]kb，速度[%.3f]mb/s，平均用时[%.3f]毫秒，序列化用时[%.f]毫秒，跨线程用时[%.f]毫秒'):format(path, size / 1000, size / passed / 1000 / 1000, passed / testTimes * 1000, unpackPassed * 1000, channelPassed * 1000))
+    print(('[%s]测试完成，大小[%.3f]kb，速度[%.3f]mb/s，平均用时[%.3f]毫秒'):format(path, size / 1000, size / passed / 1000 / 1000, passed / testTimes * 1000))
 end
 
 collectgarbage 'stop'

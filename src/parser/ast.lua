@@ -90,6 +90,8 @@ end
 local function getSelect(vararg, index)
     return {
         type   = 'select',
+        start  = vararg.start,
+        finish = vararg.finish,
         vararg = vararg,
         index  = index,
     }
@@ -1190,7 +1192,9 @@ local Defs = {
         if func then
             local call = createCall(exp, func.finish + 1, exp.finish)
             call.node = func
+            call.start = func.start
             values = { call }
+            keys.range = call.finish
         end
         for i = 1, #keys do
             local loc = keys[i]
