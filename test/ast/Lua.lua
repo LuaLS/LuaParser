@@ -69,15 +69,14 @@ CHECK';;;x = 1'
                     child = {
                         ["string|x"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 8,
-                                        finish = 8,
-                                        vref   = "<LOOP>",
-                                        [1]    = 1,
-                                    },
+                                type   = "number",
+                                start  = 8,
+                                finish = 8,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 1,
                             },
                         },
                     },
@@ -99,11 +98,10 @@ CHECK';;;x = 1'
                         start  = 8,
                         finish = 8,
                         vref   = {
-                            [1] = {
-                                ref = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
+                            [1] = "<LOOP>",
+                        },
+                        ref    = {
+                            [1] = "<LOOP>",
                         },
                         [1]    = 1,
                     },
@@ -132,15 +130,14 @@ CHECK';;;x = 1'
                     child = {
                         ["string|x"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 8,
-                                        finish = 8,
-                                        vref   = "<LOOP>",
-                                        [1]    = 1,
-                                    },
+                                type   = "number",
+                                start  = 8,
+                                finish = 8,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 1,
                             },
                         },
                     },
@@ -159,11 +156,10 @@ CHECK';;;x = 1'
             start  = 8,
             finish = 8,
             vref   = {
-                [1] = {
-                    ref = {
-                        [1] = "<LOOP>",
-                    },
-                },
+                [1] = "<LOOP>",
+            },
+            ref    = {
+                [1] = "<LOOP>",
             },
             [1]    = 1,
         },
@@ -189,41 +185,38 @@ CHECK'x, y, z = 1, 2, 3'
                     child = {
                         ["string|x"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 11,
-                                        finish = 11,
-                                        vref   = "<LOOP>",
-                                        [1]    = 1,
-                                    },
+                                type   = "number",
+                                start  = 11,
+                                finish = 11,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 1,
                             },
                         },
                         ["string|y"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 14,
-                                        finish = 14,
-                                        vref   = "<LOOP>",
-                                        [1]    = 2,
-                                    },
+                                type   = "number",
+                                start  = 14,
+                                finish = 14,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 2,
                             },
                         },
                         ["string|z"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 17,
-                                        finish = 17,
-                                        vref   = "<LOOP>",
-                                        [1]    = 3,
-                                    },
+                                type   = "number",
+                                start  = 17,
+                                finish = 17,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 3,
                             },
                         },
                     },
@@ -245,11 +238,10 @@ CHECK'x, y, z = 1, 2, 3'
                         start  = 11,
                         finish = 11,
                         vref   = {
-                            [1] = {
-                                ref = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
+                            [1] = "<LOOP>",
+                        },
+                        ref    = {
+                            [1] = "<LOOP>",
                         },
                         [1]    = 1,
                     },
@@ -267,11 +259,10 @@ CHECK'x, y, z = 1, 2, 3'
                         start  = 14,
                         finish = 14,
                         vref   = {
-                            [1] = {
-                                ref = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
+                            [1] = "<LOOP>",
+                        },
+                        ref    = {
+                            [1] = "<LOOP>",
                         },
                         [1]    = 2,
                     },
@@ -289,11 +280,10 @@ CHECK'x, y, z = 1, 2, 3'
                         start  = 17,
                         finish = 17,
                         vref   = {
-                            [1] = {
-                                ref = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
+                            [1] = "<LOOP>",
+                        },
+                        ref    = {
+                            [1] = "<LOOP>",
                         },
                         [1]    = 3,
                     },
@@ -322,41 +312,38 @@ CHECK'x, y, z = 1, 2, 3'
                     child = {
                         ["string|x"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 11,
-                                        finish = 11,
-                                        vref   = "<LOOP>",
-                                        [1]    = 1,
-                                    },
+                                type   = "number",
+                                start  = 11,
+                                finish = 11,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 1,
                             },
                         },
                         ["string|y"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 14,
-                                        finish = 14,
-                                        vref   = "<LOOP>",
-                                        [1]    = 2,
-                                    },
+                                type   = "number",
+                                start  = 14,
+                                finish = 14,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 2,
                             },
                         },
                         ["string|z"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 17,
-                                        finish = 17,
-                                        vref   = "<LOOP>",
-                                        [1]    = 3,
-                                    },
+                                type   = "number",
+                                start  = 17,
+                                finish = 17,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 3,
                             },
                         },
                     },
@@ -379,11 +366,10 @@ CHECK'x, y, z = 1, 2, 3'
                         start  = 14,
                         finish = 14,
                         vref   = {
-                            [1] = {
-                                ref = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
+                            [1] = "<LOOP>",
+                        },
+                        ref    = {
+                            [1] = "<LOOP>",
                         },
                         [1]    = 2,
                     },
@@ -401,11 +387,10 @@ CHECK'x, y, z = 1, 2, 3'
                         start  = 17,
                         finish = 17,
                         vref   = {
-                            [1] = {
-                                ref = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
+                            [1] = "<LOOP>",
+                        },
+                        ref    = {
+                            [1] = "<LOOP>",
                         },
                         [1]    = 3,
                     },
@@ -419,11 +404,10 @@ CHECK'x, y, z = 1, 2, 3'
             start  = 11,
             finish = 11,
             vref   = {
-                [1] = {
-                    ref = {
-                        [1] = "<LOOP>",
-                    },
-                },
+                [1] = "<LOOP>",
+            },
+            ref    = {
+                [1] = "<LOOP>",
             },
             [1]    = 1,
         },
@@ -448,41 +432,38 @@ CHECK'x, y, z = 1, 2, 3'
                     child = {
                         ["string|x"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 11,
-                                        finish = 11,
-                                        vref   = "<LOOP>",
-                                        [1]    = 1,
-                                    },
+                                type   = "number",
+                                start  = 11,
+                                finish = 11,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 1,
                             },
                         },
                         ["string|y"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 14,
-                                        finish = 14,
-                                        vref   = "<LOOP>",
-                                        [1]    = 2,
-                                    },
+                                type   = "number",
+                                start  = 14,
+                                finish = 14,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 2,
                             },
                         },
                         ["string|z"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 17,
-                                        finish = 17,
-                                        vref   = "<LOOP>",
-                                        [1]    = 3,
-                                    },
+                                type   = "number",
+                                start  = 17,
+                                finish = 17,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 3,
                             },
                         },
                     },
@@ -504,11 +485,10 @@ CHECK'x, y, z = 1, 2, 3'
                         start  = 11,
                         finish = 11,
                         vref   = {
-                            [1] = {
-                                ref = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
+                            [1] = "<LOOP>",
+                        },
+                        ref    = {
+                            [1] = "<LOOP>",
                         },
                         [1]    = 1,
                     },
@@ -527,11 +507,10 @@ CHECK'x, y, z = 1, 2, 3'
                         start  = 17,
                         finish = 17,
                         vref   = {
-                            [1] = {
-                                ref = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
+                            [1] = "<LOOP>",
+                        },
+                        ref    = {
+                            [1] = "<LOOP>",
                         },
                         [1]    = 3,
                     },
@@ -545,11 +524,10 @@ CHECK'x, y, z = 1, 2, 3'
             start  = 14,
             finish = 14,
             vref   = {
-                [1] = {
-                    ref = {
-                        [1] = "<LOOP>",
-                    },
-                },
+                [1] = "<LOOP>",
+            },
+            ref    = {
+                [1] = "<LOOP>",
             },
             [1]    = 2,
         },
@@ -574,41 +552,38 @@ CHECK'x, y, z = 1, 2, 3'
                     child = {
                         ["string|x"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 11,
-                                        finish = 11,
-                                        vref   = "<LOOP>",
-                                        [1]    = 1,
-                                    },
+                                type   = "number",
+                                start  = 11,
+                                finish = 11,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 1,
                             },
                         },
                         ["string|y"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 14,
-                                        finish = 14,
-                                        vref   = "<LOOP>",
-                                        [1]    = 2,
-                                    },
+                                type   = "number",
+                                start  = 14,
+                                finish = 14,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 2,
                             },
                         },
                         ["string|z"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 17,
-                                        finish = 17,
-                                        vref   = "<LOOP>",
-                                        [1]    = 3,
-                                    },
+                                type   = "number",
+                                start  = 17,
+                                finish = 17,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 3,
                             },
                         },
                     },
@@ -630,11 +605,10 @@ CHECK'x, y, z = 1, 2, 3'
                         start  = 11,
                         finish = 11,
                         vref   = {
-                            [1] = {
-                                ref = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
+                            [1] = "<LOOP>",
+                        },
+                        ref    = {
+                            [1] = "<LOOP>",
                         },
                         [1]    = 1,
                     },
@@ -652,11 +626,10 @@ CHECK'x, y, z = 1, 2, 3'
                         start  = 14,
                         finish = 14,
                         vref   = {
-                            [1] = {
-                                ref = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
+                            [1] = "<LOOP>",
+                        },
+                        ref    = {
+                            [1] = "<LOOP>",
                         },
                         [1]    = 2,
                     },
@@ -671,11 +644,10 @@ CHECK'x, y, z = 1, 2, 3'
             start  = 17,
             finish = 17,
             vref   = {
-                [1] = {
-                    ref = {
-                        [1] = "<LOOP>",
-                    },
-                },
+                [1] = "<LOOP>",
+            },
+            ref    = {
+                [1] = "<LOOP>",
             },
             [1]    = 3,
         },
@@ -2336,28 +2308,26 @@ y = 2
                     child = {
                         ["string|x"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 5,
-                                        finish = 5,
-                                        vref   = "<LOOP>",
-                                        [1]    = 1,
-                                    },
+                                type   = "number",
+                                start  = 5,
+                                finish = 5,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 1,
                             },
                         },
                         ["string|y"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 11,
-                                        finish = 11,
-                                        vref   = "<LOOP>",
-                                        [1]    = 2,
-                                    },
+                                type   = "number",
+                                start  = 11,
+                                finish = 11,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 2,
                             },
                         },
                     },
@@ -2379,11 +2349,10 @@ y = 2
                         start  = 5,
                         finish = 5,
                         vref   = {
-                            [1] = {
-                                ref = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
+                            [1] = "<LOOP>",
+                        },
+                        ref    = {
+                            [1] = "<LOOP>",
                         },
                         [1]    = 1,
                     },
@@ -2401,11 +2370,10 @@ y = 2
                         start  = 11,
                         finish = 11,
                         vref   = {
-                            [1] = {
-                                ref = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
+                            [1] = "<LOOP>",
+                        },
+                        ref    = {
+                            [1] = "<LOOP>",
                         },
                         [1]    = 2,
                     },
@@ -2434,28 +2402,26 @@ y = 2
                     child = {
                         ["string|x"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 5,
-                                        finish = 5,
-                                        vref   = "<LOOP>",
-                                        [1]    = 1,
-                                    },
+                                type   = "number",
+                                start  = 5,
+                                finish = 5,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 1,
                             },
                         },
                         ["string|y"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 11,
-                                        finish = 11,
-                                        vref   = "<LOOP>",
-                                        [1]    = 2,
-                                    },
+                                type   = "number",
+                                start  = 11,
+                                finish = 11,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 2,
                             },
                         },
                     },
@@ -2478,11 +2444,10 @@ y = 2
                         start  = 11,
                         finish = 11,
                         vref   = {
-                            [1] = {
-                                ref = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
+                            [1] = "<LOOP>",
+                        },
+                        ref    = {
+                            [1] = "<LOOP>",
                         },
                         [1]    = 2,
                     },
@@ -2496,11 +2461,10 @@ y = 2
             start  = 5,
             finish = 5,
             vref   = {
-                [1] = {
-                    ref = {
-                        [1] = "<LOOP>",
-                    },
-                },
+                [1] = "<LOOP>",
+            },
+            ref    = {
+                [1] = "<LOOP>",
             },
             [1]    = 1,
         },
@@ -2525,28 +2489,26 @@ y = 2
                     child = {
                         ["string|x"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 5,
-                                        finish = 5,
-                                        vref   = "<LOOP>",
-                                        [1]    = 1,
-                                    },
+                                type   = "number",
+                                start  = 5,
+                                finish = 5,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 1,
                             },
                         },
                         ["string|y"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 11,
-                                        finish = 11,
-                                        vref   = "<LOOP>",
-                                        [1]    = 2,
-                                    },
+                                type   = "number",
+                                start  = 11,
+                                finish = 11,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 2,
                             },
                         },
                     },
@@ -2568,11 +2530,10 @@ y = 2
                         start  = 5,
                         finish = 5,
                         vref   = {
-                            [1] = {
-                                ref = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
+                            [1] = "<LOOP>",
+                        },
+                        ref    = {
+                            [1] = "<LOOP>",
                         },
                         [1]    = 1,
                     },
@@ -2587,11 +2548,10 @@ y = 2
             start  = 11,
             finish = 11,
             vref   = {
-                [1] = {
-                    ref = {
-                        [1] = "<LOOP>",
-                    },
-                },
+                [1] = "<LOOP>",
+            },
+            ref    = {
+                [1] = "<LOOP>",
             },
             [1]    = 2,
         },
@@ -2620,28 +2580,26 @@ x, y = 1, 2
                     child = {
                         ["string|x"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 8,
-                                        finish = 8,
-                                        vref   = "<LOOP>",
-                                        [1]    = 1,
-                                    },
+                                type   = "number",
+                                start  = 8,
+                                finish = 8,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 1,
                             },
                         },
                         ["string|y"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 11,
-                                        finish = 11,
-                                        vref   = "<LOOP>",
-                                        [1]    = 2,
-                                    },
+                                type   = "number",
+                                start  = 11,
+                                finish = 11,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 2,
                             },
                         },
                     },
@@ -2663,11 +2621,10 @@ x, y = 1, 2
                         start  = 8,
                         finish = 8,
                         vref   = {
-                            [1] = {
-                                ref = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
+                            [1] = "<LOOP>",
+                        },
+                        ref    = {
+                            [1] = "<LOOP>",
                         },
                         [1]    = 1,
                     },
@@ -2685,11 +2642,10 @@ x, y = 1, 2
                         start  = 11,
                         finish = 11,
                         vref   = {
-                            [1] = {
-                                ref = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
+                            [1] = "<LOOP>",
+                        },
+                        ref    = {
+                            [1] = "<LOOP>",
                         },
                         [1]    = 2,
                     },
@@ -2718,28 +2674,26 @@ x, y = 1, 2
                     child = {
                         ["string|x"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 8,
-                                        finish = 8,
-                                        vref   = "<LOOP>",
-                                        [1]    = 1,
-                                    },
+                                type   = "number",
+                                start  = 8,
+                                finish = 8,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 1,
                             },
                         },
                         ["string|y"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 11,
-                                        finish = 11,
-                                        vref   = "<LOOP>",
-                                        [1]    = 2,
-                                    },
+                                type   = "number",
+                                start  = 11,
+                                finish = 11,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 2,
                             },
                         },
                     },
@@ -2762,11 +2716,10 @@ x, y = 1, 2
                         start  = 11,
                         finish = 11,
                         vref   = {
-                            [1] = {
-                                ref = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
+                            [1] = "<LOOP>",
+                        },
+                        ref    = {
+                            [1] = "<LOOP>",
                         },
                         [1]    = 2,
                     },
@@ -2780,11 +2733,10 @@ x, y = 1, 2
             start  = 8,
             finish = 8,
             vref   = {
-                [1] = {
-                    ref = {
-                        [1] = "<LOOP>",
-                    },
-                },
+                [1] = "<LOOP>",
+            },
+            ref    = {
+                [1] = "<LOOP>",
             },
             [1]    = 1,
         },
@@ -2809,28 +2761,26 @@ x, y = 1, 2
                     child = {
                         ["string|x"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 8,
-                                        finish = 8,
-                                        vref   = "<LOOP>",
-                                        [1]    = 1,
-                                    },
+                                type   = "number",
+                                start  = 8,
+                                finish = 8,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 1,
                             },
                         },
                         ["string|y"] = {
                             [1] = {
-                                ref = {
-                                    [1] = {
-                                        type   = "number",
-                                        start  = 11,
-                                        finish = 11,
-                                        vref   = "<LOOP>",
-                                        [1]    = 2,
-                                    },
+                                type   = "number",
+                                start  = 11,
+                                finish = 11,
+                                vref   = "<LOOP>",
+                                ref    = {
+                                    [1] = "<LOOP>",
                                 },
+                                [1]    = 2,
                             },
                         },
                     },
@@ -2852,11 +2802,10 @@ x, y = 1, 2
                         start  = 8,
                         finish = 8,
                         vref   = {
-                            [1] = {
-                                ref = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
+                            [1] = "<LOOP>",
+                        },
+                        ref    = {
+                            [1] = "<LOOP>",
                         },
                         [1]    = 1,
                     },
@@ -2871,11 +2820,10 @@ x, y = 1, 2
             start  = 11,
             finish = 11,
             vref   = {
-                [1] = {
-                    ref = {
-                        [1] = "<LOOP>",
-                    },
-                },
+                [1] = "<LOOP>",
+            },
+            ref    = {
+                [1] = "<LOOP>",
             },
             [1]    = 2,
         },

@@ -57,6 +57,16 @@ m.childMap = {
     ['list']        = {'#'},
 }
 
+--- 是否是字面量
+function m.isLiteral(obj)
+    local tp = obj.type
+    return tp == 'nil'
+        or tp == 'boolean'
+        or tp == 'string'
+        or tp == 'number'
+        or tp == 'table'
+end
+
 --- 寻找所在函数
 function m.getParentFunction(obj)
     for _ = 1, 1000 do
@@ -340,11 +350,26 @@ function m.lineRange(lines, row)
     return line.start + 1, line.finish
 end
 
+--- 获取对象作为key时的名字
 function m.getKeyName(obj)
     if obj.type == 'getglobal' or obj.type == 'setglobal' then
         return 'string|' .. obj[1]
     elseif obj.type == 'getfield' or obj.type == 'getglobal' then
         return 'string|' .. obj[1]
+    end
+end
+
+--- 获取对象所有field的key与valueObj
+function m.eachField(obj, callback)
+    local vref = obj.vref
+    if not vref then
+        return
+    end
+    for i = 1, vref do
+        local v = vref[i]
+        local child = v.child
+        if child then
+        end
     end
 end
 

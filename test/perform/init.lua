@@ -90,7 +90,7 @@ local function test(path)
     --local channelPassed = os.clock() - clock
 
     local size = #buf * testTimes
-    print(('[%s]测试完成，大小[%.3f]kb，速度[%.3f]mb/s，平均用时[%.3f]毫秒'):format(path, size / 1000, size / passed / 1000 / 1000, passed / testTimes * 1000))
+    print(('[%s]测试完成，大小[%.3f]kb，速度[%.3f]mb/s，平均用时[%.3f]毫秒'):format(path, size / testTimes / 1000, size / passed / 1000 / 1000, passed / testTimes * 1000))
 end
 
 collectgarbage 'stop'
