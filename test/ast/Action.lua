@@ -3,6 +3,7 @@ CHECK'x = 1'
     type   = "setglobal",
     start  = 1,
     finish = 1,
+    range  = 5,
     value  = {
         type   = "number",
         start  = 5,
@@ -25,6 +26,7 @@ CHECK'local x = 1'
     start  = 7,
     finish = 7,
     effect = 12,
+    range  = 11,
     value  = {
         type   = "number",
         start  = 11,
@@ -39,6 +41,7 @@ CHECK'local x = x'
     start  = 7,
     finish = 7,
     effect = 12,
+    range  = 11,
     value  = {
         type   = "getglobal",
         start  = 11,
@@ -54,6 +57,7 @@ CHECK'local x <close> <const> = 1'
     start  = 7,
     finish = 7,
     effect = 28,
+    range  = 27,
     value  = {
         type   = "number",
         start  = 27,
@@ -82,6 +86,7 @@ CHECK'local x < const > = 1'
     start  = 7,
     finish = 7,
     effect = 22,
+    range  = 21,
     value  = {
         type   = "number",
         start  = 21,
@@ -103,6 +108,7 @@ CHECK 'x.y = 1'
     type   = "setfield",
     start  = 1,
     finish = 3,
+    range  = 7,
     node   = {
         type   = "getglobal",
         start  = 1,
@@ -133,6 +139,7 @@ CHECK 'x[y] = 1'
     type   = "setindex",
     start  = 1,
     finish = 4,
+    range  = 8,
     node   = {
         type   = "getglobal",
         start  = 1,
@@ -159,6 +166,7 @@ CHECK'x = function () end'
     type   = "setglobal",
     start  = 1,
     finish = 1,
+    range  = 19,
     value  = {
         type   = "function",
         start  = 5,
@@ -172,6 +180,7 @@ CHECK'x.y = function () end'
     type   = "setfield",
     start  = 1,
     finish = 3,
+    range  = 21,
     node   = {
         type   = "getglobal",
         start  = 1,
@@ -356,6 +365,7 @@ CHECK'do x = 1 end'
         type   = "setglobal",
         start  = 4,
         finish = 4,
+        range  = 8,
         parent = "<LOOP>",
         value  = {
             type   = "number",
@@ -759,6 +769,7 @@ end]]
         start  = 5,
         finish = 5,
         effect = 16,
+        range  = 9,
         parent = "<LOOP>",
         value  = {
             type   = "number",
@@ -781,6 +792,7 @@ end]]
             start  = 5,
             finish = 5,
             effect = 16,
+            range  = 9,
             parent = "<LOOP>",
             value  = {
                 type   = "number",
@@ -811,6 +823,7 @@ end]]
         start  = 5,
         finish = 5,
         effect = 20,
+        range  = 9,
         parent = "<LOOP>",
         value  = {
             type   = "number",
@@ -839,6 +852,7 @@ end]]
             start  = 5,
             finish = 5,
             effect = 20,
+            range  = 9,
             parent = "<LOOP>",
             value  = {
                 type   = "number",
@@ -899,38 +913,6 @@ end]]
                 index  = 1,
             },
             [1]    = "a",
-        },
-    },
-    call   = {
-        type   = "call",
-        start  = 11,
-        finish = 10,
-        parent = {
-            type   = "select",
-            parent = {
-                type   = "local",
-                start  = 5,
-                finish = 5,
-                effect = 14,
-                parent = "<LOOP>",
-                value  = "<LOOP>",
-                [1]    = "a",
-            },
-            vararg = "<LOOP>",
-            index  = 1,
-        },
-        node   = {
-            type   = "getglobal",
-            start  = 10,
-            finish = 10,
-            parent = "<LOOP>",
-            [1]    = "a",
-        },
-        args   = {
-            type   = "callargs",
-            start  = 11,
-            finish = 10,
-            parent = "<LOOP>",
         },
     },
     locals = {
@@ -1213,82 +1195,6 @@ end]]
                 index  = 3,
             },
             [1]    = "c",
-        },
-    },
-    call   = {
-        type      = "call",
-        start     = 17,
-        finish    = 22,
-        parent    = {
-            type   = "select",
-            parent = {
-                type   = "local",
-                start  = 5,
-                finish = 5,
-                effect = 26,
-                parent = "<LOOP>",
-                value  = "<LOOP>",
-                [1]    = "a",
-            },
-            vararg = "<LOOP>",
-            index  = 1,
-        },
-        extParent = {
-            [1] = {
-                type   = "select",
-                parent = {
-                    type   = "local",
-                    start  = 8,
-                    finish = 8,
-                    effect = 26,
-                    parent = "<LOOP>",
-                    value  = "<LOOP>",
-                    [1]    = "b",
-                },
-                vararg = "<LOOP>",
-                index  = 2,
-            },
-            [2] = {
-                type   = "select",
-                parent = {
-                    type   = "local",
-                    start  = 11,
-                    finish = 11,
-                    effect = 26,
-                    parent = "<LOOP>",
-                    value  = "<LOOP>",
-                    [1]    = "c",
-                },
-                vararg = "<LOOP>",
-                index  = 3,
-            },
-        },
-        node      = {
-            type   = "getglobal",
-            start  = 16,
-            finish = 16,
-            parent = "<LOOP>",
-            [1]    = "a",
-        },
-        args      = {
-            type   = "callargs",
-            start  = 17,
-            finish = 22,
-            parent = "<LOOP>",
-            [1]    = {
-                type   = "getglobal",
-                start  = 19,
-                finish = 19,
-                parent = "<LOOP>",
-                [1]    = "b",
-            },
-            [2]    = {
-                type   = "getglobal",
-                start  = 22,
-                finish = 22,
-                parent = "<LOOP>",
-                [1]    = "c",
-            },
         },
     },
     locals = {

@@ -29,7 +29,7 @@ m.childMap = {
     ['main']        = {'#'},
     ['repeat']      = {'#', 'filter'},
     ['while']       = {'filter', '#'},
-    ['in']          = {'keys', 'call', '#'},
+    ['in']          = {'keys', '#'},
     ['loop']        = {'loc', 'max', 'step', '#'},
     ['if']          = {'#'},
     ['ifblock']     = {'filter', '#'},
@@ -208,6 +208,11 @@ function m.isContain(source, offset)
     return source.start <= offset and source.finish >= offset - 1
 end
 
+--- 判断offset在source的范围内
+function m.isInRange(source, offset)
+    return source.start <= offset and (source.range or source.finish) >= offset - 1
+end
+
 --- 遍历所有包含offset的source
 function m.eachSource(ast, offset, callback)
     local map = m.childMap
@@ -222,8 +227,10 @@ function m.eachSource(ast, offset, callback)
         if obj.value then
             list[len] = obj.value
         end
-        if m.isContain(obj, offset) then
-            callback(obj)
+        if m.isInRange(obj, offset) then
+            if m.isContain(obj, offset) then
+                callback(obj)
+            end
             local keys = map[obj.type]
             if keys then
                 for i = 1, #keys do

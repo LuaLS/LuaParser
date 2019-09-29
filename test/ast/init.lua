@@ -37,13 +37,13 @@ local function eq(a, b)
 end
 
 local sortList = {
-    'type', 'start', 'finish', 'effect',
+    'type', 'start', 'finish', 'effect', 'range',
     'tag',
     'parent', 'extParent', 'child',
     'filter',
     'node',
     'op', 'args',
-    'loc', 'max', 'step', 'keys', 'exps', 'call',
+    'loc', 'max', 'step', 'keys', 'exps', 'call', 'func',
     'dot', 'colon',
     'vararg',
     'field', 'index', 'method',

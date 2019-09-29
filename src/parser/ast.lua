@@ -124,6 +124,9 @@ local function createLocal(key, effect, value, attrs)
     key.effect = effect
     key.value  = value
     key.attrs  = attrs
+    if value then
+        key.range = value.finish
+    end
     return key
 end
 
@@ -996,6 +999,9 @@ local Defs = {
                 key.type = 'setindex'
                 key.value = getValue(values, i)
             end
+            if key.value then
+                key.range = key.value.finish
+            end
         end
         return tableUnpack(keys)
     end,
@@ -1184,7 +1190,6 @@ local Defs = {
         if func then
             local call = createCall(exp, func.finish + 1, exp.finish)
             call.node = func
-            block.call = call
             values = { call }
         end
         for i = 1, #keys do
