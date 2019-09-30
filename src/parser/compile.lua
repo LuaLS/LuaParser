@@ -104,6 +104,20 @@ local function addRef(node, obj)
     obj.node = node
 end
 
+local function createENV()
+    local env = {
+        type   = 'local',
+        start  = 0,
+        finish = 0,
+        effect = 0,
+        [1]    = '_ENV',
+    }
+    env.child = {
+        ['s|_G'] = { env }
+    }
+    return env
+end
+
 local vmMap = {
     ['getname'] = function (obj)
         local loc = guide.getLocal(obj, obj[1], obj.start)
@@ -391,13 +405,7 @@ local vmMap = {
     ['main'] = function (obj)
         Block = obj
         if ENVMode == '_ENV' then
-            local env = {
-                type   = 'local',
-                start  = 0,
-                finish = 0,
-                effect = 0,
-                [1]    = '_ENV',
-            }
+            local env = createENV()
             Compile(env, obj)
             addValue(env, {
                 type = 'table',

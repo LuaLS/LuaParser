@@ -10,6 +10,11 @@ CHECK'a.'
             finish = 0,
             effect = 0,
             parent = "<LOOP>",
+            child  = {
+                ["s|_G"] = {
+                    [1] = "<LOOP>",
+                },
+            },
             vref   = {
                 [1] = {
                     id   = 1,
@@ -74,6 +79,11 @@ CHECK'a.'
                 finish = 0,
                 effect = 0,
                 parent = "<LOOP>",
+                child  = {
+                    ["s|_G"] = {
+                        [1] = "<LOOP>",
+                    },
+                },
                 vref   = {
                     [1] = {
                         id   = 1,
@@ -114,6 +124,11 @@ CHECK'a:'
             finish = 0,
             effect = 0,
             parent = "<LOOP>",
+            child  = {
+                ["s|_G"] = {
+                    [1] = "<LOOP>",
+                },
+            },
             vref   = {
                 [1] = {
                     id   = 1,
@@ -178,6 +193,11 @@ CHECK'a:'
                 finish = 0,
                 effect = 0,
                 parent = "<LOOP>",
+                child  = {
+                    ["s|_G"] = {
+                        [1] = "<LOOP>",
+                    },
+                },
                 vref   = {
                     [1] = {
                         id   = 1,
@@ -221,6 +241,11 @@ a
             finish = 0,
             effect = 0,
             parent = "<LOOP>",
+            child  = {
+                ["s|_G"] = {
+                    [1] = "<LOOP>",
+                },
+            },
             vref   = {
                 [1] = {
                     id   = 1,
@@ -289,6 +314,11 @@ a
                     finish = 0,
                     effect = 0,
                     parent = "<LOOP>",
+                    child  = {
+                        ["s|_G"] = {
+                            [1] = "<LOOP>",
+                        },
+                    },
                     vref   = {
                         [1] = {
                             id   = 1,
@@ -325,6 +355,11 @@ a
             finish = 0,
             effect = 0,
             parent = "<LOOP>",
+            child  = {
+                ["s|_G"] = {
+                    [1] = "<LOOP>",
+                },
+            },
             vref   = {
                 [1] = {
                     id   = 1,
@@ -393,6 +428,11 @@ a
                     finish = 0,
                     effect = 0,
                     parent = "<LOOP>",
+                    child  = {
+                        ["s|_G"] = {
+                            [1] = "<LOOP>",
+                        },
+                    },
                     vref   = {
                         [1] = {
                             id   = 1,
@@ -428,6 +468,11 @@ x =
             finish = 0,
             effect = 0,
             parent = "<LOOP>",
+            child  = {
+                ["s|_G"] = {
+                    [1] = "<LOOP>",
+                },
+            },
             vref   = {
                 [1] = {
                     id   = 1,
@@ -462,6 +507,11 @@ x =
             finish = 0,
             effect = 0,
             parent = "<LOOP>",
+            child  = {
+                ["s|_G"] = {
+                    [1] = "<LOOP>",
+                },
+            },
             vref   = {
                 [1] = {
                     id   = 1,
@@ -493,6 +543,11 @@ CHECK'1 == 2'
             finish = 0,
             effect = 0,
             parent = "<LOOP>",
+            child  = {
+                ["s|_G"] = {
+                    [1] = "<LOOP>",
+                },
+            },
             vref   = {
                 [1] = {
                     id   = 1,
@@ -543,6 +598,11 @@ CHECK 'local function a'
             finish = 0,
             effect = 0,
             parent = "<LOOP>",
+            child  = {
+                ["s|_G"] = {
+                    [1] = "<LOOP>",
+                },
+            },
             vref   = {
                 [1] = {
                     id   = 1,
@@ -600,6 +660,11 @@ CHECK 'local function'
             finish = 0,
             effect = 0,
             parent = "<LOOP>",
+            child  = {
+                ["s|_G"] = {
+                    [1] = "<LOOP>",
+                },
+            },
             vref   = {
                 [1] = {
                     id   = 1,
@@ -627,6 +692,11 @@ CHECK 'local function a(v'
             finish = 0,
             effect = 0,
             parent = "<LOOP>",
+            child  = {
+                ["s|_G"] = {
+                    [1] = "<LOOP>",
+                },
+            },
             vref   = {
                 [1] = {
                     id   = 1,
@@ -744,6 +814,11 @@ CHECK 'function a'
             finish = 0,
             effect = 0,
             parent = "<LOOP>",
+            child  = {
+                ["s|_G"] = {
+                    [1] = "<LOOP>",
+                },
+            },
             vref   = {
                 [1] = {
                     id    = 1,
@@ -816,6 +891,11 @@ CHECK 'function a'
             finish = 0,
             effect = 0,
             parent = "<LOOP>",
+            child  = {
+                ["s|_G"] = {
+                    [1] = "<LOOP>",
+                },
+            },
             vref   = {
                 [1] = {
                     id    = 1,
@@ -877,6 +957,11 @@ CHECK 'function a:'
             finish = 0,
             effect = 0,
             parent = "<LOOP>",
+            child  = {
+                ["s|_G"] = {
+                    [1] = "<LOOP>",
+                },
+            },
             vref   = {
                 [1] = {
                     id   = 1,
@@ -975,6 +1060,11 @@ CHECK 'function a:'
                 finish = 0,
                 effect = 0,
                 parent = "<LOOP>",
+                child  = {
+                    ["s|_G"] = {
+                        [1] = "<LOOP>",
+                    },
+                },
                 vref   = {
                     [1] = {
                         id   = 1,
@@ -1032,6 +1122,11 @@ CHECK 'function a:b(v'
             finish = 0,
             effect = 0,
             parent = "<LOOP>",
+            child  = {
+                ["s|_G"] = {
+                    [1] = "<LOOP>",
+                },
+            },
             vref   = {
                 [1] = {
                     id   = 1,
@@ -1198,6 +1293,11 @@ CHECK 'function a:b(v'
                 finish = 0,
                 effect = 0,
                 parent = "<LOOP>",
+                child  = {
+                    ["s|_G"] = {
+                        [1] = "<LOOP>",
+                    },
+                },
                 vref   = {
                     [1] = {
                         id   = 1,
@@ -1289,6 +1389,11 @@ CHECK 'return local a'
             finish = 0,
             effect = 0,
             parent = "<LOOP>",
+            child  = {
+                ["s|_G"] = {
+                    [1] = "<LOOP>",
+                },
+            },
             vref   = {
                 [1] = {
                     id   = 1,
@@ -1338,6 +1443,11 @@ CHECK 'end'
             finish = 0,
             effect = 0,
             parent = "<LOOP>",
+            child  = {
+                ["s|_G"] = {
+                    [1] = "<LOOP>",
+                },
+            },
             vref   = {
                 [1] = {
                     id   = 1,
@@ -1365,6 +1475,11 @@ CHECK 'local x = ,'
             finish = 0,
             effect = 0,
             parent = "<LOOP>",
+            child  = {
+                ["s|_G"] = {
+                    [1] = "<LOOP>",
+                },
+            },
             vref   = {
                 [1] = {
                     id   = 1,
@@ -1408,6 +1523,11 @@ CHECK 'local x = (a && b)'
             finish = 0,
             effect = 0,
             parent = "<LOOP>",
+            child  = {
+                ["s|_G"] = {
+                    [1] = "<LOOP>",
+                },
+            },
             vref   = {
                 [1] = {
                     id   = 1,
@@ -1539,6 +1659,11 @@ CHECK 'local x = (a && b)'
                             finish = 0,
                             effect = 0,
                             parent = "<LOOP>",
+                            child  = {
+                                ["s|_G"] = {
+                                    [1] = "<LOOP>",
+                                },
+                            },
                             vref   = {
                                 [1] = {
                                     id   = 1,
@@ -1575,6 +1700,11 @@ CHECK 'local x = (a && b)'
                             finish = 0,
                             effect = 0,
                             parent = "<LOOP>",
+                            child  = {
+                                ["s|_G"] = {
+                                    [1] = "<LOOP>",
+                                },
+                            },
                             vref   = {
                                 [1] = {
                                     id   = 1,
@@ -1638,6 +1768,11 @@ CHECK 'local x = (a && b)'
                         finish = 0,
                         effect = 0,
                         parent = "<LOOP>",
+                        child  = {
+                            ["s|_G"] = {
+                                [1] = "<LOOP>",
+                            },
+                        },
                         vref   = {
                             [1] = {
                                 id   = 1,
@@ -1674,6 +1809,11 @@ CHECK 'local x = (a && b)'
                         finish = 0,
                         effect = 0,
                         parent = "<LOOP>",
+                        child  = {
+                            ["s|_G"] = {
+                                [1] = "<LOOP>",
+                            },
+                        },
                         vref   = {
                             [1] = {
                                 id   = 1,
