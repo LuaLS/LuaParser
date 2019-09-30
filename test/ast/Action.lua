@@ -1871,6 +1871,7 @@ end]]
                             parent = "<LOOP>",
                             [1]    = "<LOOP>",
                         },
+                        node   = "<LOOP>",
                         loc    = "<LOOP>",
                         [1]    = "self",
                     },
@@ -1888,6 +1889,18 @@ end]]
                 start  = 27,
                 finish = 30,
                 parent = "<LOOP>",
+                node   = {
+                    type   = "local",
+                    start  = 0,
+                    finish = 0,
+                    effect = 12,
+                    parent = "<LOOP>",
+                    method = "<LOOP>",
+                    ref    = {
+                        [1] = "<LOOP>",
+                    },
+                    [1]    = "self",
+                },
                 loc    = {
                     type   = "local",
                     start  = 0,

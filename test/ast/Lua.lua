@@ -3043,6 +3043,7 @@ end]]
                             start  = 31,
                             finish = 31,
                             parent = "<LOOP>",
+                            node   = "<LOOP>",
                             loc    = "<LOOP>",
                             [1]    = "f",
                         },
@@ -3073,6 +3074,7 @@ end]]
                         },
                         node   = "<LOOP>",
                     },
+                    node   = "<LOOP>",
                     loc    = "<LOOP>",
                     [1]    = "f",
                 },
@@ -3107,6 +3109,7 @@ end]]
                         start  = 31,
                         finish = 31,
                         parent = "<LOOP>",
+                        node   = "<LOOP>",
                         loc    = "<LOOP>",
                         [1]    = "f",
                     },
@@ -3137,6 +3140,7 @@ end]]
                     },
                     node   = "<LOOP>",
                 },
+                node   = "<LOOP>",
                 loc    = "<LOOP>",
                 [1]    = "f",
             },
@@ -3416,6 +3420,7 @@ y, z = 3, 4
                     finish = 45,
                     range  = 52,
                     parent = "<LOOP>",
+                    node   = "<LOOP>",
                     loc    = "<LOOP>",
                     value  = {
                         type   = "number",
@@ -3441,6 +3446,7 @@ y, z = 3, 4
                     finish = 48,
                     range  = 55,
                     parent = "<LOOP>",
+                    node   = "<LOOP>",
                     loc    = "<LOOP>",
                     value  = {
                         type   = "number",
@@ -3504,6 +3510,7 @@ y, z = 3, 4
                 finish = 45,
                 range  = 52,
                 parent = "<LOOP>",
+                node   = "<LOOP>",
                 loc    = "<LOOP>",
                 value  = {
                     type   = "number",
@@ -3529,6 +3536,7 @@ y, z = 3, 4
                 finish = 48,
                 range  = 55,
                 parent = "<LOOP>",
+                node   = "<LOOP>",
                 loc    = "<LOOP>",
                 value  = {
                     type   = "number",
@@ -3562,6 +3570,24 @@ y, z = 3, 4
         finish = 45,
         range  = 52,
         parent = "<LOOP>",
+        node   = {
+            type   = "local",
+            start  = 10,
+            finish = 10,
+            effect = 21,
+            range  = 20,
+            parent = "<LOOP>",
+            value  = {
+                type   = "number",
+                start  = 20,
+                finish = 20,
+                [1]    = 2,
+            },
+            ref    = {
+                [1] = "<LOOP>",
+            },
+            [1]    = "y",
+        },
         loc    = {
             type   = "local",
             start  = 10,
@@ -3594,6 +3620,17 @@ y, z = 3, 4
         finish = 48,
         range  = 55,
         parent = "<LOOP>",
+        node   = {
+            type   = "local",
+            start  = 13,
+            finish = 13,
+            effect = 21,
+            parent = "<LOOP>",
+            ref    = {
+                [1] = "<LOOP>",
+            },
+            [1]    = "z",
+        },
         loc    = {
             type   = "local",
             start  = 13,

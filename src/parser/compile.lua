@@ -110,10 +110,8 @@ local vmMap = {
         if loc then
             obj.type = 'getlocal'
             obj.loc  = loc
-            if not loc.ref then
-                loc.ref = {}
-            end
-            loc.ref[#loc.ref+1] = obj
+            addRef(loc, obj)
+            mergeValue(obj, loc)
         else
             obj.type = 'getglobal'
             if ENVMode == '_ENV' then
@@ -242,10 +240,8 @@ local vmMap = {
         if loc then
             obj.type = 'setlocal'
             obj.loc  = loc
-            if not loc.ref then
-                loc.ref = {}
-            end
-            loc.ref[#loc.ref+1] = obj
+            addRef(loc, obj)
+            mergeValue(obj, loc)
         else
             obj.type = 'setglobal'
             if ENVMode == '_ENV' then
