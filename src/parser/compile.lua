@@ -274,6 +274,7 @@ local vmMap = {
     ['setfield'] = function (obj)
         Compile(obj.node, obj)
         Compile(obj.value, obj)
+        addRef(obj.node, obj)
     end,
     ['do'] = function (obj)
         local lastBlock = Block

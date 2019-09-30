@@ -114,6 +114,9 @@ CHECK 'x.y = 1'
         start  = 1,
         finish = 1,
         parent = "<LOOP>",
+        ref    = {
+            [1] = "<LOOP>",
+        },
         [1]    = "x",
     },
     dot    = {
@@ -189,6 +192,9 @@ CHECK'x.y = function () end'
         start  = 1,
         finish = 1,
         parent = "<LOOP>",
+        ref    = {
+            [1] = "<LOOP>",
+        },
         [1]    = "x",
     },
     dot    = {
