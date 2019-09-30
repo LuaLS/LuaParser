@@ -21,6 +21,9 @@ CHECK'a.b'
         start  = 1,
         finish = 1,
         parent = "<LOOP>",
+        ref    = {
+            [1] = "<LOOP>",
+        },
         [1]    = "a",
     },
     dot    = {
@@ -50,6 +53,9 @@ CHECK'a.b.c'
             start  = 1,
             finish = 1,
             parent = "<LOOP>",
+            ref    = {
+                [1] = "<LOOP>",
+            },
             [1]    = "a",
         },
         dot    = {
@@ -62,6 +68,9 @@ CHECK'a.b.c'
             start  = 3,
             finish = 3,
             [1]    = "b",
+        },
+        ref    = {
+            [1] = "<LOOP>",
         },
     },
     dot    = {
@@ -109,6 +118,9 @@ CHECK'a.b.c()'
                 start  = 1,
                 finish = 1,
                 parent = "<LOOP>",
+                ref    = {
+                    [1] = "<LOOP>",
+                },
                 [1]    = "a",
             },
             dot    = {
@@ -121,6 +133,9 @@ CHECK'a.b.c()'
                 start  = 3,
                 finish = 3,
                 [1]    = "b",
+            },
+            ref    = {
+                [1] = "<LOOP>",
             },
         },
         dot    = {
@@ -717,6 +732,9 @@ CHECK'table[1]'
         start  = 1,
         finish = 5,
         parent = "<LOOP>",
+        ref    = {
+            [1] = "<LOOP>",
+        },
         [1]    = "table",
     },
     index  = {
@@ -742,6 +760,9 @@ CHECK'get_point().x'
             finish = 9,
             parent = "<LOOP>",
             [1]    = "get_point",
+        },
+        ref    = {
+            [1] = "<LOOP>",
         },
     },
     dot    = {
@@ -771,6 +792,9 @@ CHECK'obj:remove()'
             start  = 1,
             finish = 3,
             parent = "<LOOP>",
+            ref    = {
+                [1] = "<LOOP>",
+            },
             [1]    = "obj",
         },
         colon  = {
@@ -801,6 +825,9 @@ CHECK'(...)[1]'
             start  = 2,
             finish = 4,
             parent = "<LOOP>",
+        },
+        ref    = {
+            [1] = "<LOOP>",
         },
     },
     index  = {

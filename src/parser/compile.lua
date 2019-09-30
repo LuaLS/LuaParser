@@ -96,7 +96,7 @@ local function setChildValue(obj, key, value)
     end
 end
 
-local function addLocalRef(node, obj)
+local function addRef(node, obj)
     if not node.ref then
         node.ref = {}
     end
@@ -119,7 +119,7 @@ local vmMap = {
             if ENVMode == '_ENV' then
                 local node = guide.getLocal(obj, '_ENV', obj.start)
                 if node then
-                    addLocalRef(node, obj)
+                    addRef(node, obj)
                 end
             end
         end
@@ -127,6 +127,7 @@ local vmMap = {
     end,
     ['getfield'] = function (obj)
         Compile(obj.node, obj)
+        addRef(obj.node, obj)
     end,
     ['call'] = function (obj)
         Compile(obj.node, obj)
@@ -163,15 +164,18 @@ local vmMap = {
     ['getindex'] = function (obj)
         Compile(obj.node, obj)
         Compile(obj.index, obj)
+        addRef(obj.node, obj)
     end,
     ['setindex'] = function (obj)
         Compile(obj.node, obj)
         Compile(obj.index, obj)
         Compile(obj.value, obj)
+        addRef(obj.node, obj)
     end,
     ['getmethod'] = function (obj)
         Compile(obj.node, obj)
         Compile(obj.method, obj)
+        addRef(obj.node, obj)
     end,
     ['setmethod'] = function (obj)
         Compile(obj.node, obj)
@@ -186,6 +190,7 @@ local vmMap = {
             [1]    = 'self',
         }
         Compile(value, obj)
+        addRef(obj.node, obj)
     end,
     ['function'] = function (obj)
         local lastBlock = Block
@@ -246,7 +251,7 @@ local vmMap = {
             if ENVMode == '_ENV' then
                 local node = guide.getLocal(obj, '_ENV', obj.start)
                 if node then
-                    addLocalRef(node, obj)
+                    addRef(node, obj)
                     setChildValue(node, obj, obj.value)
                 end
             end

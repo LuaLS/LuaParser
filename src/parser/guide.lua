@@ -397,18 +397,28 @@ function m.eachChildValueOf(obj, field, callback)
     end
 end
 
---- 获取对象所有field的引用
-function m.eachChildRef(obj, callback)
+--- 获取对象值的所有引用
+--- 对象 -> 对象绑定的值 -> 引用值的对象 -> 对象的引用
+function m.eachValueRef(obj, callback)
+    -- 对象绑定的值
     local vref = obj.vref
     if not vref then
         return
     end
-    for i = 1, #vref do
-        local v = vref[i]
-        local cref = v.ref
-        if cref then
-            for j = 1, #cref do
-                callback(cref[j])
+    for x = 1, #vref do
+        local v = vref[x]
+        -- 引用值的对象
+        local oref = v.ref
+        if oref then
+            for y = 1, #oref do
+                local co = oref[y]
+                -- 对象的引用
+                local ref = co.ref
+                if ref then
+                    for z = 1, #ref do
+                        callback(ref[z])
+                    end
+                end
             end
         end
     end

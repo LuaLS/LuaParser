@@ -145,6 +145,9 @@ CHECK 'x[y] = 1'
         start  = 1,
         finish = 1,
         parent = "<LOOP>",
+        ref    = {
+            [1] = "<LOOP>",
+        },
         [1]    = "x",
     },
     index  = {
@@ -221,6 +224,9 @@ CHECK'func.x(1, 2)'
             start  = 1,
             finish = 4,
             parent = "<LOOP>",
+            ref    = {
+                [1] = "<LOOP>",
+            },
             [1]    = "func",
         },
         dot    = {
@@ -269,6 +275,9 @@ CHECK'func:x(1, 2)'
             start  = 1,
             finish = 4,
             parent = "<LOOP>",
+            ref    = {
+                [1] = "<LOOP>",
+            },
             [1]    = "func",
         },
         colon  = {
@@ -323,6 +332,9 @@ CHECK'("%s"):format(1)'
                 finish = 5,
                 [1]    = "%s",
                 [2]    = "\"",
+            },
+            ref    = {
+                [1] = "<LOOP>",
             },
         },
         colon  = {
@@ -1630,6 +1642,9 @@ end]]
             start  = 10,
             finish = 10,
             parent = "<LOOP>",
+            ref    = {
+                [1] = "<LOOP>",
+            },
             [1]    = "a",
         },
         dot    = {
@@ -1642,6 +1657,9 @@ end]]
             start  = 12,
             finish = 12,
             [1]    = "b",
+        },
+        ref    = {
+            [1] = "<LOOP>",
         },
     },
     colon  = {
@@ -1812,6 +1830,9 @@ end]]
         start  = 10,
         finish = 10,
         parent = "<LOOP>",
+        ref    = {
+            [1] = "<LOOP>",
+        },
         [1]    = "m",
     },
     colon  = {
