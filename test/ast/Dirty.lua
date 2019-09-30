@@ -716,7 +716,7 @@ CHECK 'function a'
                     type  = "table",
                     tag   = "_ENV",
                     child = {
-                        ["string|a"] = {
+                        ["s|a"] = {
                             [1] = {
                                 id  = 2,
                                 ref = {
@@ -788,7 +788,7 @@ CHECK 'function a'
                     type  = "table",
                     tag   = "_ENV",
                     child = {
-                        ["string|a"] = {
+                        ["s|a"] = {
                             [1] = {
                                 id  = 2,
                                 ref = {

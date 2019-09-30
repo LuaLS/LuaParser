@@ -70,7 +70,7 @@ CHECK';;;x = 1'
                     type  = "table",
                     tag   = "_ENV",
                     child = {
-                        ["string|x"] = {
+                        ["s|x"] = {
                             [1] = {
                                 id     = 2,
                                 type   = "number",
@@ -134,7 +134,7 @@ CHECK';;;x = 1'
                     type  = "table",
                     tag   = "_ENV",
                     child = {
-                        ["string|x"] = {
+                        ["s|x"] = {
                             [1] = {
                                 id     = 2,
                                 type   = "number",
@@ -192,7 +192,7 @@ CHECK'x, y, z = 1, 2, 3'
                     type  = "table",
                     tag   = "_ENV",
                     child = {
-                        ["string|x"] = {
+                        ["s|x"] = {
                             [1] = {
                                 id     = 2,
                                 type   = "number",
@@ -205,7 +205,7 @@ CHECK'x, y, z = 1, 2, 3'
                                 [1]    = 1,
                             },
                         },
-                        ["string|y"] = {
+                        ["s|y"] = {
                             [1] = {
                                 id     = 3,
                                 type   = "number",
@@ -218,7 +218,7 @@ CHECK'x, y, z = 1, 2, 3'
                                 [1]    = 2,
                             },
                         },
-                        ["string|z"] = {
+                        ["s|z"] = {
                             [1] = {
                                 id     = 4,
                                 type   = "number",
@@ -326,7 +326,7 @@ CHECK'x, y, z = 1, 2, 3'
                     type  = "table",
                     tag   = "_ENV",
                     child = {
-                        ["string|x"] = {
+                        ["s|x"] = {
                             [1] = {
                                 id     = 2,
                                 type   = "number",
@@ -339,7 +339,7 @@ CHECK'x, y, z = 1, 2, 3'
                                 [1]    = 1,
                             },
                         },
-                        ["string|y"] = {
+                        ["s|y"] = {
                             [1] = {
                                 id     = 3,
                                 type   = "number",
@@ -352,7 +352,7 @@ CHECK'x, y, z = 1, 2, 3'
                                 [1]    = 2,
                             },
                         },
-                        ["string|z"] = {
+                        ["s|z"] = {
                             [1] = {
                                 id     = 4,
                                 type   = "number",
@@ -453,7 +453,7 @@ CHECK'x, y, z = 1, 2, 3'
                     type  = "table",
                     tag   = "_ENV",
                     child = {
-                        ["string|x"] = {
+                        ["s|x"] = {
                             [1] = {
                                 id     = 2,
                                 type   = "number",
@@ -466,7 +466,7 @@ CHECK'x, y, z = 1, 2, 3'
                                 [1]    = 1,
                             },
                         },
-                        ["string|y"] = {
+                        ["s|y"] = {
                             [1] = {
                                 id     = 3,
                                 type   = "number",
@@ -479,7 +479,7 @@ CHECK'x, y, z = 1, 2, 3'
                                 [1]    = 2,
                             },
                         },
-                        ["string|z"] = {
+                        ["s|z"] = {
                             [1] = {
                                 id     = 4,
                                 type   = "number",
@@ -580,7 +580,7 @@ CHECK'x, y, z = 1, 2, 3'
                     type  = "table",
                     tag   = "_ENV",
                     child = {
-                        ["string|x"] = {
+                        ["s|x"] = {
                             [1] = {
                                 id     = 2,
                                 type   = "number",
@@ -593,7 +593,7 @@ CHECK'x, y, z = 1, 2, 3'
                                 [1]    = 1,
                             },
                         },
-                        ["string|y"] = {
+                        ["s|y"] = {
                             [1] = {
                                 id     = 3,
                                 type   = "number",
@@ -606,7 +606,7 @@ CHECK'x, y, z = 1, 2, 3'
                                 [1]    = 2,
                             },
                         },
-                        ["string|z"] = {
+                        ["s|z"] = {
                             [1] = {
                                 id     = 4,
                                 type   = "number",
@@ -2365,7 +2365,7 @@ y = 2
                     type  = "table",
                     tag   = "_ENV",
                     child = {
-                        ["string|x"] = {
+                        ["s|x"] = {
                             [1] = {
                                 id     = 2,
                                 type   = "number",
@@ -2378,7 +2378,7 @@ y = 2
                                 [1]    = 1,
                             },
                         },
-                        ["string|y"] = {
+                        ["s|y"] = {
                             [1] = {
                                 id     = 3,
                                 type   = "number",
@@ -2464,7 +2464,7 @@ y = 2
                     type  = "table",
                     tag   = "_ENV",
                     child = {
-                        ["string|x"] = {
+                        ["s|x"] = {
                             [1] = {
                                 id     = 2,
                                 type   = "number",
@@ -2477,7 +2477,7 @@ y = 2
                                 [1]    = 1,
                             },
                         },
-                        ["string|y"] = {
+                        ["s|y"] = {
                             [1] = {
                                 id     = 3,
                                 type   = "number",
@@ -2556,7 +2556,7 @@ y = 2
                     type  = "table",
                     tag   = "_ENV",
                     child = {
-                        ["string|x"] = {
+                        ["s|x"] = {
                             [1] = {
                                 id     = 2,
                                 type   = "number",
@@ -2569,7 +2569,7 @@ y = 2
                                 [1]    = 1,
                             },
                         },
-                        ["string|y"] = {
+                        ["s|y"] = {
                             [1] = {
                                 id     = 3,
                                 type   = "number",
@@ -2652,7 +2652,7 @@ x, y = 1, 2
                     type  = "table",
                     tag   = "_ENV",
                     child = {
-                        ["string|x"] = {
+                        ["s|x"] = {
                             [1] = {
                                 id     = 2,
                                 type   = "number",
@@ -2665,7 +2665,7 @@ x, y = 1, 2
                                 [1]    = 1,
                             },
                         },
-                        ["string|y"] = {
+                        ["s|y"] = {
                             [1] = {
                                 id     = 3,
                                 type   = "number",
@@ -2751,7 +2751,7 @@ x, y = 1, 2
                     type  = "table",
                     tag   = "_ENV",
                     child = {
-                        ["string|x"] = {
+                        ["s|x"] = {
                             [1] = {
                                 id     = 2,
                                 type   = "number",
@@ -2764,7 +2764,7 @@ x, y = 1, 2
                                 [1]    = 1,
                             },
                         },
-                        ["string|y"] = {
+                        ["s|y"] = {
                             [1] = {
                                 id     = 3,
                                 type   = "number",
@@ -2843,7 +2843,7 @@ x, y = 1, 2
                     type  = "table",
                     tag   = "_ENV",
                     child = {
-                        ["string|x"] = {
+                        ["s|x"] = {
                             [1] = {
                                 id     = 2,
                                 type   = "number",
@@ -2856,7 +2856,7 @@ x, y = 1, 2
                                 [1]    = 1,
                             },
                         },
-                        ["string|y"] = {
+                        ["s|y"] = {
                             [1] = {
                                 id     = 3,
                                 type   = "number",

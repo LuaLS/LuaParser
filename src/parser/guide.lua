@@ -352,14 +352,14 @@ end
 --- 获取对象作为key时的名字
 function m.getKeyName(obj)
     if obj.type == 'getglobal' or obj.type == 'setglobal' then
-        return 'string|' .. obj[1]
+        return 's|' .. obj[1]
     elseif obj.type == 'getfield' or obj.type == 'getglobal' then
-        return 'string|' .. obj[1]
+        return 's|' .. obj[1]
     end
 end
 
 --- 获取对象所有field的key与valueObj
-function m.eachField(obj, callback)
+function m.eachChildValue(obj, callback)
     local vref = obj.vref
     if not vref then
         return
@@ -378,7 +378,7 @@ function m.eachField(obj, callback)
 end
 
 --- 获取对象所有指定field的key与valueObj
-function m.eachFieldOf(obj, field, callback)
+function m.eachChildValueOf(obj, field, callback)
     local vref = obj.vref
     if not vref then
         return
@@ -394,6 +394,34 @@ function m.eachFieldOf(obj, field, callback)
                 end
             end
         end
+    end
+end
+
+--- 获取对象所有field的引用
+function m.eachChildRef(obj, callback)
+    local vref = obj.vref
+    if not vref then
+        return
+    end
+    for i = 1, #vref do
+        local v = vref[i]
+        local cref = v.ref
+        if cref then
+            for j = 1, #cref do
+                callback(cref[j])
+            end
+        end
+    end
+end
+
+--- 获取对象的所有引用
+function m.eachRef(obj, callback)
+    local ref = obj.ref
+    if not ref then
+        return
+    end
+    for i = 1, #ref do
+        callback(ref[i])
     end
 end
 
