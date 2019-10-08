@@ -36,7 +36,8 @@ m.childMap = {
     ['ifblock']     = {'filter', '#'},
     ['elseifblock'] = {'filter', '#'},
     ['elseblock']   = {'#'},
-    ['setfield']    = {'node', 'value'},
+    ['setfield']    = {'node', 'field', 'value'},
+    ['setglobal']   = {'value'},
     ['local']       = {'attrs', 'value'},
     ['setlocal']    = {'value'},
     ['return']      = {'#'},
@@ -55,7 +56,7 @@ m.childMap = {
     ['paren']       = {'exp'},
     ['call']        = {'node', 'args'},
     ['callargs']    = {'#'},
-    ['getfield']    = {'node'},
+    ['getfield']    = {'node', 'field'},
     ['list']        = {'#'},
 }
 
@@ -226,7 +227,7 @@ function m.isInRange(source, offset)
 end
 
 --- 遍历所有包含offset的source
-function m.eachSource(ast, offset, callback)
+function m.eachSourceContain(ast, offset, callback)
     local map = m.childMap
     local list = { ast }
     while true do
@@ -257,24 +258,32 @@ function m.eachSource(ast, offset, callback)
     end
 end
 
---- 遍历所有某种类型的source
-function m.eachSourceOf(types, callback)
-    if type(types) == 'string' then
-        types = {[types] = callback}
-    elseif type(types) == 'table' then
-        for i = 1, #types do
-            types[types[i]] = callback
+--- 遍历所有包含offset的source
+function m.eachSource(ast, callback)
+    local map = m.childMap
+    local list = { ast }
+    while true do
+        local len = #list
+        if len == 0 then
+            return
         end
-    else
-        return
+        local obj = list[len]
+        list[len] = nil
+        callback(obj)
+        local keys = map[obj.type]
+        if keys then
+            for i = 1, #keys do
+                local key = keys[i]
+                if key == '#' then
+                    for i = 1, #obj do
+                        list[#list+1] = obj[i]
+                    end
+                else
+                    list[#list+1] = obj[key]
+                end
+            end
+        end
     end
-    --for i = 1, #root do
-    --    local source = root[i]
-    --    local f = types[source.type]
-    --    if f then
-    --        f(source)
-    --    end
-    --end
 end
 
 --- 获取偏移对应的坐标（row从0开始，col为光标位置）
@@ -349,90 +358,13 @@ function m.lineRange(lines, row)
     return line.start + 1, line.finish
 end
 
---- 获取对象作为key时的名字
 function m.getKeyName(obj)
     if obj.type == 'getglobal' or obj.type == 'setglobal' then
-        return 's|' .. obj[1]
-    elseif obj.type == 'getfield' or obj.type == 'getglobal' then
-        return 's|' .. obj[1]
+        return obj[1]
+    elseif obj.type == 'getfield' or obj.type == 'setfield' then
+        return obj.field[1]
     end
-end
-
---- 获取对象所有field的key与valueObj
-function m.eachChildValue(obj, callback)
-    local vref = obj.vref
-    if not vref then
-        return
-    end
-    for i = 1, #vref do
-        local v = vref[i]
-        local child = v.child
-        if child then
-            for fieldName, cvref in next, child do
-                for j = 1, #cvref do
-                    callback(fieldName, cvref[j])
-                end
-            end
-        end
-    end
-end
-
---- 获取对象所有指定field的key与valueObj
-function m.eachChildValueOf(obj, field, callback)
-    local vref = obj.vref
-    if not vref then
-        return
-    end
-    for i = 1, #vref do
-        local v = vref[i]
-        local child = v.child
-        if child then
-            local cvref = child[field]
-            if cvref then
-                for j = 1, #cvref do
-                    callback(cvref[j])
-                end
-            end
-        end
-    end
-end
-
---- 获取对象值的所有引用
---- 对象 -> 对象绑定的值 -> 引用值的对象 -> 对象的引用
-function m.eachValueRef(obj, callback)
-    -- 对象绑定的值
-    local vref = obj.vref
-    if not vref then
-        return
-    end
-    for x = 1, #vref do
-        local v = vref[x]
-        -- 引用值的对象
-        local oref = v.ref
-        if oref then
-            for y = 1, #oref do
-                local co = oref[y]
-                -- 对象的引用
-                local ref = co.ref
-                if ref then
-                    for z = 1, #ref do
-                        callback(ref[z])
-                    end
-                end
-            end
-        end
-    end
-end
-
---- 获取对象的所有引用
-function m.eachRef(obj, callback)
-    local ref = obj.ref
-    if not ref then
-        return
-    end
-    for i = 1, #ref do
-        callback(ref[i])
-    end
+    return nil
 end
 
 return m
