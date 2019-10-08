@@ -114,9 +114,6 @@ CHECK 'x.y = 1'
         start  = 1,
         finish = 1,
         parent = "<LOOP>",
-        ref    = {
-            [1] = "<LOOP>",
-        },
         [1]    = "x",
     },
     dot    = {
@@ -148,9 +145,6 @@ CHECK 'x[y] = 1'
         start  = 1,
         finish = 1,
         parent = "<LOOP>",
-        ref    = {
-            [1] = "<LOOP>",
-        },
         [1]    = "x",
     },
     index  = {
@@ -192,9 +186,6 @@ CHECK'x.y = function () end'
         start  = 1,
         finish = 1,
         parent = "<LOOP>",
-        ref    = {
-            [1] = "<LOOP>",
-        },
         [1]    = "x",
     },
     dot    = {
@@ -230,9 +221,6 @@ CHECK'func.x(1, 2)'
             start  = 1,
             finish = 4,
             parent = "<LOOP>",
-            ref    = {
-                [1] = "<LOOP>",
-            },
             [1]    = "func",
         },
         dot    = {
@@ -281,9 +269,6 @@ CHECK'func:x(1, 2)'
             start  = 1,
             finish = 4,
             parent = "<LOOP>",
-            ref    = {
-                [1] = "<LOOP>",
-            },
             [1]    = "func",
         },
         colon  = {
@@ -338,9 +323,6 @@ CHECK'("%s"):format(1)'
                 finish = 5,
                 [1]    = "%s",
                 [2]    = "\"",
-            },
-            ref    = {
-                [1] = "<LOOP>",
             },
         },
         colon  = {
@@ -1564,6 +1546,7 @@ end]]
     type   = "setglobal",
     start  = 10,
     finish = 13,
+    range  = 30,
     value  = {
         type   = "function",
         start  = 1,
@@ -1586,6 +1569,7 @@ end]]
     type   = "setglobal",
     start  = 10,
     finish = 13,
+    range  = 31,
     value  = {
         type   = "function",
         start  = 1,
@@ -1638,6 +1622,7 @@ end]]
     type   = "setmethod",
     start  = 10,
     finish = 14,
+    range  = 38,
     node   = {
         type   = "getfield",
         start  = 10,
@@ -1648,9 +1633,6 @@ end]]
             start  = 10,
             finish = 10,
             parent = "<LOOP>",
-            ref    = {
-                [1] = "<LOOP>",
-            },
             [1]    = "a",
         },
         dot    = {
@@ -1663,9 +1645,6 @@ end]]
             start  = 12,
             finish = 12,
             [1]    = "b",
-        },
-        ref    = {
-            [1] = "<LOOP>",
         },
     },
     colon  = {
@@ -1720,6 +1699,7 @@ end]]
                 start  = 0,
                 finish = 0,
                 effect = 14,
+                tag    = "self",
                 parent = "<LOOP>",
                 method = "<LOOP>",
                 [1]    = "self",
@@ -1831,14 +1811,12 @@ end]]
     type   = "setmethod",
     start  = 10,
     finish = 12,
+    range  = 34,
     node   = {
         type   = "getglobal",
         start  = 10,
         finish = 10,
         parent = "<LOOP>",
-        ref    = {
-            [1] = "<LOOP>",
-        },
         [1]    = "m",
     },
     colon  = {
@@ -1863,6 +1841,7 @@ end]]
                 start  = 0,
                 finish = 0,
                 effect = 12,
+                tag    = "self",
                 parent = "<LOOP>",
                 method = "<LOOP>",
                 ref    = {
@@ -1900,6 +1879,7 @@ end]]
                     start  = 0,
                     finish = 0,
                     effect = 12,
+                    tag    = "self",
                     parent = "<LOOP>",
                     method = "<LOOP>",
                     ref    = {
@@ -1912,6 +1892,7 @@ end]]
                     start  = 0,
                     finish = 0,
                     effect = 12,
+                    tag    = "self",
                     parent = "<LOOP>",
                     method = "<LOOP>",
                     ref    = {

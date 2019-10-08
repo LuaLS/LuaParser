@@ -9,22 +9,8 @@ CHECK''
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id   = 1,
-                    type = "table",
-                    tag  = "_ENV",
-                    ref  = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             [1]    = "_ENV",
         },
     },
@@ -41,22 +27,8 @@ CHECK';;;'
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id   = 1,
-                    type = "table",
-                    tag  = "_ENV",
-                    ref  = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             [1]    = "_ENV",
         },
     },
@@ -73,37 +45,8 @@ CHECK';;;x = 1'
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id    = 1,
-                    type  = "table",
-                    tag   = "_ENV",
-                    child = {
-                        ["s|x"] = {
-                            [1] = {
-                                id     = 2,
-                                type   = "number",
-                                start  = 8,
-                                finish = 8,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 1,
-                            },
-                        },
-                    },
-                    ref   = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             ref    = {
                 [1] = {
                     type   = "setglobal",
@@ -113,16 +56,9 @@ CHECK';;;x = 1'
                     parent = "<LOOP>",
                     node   = "<LOOP>",
                     value  = {
-                        id     = 2,
                         type   = "number",
                         start  = 8,
                         finish = 8,
-                        vref   = {
-                            [1] = "<LOOP>",
-                        },
-                        ref    = {
-                            [1] = "<LOOP>",
-                        },
                         [1]    = 1,
                     },
                     [1]    = "x",
@@ -142,53 +78,17 @@ CHECK';;;x = 1'
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id    = 1,
-                    type  = "table",
-                    tag   = "_ENV",
-                    child = {
-                        ["s|x"] = {
-                            [1] = {
-                                id     = 2,
-                                type   = "number",
-                                start  = 8,
-                                finish = 8,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 1,
-                            },
-                        },
-                    },
-                    ref   = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             ref    = {
                 [1] = "<LOOP>",
             },
             [1]    = "_ENV",
         },
         value  = {
-            id     = 2,
             type   = "number",
             start  = 8,
             finish = 8,
-            vref   = {
-                [1] = "<LOOP>",
-            },
-            ref    = {
-                [1] = "<LOOP>",
-            },
             [1]    = 1,
         },
         [1]    = "x",
@@ -205,63 +105,8 @@ CHECK'x, y, z = 1, 2, 3'
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id    = 1,
-                    type  = "table",
-                    tag   = "_ENV",
-                    child = {
-                        ["s|x"] = {
-                            [1] = {
-                                id     = 2,
-                                type   = "number",
-                                start  = 11,
-                                finish = 11,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 1,
-                            },
-                        },
-                        ["s|y"] = {
-                            [1] = {
-                                id     = 3,
-                                type   = "number",
-                                start  = 14,
-                                finish = 14,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 2,
-                            },
-                        },
-                        ["s|z"] = {
-                            [1] = {
-                                id     = 4,
-                                type   = "number",
-                                start  = 17,
-                                finish = 17,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 3,
-                            },
-                        },
-                    },
-                    ref   = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             ref    = {
                 [1] = {
                     type   = "setglobal",
@@ -271,16 +116,9 @@ CHECK'x, y, z = 1, 2, 3'
                     parent = "<LOOP>",
                     node   = "<LOOP>",
                     value  = {
-                        id     = 2,
                         type   = "number",
                         start  = 11,
                         finish = 11,
-                        vref   = {
-                            [1] = "<LOOP>",
-                        },
-                        ref    = {
-                            [1] = "<LOOP>",
-                        },
                         [1]    = 1,
                     },
                     [1]    = "x",
@@ -293,16 +131,9 @@ CHECK'x, y, z = 1, 2, 3'
                     parent = "<LOOP>",
                     node   = "<LOOP>",
                     value  = {
-                        id     = 3,
                         type   = "number",
                         start  = 14,
                         finish = 14,
-                        vref   = {
-                            [1] = "<LOOP>",
-                        },
-                        ref    = {
-                            [1] = "<LOOP>",
-                        },
                         [1]    = 2,
                     },
                     [1]    = "y",
@@ -315,16 +146,9 @@ CHECK'x, y, z = 1, 2, 3'
                     parent = "<LOOP>",
                     node   = "<LOOP>",
                     value  = {
-                        id     = 4,
                         type   = "number",
                         start  = 17,
                         finish = 17,
-                        vref   = {
-                            [1] = "<LOOP>",
-                        },
-                        ref    = {
-                            [1] = "<LOOP>",
-                        },
                         [1]    = 3,
                     },
                     [1]    = "z",
@@ -344,63 +168,8 @@ CHECK'x, y, z = 1, 2, 3'
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id    = 1,
-                    type  = "table",
-                    tag   = "_ENV",
-                    child = {
-                        ["s|x"] = {
-                            [1] = {
-                                id     = 2,
-                                type   = "number",
-                                start  = 11,
-                                finish = 11,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 1,
-                            },
-                        },
-                        ["s|y"] = {
-                            [1] = {
-                                id     = 3,
-                                type   = "number",
-                                start  = 14,
-                                finish = 14,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 2,
-                            },
-                        },
-                        ["s|z"] = {
-                            [1] = {
-                                id     = 4,
-                                type   = "number",
-                                start  = 17,
-                                finish = 17,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 3,
-                            },
-                        },
-                    },
-                    ref   = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             ref    = {
                 [1] = "<LOOP>",
                 [2] = {
@@ -411,16 +180,9 @@ CHECK'x, y, z = 1, 2, 3'
                     parent = "<LOOP>",
                     node   = "<LOOP>",
                     value  = {
-                        id     = 3,
                         type   = "number",
                         start  = 14,
                         finish = 14,
-                        vref   = {
-                            [1] = "<LOOP>",
-                        },
-                        ref    = {
-                            [1] = "<LOOP>",
-                        },
                         [1]    = 2,
                     },
                     [1]    = "y",
@@ -433,16 +195,9 @@ CHECK'x, y, z = 1, 2, 3'
                     parent = "<LOOP>",
                     node   = "<LOOP>",
                     value  = {
-                        id     = 4,
                         type   = "number",
                         start  = 17,
                         finish = 17,
-                        vref   = {
-                            [1] = "<LOOP>",
-                        },
-                        ref    = {
-                            [1] = "<LOOP>",
-                        },
                         [1]    = 3,
                     },
                     [1]    = "z",
@@ -451,16 +206,9 @@ CHECK'x, y, z = 1, 2, 3'
             [1]    = "_ENV",
         },
         value  = {
-            id     = 2,
             type   = "number",
             start  = 11,
             finish = 11,
-            vref   = {
-                [1] = "<LOOP>",
-            },
-            ref    = {
-                [1] = "<LOOP>",
-            },
             [1]    = 1,
         },
         [1]    = "x",
@@ -476,63 +224,8 @@ CHECK'x, y, z = 1, 2, 3'
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id    = 1,
-                    type  = "table",
-                    tag   = "_ENV",
-                    child = {
-                        ["s|x"] = {
-                            [1] = {
-                                id     = 2,
-                                type   = "number",
-                                start  = 11,
-                                finish = 11,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 1,
-                            },
-                        },
-                        ["s|y"] = {
-                            [1] = {
-                                id     = 3,
-                                type   = "number",
-                                start  = 14,
-                                finish = 14,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 2,
-                            },
-                        },
-                        ["s|z"] = {
-                            [1] = {
-                                id     = 4,
-                                type   = "number",
-                                start  = 17,
-                                finish = 17,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 3,
-                            },
-                        },
-                    },
-                    ref   = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             ref    = {
                 [1] = {
                     type   = "setglobal",
@@ -542,16 +235,9 @@ CHECK'x, y, z = 1, 2, 3'
                     parent = "<LOOP>",
                     node   = "<LOOP>",
                     value  = {
-                        id     = 2,
                         type   = "number",
                         start  = 11,
                         finish = 11,
-                        vref   = {
-                            [1] = "<LOOP>",
-                        },
-                        ref    = {
-                            [1] = "<LOOP>",
-                        },
                         [1]    = 1,
                     },
                     [1]    = "x",
@@ -565,16 +251,9 @@ CHECK'x, y, z = 1, 2, 3'
                     parent = "<LOOP>",
                     node   = "<LOOP>",
                     value  = {
-                        id     = 4,
                         type   = "number",
                         start  = 17,
                         finish = 17,
-                        vref   = {
-                            [1] = "<LOOP>",
-                        },
-                        ref    = {
-                            [1] = "<LOOP>",
-                        },
                         [1]    = 3,
                     },
                     [1]    = "z",
@@ -583,16 +262,9 @@ CHECK'x, y, z = 1, 2, 3'
             [1]    = "_ENV",
         },
         value  = {
-            id     = 3,
             type   = "number",
             start  = 14,
             finish = 14,
-            vref   = {
-                [1] = "<LOOP>",
-            },
-            ref    = {
-                [1] = "<LOOP>",
-            },
             [1]    = 2,
         },
         [1]    = "y",
@@ -608,63 +280,8 @@ CHECK'x, y, z = 1, 2, 3'
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id    = 1,
-                    type  = "table",
-                    tag   = "_ENV",
-                    child = {
-                        ["s|x"] = {
-                            [1] = {
-                                id     = 2,
-                                type   = "number",
-                                start  = 11,
-                                finish = 11,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 1,
-                            },
-                        },
-                        ["s|y"] = {
-                            [1] = {
-                                id     = 3,
-                                type   = "number",
-                                start  = 14,
-                                finish = 14,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 2,
-                            },
-                        },
-                        ["s|z"] = {
-                            [1] = {
-                                id     = 4,
-                                type   = "number",
-                                start  = 17,
-                                finish = 17,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 3,
-                            },
-                        },
-                    },
-                    ref   = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             ref    = {
                 [1] = {
                     type   = "setglobal",
@@ -674,16 +291,9 @@ CHECK'x, y, z = 1, 2, 3'
                     parent = "<LOOP>",
                     node   = "<LOOP>",
                     value  = {
-                        id     = 2,
                         type   = "number",
                         start  = 11,
                         finish = 11,
-                        vref   = {
-                            [1] = "<LOOP>",
-                        },
-                        ref    = {
-                            [1] = "<LOOP>",
-                        },
                         [1]    = 1,
                     },
                     [1]    = "x",
@@ -696,16 +306,9 @@ CHECK'x, y, z = 1, 2, 3'
                     parent = "<LOOP>",
                     node   = "<LOOP>",
                     value  = {
-                        id     = 3,
                         type   = "number",
                         start  = 14,
                         finish = 14,
-                        vref   = {
-                            [1] = "<LOOP>",
-                        },
-                        ref    = {
-                            [1] = "<LOOP>",
-                        },
                         [1]    = 2,
                     },
                     [1]    = "y",
@@ -715,16 +318,9 @@ CHECK'x, y, z = 1, 2, 3'
             [1]    = "_ENV",
         },
         value  = {
-            id     = 4,
             type   = "number",
             start  = 17,
             finish = 17,
-            vref   = {
-                [1] = "<LOOP>",
-            },
-            ref    = {
-                [1] = "<LOOP>",
-            },
             [1]    = 3,
         },
         [1]    = "z",
@@ -741,22 +337,8 @@ CHECK'local x, y, z'
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id   = 1,
-                    type = "table",
-                    tag  = "_ENV",
-                    ref  = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             [1]    = "_ENV",
         },
         [2] = {
@@ -820,22 +402,8 @@ CHECK'local x, y, z = 1, 2, 3'
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id   = 1,
-                    type = "table",
-                    tag  = "_ENV",
-                    ref  = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             [1]    = "_ENV",
         },
         [2] = {
@@ -941,22 +509,8 @@ CHECK'local x, y = y, x'
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id   = 1,
-                    type = "table",
-                    tag  = "_ENV",
-                    ref  = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             ref    = {
                 [1] = {
                     type   = "getglobal",
@@ -1012,22 +566,8 @@ CHECK'local x, y = y, x'
                     start  = 0,
                     finish = 0,
                     effect = 0,
+                    tag    = "_ENV",
                     parent = "<LOOP>",
-                    child  = {
-                        ["s|_G"] = {
-                            [1] = "<LOOP>",
-                        },
-                    },
-                    vref   = {
-                        [1] = {
-                            id   = 1,
-                            type = "table",
-                            tag  = "_ENV",
-                            ref  = {
-                                [1] = "<LOOP>",
-                            },
-                        },
-                    },
                     ref    = {
                         [1] = "<LOOP>",
                         [2] = {
@@ -1071,22 +611,8 @@ CHECK'local x, y = y, x'
                     start  = 0,
                     finish = 0,
                     effect = 0,
+                    tag    = "_ENV",
                     parent = "<LOOP>",
-                    child  = {
-                        ["s|_G"] = {
-                            [1] = "<LOOP>",
-                        },
-                    },
-                    vref   = {
-                        [1] = {
-                            id   = 1,
-                            type = "table",
-                            tag  = "_ENV",
-                            ref  = {
-                                [1] = "<LOOP>",
-                            },
-                        },
-                    },
                     ref    = {
                         [1] = {
                             type   = "getglobal",
@@ -1131,22 +657,8 @@ CHECK'local x, y = y, x'
                 start  = 0,
                 finish = 0,
                 effect = 0,
+                tag    = "_ENV",
                 parent = "<LOOP>",
-                child  = {
-                    ["s|_G"] = {
-                        [1] = "<LOOP>",
-                    },
-                },
-                vref   = {
-                    [1] = {
-                        id   = 1,
-                        type = "table",
-                        tag  = "_ENV",
-                        ref  = {
-                            [1] = "<LOOP>",
-                        },
-                    },
-                },
                 ref    = {
                     [1] = "<LOOP>",
                     [2] = {
@@ -1190,22 +702,8 @@ CHECK'local x, y = y, x'
                 start  = 0,
                 finish = 0,
                 effect = 0,
+                tag    = "_ENV",
                 parent = "<LOOP>",
-                child  = {
-                    ["s|_G"] = {
-                        [1] = "<LOOP>",
-                    },
-                },
-                vref   = {
-                    [1] = {
-                        id   = 1,
-                        type = "table",
-                        tag  = "_ENV",
-                        ref  = {
-                            [1] = "<LOOP>",
-                        },
-                    },
-                },
                 ref    = {
                     [1] = {
                         type   = "getglobal",
@@ -1244,22 +742,8 @@ CHECK'local x, y = f()'
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id   = 1,
-                    type = "table",
-                    tag  = "_ENV",
-                    ref  = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             ref    = {
                 [1] = {
                     type   = "getglobal",
@@ -1359,22 +843,8 @@ CHECK'local x, y = f()'
                             start  = 0,
                             finish = 0,
                             effect = 0,
+                            tag    = "_ENV",
                             parent = "<LOOP>",
-                            child  = {
-                                ["s|_G"] = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
-                            vref   = {
-                                [1] = {
-                                    id   = 1,
-                                    type = "table",
-                                    tag  = "_ENV",
-                                    ref  = {
-                                        [1] = "<LOOP>",
-                                    },
-                                },
-                            },
                             ref    = {
                                 [1] = "<LOOP>",
                             },
@@ -1433,22 +903,8 @@ CHECK'local x, y = f()'
                             start  = 0,
                             finish = 0,
                             effect = 0,
+                            tag    = "_ENV",
                             parent = "<LOOP>",
-                            child  = {
-                                ["s|_G"] = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
-                            vref   = {
-                                [1] = {
-                                    id   = 1,
-                                    type = "table",
-                                    tag  = "_ENV",
-                                    ref  = {
-                                        [1] = "<LOOP>",
-                                    },
-                                },
-                            },
                             ref    = {
                                 [1] = "<LOOP>",
                             },
@@ -1508,22 +964,8 @@ CHECK'local x, y = f()'
                         start  = 0,
                         finish = 0,
                         effect = 0,
+                        tag    = "_ENV",
                         parent = "<LOOP>",
-                        child  = {
-                            ["s|_G"] = {
-                                [1] = "<LOOP>",
-                            },
-                        },
-                        vref   = {
-                            [1] = {
-                                id   = 1,
-                                type = "table",
-                                tag  = "_ENV",
-                                ref  = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
-                        },
                         ref    = {
                             [1] = "<LOOP>",
                         },
@@ -1582,22 +1024,8 @@ CHECK'local x, y = f()'
                         start  = 0,
                         finish = 0,
                         effect = 0,
+                        tag    = "_ENV",
                         parent = "<LOOP>",
-                        child  = {
-                            ["s|_G"] = {
-                                [1] = "<LOOP>",
-                            },
-                        },
-                        vref   = {
-                            [1] = {
-                                id   = 1,
-                                type = "table",
-                                tag  = "_ENV",
-                                ref  = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
-                        },
                         ref    = {
                             [1] = "<LOOP>",
                         },
@@ -1622,22 +1050,8 @@ CHECK'local x, y = (f())'
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id   = 1,
-                    type = "table",
-                    tag  = "_ENV",
-                    ref  = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             ref    = {
                 [1] = {
                     type   = "getglobal",
@@ -1698,22 +1112,8 @@ CHECK'local x, y = (f())'
                             start  = 0,
                             finish = 0,
                             effect = 0,
+                            tag    = "_ENV",
                             parent = "<LOOP>",
-                            child  = {
-                                ["s|_G"] = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
-                            vref   = {
-                                [1] = {
-                                    id   = 1,
-                                    type = "table",
-                                    tag  = "_ENV",
-                                    ref  = {
-                                        [1] = "<LOOP>",
-                                    },
-                                },
-                            },
                             ref    = {
                                 [1] = "<LOOP>",
                             },
@@ -1761,22 +1161,8 @@ CHECK'local x, y = (f())'
                         start  = 0,
                         finish = 0,
                         effect = 0,
+                        tag    = "_ENV",
                         parent = "<LOOP>",
-                        child  = {
-                            ["s|_G"] = {
-                                [1] = "<LOOP>",
-                            },
-                        },
-                        vref   = {
-                            [1] = {
-                                id   = 1,
-                                type = "table",
-                                tag  = "_ENV",
-                                ref  = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
-                        },
                         ref    = {
                             [1] = "<LOOP>",
                         },
@@ -1808,22 +1194,8 @@ CHECK'local x, y = f(), nil'
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id   = 1,
-                    type = "table",
-                    tag  = "_ENV",
-                    ref  = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             ref    = {
                 [1] = {
                     type   = "getglobal",
@@ -1885,22 +1257,8 @@ CHECK'local x, y = f(), nil'
                             start  = 0,
                             finish = 0,
                             effect = 0,
+                            tag    = "_ENV",
                             parent = "<LOOP>",
-                            child  = {
-                                ["s|_G"] = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
-                            vref   = {
-                                [1] = {
-                                    id   = 1,
-                                    type = "table",
-                                    tag  = "_ENV",
-                                    ref  = {
-                                        [1] = "<LOOP>",
-                                    },
-                                },
-                            },
                             ref    = {
                                 [1] = "<LOOP>",
                             },
@@ -1955,22 +1313,8 @@ CHECK'local x, y = f(), nil'
                         start  = 0,
                         finish = 0,
                         effect = 0,
+                        tag    = "_ENV",
                         parent = "<LOOP>",
-                        child  = {
-                            ["s|_G"] = {
-                                [1] = "<LOOP>",
-                            },
-                        },
-                        vref   = {
-                            [1] = {
-                                id   = 1,
-                                type = "table",
-                                tag  = "_ENV",
-                                ref  = {
-                                    [1] = "<LOOP>",
-                                },
-                            },
-                        },
                         ref    = {
                             [1] = "<LOOP>",
                         },
@@ -2009,22 +1353,8 @@ CHECK'local x, y = ...'
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id   = 1,
-                    type = "table",
-                    tag  = "_ENV",
-                    ref  = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             [1]    = "_ENV",
         },
         [2] = {
@@ -2204,22 +1534,8 @@ CHECK'local x, y = (...)'
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id   = 1,
-                    type = "table",
-                    tag  = "_ENV",
-                    ref  = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             [1]    = "_ENV",
         },
         [2] = {
@@ -2293,22 +1609,8 @@ CHECK'local x, y = ..., nil'
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id   = 1,
-                    type = "table",
-                    tag  = "_ENV",
-                    ref  = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             [1]    = "_ENV",
         },
         [2] = {
@@ -2396,22 +1698,8 @@ CHECK'local x <const>, y <close> = 1'
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id   = 1,
-                    type = "table",
-                    tag  = "_ENV",
-                    ref  = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             [1]    = "_ENV",
         },
         [2] = {
@@ -2508,50 +1796,8 @@ y = 2
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id    = 1,
-                    type  = "table",
-                    tag   = "_ENV",
-                    child = {
-                        ["s|x"] = {
-                            [1] = {
-                                id     = 2,
-                                type   = "number",
-                                start  = 5,
-                                finish = 5,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 1,
-                            },
-                        },
-                        ["s|y"] = {
-                            [1] = {
-                                id     = 3,
-                                type   = "number",
-                                start  = 11,
-                                finish = 11,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 2,
-                            },
-                        },
-                    },
-                    ref   = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             ref    = {
                 [1] = {
                     type   = "setglobal",
@@ -2561,16 +1807,9 @@ y = 2
                     parent = "<LOOP>",
                     node   = "<LOOP>",
                     value  = {
-                        id     = 2,
                         type   = "number",
                         start  = 5,
                         finish = 5,
-                        vref   = {
-                            [1] = "<LOOP>",
-                        },
-                        ref    = {
-                            [1] = "<LOOP>",
-                        },
                         [1]    = 1,
                     },
                     [1]    = "x",
@@ -2583,16 +1822,9 @@ y = 2
                     parent = "<LOOP>",
                     node   = "<LOOP>",
                     value  = {
-                        id     = 3,
                         type   = "number",
                         start  = 11,
                         finish = 11,
-                        vref   = {
-                            [1] = "<LOOP>",
-                        },
-                        ref    = {
-                            [1] = "<LOOP>",
-                        },
                         [1]    = 2,
                     },
                     [1]    = "y",
@@ -2612,50 +1844,8 @@ y = 2
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id    = 1,
-                    type  = "table",
-                    tag   = "_ENV",
-                    child = {
-                        ["s|x"] = {
-                            [1] = {
-                                id     = 2,
-                                type   = "number",
-                                start  = 5,
-                                finish = 5,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 1,
-                            },
-                        },
-                        ["s|y"] = {
-                            [1] = {
-                                id     = 3,
-                                type   = "number",
-                                start  = 11,
-                                finish = 11,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 2,
-                            },
-                        },
-                    },
-                    ref   = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             ref    = {
                 [1] = "<LOOP>",
                 [2] = {
@@ -2666,16 +1856,9 @@ y = 2
                     parent = "<LOOP>",
                     node   = "<LOOP>",
                     value  = {
-                        id     = 3,
                         type   = "number",
                         start  = 11,
                         finish = 11,
-                        vref   = {
-                            [1] = "<LOOP>",
-                        },
-                        ref    = {
-                            [1] = "<LOOP>",
-                        },
                         [1]    = 2,
                     },
                     [1]    = "y",
@@ -2684,16 +1867,9 @@ y = 2
             [1]    = "_ENV",
         },
         value  = {
-            id     = 2,
             type   = "number",
             start  = 5,
             finish = 5,
-            vref   = {
-                [1] = "<LOOP>",
-            },
-            ref    = {
-                [1] = "<LOOP>",
-            },
             [1]    = 1,
         },
         [1]    = "x",
@@ -2709,50 +1885,8 @@ y = 2
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id    = 1,
-                    type  = "table",
-                    tag   = "_ENV",
-                    child = {
-                        ["s|x"] = {
-                            [1] = {
-                                id     = 2,
-                                type   = "number",
-                                start  = 5,
-                                finish = 5,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 1,
-                            },
-                        },
-                        ["s|y"] = {
-                            [1] = {
-                                id     = 3,
-                                type   = "number",
-                                start  = 11,
-                                finish = 11,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 2,
-                            },
-                        },
-                    },
-                    ref   = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             ref    = {
                 [1] = {
                     type   = "setglobal",
@@ -2762,16 +1896,9 @@ y = 2
                     parent = "<LOOP>",
                     node   = "<LOOP>",
                     value  = {
-                        id     = 2,
                         type   = "number",
                         start  = 5,
                         finish = 5,
-                        vref   = {
-                            [1] = "<LOOP>",
-                        },
-                        ref    = {
-                            [1] = "<LOOP>",
-                        },
                         [1]    = 1,
                     },
                     [1]    = "x",
@@ -2781,16 +1908,9 @@ y = 2
             [1]    = "_ENV",
         },
         value  = {
-            id     = 3,
             type   = "number",
             start  = 11,
             finish = 11,
-            vref   = {
-                [1] = "<LOOP>",
-            },
-            ref    = {
-                [1] = "<LOOP>",
-            },
             [1]    = 2,
         },
         [1]    = "y",
@@ -2810,50 +1930,8 @@ x, y = 1, 2
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id    = 1,
-                    type  = "table",
-                    tag   = "_ENV",
-                    child = {
-                        ["s|x"] = {
-                            [1] = {
-                                id     = 2,
-                                type   = "number",
-                                start  = 8,
-                                finish = 8,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 1,
-                            },
-                        },
-                        ["s|y"] = {
-                            [1] = {
-                                id     = 3,
-                                type   = "number",
-                                start  = 11,
-                                finish = 11,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 2,
-                            },
-                        },
-                    },
-                    ref   = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             ref    = {
                 [1] = {
                     type   = "setglobal",
@@ -2863,16 +1941,9 @@ x, y = 1, 2
                     parent = "<LOOP>",
                     node   = "<LOOP>",
                     value  = {
-                        id     = 2,
                         type   = "number",
                         start  = 8,
                         finish = 8,
-                        vref   = {
-                            [1] = "<LOOP>",
-                        },
-                        ref    = {
-                            [1] = "<LOOP>",
-                        },
                         [1]    = 1,
                     },
                     [1]    = "x",
@@ -2885,16 +1956,9 @@ x, y = 1, 2
                     parent = "<LOOP>",
                     node   = "<LOOP>",
                     value  = {
-                        id     = 3,
                         type   = "number",
                         start  = 11,
                         finish = 11,
-                        vref   = {
-                            [1] = "<LOOP>",
-                        },
-                        ref    = {
-                            [1] = "<LOOP>",
-                        },
                         [1]    = 2,
                     },
                     [1]    = "y",
@@ -2914,50 +1978,8 @@ x, y = 1, 2
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id    = 1,
-                    type  = "table",
-                    tag   = "_ENV",
-                    child = {
-                        ["s|x"] = {
-                            [1] = {
-                                id     = 2,
-                                type   = "number",
-                                start  = 8,
-                                finish = 8,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 1,
-                            },
-                        },
-                        ["s|y"] = {
-                            [1] = {
-                                id     = 3,
-                                type   = "number",
-                                start  = 11,
-                                finish = 11,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 2,
-                            },
-                        },
-                    },
-                    ref   = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             ref    = {
                 [1] = "<LOOP>",
                 [2] = {
@@ -2968,16 +1990,9 @@ x, y = 1, 2
                     parent = "<LOOP>",
                     node   = "<LOOP>",
                     value  = {
-                        id     = 3,
                         type   = "number",
                         start  = 11,
                         finish = 11,
-                        vref   = {
-                            [1] = "<LOOP>",
-                        },
-                        ref    = {
-                            [1] = "<LOOP>",
-                        },
                         [1]    = 2,
                     },
                     [1]    = "y",
@@ -2986,16 +2001,9 @@ x, y = 1, 2
             [1]    = "_ENV",
         },
         value  = {
-            id     = 2,
             type   = "number",
             start  = 8,
             finish = 8,
-            vref   = {
-                [1] = "<LOOP>",
-            },
-            ref    = {
-                [1] = "<LOOP>",
-            },
             [1]    = 1,
         },
         [1]    = "x",
@@ -3011,50 +2019,8 @@ x, y = 1, 2
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id    = 1,
-                    type  = "table",
-                    tag   = "_ENV",
-                    child = {
-                        ["s|x"] = {
-                            [1] = {
-                                id     = 2,
-                                type   = "number",
-                                start  = 8,
-                                finish = 8,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 1,
-                            },
-                        },
-                        ["s|y"] = {
-                            [1] = {
-                                id     = 3,
-                                type   = "number",
-                                start  = 11,
-                                finish = 11,
-                                vref   = "<LOOP>",
-                                ref    = {
-                                    [1] = "<LOOP>",
-                                },
-                                [1]    = 2,
-                            },
-                        },
-                    },
-                    ref   = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             ref    = {
                 [1] = {
                     type   = "setglobal",
@@ -3064,16 +2030,9 @@ x, y = 1, 2
                     parent = "<LOOP>",
                     node   = "<LOOP>",
                     value  = {
-                        id     = 2,
                         type   = "number",
                         start  = 8,
                         finish = 8,
-                        vref   = {
-                            [1] = "<LOOP>",
-                        },
-                        ref    = {
-                            [1] = "<LOOP>",
-                        },
                         [1]    = 1,
                     },
                     [1]    = "x",
@@ -3083,16 +2042,9 @@ x, y = 1, 2
             [1]    = "_ENV",
         },
         value  = {
-            id     = 3,
             type   = "number",
             start  = 11,
             finish = 11,
-            vref   = {
-                [1] = "<LOOP>",
-            },
-            ref    = {
-                [1] = "<LOOP>",
-            },
             [1]    = 2,
         },
         [1]    = "y",
@@ -3112,22 +2064,8 @@ end]]
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id   = 1,
-                    type = "table",
-                    tag  = "_ENV",
-                    ref  = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             [1]    = "_ENV",
         },
         [2] = {
@@ -3188,22 +2126,8 @@ end]]
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id   = 1,
-                    type = "table",
-                    tag  = "_ENV",
-                    ref  = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             [1]    = "_ENV",
         },
         [2] = {
@@ -3352,22 +2276,8 @@ end]]
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id   = 1,
-                    type = "table",
-                    tag  = "_ENV",
-                    ref  = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             [1]    = "_ENV",
         },
         [2] = {
@@ -3567,22 +2477,8 @@ y, z = 3, 4
             start  = 0,
             finish = 0,
             effect = 0,
+            tag    = "_ENV",
             parent = "<LOOP>",
-            child  = {
-                ["s|_G"] = {
-                    [1] = "<LOOP>",
-                },
-            },
-            vref   = {
-                [1] = {
-                    id   = 1,
-                    type = "table",
-                    tag  = "_ENV",
-                    ref  = {
-                        [1] = "<LOOP>",
-                    },
-                },
-            },
             [1]    = "_ENV",
         },
         [2] = {
