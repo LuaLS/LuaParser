@@ -125,6 +125,7 @@ CHECK 'x.y = 1'
         type   = "field",
         start  = 3,
         finish = 3,
+        node   = "<LOOP>",
         [1]    = "y",
     },
     value  = {
@@ -197,6 +198,7 @@ CHECK'x.y = function () end'
         type   = "field",
         start  = 3,
         finish = 3,
+        node   = "<LOOP>",
         [1]    = "y",
     },
     value  = {
@@ -232,6 +234,7 @@ CHECK'func.x(1, 2)'
             type   = "field",
             start  = 6,
             finish = 6,
+            node   = "<LOOP>",
             [1]    = "x",
         },
     },
@@ -1644,6 +1647,7 @@ end]]
             type   = "field",
             start  = 12,
             finish = 12,
+            node   = "<LOOP>",
             [1]    = "b",
         },
     },

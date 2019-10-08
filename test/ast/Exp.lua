@@ -32,6 +32,7 @@ CHECK'a.b'
         type   = "field",
         start  = 3,
         finish = 3,
+        node   = "<LOOP>",
         [1]    = "b",
     },
 }
@@ -61,6 +62,7 @@ CHECK'a.b.c'
             type   = "field",
             start  = 3,
             finish = 3,
+            node   = "<LOOP>",
             [1]    = "b",
         },
     },
@@ -73,6 +75,7 @@ CHECK'a.b.c'
         type   = "field",
         start  = 5,
         finish = 5,
+        node   = "<LOOP>",
         [1]    = "c",
     },
 }
@@ -120,6 +123,7 @@ CHECK'a.b.c()'
                 type   = "field",
                 start  = 3,
                 finish = 3,
+                node   = "<LOOP>",
                 [1]    = "b",
             },
         },
@@ -132,6 +136,7 @@ CHECK'a.b.c()'
             type   = "field",
             start  = 5,
             finish = 5,
+            node   = "<LOOP>",
             [1]    = "c",
         },
     },
@@ -753,6 +758,7 @@ CHECK'get_point().x'
         type   = "field",
         start  = 13,
         finish = 13,
+        node   = "<LOOP>",
         [1]    = "x",
     },
 }
@@ -935,6 +941,7 @@ CHECK'{x = 1, y = 2}'
             type   = "field",
             start  = 2,
             finish = 2,
+            node   = "<LOOP>",
             [1]    = "x",
         },
         value  = {
@@ -953,6 +960,7 @@ CHECK'{x = 1, y = 2}'
             type   = "field",
             start  = 9,
             finish = 9,
+            node   = "<LOOP>",
             [1]    = "y",
         },
         value  = {
@@ -1101,6 +1109,7 @@ CHECK'{ a = { b = { c = {} } } }'
             type   = "field",
             start  = 3,
             finish = 3,
+            node   = "<LOOP>",
             [1]    = "a",
         },
         value  = {
@@ -1117,6 +1126,7 @@ CHECK'{ a = { b = { c = {} } } }'
                     type   = "field",
                     start  = 9,
                     finish = 9,
+                    node   = "<LOOP>",
                     [1]    = "b",
                 },
                 value  = {
@@ -1133,6 +1143,7 @@ CHECK'{ a = { b = { c = {} } } }'
                             type   = "field",
                             start  = 15,
                             finish = 15,
+                            node   = "<LOOP>",
                             [1]    = "c",
                         },
                         value  = {
