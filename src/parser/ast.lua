@@ -567,29 +567,35 @@ local Defs = {
         }
         if field then
             field.type = 'field'
-            field.node = obj
+            field.parent = obj
         end
         return obj
     end,
     GetIndex = function (start, index, finish)
-        return {
+        local obj = {
             type   = 'getindex',
             start  = start,
             finish = finish - 1,
             index  = index,
         }
+        if index then
+            index.parent = obj
+        end
+        return obj
     end,
     GetMethod = function (colon, method)
-        if method then
-            method.type = 'method'
-        end
-        return {
+        local obj = {
             type   = 'getmethod',
             method = method,
             colon  = colon,
             start  = colon.start,
             finish = (method or colon).finish,
         }
+        if method then
+            method.type = 'method'
+            method.parent = obj
+        end
+        return obj
     end,
     Single = function (unit)
         unit.type  = 'getname'
@@ -907,26 +913,36 @@ local Defs = {
             field  = field,
             value  = value,
         }
-        field.type = 'field'
-        field.node = obj
+        if field then
+            field.type = 'field'
+            field.parent = obj
+        end
         return obj
     end,
     Index = function (start, index, finish)
-        return {
+        local obj = {
             type   = 'index',
             start  = start,
             finish = finish - 1,
             index  = index,
         }
+        if index then
+            index.parent = obj
+        end
+        return obj
     end,
     NewIndex = function (start, index, value, finish)
-        return {
+        local obj = {
             type   = 'tableindex',
             start  = start,
             finish = finish-1,
             index  = index,
             value  = value,
         }
+        if index then
+            index.parent = obj
+        end
+        return obj
     end,
     FuncArgs = function (start, args, finish)
         args.type   = 'funcargs'

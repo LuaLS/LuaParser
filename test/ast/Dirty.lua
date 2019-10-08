@@ -774,6 +774,7 @@ CHECK 'function a:b(v'
                             type   = "method",
                             start  = 12,
                             finish = 12,
+                            parent = "<LOOP>",
                             [1]    = "b",
                         },
                         value  = {
@@ -864,6 +865,7 @@ CHECK 'function a:b(v'
             type   = "method",
             start  = 12,
             finish = 12,
+            parent = "<LOOP>",
             [1]    = "b",
         },
         value  = {
