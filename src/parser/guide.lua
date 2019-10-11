@@ -259,7 +259,7 @@ function m.eachSourceContain(ast, offset, callback)
     end
 end
 
---- 遍历所有包含offset的source
+--- 遍历所有的source
 function m.eachSource(ast, callback)
     local map = m.childMap
     local list = { ast }
@@ -368,11 +368,15 @@ function m.getKeyName(obj)
     or     tp == 'setfield'
     or     tp == 'tablefield' then
         return 's|' .. obj.field[1]
+    elseif tp == 'getmethod'
+    or     tp == 'setmethod' then
+        return 's|' .. obj.method[1]
     elseif tp == 'getindex'
     or     tp == 'setindex'
     or     tp == 'tableindex' then
         return m.getKeyName(obj.index)
-    elseif tp == 'field' then
+    elseif tp == 'field'
+    or     tp == 'method' then
         return 's|' .. obj[1]
     elseif tp == 'index' then
         return m.getKeyName(obj.index)
@@ -399,6 +403,13 @@ function m.getKeyName(obj)
         end
     end
     return nil
+end
+
+function m.getENV(ast)
+    if ast.type ~= 'main' then
+        return nil
+    end
+    return ast.locals[1]
 end
 
 return m
