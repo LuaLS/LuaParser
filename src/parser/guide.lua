@@ -63,6 +63,21 @@ m.childMap = {
     ['unary']       = {1}
 }
 
+m.actionMap = {
+    ['main']        = {'#'},
+    ['repeat']      = {'#'},
+    ['while']       = {'#'},
+    ['in']          = {'#'},
+    ['loop']        = {'#'},
+    ['if']          = {'#'},
+    ['ifblock']     = {'#'},
+    ['elseifblock'] = {'#'},
+    ['elseblock']   = {'#'},
+    ['do']          = {'#'},
+    ['function']    = {'#'},
+    ['funcargs']    = {'#'},
+}
+
 --- 是否是字面量
 function m.isLiteral(obj)
     local tp = obj.type
@@ -71,6 +86,19 @@ function m.isLiteral(obj)
         or tp == 'string'
         or tp == 'number'
         or tp == 'table'
+end
+
+--- 获取字面量
+function m.getLiteral(obj)
+    local tp = obj.type
+    if     tp == 'boolean' then
+        return obj[1]
+    elseif tp == 'string' then
+        return obj[1]
+    elseif tp == 'number' then
+        return obj[1]
+    end
+    return nil
 end
 
 --- 寻找所在函数
@@ -224,14 +252,32 @@ function m.isContain(source, offset)
     return source.start <= offset and source.finish >= offset - 1
 end
 
---- 判断offset在source的范围内
+--- 判断offset在source的影响范围内
+---
+--- 主要针对赋值等语句时，key包含value
 function m.isInRange(source, offset)
     return source.start <= offset and (source.range or source.finish) >= offset - 1
 end
 
+--- 添加child
+function m.addChilds(list, obj, map)
+    local keys = map[obj.type]
+    if keys then
+        for i = 1, #keys do
+            local key = keys[i]
+            if key == '#' then
+                for i = 1, #obj do
+                    list[#list+1] = obj[i]
+                end
+            else
+                list[#list+1] = obj[key]
+            end
+        end
+    end
+end
+
 --- 遍历所有包含offset的source
 function m.eachSourceContain(ast, offset, callback)
-    local map = m.childMap
     local list = { ast }
     while true do
         local len = #list
@@ -244,26 +290,13 @@ function m.eachSourceContain(ast, offset, callback)
             if m.isContain(obj, offset) then
                 callback(obj)
             end
-            local keys = map[obj.type]
-            if keys then
-                for i = 1, #keys do
-                    local key = keys[i]
-                    if key == '#' then
-                        for i = 1, #obj do
-                            list[#list+1] = obj[i]
-                        end
-                    else
-                        list[#list+1] = obj[key]
-                    end
-                end
-            end
+            m.addChilds(list, obj, m.childMap)
         end
     end
 end
 
 --- 遍历所有的source
 function m.eachSource(ast, callback)
-    local map = m.childMap
     local list = { ast }
     while true do
         local len = #list
@@ -273,19 +306,7 @@ function m.eachSource(ast, callback)
         local obj = list[len]
         list[len] = nil
         callback(obj)
-        local keys = map[obj.type]
-        if keys then
-            for i = 1, #keys do
-                local key = keys[i]
-                if key == '#' then
-                    for i = 1, #obj do
-                        list[#list+1] = obj[i]
-                    end
-                else
-                    list[#list+1] = obj[key]
-                end
-            end
-        end
+        m.addChilds(list, obj, m.childMap)
     end
 end
 
