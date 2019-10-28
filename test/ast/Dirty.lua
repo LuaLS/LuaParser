@@ -919,10 +919,10 @@ CHECK 'function a:b(v'
 
 CHECK 'return local a'
 {
-    type   = "main",
-    start  = 1,
-    finish = 14,
-    locals = {
+    type    = "main",
+    start   = 1,
+    finish  = 14,
+    locals  = {
         [1] = {
             type   = "local",
             start  = 0,
@@ -941,13 +941,21 @@ CHECK 'return local a'
             [1]    = "a",
         },
     },
-    [1]    = {
+    returns = {
+        [1] = {
+            type   = "return",
+            start  = 1,
+            finish = 7,
+            parent = "<LOOP>",
+        },
+    },
+    [1]     = {
         type   = "return",
         start  = 1,
         finish = 7,
         parent = "<LOOP>",
     },
-    [2]    = {
+    [2]     = {
         type   = "local",
         start  = 14,
         finish = 14,

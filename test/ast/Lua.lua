@@ -2076,11 +2076,19 @@ end]]
             range  = 33,
             parent = "<LOOP>",
             value  = {
-                type   = "function",
-                start  = 1,
-                finish = 33,
-                parent = "<LOOP>",
-                [1]    = {
+                type    = "function",
+                start   = 1,
+                finish  = 33,
+                parent  = "<LOOP>",
+                returns = {
+                    [1] = {
+                        type   = "return",
+                        start  = 24,
+                        finish = 30,
+                        parent = "<LOOP>",
+                    },
+                },
+                [1]     = {
                     type   = "return",
                     start  = 24,
                     finish = 30,
@@ -2098,11 +2106,19 @@ end]]
         range  = 33,
         parent = "<LOOP>",
         value  = {
-            type   = "function",
-            start  = 1,
-            finish = 33,
-            parent = "<LOOP>",
-            [1]    = {
+            type    = "function",
+            start   = 1,
+            finish  = 33,
+            parent  = "<LOOP>",
+            returns = {
+                [1] = {
+                    type   = "return",
+                    start  = 24,
+                    finish = 30,
+                    parent = "<LOOP>",
+                },
+            },
+            [1]     = {
                 type   = "return",
                 start  = 24,
                 finish = 30,
@@ -2138,11 +2154,34 @@ end]]
             range  = 37,
             parent = "<LOOP>",
             value  = {
-                type   = "function",
-                start  = 1,
-                finish = 37,
-                parent = "<LOOP>",
-                [1]    = {
+                type    = "function",
+                start   = 1,
+                finish  = 37,
+                parent  = "<LOOP>",
+                returns = {
+                    [1] = {
+                        type   = "return",
+                        start  = 24,
+                        finish = 33,
+                        parent = "<LOOP>",
+                        [1]    = {
+                            type   = "call",
+                            start  = 31,
+                            finish = 33,
+                            parent = "<LOOP>",
+                            node   = {
+                                type   = "getlocal",
+                                start  = 31,
+                                finish = 31,
+                                parent = "<LOOP>",
+                                node   = "<LOOP>",
+                                loc    = "<LOOP>",
+                                [1]    = "f",
+                            },
+                        },
+                    },
+                },
+                [1]     = {
                     type   = "return",
                     start  = 24,
                     finish = 33,
@@ -2178,11 +2217,14 @@ end]]
                             start  = 24,
                             finish = 33,
                             parent = {
-                                type   = "function",
-                                start  = 1,
-                                finish = 37,
-                                parent = "<LOOP>",
-                                [1]    = "<LOOP>",
+                                type    = "function",
+                                start   = 1,
+                                finish  = 37,
+                                parent  = "<LOOP>",
+                                returns = {
+                                    [1] = "<LOOP>",
+                                },
+                                [1]     = "<LOOP>",
                             },
                             [1]    = "<LOOP>",
                         },
@@ -2204,11 +2246,34 @@ end]]
         range  = 37,
         parent = "<LOOP>",
         value  = {
-            type   = "function",
-            start  = 1,
-            finish = 37,
-            parent = "<LOOP>",
-            [1]    = {
+            type    = "function",
+            start   = 1,
+            finish  = 37,
+            parent  = "<LOOP>",
+            returns = {
+                [1] = {
+                    type   = "return",
+                    start  = 24,
+                    finish = 33,
+                    parent = "<LOOP>",
+                    [1]    = {
+                        type   = "call",
+                        start  = 31,
+                        finish = 33,
+                        parent = "<LOOP>",
+                        node   = {
+                            type   = "getlocal",
+                            start  = 31,
+                            finish = 31,
+                            parent = "<LOOP>",
+                            node   = "<LOOP>",
+                            loc    = "<LOOP>",
+                            [1]    = "f",
+                        },
+                    },
+                },
+            },
+            [1]     = {
                 type   = "return",
                 start  = 24,
                 finish = 33,
@@ -2244,11 +2309,14 @@ end]]
                         start  = 24,
                         finish = 33,
                         parent = {
-                            type   = "function",
-                            start  = 1,
-                            finish = 37,
-                            parent = "<LOOP>",
-                            [1]    = "<LOOP>",
+                            type    = "function",
+                            start   = 1,
+                            finish  = 37,
+                            parent  = "<LOOP>",
+                            returns = {
+                                [1] = "<LOOP>",
+                            },
+                            [1]     = "<LOOP>",
                         },
                         [1]    = "<LOOP>",
                     },
@@ -2288,11 +2356,11 @@ end]]
             range  = 37,
             parent = "<LOOP>",
             value  = {
-                type   = "function",
-                start  = 1,
-                finish = 37,
-                parent = "<LOOP>",
-                args   = {
+                type    = "function",
+                start   = 1,
+                finish  = 37,
+                parent  = "<LOOP>",
+                args    = {
                     type   = "funcargs",
                     start  = 17,
                     finish = 22,
@@ -2314,7 +2382,7 @@ end]]
                         [1]    = "c",
                     },
                 },
-                locals = {
+                locals  = {
                     [1] = {
                         type   = "local",
                         start  = 18,
@@ -2360,7 +2428,15 @@ end]]
                         [1]    = "c",
                     },
                 },
-                [1]    = {
+                returns = {
+                    [1] = {
+                        type   = "return",
+                        start  = 28,
+                        finish = 34,
+                        parent = "<LOOP>",
+                    },
+                },
+                [1]     = {
                     type   = "return",
                     start  = 28,
                     finish = 34,
@@ -2378,11 +2454,11 @@ end]]
         range  = 37,
         parent = "<LOOP>",
         value  = {
-            type   = "function",
-            start  = 1,
-            finish = 37,
-            parent = "<LOOP>",
-            args   = {
+            type    = "function",
+            start   = 1,
+            finish  = 37,
+            parent  = "<LOOP>",
+            args    = {
                 type   = "funcargs",
                 start  = 17,
                 finish = 22,
@@ -2404,7 +2480,7 @@ end]]
                     [1]    = "c",
                 },
             },
-            locals = {
+            locals  = {
                 [1] = {
                     type   = "local",
                     start  = 18,
@@ -2450,7 +2526,15 @@ end]]
                     [1]    = "c",
                 },
             },
-            [1]    = {
+            returns = {
+                [1] = {
+                    type   = "return",
+                    start  = 28,
+                    finish = 34,
+                    parent = "<LOOP>",
+                },
+            },
+            [1]     = {
                 type   = "return",
                 start  = 28,
                 finish = 34,
