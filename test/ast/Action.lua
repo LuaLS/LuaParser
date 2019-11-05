@@ -117,6 +117,7 @@ CHECK 'x.y = 1'
     finish = 3,
     range  = 7,
     node   = {
+        next   = "<LOOP>",
         type   = "getglobal",
         start  = 1,
         finish = 1,
@@ -150,6 +151,7 @@ CHECK 'x[y] = 1'
     finish = 4,
     range  = 8,
     node   = {
+        next   = "<LOOP>",
         type   = "getglobal",
         start  = 1,
         finish = 1,
@@ -192,6 +194,7 @@ CHECK'x.y = function () end'
     finish = 3,
     range  = 21,
     node   = {
+        next   = "<LOOP>",
         type   = "getglobal",
         start  = 1,
         finish = 1,
@@ -223,11 +226,13 @@ CHECK'func.x(1, 2)'
     start  = 1,
     finish = 12,
     node   = {
+        next   = "<LOOP>",
         type   = "getfield",
         start  = 1,
         finish = 6,
         parent = "<LOOP>",
         node   = {
+            next   = "<LOOP>",
             type   = "getglobal",
             start  = 1,
             finish = 4,
@@ -274,11 +279,13 @@ CHECK'func:x(1, 2)'
     start  = 1,
     finish = 12,
     node   = {
+        next   = "<LOOP>",
         type   = "getmethod",
         start  = 1,
         finish = 6,
         parent = "<LOOP>",
         node   = {
+            next   = "<LOOP>",
             type   = "getglobal",
             start  = 1,
             finish = 4,
@@ -325,11 +332,13 @@ CHECK'("%s"):format(1)'
     start  = 1,
     finish = 16,
     node   = {
+        next   = "<LOOP>",
         type   = "getmethod",
         start  = 1,
         finish = 13,
         parent = "<LOOP>",
         node   = {
+            next   = "<LOOP>",
             type   = "paren",
             start  = 1,
             finish = 6,
@@ -945,6 +954,7 @@ end]]
                     finish = 10,
                     parent = "<LOOP>",
                     node   = {
+                        next   = "<LOOP>",
                         type   = "getglobal",
                         start  = 10,
                         finish = 10,
@@ -982,6 +992,7 @@ end]]
                     finish = 10,
                     parent = "<LOOP>",
                     node   = {
+                        next   = "<LOOP>",
                         type   = "getglobal",
                         start  = 10,
                         finish = 10,
@@ -1074,6 +1085,7 @@ end]]
                         },
                     },
                     node      = {
+                        next   = "<LOOP>",
                         type   = "getglobal",
                         start  = 16,
                         finish = 16,
@@ -1159,6 +1171,7 @@ end]]
                         },
                     },
                     node      = {
+                        next   = "<LOOP>",
                         type   = "getglobal",
                         start  = 16,
                         finish = 16,
@@ -1244,6 +1257,7 @@ end]]
                         [2] = "<LOOP>",
                     },
                     node      = {
+                        next   = "<LOOP>",
                         type   = "getglobal",
                         start  = 16,
                         finish = 16,
@@ -1331,6 +1345,7 @@ end]]
                         },
                     },
                     node      = {
+                        next   = "<LOOP>",
                         type   = "getglobal",
                         start  = 16,
                         finish = 16,
@@ -1416,6 +1431,7 @@ end]]
                         },
                     },
                     node      = {
+                        next   = "<LOOP>",
                         type   = "getglobal",
                         start  = 16,
                         finish = 16,
@@ -1501,6 +1517,7 @@ end]]
                         [2] = "<LOOP>",
                     },
                     node      = {
+                        next   = "<LOOP>",
                         type   = "getglobal",
                         start  = 16,
                         finish = 16,
@@ -1694,11 +1711,13 @@ end]]
     finish = 14,
     range  = 38,
     node   = {
+        next   = "<LOOP>",
         type   = "getfield",
         start  = 10,
         finish = 12,
         parent = "<LOOP>",
         node   = {
+            next   = "<LOOP>",
             type   = "getglobal",
             start  = 10,
             finish = 10,
@@ -1893,6 +1912,7 @@ end]]
     finish = 12,
     range  = 34,
     node   = {
+        next   = "<LOOP>",
         type   = "getglobal",
         start  = 10,
         finish = 10,

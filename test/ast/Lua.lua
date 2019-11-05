@@ -766,6 +766,48 @@ CHECK'local x, y = f()'
             parent = "<LOOP>",
             ref    = {
                 [1] = {
+                    next   = {
+                        type      = "call",
+                        start     = 14,
+                        finish    = 16,
+                        parent    = {
+                            type   = "select",
+                            start  = 14,
+                            finish = 16,
+                            parent = {
+                                type   = "local",
+                                start  = 7,
+                                finish = 7,
+                                effect = 17,
+                                range  = 16,
+                                parent = "<LOOP>",
+                                value  = "<LOOP>",
+                                [1]    = "x",
+                            },
+                            vararg = "<LOOP>",
+                            index  = 1,
+                        },
+                        extParent = {
+                            [1] = {
+                                type   = "select",
+                                start  = 14,
+                                finish = 16,
+                                parent = {
+                                    type   = "local",
+                                    start  = 10,
+                                    finish = 10,
+                                    effect = 17,
+                                    range  = 16,
+                                    parent = "<LOOP>",
+                                    value  = "<LOOP>",
+                                    [1]    = "y",
+                                },
+                                vararg = "<LOOP>",
+                                index  = 2,
+                            },
+                        },
+                        node      = "<LOOP>",
+                    },
                     type   = "getglobal",
                     start  = 14,
                     finish = 14,
@@ -854,6 +896,7 @@ CHECK'local x, y = f()'
                         },
                     },
                     node      = {
+                        next   = "<LOOP>",
                         type   = "getglobal",
                         start  = 14,
                         finish = 14,
@@ -914,6 +957,7 @@ CHECK'local x, y = f()'
                         [1] = "<LOOP>",
                     },
                     node      = {
+                        next   = "<LOOP>",
                         type   = "getglobal",
                         start  = 14,
                         finish = 14,
@@ -975,6 +1019,7 @@ CHECK'local x, y = f()'
                     },
                 },
                 node      = {
+                    next   = "<LOOP>",
                     type   = "getglobal",
                     start  = 14,
                     finish = 14,
@@ -1035,6 +1080,7 @@ CHECK'local x, y = f()'
                     [1] = "<LOOP>",
                 },
                 node      = {
+                    next   = "<LOOP>",
                     type   = "getglobal",
                     start  = 14,
                     finish = 14,
@@ -1074,6 +1120,28 @@ CHECK'local x, y = (f())'
             parent = "<LOOP>",
             ref    = {
                 [1] = {
+                    next   = {
+                        type   = "call",
+                        start  = 15,
+                        finish = 17,
+                        parent = {
+                            type   = "paren",
+                            start  = 14,
+                            finish = 18,
+                            parent = {
+                                type   = "local",
+                                start  = 7,
+                                finish = 7,
+                                effect = 19,
+                                range  = 18,
+                                parent = "<LOOP>",
+                                value  = "<LOOP>",
+                                [1]    = "x",
+                            },
+                            exp    = "<LOOP>",
+                        },
+                        node   = "<LOOP>",
+                    },
                     type   = "getglobal",
                     start  = 15,
                     finish = 15,
@@ -1123,6 +1191,7 @@ CHECK'local x, y = (f())'
                     finish = 17,
                     parent = "<LOOP>",
                     node   = {
+                        next   = "<LOOP>",
                         type   = "getglobal",
                         start  = 15,
                         finish = 15,
@@ -1172,6 +1241,7 @@ CHECK'local x, y = (f())'
                 finish = 17,
                 parent = "<LOOP>",
                 node   = {
+                    next   = "<LOOP>",
                     type   = "getglobal",
                     start  = 15,
                     finish = 15,
@@ -1218,6 +1288,29 @@ CHECK'local x, y = f(), nil'
             parent = "<LOOP>",
             ref    = {
                 [1] = {
+                    next   = {
+                        type   = "call",
+                        start  = 14,
+                        finish = 16,
+                        parent = {
+                            type   = "select",
+                            start  = 14,
+                            finish = 16,
+                            parent = {
+                                type   = "local",
+                                start  = 7,
+                                finish = 7,
+                                effect = 22,
+                                range  = 16,
+                                parent = "<LOOP>",
+                                value  = "<LOOP>",
+                                [1]    = "x",
+                            },
+                            vararg = "<LOOP>",
+                            index  = 1,
+                        },
+                        node   = "<LOOP>",
+                    },
                     type   = "getglobal",
                     start  = 14,
                     finish = 14,
@@ -1268,6 +1361,7 @@ CHECK'local x, y = f(), nil'
                     finish = 16,
                     parent = "<LOOP>",
                     node   = {
+                        next   = "<LOOP>",
                         type   = "getglobal",
                         start  = 14,
                         finish = 14,
@@ -1325,6 +1419,7 @@ CHECK'local x, y = f(), nil'
                 finish = 16,
                 parent = "<LOOP>",
                 node   = {
+                    next   = "<LOOP>",
                     type   = "getglobal",
                     start  = 14,
                     finish = 14,
@@ -2114,7 +2209,7 @@ end]]
             type   = "local",
             start  = 16,
             finish = 16,
-            effect = 1,
+            effect = 16,
             range  = 33,
             parent = "<LOOP>",
             value  = {
@@ -2144,7 +2239,7 @@ end]]
         type   = "local",
         start  = 16,
         finish = 16,
-        effect = 1,
+        effect = 16,
         range  = 33,
         parent = "<LOOP>",
         value  = {
@@ -2192,7 +2287,7 @@ end]]
             type   = "local",
             start  = 16,
             finish = 16,
-            effect = 1,
+            effect = 16,
             range  = 37,
             parent = "<LOOP>",
             value  = {
@@ -2212,6 +2307,7 @@ end]]
                             finish = 33,
                             parent = "<LOOP>",
                             node   = {
+                                next   = "<LOOP>",
                                 type   = "getlocal",
                                 start  = 31,
                                 finish = 31,
@@ -2234,6 +2330,7 @@ end]]
                         finish = 33,
                         parent = "<LOOP>",
                         node   = {
+                            next   = "<LOOP>",
                             type   = "getlocal",
                             start  = 31,
                             finish = 31,
@@ -2247,6 +2344,28 @@ end]]
             },
             ref    = {
                 [1] = {
+                    next   = {
+                        type   = "call",
+                        start  = 31,
+                        finish = 33,
+                        parent = {
+                            type   = "return",
+                            start  = 24,
+                            finish = 33,
+                            parent = {
+                                type    = "function",
+                                start   = 1,
+                                finish  = 37,
+                                parent  = "<LOOP>",
+                                returns = {
+                                    [1] = "<LOOP>",
+                                },
+                                [1]     = "<LOOP>",
+                            },
+                            [1]    = "<LOOP>",
+                        },
+                        node   = "<LOOP>",
+                    },
                     type   = "getlocal",
                     start  = 31,
                     finish = 31,
@@ -2284,7 +2403,7 @@ end]]
         type   = "local",
         start  = 16,
         finish = 16,
-        effect = 1,
+        effect = 16,
         range  = 37,
         parent = "<LOOP>",
         value  = {
@@ -2304,6 +2423,7 @@ end]]
                         finish = 33,
                         parent = "<LOOP>",
                         node   = {
+                            next   = "<LOOP>",
                             type   = "getlocal",
                             start  = 31,
                             finish = 31,
@@ -2326,6 +2446,7 @@ end]]
                     finish = 33,
                     parent = "<LOOP>",
                     node   = {
+                        next   = "<LOOP>",
                         type   = "getlocal",
                         start  = 31,
                         finish = 31,
@@ -2339,6 +2460,28 @@ end]]
         },
         ref    = {
             [1] = {
+                next   = {
+                    type   = "call",
+                    start  = 31,
+                    finish = 33,
+                    parent = {
+                        type   = "return",
+                        start  = 24,
+                        finish = 33,
+                        parent = {
+                            type    = "function",
+                            start   = 1,
+                            finish  = 37,
+                            parent  = "<LOOP>",
+                            returns = {
+                                [1] = "<LOOP>",
+                            },
+                            [1]     = "<LOOP>",
+                        },
+                        [1]    = "<LOOP>",
+                    },
+                    node   = "<LOOP>",
+                },
                 type   = "getlocal",
                 start  = 31,
                 finish = 31,
@@ -2394,7 +2537,7 @@ end]]
             type   = "local",
             start  = 16,
             finish = 16,
-            effect = 1,
+            effect = 16,
             range  = 37,
             parent = "<LOOP>",
             value  = {
@@ -2492,7 +2635,7 @@ end]]
         type   = "local",
         start  = 16,
         finish = 16,
-        effect = 1,
+        effect = 16,
         range  = 37,
         parent = "<LOOP>",
         value  = {
@@ -2689,7 +2832,7 @@ y, z = 3, 4
             type   = "local",
             start  = 37,
             finish = 37,
-            effect = 22,
+            effect = 37,
             range  = 43,
             parent = "<LOOP>",
             value  = {
@@ -2783,7 +2926,7 @@ y, z = 3, 4
         type   = "local",
         start  = 37,
         finish = 37,
-        effect = 22,
+        effect = 37,
         range  = 43,
         parent = "<LOOP>",
         value  = {

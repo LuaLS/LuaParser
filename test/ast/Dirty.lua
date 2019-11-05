@@ -13,6 +13,18 @@ CHECK'a.'
             parent = "<LOOP>",
             ref    = {
                 [1] = {
+                    next   = {
+                        type   = "getfield",
+                        start  = 1,
+                        finish = 2,
+                        parent = "<LOOP>",
+                        node   = "<LOOP>",
+                        dot    = {
+                            type   = ".",
+                            start  = 2,
+                            finish = 2,
+                        },
+                    },
                     type   = "getglobal",
                     start  = 1,
                     finish = 1,
@@ -41,6 +53,7 @@ CHECK'a.'
         finish = 2,
         parent = "<LOOP>",
         node   = {
+            next   = "<LOOP>",
             type   = "getglobal",
             start  = 1,
             finish = 1,
@@ -82,6 +95,18 @@ CHECK'a:'
             parent = "<LOOP>",
             ref    = {
                 [1] = {
+                    next   = {
+                        type   = "getmethod",
+                        start  = 1,
+                        finish = 2,
+                        parent = "<LOOP>",
+                        node   = "<LOOP>",
+                        colon  = {
+                            type   = ":",
+                            start  = 2,
+                            finish = 2,
+                        },
+                    },
                     type   = "getglobal",
                     start  = 1,
                     finish = 1,
@@ -110,6 +135,7 @@ CHECK'a:'
         finish = 2,
         parent = "<LOOP>",
         node   = {
+            next   = "<LOOP>",
             type   = "getglobal",
             start  = 1,
             finish = 1,
@@ -423,7 +449,7 @@ CHECK 'local function a'
             type   = "local",
             start  = 16,
             finish = 16,
-            effect = 1,
+            effect = 16,
             range  = 16,
             parent = "<LOOP>",
             value  = {
@@ -439,7 +465,7 @@ CHECK 'local function a'
         type   = "local",
         start  = 16,
         finish = 16,
-        effect = 1,
+        effect = 16,
         range  = 16,
         parent = "<LOOP>",
         value  = {
@@ -489,7 +515,7 @@ CHECK 'local function a(v'
             type   = "local",
             start  = 16,
             finish = 16,
-            effect = 1,
+            effect = 16,
             range  = 18,
             parent = "<LOOP>",
             value  = {
@@ -535,7 +561,7 @@ CHECK 'local function a(v'
         type   = "local",
         start  = 16,
         finish = 16,
-        effect = 1,
+        effect = 16,
         range  = 18,
         parent = "<LOOP>",
         value  = {
@@ -654,6 +680,37 @@ CHECK 'function a:'
             parent = "<LOOP>",
             ref    = {
                 [1] = {
+                    next   = {
+                        type   = "setmethod",
+                        start  = 10,
+                        finish = 11,
+                        range  = 11,
+                        parent = "<LOOP>",
+                        node   = "<LOOP>",
+                        colon  = {
+                            type   = ":",
+                            start  = 11,
+                            finish = 11,
+                        },
+                        value  = {
+                            type   = "function",
+                            start  = 1,
+                            finish = 11,
+                            parent = "<LOOP>",
+                            locals = {
+                                [1] = {
+                                    type   = "local",
+                                    start  = 0,
+                                    finish = 0,
+                                    effect = 11,
+                                    tag    = "self",
+                                    parent = "<LOOP>",
+                                    method = "<LOOP>",
+                                    [1]    = "self",
+                                },
+                            },
+                        },
+                    },
                     type   = "getglobal",
                     start  = 10,
                     finish = 10,
@@ -702,6 +759,7 @@ CHECK 'function a:'
         range  = 11,
         parent = "<LOOP>",
         node   = {
+            next   = "<LOOP>",
             type   = "getglobal",
             start  = 10,
             finish = 10,
@@ -761,6 +819,72 @@ CHECK 'function a:b(v'
             parent = "<LOOP>",
             ref    = {
                 [1] = {
+                    next   = {
+                        type   = "setmethod",
+                        start  = 10,
+                        finish = 12,
+                        range  = 14,
+                        parent = "<LOOP>",
+                        node   = "<LOOP>",
+                        colon  = {
+                            type   = ":",
+                            start  = 11,
+                            finish = 11,
+                        },
+                        method = {
+                            type   = "method",
+                            start  = 12,
+                            finish = 12,
+                            parent = "<LOOP>",
+                            [1]    = "b",
+                        },
+                        value  = {
+                            type   = "function",
+                            start  = 1,
+                            finish = 14,
+                            parent = "<LOOP>",
+                            args   = {
+                                type   = "funcargs",
+                                start  = 13,
+                                finish = 14,
+                                parent = "<LOOP>",
+                                [1]    = {
+                                    type   = "local",
+                                    start  = 14,
+                                    finish = 14,
+                                    effect = 14,
+                                    parent = "<LOOP>",
+                                    [1]    = "v",
+                                },
+                            },
+                            locals = {
+                                [1] = {
+                                    type   = "local",
+                                    start  = 0,
+                                    finish = 0,
+                                    effect = 12,
+                                    tag    = "self",
+                                    parent = "<LOOP>",
+                                    method = "<LOOP>",
+                                    [1]    = "self",
+                                },
+                                [2] = {
+                                    type   = "local",
+                                    start  = 14,
+                                    finish = 14,
+                                    effect = 14,
+                                    parent = {
+                                        type   = "funcargs",
+                                        start  = 13,
+                                        finish = 14,
+                                        parent = "<LOOP>",
+                                        [1]    = "<LOOP>",
+                                    },
+                                    [1]    = "v",
+                                },
+                            },
+                        },
+                    },
                     type   = "getglobal",
                     start  = 10,
                     finish = 10,
@@ -844,6 +968,7 @@ CHECK 'function a:b(v'
         range  = 14,
         parent = "<LOOP>",
         node   = {
+            next   = "<LOOP>",
             type   = "getglobal",
             start  = 10,
             finish = 10,

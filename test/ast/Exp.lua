@@ -17,6 +17,7 @@ CHECK'a.b'
     start  = 1,
     finish = 3,
     node   = {
+        next   = "<LOOP>",
         type   = "getglobal",
         start  = 1,
         finish = 1,
@@ -42,11 +43,13 @@ CHECK'a.b.c'
     start  = 1,
     finish = 5,
     node   = {
+        next   = "<LOOP>",
         type   = "getfield",
         start  = 1,
         finish = 3,
         parent = "<LOOP>",
         node   = {
+            next   = "<LOOP>",
             type   = "getglobal",
             start  = 1,
             finish = 1,
@@ -85,6 +88,7 @@ CHECK'func()'
     start  = 1,
     finish = 6,
     node   = {
+        next   = "<LOOP>",
         type   = "getglobal",
         start  = 1,
         finish = 4,
@@ -98,16 +102,19 @@ CHECK'a.b.c()'
     start  = 1,
     finish = 7,
     node   = {
+        next   = "<LOOP>",
         type   = "getfield",
         start  = 1,
         finish = 5,
         parent = "<LOOP>",
         node   = {
+            next   = "<LOOP>",
             type   = "getfield",
             start  = 1,
             finish = 3,
             parent = "<LOOP>",
             node   = {
+                next   = "<LOOP>",
                 type   = "getglobal",
                 start  = 1,
                 finish = 1,
@@ -583,6 +590,7 @@ CHECK'func(1)'
     start  = 1,
     finish = 7,
     node   = {
+        next   = "<LOOP>",
         type   = "getglobal",
         start  = 1,
         finish = 4,
@@ -609,6 +617,7 @@ CHECK'func(1, 2)'
     start  = 1,
     finish = 10,
     node   = {
+        next   = "<LOOP>",
         type   = "getglobal",
         start  = 1,
         finish = 4,
@@ -642,6 +651,7 @@ CHECK'func(...)'
     start  = 1,
     finish = 9,
     node   = {
+        next   = "<LOOP>",
         type   = "getglobal",
         start  = 1,
         finish = 4,
@@ -667,6 +677,7 @@ CHECK'func(1, ...)'
     start  = 1,
     finish = 12,
     node   = {
+        next   = "<LOOP>",
         type   = "getglobal",
         start  = 1,
         finish = 4,
@@ -699,6 +710,7 @@ CHECK'func ""'
     start  = 1,
     finish = 7,
     node   = {
+        next   = "<LOOP>",
         type   = "getglobal",
         start  = 1,
         finish = 4,
@@ -726,6 +738,7 @@ CHECK'func {}'
     start  = 1,
     finish = 7,
     node   = {
+        next   = "<LOOP>",
         type   = "getglobal",
         start  = 1,
         finish = 4,
@@ -751,6 +764,7 @@ CHECK'table[1]'
     start  = 1,
     finish = 8,
     node   = {
+        next   = "<LOOP>",
         type   = "getglobal",
         start  = 1,
         finish = 5,
@@ -771,11 +785,13 @@ CHECK'get_point().x'
     start  = 1,
     finish = 13,
     node   = {
+        next   = "<LOOP>",
         type   = "call",
         start  = 1,
         finish = 11,
         parent = "<LOOP>",
         node   = {
+            next   = "<LOOP>",
             type   = "getglobal",
             start  = 1,
             finish = 9,
@@ -802,11 +818,13 @@ CHECK'obj:remove()'
     start  = 1,
     finish = 12,
     node   = {
+        next   = "<LOOP>",
         type   = "getmethod",
         start  = 1,
         finish = 10,
         parent = "<LOOP>",
         node   = {
+            next   = "<LOOP>",
             type   = "getglobal",
             start  = 1,
             finish = 3,
@@ -833,6 +851,7 @@ CHECK'(...)[1]'
     start  = 1,
     finish = 8,
     node   = {
+        next   = "<LOOP>",
         type   = "paren",
         start  = 1,
         finish = 5,
