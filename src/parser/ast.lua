@@ -13,6 +13,7 @@ _ENV = nil
 
 local State
 local PushError
+local PushDiag
 
 -- goto 单独处理
 local RESERVED = {
@@ -607,6 +608,7 @@ local Defs = {
             local current  = units[i]
             current.node = last
             current.start  = last.start
+            last.next = current
             last = units[i]
         end
         return last
@@ -862,7 +864,7 @@ local Defs = {
             return
         end
 
-        local loc = createLocal(name, start, actions)
+        local loc = createLocal(name, name.start, actions)
         loc.localfunction = true
 
         return loc
@@ -1024,6 +1026,17 @@ local Defs = {
                 key.range = key.value.finish
             end
         end
+        if values then
+            for i = #keys+1, #values do
+                local value = values[i]
+                PushDiag('redundant-value', {
+                    start  = value.start,
+                    finish = value.finish,
+                    max    = #keys,
+                    passed = #values,
+                })
+            end
+        end
         return tableUnpack(keys)
     end,
     LocalAttr = function (attrs)
@@ -1077,6 +1090,17 @@ local Defs = {
             key.attrs = nil
             local value = getValue(values, i)
             createLocal(key, finish, value, attrs)
+        end
+        if values then
+            for i = #keys+1, #values do
+                local value = values[i]
+                PushDiag('redundant-value', {
+                    start  = value.start,
+                    finish = value.finish,
+                    max    = #keys,
+                    passed = #values,
+                })
+            end
         end
         return tableUnpack(keys)
     end,
@@ -1212,6 +1236,7 @@ local Defs = {
             local call = createCall(exp, func.finish + 1, exp.finish)
             call.node = func
             call.start = func.start
+            func.next = call
             values = { call }
             keys.range = call.finish
         end
@@ -1617,12 +1642,14 @@ local Defs = {
 local function init(state)
     State     = state
     PushError = state.pushError
+    PushDiag  = state.pushDiag
     emmy.init(State)
 end
 
 local function close()
     State     = nil
     PushError = nil
+    PushDiag  = nil
 end
 
 return {

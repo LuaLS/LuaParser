@@ -53,13 +53,19 @@ local vmMap = {
     ['varargs'] = function (obj)
         local func = guide.getParentFunction(obj)
         if func then
-            local index = guide.getFunctionVarArgs(func)
+            local index, vararg = guide.getFunctionVarArgs(func)
             if not index then
                 pushError {
                     type   = 'UNEXPECT_DOTS',
                     start  = obj.start,
                     finish = obj.finish,
                 }
+            end
+            if vararg then
+                if not vararg.ref then
+                    vararg.ref = {}
+                end
+                vararg.ref[#vararg.ref+1] = obj
             end
         end
     end,
@@ -360,6 +366,8 @@ local function compileGoTo(obj)
         }
         return
     end
+    label.ref = obj
+
     -- 如果有局部变量在 goto 与 label 之间声明，
     -- 并在 label 之后使用，则算作语法错误
 
