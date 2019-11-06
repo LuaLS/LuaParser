@@ -337,3 +337,20 @@ end
         },
     }
 }
+
+Version = 'Lua 5.4'
+TEST[[
+local x <const> = 1
+<!x!> = 2
+]]
+{
+    type = 'SET_CONST',
+}
+
+TEST[[
+local x <close> = 1
+<!x!> = 2
+]]
+{
+    type = 'SET_CONST',
+}
