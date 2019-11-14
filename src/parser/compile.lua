@@ -1,10 +1,20 @@
 local guide = require 'parser.guide'
 local type = type
 
+local specials = {
+    ['_G']           = true,
+    ['rawset']       = true,
+    ['rawget']       = true,
+    ['setmetatable'] = true,
+    ['require']      = true,
+    ['dofile']       = true,
+    ['loadfile']     = true,
+}
+
 _ENV = nil
 
 local LocalLimit = 200
-local pushError, Compile, CompileBlock, Block, GoToTag, ENVMode, Compiled, LocalCount, Version
+local pushError, Compile, CompileBlock, Block, GoToTag, ENVMode, Compiled, LocalCount, Version, Special
 
 local function addRef(node, obj)
     if not node.ref then
@@ -14,6 +24,14 @@ local function addRef(node, obj)
     obj.node = node
 end
 
+local function addSpecial(name, obj)
+    if not Special[name] then
+        Special[name] = {}
+    end
+    Special[name][#Special[name]+1] = obj
+    obj.special = name
+end
+
 local vmMap = {
     ['getname'] = function (obj)
         local loc = guide.getLocal(obj, obj[1], obj.start)
@@ -21,6 +39,9 @@ local vmMap = {
             obj.type = 'getlocal'
             obj.loc  = loc
             addRef(loc, obj)
+            if loc.special then
+                addSpecial(loc.special, obj)
+            end
         else
             obj.type = 'getglobal'
             if ENVMode == '_ENV' then
@@ -28,6 +49,10 @@ local vmMap = {
                 if node then
                     addRef(node, obj)
                 end
+            end
+            local name = obj[1]
+            if specials[name] then
+                addSpecial(name, obj)
             end
         end
         return obj
@@ -208,6 +233,9 @@ local vmMap = {
             obj.localfunction = nil
         end
         Compile(obj.value, obj)
+        if obj.value and obj.value.special then
+            addSpecial(obj.value.special, obj)
+        end
     end,
     ['setfield'] = function (obj)
         Compile(obj.node, obj)
@@ -501,6 +529,7 @@ return function (self, lua, mode, version)
     GoToTag = {}
     LocalCount = 0
     Version = version
+    Special = state.special
     if type(state.ast) == 'table' then
         Compile(state.ast)
     end
