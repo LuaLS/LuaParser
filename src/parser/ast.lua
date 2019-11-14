@@ -80,7 +80,12 @@ local function checkMissEnd(start)
     if not finish then
         return
     end
-    err.info.related = { start, finish }
+    err.info.related = {
+        {
+            start  = start,
+            finish = finish,
+        }
+    }
     PushError {
         type   = 'MISS_END',
         start  = start,
@@ -701,7 +706,7 @@ local Defs = {
                 type   = 'binary',
                 op     = op,
                 start  = left.start,
-                finish = right.finish,
+                finish = right and right.finish or op.finish,
                 [1]    = left,
                 [2]    = right,
             }
