@@ -551,7 +551,12 @@ function f()<!!>
     type = 'MISS_SYMBOL',
     info = {
         symbol = 'end',
-        related = {1, 8},
+        related = {
+            {
+                start  = 1,
+                finish = 8,
+            }
+        },
     }
 }
 
@@ -659,7 +664,12 @@ for k, v in next do<!!>
     type = 'MISS_SYMBOL',
     info = {
         symbol = 'end',
-        related = {1, 3},
+        related = {
+            {
+                start  = 1,
+                finish = 3,
+            },
+        }
     }
 }
 
@@ -769,7 +779,12 @@ for i = 1, 2 do<!!>
     type = 'MISS_SYMBOL',
     info = {
         symbol = 'end',
-        related = {1, 3},
+        related = {
+            {
+                start  = 1,
+                finish = 3,
+            },
+        }
     }
 }
 
@@ -808,7 +823,12 @@ while true do<!!>
     type = 'MISS_SYMBOL',
     info = {
         symbol = 'end',
-        related = {1, 5},
+        related = {
+            {
+                start  = 1,
+                finish = 5,
+            },
+        }
     }
 }
 
@@ -865,7 +885,12 @@ if true then<!!>
     type = 'MISS_SYMBOL',
     info = {
         symbol = 'end',
-        related = {1, 2},
+        related = {
+            {
+                start  = 1,
+                finish = 2,
+            },
+        }
     }
 }
 
@@ -886,7 +911,12 @@ else<!!>
     type = 'MISS_SYMBOL',
     info = {
         symbol = 'end',
-        related = {1, 2},
+        related = {
+            {
+                start  = 1,
+                finish = 2,
+            },
+        }
     }
 }
 
@@ -1203,7 +1233,12 @@ local test = function ( a , b , c , ... )<!!>
     type = 'MISS_SYMBOL',
     info = {
         symbol = 'end',
-        related = {14, 21},
+        related = {
+            {
+                start  = 14,
+                finish = 21,
+            },
+        }
     }
 }
 
@@ -1323,7 +1358,12 @@ if a then<!!>
     type = 'MISS_SYMBOL',
     info = {
         symbol = 'end',
-        related = {1, 2},
+        related = {
+            {
+                start  = 1,
+                finish = 2,
+            },
+        }
     }
 }
 
@@ -1343,7 +1383,12 @@ if a then else<!!>
     type = 'MISS_SYMBOL',
     info = {
         symbol = 'end',
-        related = {1, 2},
+        related = {
+            {
+                start  = 1,
+                finish = 2,
+            },
+        }
     }
 }
 
@@ -1395,7 +1440,12 @@ TEST[[
 --    type = 'REDEFINE_LABEL',
 --    info = {
 --        label = 'label',
---        related = {3, 7},
+--        related = {
+--            {
+--                start  = 3,
+--                finish = 7,
+--            },
+--        }
 --    }
 --}
 
