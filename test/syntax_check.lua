@@ -310,33 +310,62 @@ return x
 
 TEST[[
 ::label::
+::other_label::
 ::<!label!>::
 ]]
 {
     type = 'REDEFINED_LABEL',
-    relative = {
+    related = {
         {
-            start = 3,
+            start  = 3,
+            finish = 7,
+        },
+    }
+}
+
+Version = 'Lua 5.4'
+TEST[[
+::label::
+::other_label::
+if true then
+    ::<!label!>::
+end
+]]
+{
+    type = 'REDEFINED_LABEL',
+    related = {
+        {
+            start  = 3,
             finish = 7,
         },
     }
 }
 
 TEST[[
+if true then
+    ::label::
+end
 ::label::
-do
-    ::<!label!>::
+]]
+(nil)
+
+Version = 'Lua 5.3'
+TEST[[
+::label::
+::other_label::
+if true then
+    ::label::
 end
 ]]
-{
-    type = 'REDEFINED_LABEL',
-    relative = {
-        {
-            start = 3,
-            finish = 7,
-        },
-    }
-}
+(nil)
+
+TEST[[
+if true then
+    ::label::
+end
+::label::
+]]
+(nil)
 
 Version = 'Lua 5.4'
 TEST[[

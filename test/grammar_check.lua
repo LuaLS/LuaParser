@@ -1431,24 +1431,6 @@ TEST[[
     type = 'KEYWORD',
 }
 
---TEST[[
---::label::
---::other_label::
---::<!label!>::
---]]
---{
---    type = 'REDEFINE_LABEL',
---    info = {
---        label = 'label',
---        related = {
---            {
---                start  = 3,
---                finish = 7,
---            },
---        }
---    }
---}
-
 TEST[[
 local function <!a.b!>()
 end

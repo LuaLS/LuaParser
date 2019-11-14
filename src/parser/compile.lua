@@ -4,7 +4,7 @@ local type = type
 _ENV = nil
 
 local LocalLimit = 200
-local pushError, Compile, CompileBlock, Block, GoToTag, ENVMode, Compiled, LocalCount
+local pushError, Compile, CompileBlock, Block, GoToTag, ENVMode, Compiled, LocalCount, Version
 
 local function addRef(node, obj)
     if not node.ref then
@@ -250,17 +250,20 @@ local vmMap = {
             local name = obj[1]
             local label = guide.getLabel(block, name)
             if label then
-                pushError {
-                    type   = 'REDEFINED_LABEL',
-                    start  = obj.start,
-                    finish = obj.finish,
-                    relative = {
-                        {
-                            label.start,
-                            label.finish,
+                if Version == 'Lua 5.4'
+                or block == guide.getBlock(label) then
+                    pushError {
+                        type   = 'REDEFINED_LABEL',
+                        start  = obj.start,
+                        finish = obj.finish,
+                        relative = {
+                            {
+                                label.start,
+                                label.finish,
+                            }
                         }
                     }
-                }
+                end
             end
             block.labels[name] = obj
         end
@@ -497,6 +500,7 @@ return function (self, lua, mode, version)
     Compiled = {}
     GoToTag = {}
     LocalCount = 0
+    Version = version
     if type(state.ast) == 'table' then
         Compile(state.ast)
     end
