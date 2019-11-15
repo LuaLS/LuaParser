@@ -135,9 +135,11 @@ function m.dump(tbl, option)
             end
             local value = tbl[key]
             local tp = type(value)
-            if tp == 'table' then
+            if option['format'] and option['format'][key] then
+                lines[#lines+1] = ('%s%s%s,'):format(TAB[tab+1], keyWord, option['format'][key](value, unpack, tab+1))
+            elseif tp == 'table' then
                 if mark[value] and mark[value] > 0 then
-                    lines[#lines+1] = ('%s%s%s,'):format(TAB[tab+1], keyWord, option.loop or '"<Loop>"')
+                    lines[#lines+1] = ('%s%s%s,'):format(TAB[tab+1], keyWord, option['loop'] or '"<Loop>"')
                 else
                     lines[#lines+1] = ('%s%s{'):format(TAB[tab+1], keyWord)
                     unpack(value, tab+1)
@@ -146,7 +148,7 @@ function m.dump(tbl, option)
             elseif tp == 'string' then
                 lines[#lines+1] = ('%s%s%q,'):format(TAB[tab+1], keyWord, value)
             elseif tp == 'number' then
-                lines[#lines+1] = ('%s%s%s,'):format(TAB[tab+1], keyWord, (option.number or formatNumber)(value))
+                lines[#lines+1] = ('%s%s%s,'):format(TAB[tab+1], keyWord, (option['number'] or formatNumber)(value))
             elseif tp == 'nil' then
             else
                 lines[#lines+1] = ('%s%s%s,'):format(TAB[tab+1], keyWord, tostring(value))
@@ -286,7 +288,7 @@ function m.counter(init, step)
     if not step then
         step = 1
     end
-    local current = init and (init - 1) or -1
+    local current = init and (init - 1) or 0
     return function ()
         current = current + step
         return current
@@ -382,6 +384,12 @@ function m.pack(t)
         end
     end
     return pack(1)
+end
+
+--- defer
+local deferMT = { __close = function (self) self[1]() end }
+function m.defer(callback)
+    return setmetatable({ callback }, deferMT)
 end
 
 return m

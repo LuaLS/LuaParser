@@ -222,10 +222,23 @@ CHECK'x.y = function () end'
 }
 CHECK'require "xxx"'
 {
-    type   = "call",
-    start  = 1,
-    finish = 13,
-    node   = {
+    specials = {
+        require = {
+            [1] = {
+                next    = "<LOOP>",
+                type    = "getglobal",
+                start   = 1,
+                finish  = 7,
+                special = "require",
+                parent  = "<LOOP>",
+                [1]     = "require",
+            },
+        },
+    },
+    type     = "call",
+    start    = 1,
+    finish   = 13,
+    node     = {
         next    = "<LOOP>",
         type    = "getglobal",
         start   = 1,
@@ -234,7 +247,7 @@ CHECK'require "xxx"'
         parent  = "<LOOP>",
         [1]     = "require",
     },
-    args   = {
+    args     = {
         type   = "callargs",
         start  = 9,
         finish = 13,
