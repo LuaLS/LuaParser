@@ -642,6 +642,12 @@ end]]
             type    = "function",
             start   = 1,
             finish  = 33,
+            keyword = {
+                [1] = 7,
+                [2] = 14,
+                [3] = 31,
+                [4] = 33,
+            },
             parent  = "<IGNORE>",
             returns = {
                 [1] = {
@@ -681,6 +687,12 @@ end]]
             type    = "function",
             start   = 1,
             finish  = 37,
+            keyword = {
+                [1] = 7,
+                [2] = 14,
+                [3] = 35,
+                [4] = 37,
+            },
             parent  = "<IGNORE>",
             returns = {
                 [1] = {
@@ -735,6 +747,12 @@ end]]
             type    = "function",
             start   = 1,
             finish  = 37,
+            keyword = {
+                [1] = 7,
+                [2] = 14,
+                [3] = 35,
+                [4] = 37,
+            },
             parent  = "<IGNORE>",
             args    = {
                 type   = "funcargs",
@@ -839,10 +857,16 @@ y, z = 3, 4
         range  = 43,
         parent = "<IGNORE>",
         value  = {
-            type   = "function",
-            start  = 22,
-            finish = 43,
-            parent = "<IGNORE>",
+            type    = "function",
+            start   = 22,
+            finish  = 43,
+            keyword = {
+                [1] = 28,
+                [2] = 35,
+                [3] = 41,
+                [4] = 43,
+            },
+            parent  = "<IGNORE>",
         },
         [1]    = "f",
     },

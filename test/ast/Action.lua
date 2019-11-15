@@ -166,10 +166,16 @@ CHECK'x = function () end'
     finish = 1,
     range  = 19,
     value  = {
-        type   = "function",
-        start  = 5,
-        finish = 19,
-        parent = "<IGNORE>",
+        type    = "function",
+        start   = 5,
+        finish  = 19,
+        keyword = {
+            [1] = 5,
+            [2] = 12,
+            [3] = 17,
+            [4] = 19,
+        },
+        parent  = "<IGNORE>",
     },
     [1]    = "x",
 }
@@ -193,10 +199,16 @@ CHECK'x.y = function () end'
         [1]    = "y",
     },
     value  = {
-        type   = "function",
-        start  = 7,
-        finish = 21,
-        parent = "<IGNORE>",
+        type    = "function",
+        start   = 7,
+        finish  = 21,
+        keyword = {
+            [1] = 7,
+            [2] = 14,
+            [3] = 19,
+            [4] = 21,
+        },
+        parent  = "<IGNORE>",
     },
 }
 CHECK'require "xxx"'
@@ -297,16 +309,28 @@ CHECK'("%s"):format(1)'
 }
 CHECK'do end'
 {
-    type   = "do",
-    start  = 1,
-    finish = 6,
+    type    = "do",
+    start   = 1,
+    finish  = 6,
+    keyword = {
+        [1] = 1,
+        [2] = 2,
+        [3] = 4,
+        [4] = 6,
+    },
 }
 CHECK'do x = 1 end'
 {
-    type   = "do",
-    start  = 1,
-    finish = 12,
-    [1]    = {
+    type    = "do",
+    start   = 1,
+    finish  = 12,
+    keyword = {
+        [1] = 1,
+        [2] = 2,
+        [3] = 10,
+        [4] = 12,
+    },
+    [1]     = {
         type   = "setglobal",
         start  = 4,
         finish = 4,
@@ -393,6 +417,12 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        keys   = {
+            [1] = 1,
+            [2] = 2,
+            [3] = 6,
+            [4] = 9,
+        },
     },
 }
 CHECK[[if 1 then
@@ -413,6 +443,12 @@ end]]
             finish = 4,
             parent = "<IGNORE>",
             [1]    = 1,
+        },
+        keys   = {
+            [1] = 1,
+            [2] = 2,
+            [3] = 6,
+            [4] = 9,
         },
         [1]    = {
             type   = "return",
@@ -443,6 +479,12 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        keys   = {
+            [1] = 1,
+            [2] = 2,
+            [3] = 6,
+            [4] = 9,
+        },
         [1]    = {
             type   = "return",
             start  = 15,
@@ -455,6 +497,10 @@ end]]
         start  = 22,
         finish = 37,
         parent = "<IGNORE>",
+        keys   = {
+            [1] = 22,
+            [2] = 25,
+        },
         [1]    = {
             type   = "return",
             start  = 31,
@@ -484,6 +530,12 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        keys   = {
+            [1] = 1,
+            [2] = 2,
+            [3] = 6,
+            [4] = 9,
+        },
         [1]    = {
             type   = "return",
             start  = 15,
@@ -502,6 +554,12 @@ end]]
             finish = 29,
             parent = "<IGNORE>",
             [1]    = 1,
+        },
+        keys   = {
+            [1] = 22,
+            [2] = 27,
+            [3] = 31,
+            [4] = 34,
         },
         [1]    = {
             type   = "return",
@@ -534,6 +592,12 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        keys   = {
+            [1] = 1,
+            [2] = 2,
+            [3] = 6,
+            [4] = 9,
+        },
         [1]    = {
             type   = "return",
             start  = 15,
@@ -553,6 +617,12 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        keys   = {
+            [1] = 22,
+            [2] = 27,
+            [3] = 31,
+            [4] = 34,
+        },
         [1]    = {
             type   = "return",
             start  = 40,
@@ -565,6 +635,10 @@ end]]
         start  = 47,
         finish = 62,
         parent = "<IGNORE>",
+        keys   = {
+            [1] = 47,
+            [2] = 50,
+        },
         [1]    = {
             type   = "return",
             start  = 56,
@@ -595,6 +669,12 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        keys   = {
+            [1] = 1,
+            [2] = 2,
+            [3] = 6,
+            [4] = 9,
+        },
     },
     [2]    = {
         type   = "elseifblock",
@@ -607,6 +687,12 @@ end]]
             finish = 18,
             parent = "<IGNORE>",
             [1]    = 1,
+        },
+        keys   = {
+            [1] = 11,
+            [2] = 16,
+            [3] = 20,
+            [4] = 23,
         },
     },
     [3]    = {
@@ -621,6 +707,12 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        keys   = {
+            [1] = 25,
+            [2] = 30,
+            [3] = 34,
+            [4] = 37,
+        },
     },
     [4]    = {
         type   = "elseifblock",
@@ -633,6 +725,12 @@ end]]
             finish = 46,
             parent = "<IGNORE>",
             [1]    = 1,
+        },
+        keys   = {
+            [1] = 39,
+            [2] = 44,
+            [3] = 48,
+            [4] = 51,
         },
     },
 }
@@ -657,6 +755,12 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        keys   = {
+            [1] = 1,
+            [2] = 2,
+            [3] = 6,
+            [4] = 9,
+        },
         [1]    = {
             type   = "if",
             start  = 15,
@@ -673,6 +777,12 @@ end]]
                     finish = 18,
                     parent = "<IGNORE>",
                     [1]    = 2,
+                },
+                keys   = {
+                    [1] = 15,
+                    [2] = 16,
+                    [3] = 20,
+                    [4] = 23,
                 },
             },
         },
@@ -699,6 +809,12 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        keys   = {
+            [1] = 1,
+            [2] = 2,
+            [3] = 6,
+            [4] = 9,
+        },
     },
     [2]    = {
         type   = "elseifblock",
@@ -712,12 +828,22 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        keys   = {
+            [1] = 11,
+            [2] = 16,
+            [3] = 20,
+            [4] = 23,
+        },
     },
     [3]    = {
         type   = "elseblock",
         start  = 25,
         finish = 28,
         parent = "<IGNORE>",
+        keys   = {
+            [1] = 25,
+            [2] = 28,
+        },
     },
 }
 CHECK[[
@@ -725,10 +851,18 @@ for i = 1, i do
     return
 end]]
 {
-    type   = "loop",
-    start  = 1,
-    finish = 30,
-    loc    = {
+    type    = "loop",
+    start   = 1,
+    finish  = 30,
+    keyword = {
+        [1] = 1,
+        [2] = 3,
+        [3] = 14,
+        [4] = 15,
+        [5] = 28,
+        [6] = 30,
+    },
+    loc     = {
         type   = "local",
         start  = 5,
         finish = 5,
@@ -744,15 +878,15 @@ end]]
         },
         [1]    = "i",
     },
-    max    = {
+    max     = {
         type   = "getglobal",
         start  = 12,
         finish = 12,
         parent = "<IGNORE>",
         [1]    = "i",
     },
-    locals = "<IGNORE>",
-    [1]    = {
+    locals  = "<IGNORE>",
+    [1]     = {
         type   = "return",
         start  = 21,
         finish = 27,
@@ -764,10 +898,18 @@ for i = 1, 10, i do
     return
 end]]
 {
-    type   = "loop",
-    start  = 1,
-    finish = 34,
-    loc    = {
+    type    = "loop",
+    start   = 1,
+    finish  = 34,
+    keyword = {
+        [1] = 1,
+        [2] = 3,
+        [3] = 18,
+        [4] = 19,
+        [5] = 32,
+        [6] = 34,
+    },
+    loc     = {
         type   = "local",
         start  = 5,
         finish = 5,
@@ -783,22 +925,22 @@ end]]
         },
         [1]    = "i",
     },
-    max    = {
+    max     = {
         type   = "number",
         start  = 12,
         finish = 13,
         parent = "<IGNORE>",
         [1]    = 10,
     },
-    step   = {
+    step    = {
         type   = "getglobal",
         start  = 16,
         finish = 16,
         parent = "<IGNORE>",
         [1]    = "i",
     },
-    locals = "<IGNORE>",
-    [1]    = {
+    locals  = "<IGNORE>",
+    [1]     = {
         type   = "return",
         start  = 25,
         finish = 31,
@@ -810,10 +952,20 @@ for a in a do
     return
 end]]
 {
-    type   = "in",
-    start  = 1,
-    finish = 28,
-    keys   = {
+    type    = "in",
+    start   = 1,
+    finish  = 28,
+    keyword = {
+        [1] = 1,
+        [2] = 3,
+        [3] = 7,
+        [4] = 8,
+        [5] = 12,
+        [6] = 13,
+        [7] = 26,
+        [8] = 28,
+    },
+    keys    = {
         type   = "list",
         start  = 4,
         finish = 5,
@@ -848,8 +1000,8 @@ end]]
             [1]    = "a",
         },
     },
-    locals = "<IGNORE>",
-    [1]    = {
+    locals  = "<IGNORE>",
+    [1]     = {
         type   = "return",
         start  = 19,
         finish = 25,
@@ -861,10 +1013,20 @@ for a, b, c in a, b, c do
     return
 end]]
 {
-    type   = "in",
-    start  = 1,
-    finish = 40,
-    keys   = {
+    type    = "in",
+    start   = 1,
+    finish  = 40,
+    keyword = {
+        [1] = 1,
+        [2] = 3,
+        [3] = 13,
+        [4] = 14,
+        [5] = 24,
+        [6] = 25,
+        [7] = 38,
+        [8] = 40,
+    },
+    keys    = {
         type   = "list",
         start  = 4,
         finish = 11,
@@ -1002,8 +1164,8 @@ end]]
             [1]    = "c",
         },
     },
-    locals = "<IGNORE>",
-    [1]    = {
+    locals  = "<IGNORE>",
+    [1]     = {
         type   = "return",
         start  = 31,
         finish = 37,
@@ -1015,17 +1177,25 @@ while true do
     return
 end]]
 {
-    type   = "while",
-    start  = 1,
-    finish = 28,
-    filter = {
+    type    = "while",
+    start   = 1,
+    finish  = 28,
+    keyword = {
+        [1] = 1,
+        [2] = 5,
+        [3] = 12,
+        [4] = 13,
+        [5] = 26,
+        [6] = 28,
+    },
+    filter  = {
         type   = "boolean",
         start  = 7,
         finish = 10,
         parent = "<IGNORE>",
         [1]    = true,
     },
-    [1]    = {
+    [1]     = {
         type   = "return",
         start  = 19,
         finish = 25,
@@ -1037,17 +1207,23 @@ repeat
     break
 until 1]]
 {
-    type   = "repeat",
-    start  = 1,
-    finish = 25,
-    filter = {
+    type    = "repeat",
+    start   = 1,
+    finish  = 25,
+    keyword = {
+        [1] = 1,
+        [2] = 6,
+        [3] = 18,
+        [4] = 22,
+    },
+    filter  = {
         type   = "number",
         start  = 24,
         finish = 24,
         parent = "<IGNORE>",
         [1]    = 1,
     },
-    breaks = {
+    breaks  = {
         [1] = {
             type   = "break",
             start  = 12,
@@ -1055,7 +1231,7 @@ until 1]]
             parent = "<IGNORE>",
         },
     },
-    [1]    = {
+    [1]     = {
         type   = "break",
         start  = 12,
         finish = 16,
@@ -1075,6 +1251,12 @@ end]]
         type    = "function",
         start   = 1,
         finish  = 30,
+        keyword = {
+            [1] = 1,
+            [2] = 8,
+            [3] = 28,
+            [4] = 30,
+        },
         parent  = "<IGNORE>",
         returns = {
             [1] = {
@@ -1106,6 +1288,12 @@ end]]
         type    = "function",
         start   = 1,
         finish  = 31,
+        keyword = {
+            [1] = 1,
+            [2] = 8,
+            [3] = 29,
+            [4] = 31,
+        },
         parent  = "<IGNORE>",
         args    = {
             type   = "funcargs",
@@ -1165,6 +1353,12 @@ end]]
         type    = "function",
         start   = 1,
         finish  = 38,
+        keyword = {
+            [1] = 1,
+            [2] = 8,
+            [3] = 36,
+            [4] = 38,
+        },
         parent  = "<IGNORE>",
         args    = {
             type   = "funcargs",
@@ -1239,6 +1433,12 @@ end]]
         type    = "function",
         start   = 1,
         finish  = 34,
+        keyword = {
+            [1] = 1,
+            [2] = 8,
+            [3] = 32,
+            [4] = 34,
+        },
         parent  = "<IGNORE>",
         locals  = "<IGNORE>",
         returns = {

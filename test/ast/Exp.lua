@@ -811,16 +811,28 @@ CHECK'(...)[1]'
 }
 CHECK'function () end'
 {
-    type   = "function",
-    start  = 1,
-    finish = 15,
+    type    = "function",
+    start   = 1,
+    finish  = 15,
+    keyword = {
+        [1] = 1,
+        [2] = 8,
+        [3] = 13,
+        [4] = 15,
+    },
 }
 CHECK'function (...) end'
 {
-    type   = "function",
-    start  = 1,
-    finish = 18,
-    args   = {
+    type    = "function",
+    start   = 1,
+    finish  = 18,
+    keyword = {
+        [1] = 1,
+        [2] = 8,
+        [3] = 16,
+        [4] = 18,
+    },
+    args    = {
         type   = "funcargs",
         start  = 10,
         finish = 14,
@@ -835,10 +847,16 @@ CHECK'function (...) end'
 }
 CHECK'function (a, ...) end'
 {
-    type   = "function",
-    start  = 1,
-    finish = 21,
-    args   = {
+    type    = "function",
+    start   = 1,
+    finish  = 21,
+    keyword = {
+        [1] = 1,
+        [2] = 8,
+        [3] = 19,
+        [4] = 21,
+    },
+    args    = {
         type   = "funcargs",
         start  = 10,
         finish = 17,
@@ -858,7 +876,7 @@ CHECK'function (a, ...) end'
             parent = "<IGNORE>",
         },
     },
-    locals = "<IGNORE>",
+    locals  = "<IGNORE>",
 }
 CHECK'{}'
 {
