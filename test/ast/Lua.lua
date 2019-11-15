@@ -634,6 +634,7 @@ end]]
     [1]    = {
         type   = "local",
         start  = 16,
+        vstart = 7,
         finish = 16,
         effect = 16,
         range  = 33,
@@ -679,6 +680,7 @@ end]]
     [1]    = {
         type   = "local",
         start  = 16,
+        vstart = 7,
         finish = 16,
         effect = 16,
         range  = 37,
@@ -739,6 +741,7 @@ end]]
     [1]    = {
         type   = "local",
         start  = 16,
+        vstart = 7,
         finish = 16,
         effect = 16,
         range  = 37,
@@ -852,6 +855,7 @@ y, z = 3, 4
     [4]    = {
         type   = "local",
         start  = 37,
+        vstart = 28,
         finish = 37,
         effect = 37,
         range  = 43,

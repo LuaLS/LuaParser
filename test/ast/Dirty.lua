@@ -186,6 +186,7 @@ CHECK 'local function a'
     [1]    = {
         type   = "local",
         start  = 16,
+        vstart = 7,
         finish = 16,
         effect = 16,
         range  = 16,
@@ -223,6 +224,7 @@ CHECK 'local function a(v'
     [1]    = {
         type   = "local",
         start  = 16,
+        vstart = 7,
         finish = 16,
         effect = 16,
         range  = 18,
@@ -267,6 +269,7 @@ CHECK 'function a'
     [1]    = {
         type   = "setglobal",
         start  = 10,
+        vstart = 1,
         finish = 10,
         range  = 10,
         parent = "<IGNORE>",
@@ -296,6 +299,7 @@ CHECK 'function a:'
     [1]    = {
         type   = "setmethod",
         start  = 10,
+        vstart = 1,
         finish = 11,
         range  = 11,
         parent = "<IGNORE>",
@@ -330,6 +334,7 @@ CHECK 'function a:b(v'
     [1]    = {
         type   = "setmethod",
         start  = 10,
+        vstart = 1,
         finish = 12,
         range  = 14,
         parent = "<IGNORE>",

@@ -1245,6 +1245,7 @@ end]]
 {
     type   = "setglobal",
     start  = 10,
+    vstart = 1,
     finish = 13,
     range  = 30,
     value  = {
@@ -1282,6 +1283,7 @@ end]]
 {
     type   = "setglobal",
     start  = 10,
+    vstart = 1,
     finish = 13,
     range  = 31,
     value  = {
@@ -1334,6 +1336,7 @@ end]]
 {
     type   = "setmethod",
     start  = 10,
+    vstart = 1,
     finish = 14,
     range  = 38,
     node   = "<IGNORE>",
@@ -1414,6 +1417,7 @@ end]]
 {
     type   = "setmethod",
     start  = 10,
+    vstart = 1,
     finish = 12,
     range  = 34,
     node   = "<IGNORE>",

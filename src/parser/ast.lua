@@ -875,6 +875,7 @@ local Defs = {
             name.value = actions
         end
         name.range = actions.finish
+        name.vstart = functionStart
         return name
     end,
     LocalFunction = function (start, functionStart, functionFinish, name, args, actions, endStart, endFinish)
@@ -903,6 +904,7 @@ local Defs = {
 
         local loc = createLocal(name, name.start, actions)
         loc.localfunction = true
+        loc.vstart = functionStart
 
         return loc
     end,

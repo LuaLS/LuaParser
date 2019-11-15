@@ -268,7 +268,7 @@ end
 ---
 --- 主要针对赋值等语句时，key包含value
 function m.isInRange(source, offset)
-    return source.start <= offset and (source.range or source.finish) >= offset - 1
+    return (source.vstart or source.start) <= offset and (source.range or source.finish) >= offset - 1
 end
 
 --- 添加child
@@ -442,6 +442,33 @@ function m.lineRange(lines, row)
     return line.start, line.finish
 end
 
+function m.getKeyString(obj)
+    local tp = obj.type
+    if tp == 'getglobal'
+    or tp == 'setglobal' then
+        return obj[1]
+    elseif tp == 'getfield'
+    or     tp == 'setfield'
+    or     tp == 'tablefield' then
+        return obj.field[1]
+    elseif tp == 'getmethod'
+    or     tp == 'setmethod' then
+        return obj.method[1]
+    elseif tp == 'getindex'
+    or     tp == 'setindex'
+    or     tp == 'tableindex' then
+        return m.getKeyString(obj.index)
+    elseif tp == 'field'
+    or     tp == 'method' then
+        return obj[1]
+    elseif tp == 'index' then
+        return m.getKeyString(obj.index)
+    elseif tp == 'string' then
+        return obj[1]
+    end
+    return nil
+end
+
 function m.getKeyName(obj)
     local tp = obj.type
     if tp == 'getglobal'
@@ -518,14 +545,16 @@ function m.getPath(a, b)
     local mode
     local objA
     local objB
-    if a.start < b.start then
+    if a.finish < b.start then
         mode = 'before'
         objA = a
         objB = b
-    else
+    elseif a.start > b.finish then
         mode = 'after'
         objA = b
         objB = a
+    else
+        return 'equal', {}, {}
     end
     local pathA = {}
     local pathB = {}
