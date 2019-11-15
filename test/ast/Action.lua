@@ -886,24 +886,7 @@ end]]
                     start     = 16,
                     finish    = 22,
                     parent    = "<IGNORE>",
-                    extParent = {
-                        [1] = {
-                            type   = "select",
-                            start  = 16,
-                            finish = 22,
-                            parent = "<IGNORE>",
-                            vararg = "<LOOP>",
-                            index  = 2,
-                        },
-                        [2] = {
-                            type   = "select",
-                            start  = 16,
-                            finish = 22,
-                            parent = "<IGNORE>",
-                            vararg = "<LOOP>",
-                            index  = 3,
-                        },
-                    },
+                    extParent = "<IGNORE>",
                     node      = "<IGNORE>",
                     args      = {
                         type   = "callargs",
@@ -947,17 +930,7 @@ end]]
                     start     = 16,
                     finish    = 22,
                     parent    = "<IGNORE>",
-                    extParent = {
-                        [1] = "<LOOP>",
-                        [2] = {
-                            type   = "select",
-                            start  = 16,
-                            finish = 22,
-                            parent = "<IGNORE>",
-                            vararg = "<LOOP>",
-                            index  = 3,
-                        },
-                    },
+                    extParent = "<IGNORE>",
                     node      = "<IGNORE>",
                     args      = {
                         type   = "callargs",
@@ -1001,17 +974,7 @@ end]]
                     start     = 16,
                     finish    = 22,
                     parent    = "<IGNORE>",
-                    extParent = {
-                        [1] = {
-                            type   = "select",
-                            start  = 16,
-                            finish = 22,
-                            parent = "<IGNORE>",
-                            vararg = "<LOOP>",
-                            index  = 2,
-                        },
-                        [2] = "<LOOP>",
-                    },
+                    extParent = "<IGNORE>",
                     node      = "<IGNORE>",
                     args      = {
                         type   = "callargs",
