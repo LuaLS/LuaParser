@@ -1210,7 +1210,7 @@ local Defs = {
         actions.start  = ifStart
         actions.finish = finish - 1
         actions.filter = exp
-        actions.keys   = {
+        actions.keyword= {
             ifStart,   ifFinish - 1,
             thenStart, thenFinish - 1,
         }
@@ -1221,7 +1221,7 @@ local Defs = {
         actions.start  = elseifStart
         actions.finish = finish - 1
         actions.filter = exp
-        actions.keys   = {
+        actions.keyword= {
             elseifStart, elseifFinish - 1,
             thenStart,   thenFinish - 1,
         }
@@ -1231,7 +1231,7 @@ local Defs = {
         actions.type   = 'elseblock'
         actions.start  = elseStart
         actions.finish = finish - 1
-        actions.keys   = {
+        actions.keyword= {
             elseStart, elseFinish - 1,
         }
         return actions
