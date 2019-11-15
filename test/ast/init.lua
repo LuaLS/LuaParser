@@ -37,6 +37,7 @@ local function eq(a, b)
 end
 
 local sortList = {
+    'specials',
     'type', 'start', 'finish', 'effect', 'range',
     'tag', 'special',
     'parent', 'extParent', 'child',
@@ -54,6 +55,9 @@ local sortList = {
 for i, v in ipairs(sortList) do
     sortList[v] = i
 end
+local ignoreList = {
+    'specials', 'locals', 'ref', 'node', 'parent',
+}
 
 local option = {
     alignment = true,
@@ -88,7 +92,15 @@ local option = {
     number = function (n)
         return ('%q'):format(n)
     end,
+    format = {},
 }
+
+for _, key in ipairs(ignoreList) do
+    option.format[key] = function ()
+        return '"<IGNORE>"'
+    end
+end
+
 
 local function autoFix(myAst, targetAst)
     local myBuf = utility.dump(myAst, option)
