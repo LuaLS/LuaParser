@@ -367,6 +367,68 @@ CHECK'- 1 + 2 * 3'
         },
     },
 }
+CHECK"x and y == 'unary' and z"
+{
+    type   = "binary",
+    start  = 1,
+    finish = 24,
+    op     = {
+        type   = "and",
+        start  = 20,
+        finish = 22,
+    },
+    [1]    = {
+        type   = "binary",
+        start  = 1,
+        finish = 18,
+        parent = "<IGNORE>",
+        op     = {
+            type   = "and",
+            start  = 3,
+            finish = 5,
+        },
+        [1]    = {
+            type   = "getglobal",
+            start  = 1,
+            finish = 1,
+            parent = "<IGNORE>",
+            [1]    = "x",
+        },
+        [2]    = {
+            type   = "binary",
+            start  = 7,
+            finish = 18,
+            parent = "<IGNORE>",
+            op     = {
+                type   = "==",
+                start  = 9,
+                finish = 10,
+            },
+            [1]    = {
+                type   = "getglobal",
+                start  = 7,
+                finish = 7,
+                parent = "<IGNORE>",
+                [1]    = "y",
+            },
+            [2]    = {
+                type   = "string",
+                start  = 12,
+                finish = 18,
+                parent = "<IGNORE>",
+                [1]    = "unary",
+                [2]    = "'",
+            },
+        },
+    },
+    [2]    = {
+        type   = "getglobal",
+        start  = 24,
+        finish = 24,
+        parent = "<IGNORE>",
+        [1]    = "z",
+    },
+}
 -- 幂运算从右向左连接
 CHECK'1 ^ 2 ^ 3'
 {
