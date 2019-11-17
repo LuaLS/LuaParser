@@ -421,7 +421,7 @@ x:m<!!>
 }
 
 TEST[[
-x = 1 and<!!>
+x = 1 <!and!>
 ]]
 {
     type = 'MISS_EXP',
@@ -1251,28 +1251,28 @@ local test = <!function!> ( a , b , c , ... )
 }
 
 TEST[[
-a = 3 /<!!> / 2
+a = 3 <!/!> / 2
 ]]
 {
     type = 'MISS_EXP',
 }
 
 TEST[[
-b = 1 &<!!>& 1
+b = 1 <!&!>& 1
 ]]
 {
     type = 'MISS_EXP',
 }
 
 TEST[[
-b = 1 <<!!>> 0
+b = 1 <!<!>> 0
 ]]
 {
     type = 'MISS_EXP',
 }
 
 TEST[[
-b = 1 <<!!> < 0
+b = 1 <!<!> < 0
 ]]
 {
     type = 'MISS_EXP',

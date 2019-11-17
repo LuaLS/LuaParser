@@ -517,3 +517,101 @@ CHECK 'return 1 + + 1'
         },
     },
 }
+
+CHECK 'return 1 + # + 2'
+{
+    type    = "main",
+    start   = 1,
+    finish  = 16,
+    locals  = "<IGNORE>",
+    returns = "<IGNORE>",
+    [1]     = {
+        type   = "return",
+        start  = 1,
+        finish = 16,
+        parent = "<IGNORE>",
+        [1]    = {
+            type   = "binary",
+            start  = 8,
+            finish = 16,
+            parent = "<IGNORE>",
+            op     = {
+                type   = "+",
+                start  = 14,
+                finish = 14,
+            },
+            [1]    = {
+                type   = "number",
+                start  = 8,
+                finish = 8,
+                parent = "<IGNORE>",
+                [1]    = 1,
+            },
+            [2]    = {
+                type   = "number",
+                start  = 16,
+                finish = 16,
+                parent = "<IGNORE>",
+                [1]    = 2,
+            },
+        },
+    },
+}
+
+CHECK 'return 1 + 2 + # + 3'
+{
+    type    = "main",
+    start   = 1,
+    finish  = 20,
+    locals  = "<IGNORE>",
+    returns = "<IGNORE>",
+    [1]     = {
+        type   = "return",
+        start  = 1,
+        finish = 20,
+        parent = "<IGNORE>",
+        [1]    = {
+            type   = "binary",
+            start  = 8,
+            finish = 20,
+            parent = "<IGNORE>",
+            op     = {
+                type   = "+",
+                start  = 18,
+                finish = 18,
+            },
+            [1]    = {
+                type   = "binary",
+                start  = 8,
+                finish = 12,
+                parent = "<IGNORE>",
+                op     = {
+                    type   = "+",
+                    start  = 10,
+                    finish = 10,
+                },
+                [1]    = {
+                    type   = "number",
+                    start  = 8,
+                    finish = 8,
+                    parent = "<IGNORE>",
+                    [1]    = 1,
+                },
+                [2]    = {
+                    type   = "number",
+                    start  = 12,
+                    finish = 12,
+                    parent = "<IGNORE>",
+                    [1]    = 2,
+                },
+            },
+            [2]    = {
+                type   = "number",
+                start  = 20,
+                finish = 20,
+                parent = "<IGNORE>",
+                [1]    = 3,
+            },
+        },
+    },
+}
