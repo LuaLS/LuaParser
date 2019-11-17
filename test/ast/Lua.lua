@@ -650,14 +650,7 @@ end]]
                 [4] = 33,
             },
             parent  = "<IGNORE>",
-            returns = {
-                [1] = {
-                    type   = "return",
-                    start  = 24,
-                    finish = 30,
-                    parent = "<IGNORE>",
-                },
-            },
+            returns = "<IGNORE>",
             [1]     = {
                 type   = "return",
                 start  = 24,
@@ -696,21 +689,7 @@ end]]
                 [4] = 37,
             },
             parent  = "<IGNORE>",
-            returns = {
-                [1] = {
-                    type   = "return",
-                    start  = 24,
-                    finish = 33,
-                    parent = "<IGNORE>",
-                    [1]    = {
-                        type   = "call",
-                        start  = 31,
-                        finish = 33,
-                        parent = "<IGNORE>",
-                        node   = "<IGNORE>",
-                    },
-                },
-            },
+            returns = "<IGNORE>",
             [1]     = {
                 type   = "return",
                 start  = 24,
@@ -780,14 +759,7 @@ end]]
                 },
             },
             locals  = "<IGNORE>",
-            returns = {
-                [1] = {
-                    type   = "return",
-                    start  = 28,
-                    finish = 34,
-                    parent = "<IGNORE>",
-                },
-            },
+            returns = "<IGNORE>",
             [1]     = {
                 type   = "return",
                 start  = 28,

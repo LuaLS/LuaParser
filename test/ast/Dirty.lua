@@ -53,24 +53,24 @@ a
         finish = 9,
         parent = "<IGNORE>",
         [1]    = {
-            type   = "ifblock",
-            start  = 1,
-            finish = 9,
-            parent = "<IGNORE>",
-            filter = {
+            type    = "ifblock",
+            start   = 1,
+            finish  = 9,
+            keyword = {
+                [1] = 1,
+                [2] = 2,
+                [3] = 8,
+                [4] = 7,
+            },
+            parent  = "<IGNORE>",
+            filter  = {
                 type   = "boolean",
                 start  = 4,
                 finish = 7,
                 parent = "<IGNORE>",
                 [1]    = true,
             },
-            keys   = {
-                [1] = 1,
-                [2] = 2,
-                [3] = 8,
-                [4] = 7,
-            },
-            [1]    = {
+            [1]     = {
                 type   = "getglobal",
                 start  = 9,
                 finish = 9,
@@ -97,24 +97,24 @@ a
         finish = 14,
         parent = "<IGNORE>",
         [1]    = {
-            type   = "ifblock",
-            start  = 1,
-            finish = 14,
-            parent = "<IGNORE>",
-            filter = {
+            type    = "ifblock",
+            start   = 1,
+            finish  = 14,
+            keyword = {
+                [1] = 1,
+                [2] = 2,
+                [3] = 9,
+                [4] = 12,
+            },
+            parent  = "<IGNORE>",
+            filter  = {
                 type   = "boolean",
                 start  = 4,
                 finish = 7,
                 parent = "<IGNORE>",
                 [1]    = true,
             },
-            keys   = {
-                [1] = 1,
-                [2] = 2,
-                [3] = 9,
-                [4] = 12,
-            },
-            [1]    = {
+            [1]     = {
                 type   = "getglobal",
                 start  = 14,
                 finish = 14,
@@ -387,14 +387,7 @@ CHECK 'return local a'
     start   = 1,
     finish  = 14,
     locals  = "<IGNORE>",
-    returns = {
-        [1] = {
-            type   = "return",
-            start  = 1,
-            finish = 7,
-            parent = "<IGNORE>",
-        },
-    },
+    returns = "<IGNORE>",
     [1]     = {
         type   = "return",
         start  = 1,
@@ -482,5 +475,45 @@ CHECK 'local x = (a && b)'
             },
         },
         [1]    = "x",
+    },
+}
+
+CHECK 'return 1 + + 1'
+{
+    type    = "main",
+    start   = 1,
+    finish  = 14,
+    locals  = "<IGNORE>",
+    returns = "<IGNORE>",
+    [1]     = {
+        type   = "return",
+        start  = 1,
+        finish = 14,
+        parent = "<IGNORE>",
+        [1]    = {
+            type   = "binary",
+            start  = 8,
+            finish = 14,
+            parent = "<IGNORE>",
+            op     = {
+                type   = "+",
+                start  = 12,
+                finish = 12,
+            },
+            [1]    = {
+                type   = "number",
+                start  = 8,
+                finish = 8,
+                parent = "<IGNORE>",
+                [1]    = 1,
+            },
+            [2]    = {
+                type   = "number",
+                start  = 14,
+                finish = 14,
+                parent = "<IGNORE>",
+                [1]    = 1,
+            },
+        },
     },
 }

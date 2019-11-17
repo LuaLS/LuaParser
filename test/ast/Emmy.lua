@@ -698,35 +698,6 @@ EMMY [[
                 }
             },
         },
-        returns = {
-            [1]  = {
-                type   = 'emmyTableType',
-                start  = 37,
-                finish = 49,
-                [1]    = {
-                    type   = 'emmyType',
-                    start  = 43,
-                    finish = 44,
-                    [1] = {
-                        type   = 'emmyName',
-                        start  = 43,
-                        finish = 44,
-                        [1]    = 't5',
-                    },
-                },
-                [2]    = {
-                    type   = 'emmyType',
-                    start  = 47,
-                    finish = 48,
-                    [1] = {
-                        type   = 'emmyName',
-                        start  = 47,
-                        finish = 48,
-                        [1]    = 't6',
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -958,19 +929,6 @@ EMMY [[
                 },
             },
         },
-        returns = {
-            [1] = {
-                type   = "emmyType",
-                start  = 28,
-                finish = 33,
-                [1] = {
-                    type   = "emmyName",
-                    start  = 28,
-                    finish = 33,
-                    [1]    = "number",
-                },
-            },
-        }
     },
 }
 
@@ -1106,29 +1064,5 @@ EMMY [[
         type   = "emmyOverLoad",
         start  = 14,
         finish = 33,
-        returns = {
-            [1] = {
-                type   = "emmyType",
-                start  = 20,
-                finish = 25,
-                [1] = {
-                    type   = "emmyName",
-                    start  = 20,
-                    finish = 25,
-                    [1]    = "number",
-                },
-            },
-            [2] = {
-                type   = "emmyType",
-                start  = 27,
-                finish = 33,
-                [1] = {
-                    type   = "emmyName",
-                    start  = 27,
-                    finish = 33,
-                    [1]    = "boolean",
-                },
-            },
-        }
     },
 }
