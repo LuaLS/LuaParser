@@ -392,4 +392,71 @@ function m.defer(callback)
     return setmetatable({ callback }, deferMT)
 end
 
+local esc = {
+    ["'"]  = [[\']],
+    ['"']  = [[\"]],
+    ['\r'] = [[\r]],
+    ['\n'] = '\\\n',
+}
+
+function m.viewString(str, quo)
+    if not quo then
+        if str:find('[\r\n]') then
+            quo = '[['
+        elseif not str:find("'", 1, true) and str:find('"', 1, true) then
+            quo = "'"
+        else
+            quo = '"'
+        end
+    end
+    if quo == "'" then
+        str = str:gsub('[\000-\008\011-\012\014-\031\127]', function (char)
+            return ('\\%03d'):format(char:byte())
+        end)
+        return quo .. str:gsub([=[['\r\n]]=], esc) .. quo
+    elseif quo == '"' then
+        str = str:gsub('[\000-\008\011-\012\014-\031\127]', function (char)
+            return ('\\%03d'):format(char:byte())
+        end)
+        return quo .. str:gsub([=[["\r\n]]=], esc) .. quo
+    else
+        if str:find '\r' then
+            return m.viewString(str)
+        end
+        local eqnum = #quo - 2
+        local fsymb = ']' .. ('='):rep(eqnum) .. ']'
+        if not str:find(fsymb, 1, true) then
+            str = str:gsub('[\000-\008\011-\012\014-\031\127]', '')
+            return quo .. str .. fsymb
+        end
+        for i = 0, 10 do
+            local fsymb = ']' .. ('='):rep(i) .. ']'
+            if not str:find(fsymb, 1, true) then
+                local ssymb = '[' .. ('='):rep(i) .. '['
+                str = str:gsub('[\000-\008\011-\012\014-\031\127]', '')
+                return ssymb .. str .. fsymb
+            end
+        end
+        return m.viewString(str)
+    end
+end
+
+function m.viewLiteral(v)
+    local tp = type(v)
+    if tp == 'nil' then
+        return 'nil'
+    elseif tp == 'string' then
+        return m.viewString(v)
+    elseif tp == 'boolean' then
+        return tostring(v)
+    elseif tp == 'number' then
+        if isInteger(v) then
+            return tostring(v)
+        else
+            return formatNumber(v)
+        end
+    end
+    return nil
+end
+
 return m
