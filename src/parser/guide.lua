@@ -2,6 +2,7 @@ local error      = error
 local type       = type
 local next       = next
 local tostring   = tostring
+local util       = require 'utility'
 
 _ENV = nil
 
@@ -234,6 +235,24 @@ function m.getLocal(block, name, pos)
     error('guide.getLocal overstack')
 end
 
+--- 获取指定区块中所有的可见局部变量名称
+function m.getVisibleLocals(block, pos)
+    local result = {}
+    m.eachSourceContain(m.getRoot(block), pos, function (source)
+        local locals = source.locals
+        if locals then
+            for i = 1, #locals do
+                local loc = locals[i]
+                local name = loc[1]
+                if loc.effect <= pos then
+                    result[name] = loc
+                end
+            end
+        end
+    end)
+    return result
+end
+
 --- 获取指定区块中可见的标签
 ---@param block table
 ---@param name string {comment = '标签名'}
@@ -444,10 +463,14 @@ function m.lineRange(lines, row)
     return line.start, line.finish
 end
 
-function m.getKeyString(obj)
+function m.getName(obj)
     local tp = obj.type
     if tp == 'getglobal'
     or tp == 'setglobal' then
+        return obj[1]
+    elseif tp == 'local'
+    or     tp == 'getlocal'
+    or     tp == 'setlocal' then
         return obj[1]
     elseif tp == 'getfield'
     or     tp == 'setfield'
@@ -459,12 +482,12 @@ function m.getKeyString(obj)
     elseif tp == 'getindex'
     or     tp == 'setindex'
     or     tp == 'tableindex' then
-        return m.getKeyString(obj.index)
+        return m.getName(obj.index)
     elseif tp == 'field'
     or     tp == 'method' then
         return obj[1]
     elseif tp == 'index' then
-        return m.getKeyString(obj.index)
+        return m.getName(obj.index)
     elseif tp == 'string' then
         return obj[1]
     end
@@ -506,7 +529,7 @@ function m.getKeyName(obj)
     elseif tp == 'number' then
         local n = obj[1]
         if n then
-            return ('n|%q'):format(obj[1])
+            return ('n|%s'):format(util.viewLiteral(obj[1]))
         else
             return 'n'
         end
