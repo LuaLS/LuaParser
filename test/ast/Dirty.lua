@@ -615,3 +615,21 @@ CHECK 'return 1 + 2 + # + 3'
         },
     },
 }
+
+CHECK [[
+-
+return
+]]
+{
+    type    = "main",
+    start   = 1,
+    finish  = 9,
+    locals  = "<IGNORE>",
+    returns = "<IGNORE>",
+    [1]     = {
+        type   = "return",
+        start  = 3,
+        finish = 9,
+        parent = "<IGNORE>",
+    },
+}
