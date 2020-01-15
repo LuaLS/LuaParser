@@ -364,13 +364,14 @@ end
 --- 遍历所有的source
 function m.eachSource(ast, callback)
     local list = { ast }
+    local index = 1
     while true do
-        local len = #list
-        if len == 0 then
+        local obj = list[index]
+        if not obj then
             return
         end
-        local obj = list[len]
-        list[len] = nil
+        list[index] = false
+        index = index + 1
         callback(obj)
         m.addChilds(list, obj, m.childMap)
     end
@@ -463,6 +464,17 @@ function m.lineRange(lines, row)
     return line.start, line.finish
 end
 
+function m.getNameOfLiteral(obj)
+    if not obj then
+        return nil
+    end
+    local tp = obj.type
+    if tp == 'string' then
+        return obj[1]
+    end
+    return nil
+end
+
 function m.getName(obj)
     local tp = obj.type
     if tp == 'getglobal'
@@ -482,41 +494,22 @@ function m.getName(obj)
     elseif tp == 'getindex'
     or     tp == 'setindex'
     or     tp == 'tableindex' then
-        return m.getName(obj.index)
+        return m.getNameOfLiteral(obj.index)
     elseif tp == 'field'
     or     tp == 'method' then
         return obj[1]
     elseif tp == 'index' then
-        return m.getName(obj.index)
-    elseif tp == 'string' then
-        return obj[1]
+        return m.getNameOfLiteral(obj.index)
     end
-    return nil
+    return m.getNameOfLiteral(obj)
 end
 
-function m.getKeyName(obj)
+function m.getKeyNameOfLiteral(obj)
+    if not obj then
+        return nil
+    end
     local tp = obj.type
-    if tp == 'getglobal'
-    or tp == 'setglobal' then
-        return 's|' .. obj[1]
-    elseif tp == 'getfield'
-    or     tp == 'setfield'
-    or     tp == 'tablefield' then
-        if obj.field then
-            return 's|' .. obj.field[1]
-        end
-    elseif tp == 'getmethod'
-    or     tp == 'setmethod' then
-        if obj.method then
-            return 's|' .. obj.method[1]
-        end
-    elseif tp == 'getindex'
-    or     tp == 'setindex'
-    or     tp == 'tableindex' then
-        if obj.index then
-            return m.getKeyName(obj.index)
-        end
-    elseif tp == 'field'
+    if tp == 'field'
     or     tp == 'method' then
         return 's|' .. obj[1]
     elseif tp == 'string' then
@@ -544,6 +537,35 @@ function m.getKeyName(obj)
     return nil
 end
 
+function m.getKeyName(obj)
+    local tp = obj.type
+    if tp == 'getglobal'
+    or tp == 'setglobal' then
+        return 's|' .. obj[1]
+    elseif tp == 'getfield'
+    or     tp == 'setfield'
+    or     tp == 'tablefield' then
+        if obj.field then
+            return 's|' .. obj.field[1]
+        end
+    elseif tp == 'getmethod'
+    or     tp == 'setmethod' then
+        if obj.method then
+            return 's|' .. obj.method[1]
+        end
+    elseif tp == 'getindex'
+    or     tp == 'setindex'
+    or     tp == 'tableindex' then
+        return m.getKeyNameOfLiteral(obj.index)
+    elseif tp == 'index' then
+        return m.getKeyNameOfLiteral(obj.index)
+    elseif tp == 'field'
+    or     tp == 'method' then
+        return 's|' .. obj[1]
+    end
+    return m.getKeyNameOfLiteral(obj)
+end
+
 function m.getENV(ast)
     if ast.type ~= 'main' then
         return nil
@@ -566,9 +588,9 @@ end
 ---@return string|boolean mode
 ---@return table|nil pathA
 ---@return table|nil pathB
-function m.getPath(a, b)
+function m.getPath(a, b, sameFunction)
     --- 首先测试双方在同一个函数内
-    if m.getParentFunction(a) ~= m.getParentFunction(b) then
+    if not sameFunction and m.getParentFunction(a) ~= m.getParentFunction(b) then
         return false
     end
     local mode
@@ -590,14 +612,14 @@ function m.getPath(a, b)
     for _ = 1, 1000 do
         objA = m.getParentBlock(objA)
         pathA[#pathA+1] = objA
-        if objA.type == 'function' or objA.type == 'main' then
+        if (not sameFunction and objA.type == 'function') or objA.type == 'main' then
             break
         end
     end
     for _ = 1, 1000 do
         objB = m.getParentBlock(objB)
         pathB[#pathB+1] = objB
-        if objB.type == 'function' or objB.type == 'main' then
+        if (not sameFunction and objA.type == 'function') or objB.type == 'main' then
             break
         end
     end
@@ -611,6 +633,9 @@ function m.getPath(a, b)
             start = i
             break
         end
+    end
+    if not start then
+        return nil
     end
     -- pathA: {   1, 2, 3}
     -- pathB: {5, 6, 2, 3}

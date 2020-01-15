@@ -6,6 +6,7 @@
             "type": "lua",
             "request": "launch",
             "stopOnEntry": false,
+            "luaexe": "${workspaceFolder}/bin/lua-language-server.exe",
             "program": "${workspaceRoot}/test/main.lua",
             "cwd": "${workspaceRoot}",
             "path": "${workspaceRoot}/bin/?.lua",
@@ -19,7 +20,6 @@
             ],
             "consoleCoding": "utf8",
             "sourceCoding": "utf8",
-            "luaRuntime": "5.4 64bit"
         },
         {
             "name": "performance",
