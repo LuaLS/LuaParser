@@ -7,7 +7,7 @@ local function catch_target(script)
     local list = {}
     local cur = 1
     while true do
-        local start, finish  = script:find('<!.-!>', cur)
+        local start, finish  = script:find('<[?!].-[!?]>', cur)
         if not start then
             break
         end
@@ -54,7 +54,7 @@ function TEST(script)
     local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
     local source = find_source(new_script, pos)
 
-    local results = guide.getDef(source)
+    local results = guide.getSimpleRef(source)
     if results then
         local positions = {}
         for i, result in ipairs(results) do
@@ -81,4 +81,14 @@ print(<?x?>)
 TEST [[
 ::<!TAG!>::
 goto <?TAG?>
+]]
+
+TEST [[
+<!x!> = 1
+print(<?x?>)
+]]
+
+TEST [[
+<!x!> = 1
+print(<?x?>)
 ]]

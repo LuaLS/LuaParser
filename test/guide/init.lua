@@ -1,1 +1,1 @@
-require 'guide.def'
+require 'guide.ref'

@@ -2,6 +2,7 @@ local error      = error
 local type       = type
 local next       = next
 local tostring   = tostring
+local print      = print
 local util       = require 'utility'
 
 _ENV = nil
@@ -668,27 +669,50 @@ end
 
 -- 根据语法，单步搜索定义
 local function defOfLocal(loc)
-    local results = { loc }
-    for i = 1, #loc.ref do
-        local ref = loc.ref[i]
-        if ref.type == 'setlocal' then
+    local node = loc.node
+    local results = { node }
+    local refs = node.ref
+    for i = 1, #refs do
+        local ref = refs[i]
+        results[#results+1] = ref
+    end
+    return results
+end
+local function defOfLabel(label)
+    local node = label.node
+    local results = { node }
+    local refs = node.ref
+    for i = 1, #refs do
+        local ref = refs[i]
+        results[#results+1] = ref
+    end
+    return results
+end
+local function defOfGlobal(obj)
+    local results = {}
+    local name = m.getKeyName(obj)
+    local refs = obj.node.ref
+    for i = 1, #refs do
+        local ref = refs[i]
+        if m.getKeyName(ref) == name then
             results[#results+1] = ref
         end
     end
     return results
 end
-local function defOfLabel(label)
-    return { label }
-end
-function m.getDef(obj)
+function m.getSimpleRef(obj)
     if obj.type == 'getlocal'
     or obj.type == 'setlocal'
     or obj.type == 'local' then
-        return defOfLocal(obj.node)
+        return defOfLocal(obj)
     end
     if obj.type == 'label'
     or obj.type == 'goto' then
-        return defOfLabel(obj.node)
+        return defOfLabel(obj)
+    end
+    if obj.type == 'getglobal'
+    or obj.type == 'setglobal' then
+        return defOfGlobal(obj)
     end
 end
 
