@@ -761,4 +761,23 @@ function m.getSimpleField(obj)
     end
 end
 
+function m.frame(cache)
+    local frame = {
+        cache = cache or {},
+        depth = 0,
+    }
+    return frame
+end
+
+function m.getRef(frame, obj)
+    local result = {}
+    local res = m.getSimpleRef(obj)
+    if res then
+        for i = 1, #res do
+            result[#result+1] = res[i]
+        end
+    end
+    return result
+end
+
 return m
