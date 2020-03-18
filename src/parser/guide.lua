@@ -728,10 +728,25 @@ local function simpleFieldOfLocal(loc)
         or ref.type == 'getglobal' then
             results[#results+1] = ref
         elseif ref.type == 'getlocal' then
-
+            local nxt = ref.next
+            if nxt then
+                if nxt.type == 'setfield'
+                or nxt.type == 'getfield'
+                or nxt.type == 'setmethod'
+                or nxt.type == 'getmethod' then
+                    results[#results+1] = nxt
+                end
+            end
         end
     end
     return results
+end
+local function simpleFieldOfTable(tbl)
+    local result = {}
+    for i = 1, #tbl do
+        result[i] = tbl[i].field
+    end
+    return result
 end
 function m.getSimpleField(obj)
     if obj.type == 'getlocal'
@@ -740,6 +755,9 @@ function m.getSimpleField(obj)
     end
     if obj.type == 'local' then
         return simpleFieldOfLocal(obj)
+    end
+    if obj.type == 'table' then
+        return simpleFieldOfTable(obj)
     end
 end
 
