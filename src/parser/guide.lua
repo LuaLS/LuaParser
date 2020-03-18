@@ -668,27 +668,25 @@ function m.getPath(a, b, sameFunction)
 end
 
 -- 根据语法，单步搜索定义
-local function defOfLocal(loc)
-    local node = loc.node
-    local results = { node }
-    local refs = node.ref
+local function simpleRefOfLocal(loc)
+    local results = { loc }
+    local refs = loc.ref
     for i = 1, #refs do
         local ref = refs[i]
         results[#results+1] = ref
     end
     return results
 end
-local function defOfLabel(label)
-    local node = label.node
-    local results = { node }
-    local refs = node.ref
+local function simpleRefOfLabel(label)
+    local results = { label }
+    local refs = label.ref
     for i = 1, #refs do
         local ref = refs[i]
         results[#results+1] = ref
     end
     return results
 end
-local function defOfGlobal(obj)
+local function simpleRefOfGlobal(obj)
     local results = {}
     local name = m.getKeyName(obj)
     local refs = obj.node.ref
@@ -702,17 +700,46 @@ local function defOfGlobal(obj)
 end
 function m.getSimpleRef(obj)
     if obj.type == 'getlocal'
-    or obj.type == 'setlocal'
-    or obj.type == 'local' then
-        return defOfLocal(obj)
+    or obj.type == 'setlocal' then
+        return simpleRefOfLocal(obj.node)
     end
-    if obj.type == 'label'
-    or obj.type == 'goto' then
-        return defOfLabel(obj)
+    if obj.type == 'local' then
+        return simpleRefOfLocal(obj)
+    end
+    if obj.type == 'label' then
+        return simpleRefOfLabel(obj)
+    end
+    if obj.type == 'goto' then
+        return simpleRefOfLabel(obj.node)
     end
     if obj.type == 'getglobal'
     or obj.type == 'setglobal' then
-        return defOfGlobal(obj)
+        return simpleRefOfGlobal(obj)
+    end
+end
+
+-- 根据语法，单步搜索field
+local function simpleFieldOfLocal(loc)
+    local results = {}
+    local refs = loc.ref
+    for i = 1, #refs do
+        local ref = refs[i]
+        if ref.type == 'setglobal'
+        or ref.type == 'getglobal' then
+            results[#results+1] = ref
+        elseif ref.type == 'getlocal' then
+
+        end
+    end
+    return results
+end
+function m.getSimpleField(obj)
+    if obj.type == 'getlocal'
+    or obj.type == 'setlocal' then
+        return simpleFieldOfLocal(obj.node)
+    end
+    if obj.type == 'local' then
+        return simpleFieldOfLocal(obj)
     end
 end
 
