@@ -542,6 +542,10 @@ function m.getKeyName(obj)
     if tp == 'getglobal'
     or tp == 'setglobal' then
         return 's|' .. obj[1]
+    elseif tp == 'local'
+    or     tp == 'getlocal'
+    or     tp == 'setlocal' then
+        return 'l|' .. obj[1]
     elseif tp == 'getfield'
     or     tp == 'setfield'
     or     tp == 'tablefield' then
@@ -660,6 +664,32 @@ function m.getPath(a, b, sameFunction)
         resultB[#resultB+1] = pathB[i]
     end
     return mode, resultA, resultB
+end
+
+-- 根据语法，单步搜索定义
+local function defOfLocal(loc)
+    local results = { loc }
+    for i = 1, #loc.ref do
+        local ref = loc.ref[i]
+        if ref.type == 'setlocal' then
+            results[#results+1] = ref
+        end
+    end
+    return results
+end
+local function defOfLabel(label)
+    return { label }
+end
+function m.getDef(obj)
+    if obj.type == 'getlocal'
+    or obj.type == 'setlocal'
+    or obj.type == 'local' then
+        return defOfLocal(obj.node)
+    end
+    if obj.type == 'label'
+    or obj.type == 'goto' then
+        return defOfLabel(obj.node)
+    end
 end
 
 return m
