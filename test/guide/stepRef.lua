@@ -54,7 +54,7 @@ function TEST(script)
     local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
     local source = find_source(new_script, pos)
 
-    local results = guide.getSimpleRef(source)
+    local results = guide.getStepRef(source)
     if results then
         local positions = {}
         for i, result in ipairs(results) do

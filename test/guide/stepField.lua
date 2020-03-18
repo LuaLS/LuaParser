@@ -54,7 +54,7 @@ function TEST(script)
     local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
     local source = find_source(new_script, pos)
 
-    local results = guide.getSimpleField(source)
+    local results = guide.getStepField(source)
     if results then
         local positions = {}
         for i, result in ipairs(results) do
@@ -80,7 +80,7 @@ local <?x?>
 
 TEST [[
 local t = <?{
-    <!x!> = 1,
-    <!y!> = 2,
+    <!x = 1!>,
+    <!y = 2!>,
 }?>
 ]]

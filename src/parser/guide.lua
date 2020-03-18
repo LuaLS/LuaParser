@@ -668,7 +668,7 @@ function m.getPath(a, b, sameFunction)
 end
 
 -- 根据语法，单步搜索定义
-local function simpleRefOfLocal(loc)
+local function stepRefOfLocal(loc)
     local results = { loc }
     local refs = loc.ref
     for i = 1, #refs do
@@ -677,7 +677,7 @@ local function simpleRefOfLocal(loc)
     end
     return results
 end
-local function simpleRefOfLabel(label)
+local function stepRefOfLabel(label)
     local results = { label }
     local refs = label.ref
     for i = 1, #refs do
@@ -686,7 +686,7 @@ local function simpleRefOfLabel(label)
     end
     return results
 end
-local function simpleRefOfGlobal(obj)
+local function stepRefOfGlobal(obj)
     local results = {}
     local name = m.getKeyName(obj)
     local refs = obj.node.ref
@@ -698,28 +698,28 @@ local function simpleRefOfGlobal(obj)
     end
     return results
 end
-function m.getSimpleRef(obj)
+function m.getStepRef(obj)
     if obj.type == 'getlocal'
     or obj.type == 'setlocal' then
-        return simpleRefOfLocal(obj.node)
+        return stepRefOfLocal(obj.node)
     end
     if obj.type == 'local' then
-        return simpleRefOfLocal(obj)
+        return stepRefOfLocal(obj)
     end
     if obj.type == 'label' then
-        return simpleRefOfLabel(obj)
+        return stepRefOfLabel(obj)
     end
     if obj.type == 'goto' then
-        return simpleRefOfLabel(obj.node)
+        return stepRefOfLabel(obj.node)
     end
     if obj.type == 'getglobal'
     or obj.type == 'setglobal' then
-        return simpleRefOfGlobal(obj)
+        return stepRefOfGlobal(obj)
     end
 end
 
 -- 根据语法，单步搜索field
-local function simpleFieldOfLocal(loc)
+local function stepFieldOfLocal(loc)
     local results = {}
     local refs = loc.ref
     for i = 1, #refs do
@@ -741,23 +741,23 @@ local function simpleFieldOfLocal(loc)
     end
     return results
 end
-local function simpleFieldOfTable(tbl)
+local function stepFieldOfTable(tbl)
     local result = {}
     for i = 1, #tbl do
-        result[i] = tbl[i].field
+        result[i] = tbl[i]
     end
     return result
 end
-function m.getSimpleField(obj)
+function m.getStepField(obj)
     if obj.type == 'getlocal'
     or obj.type == 'setlocal' then
-        return simpleFieldOfLocal(obj.node)
+        return stepFieldOfLocal(obj.node)
     end
     if obj.type == 'local' then
-        return simpleFieldOfLocal(obj)
+        return stepFieldOfLocal(obj)
     end
     if obj.type == 'table' then
-        return simpleFieldOfTable(obj)
+        return stepFieldOfTable(obj)
     end
 end
 
@@ -771,12 +771,23 @@ end
 
 function m.getRef(frame, obj)
     local result = {}
-    local res = m.getSimpleRef(obj)
+
+    frame.depth = frame.depth + 1
+
+    -- 1. 检查单步引用
+    local res = m.getStepRef(obj)
     if res then
         for i = 1, #res do
             result[#result+1] = res[i]
         end
     end
+    -- 2. 检查simple
+    if frame.depth <= 5 then
+
+    end
+
+    frame.depth = frame.depth - 1
+
     return result
 end
 
