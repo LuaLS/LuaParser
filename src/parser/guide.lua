@@ -1,9 +1,9 @@
+local util       = require 'utility'
 local error      = error
 local type       = type
 local next       = next
 local tostring   = tostring
 local print      = print
-local util       = require 'utility'
 
 _ENV = nil
 
@@ -761,6 +761,46 @@ function m.getStepField(obj)
     end
 end
 
+-- 搜索 `a.b.c` 的等价表达式
+local function buildSimpleList(obj)
+    local list = {}
+    local cur = obj
+    for i = 1, 11 do
+        if i == 11 then
+            return nil
+        end
+        if cur.type == 'setfield'
+        or cur.type == 'getfield'
+        or cur.type == 'setmethod'
+        or cur.type == 'getmethod' then
+            list[i] = cur
+            cur = cur.node
+        elseif cur.type == 'getglobal'
+        or     cur.type == 'setglobal'
+        or     cur.type == 'getlocal'
+        or     cur.type == 'setlocal' then
+            list[i] = cur
+            break
+        else
+            break
+        end
+    end
+    return util.revertTable(list)
+end
+function m.getSimple(obj)
+    local simpleList
+    if obj.type == 'getfield'
+    or obj.type == 'setfield'
+    or obj.type == 'getmethod'
+    or obj.type == 'setmethod' then
+        simpleList = buildSimpleList(obj)
+    elseif obj.type == 'field'
+    or     obj.type == 'method' then
+        simpleList = buildSimpleList(obj.parent)
+    end
+    return simpleList
+end
+
 function m.frame(cache)
     local frame = {
         cache = cache or {},
@@ -783,7 +823,7 @@ function m.getRef(frame, obj)
     end
     -- 2. 检查simple
     if frame.depth <= 5 then
-
+        
     end
 
     frame.depth = frame.depth - 1

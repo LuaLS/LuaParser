@@ -459,4 +459,16 @@ function m.viewLiteral(v)
     return nil
 end
 
+function m.revertTable(t)
+    local len = #t
+    if len <= 1 then
+        return t
+    end
+    for x = 1, len // 2 do
+        local y = len - x + 1
+        t[x], t[y] = t[y], t[x]
+    end
+    return t
+end
+
 return m
