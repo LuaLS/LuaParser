@@ -781,8 +781,11 @@ local function buildSimpleList(obj)
         or     cur.type == 'setlocal' then
             list[i] = cur
             break
-        else
+        elseif cur.type == 'function'
+        or     cur.type == 'main' then
             break
+        else
+            return nil
         end
     end
     return util.revertTable(list)
@@ -823,7 +826,7 @@ function m.getRef(frame, obj)
     end
     -- 2. 检查simple
     if frame.depth <= 5 then
-        
+
     end
 
     frame.depth = frame.depth - 1
