@@ -534,7 +534,7 @@ f = function<!!> end
 }
 
 TEST[[
-f = function<!!> f() end
+f = function<!!> f()
 ]]
 {
     type = 'MISS_SYMBOL',
