@@ -812,7 +812,7 @@ function m.frame(cache)
     return frame
 end
 
-function m.isSameFieldName(a, b)
+function m.isSameField(a, b)
     return m.getKeyName(a) == m.getKeyName(b)
 end
 
@@ -829,7 +829,7 @@ function m.getSameSimple(frame, simple, results)
             or ref.type == 'getfield'
             or ref.type == 'setmethod'
             or ref.type == 'getmethod' then
-                if not m.isSameFieldName(simple[x], ref) then
+                if not m.isSameField(simple[x], ref) then
                     goto NEXT_REF
                 end
             end
