@@ -812,8 +812,43 @@ function m.frame(cache)
     return frame
 end
 
+function m.isSameFieldName(a, b)
+    return m.getKeyName(a) == m.getKeyName(b)
+end
+
+function m.getSameSimple(frame, simple, results)
+    local firstRefs = m.getRef(frame, simple[1])
+    for i = 1, #firstRefs do
+        local ref = firstRefs[i]
+        for x = 2, #simple do
+            ref = ref.next
+            if not ref then
+                goto NEXT_REF
+            end
+            if ref.type == 'setfield'
+            or ref.type == 'getfield'
+            or ref.type == 'setmethod'
+            or ref.type == 'getmethod' then
+                if not m.isSameFieldName(simple[x], ref) then
+                    goto NEXT_REF
+                end
+            end
+        end
+        if     ref.type == 'setfield'
+        or     ref.type == 'getfield' then
+            results[#results+1] = ref.field
+        elseif ref.type == 'setmethod'
+        or     ref.type == 'getmethod' then
+            results[#results+1] = ref.method
+        else
+            results[#results+1] = ref
+        end
+        ::NEXT_REF::
+    end
+end
+
 function m.getRef(frame, obj)
-    local result = {}
+    local results = {}
 
     frame.depth = frame.depth + 1
 
@@ -821,17 +856,20 @@ function m.getRef(frame, obj)
     local res = m.getStepRef(obj)
     if res then
         for i = 1, #res do
-            result[#result+1] = res[i]
+            results[#results+1] = res[i]
         end
     end
     -- 2. 检查simple
     if frame.depth <= 5 then
-
+        local simple = m.getSimple(obj)
+        if simple then
+            m.getSameSimple(frame, simple, results)
+        end
     end
 
     frame.depth = frame.depth - 1
 
-    return result
+    return results
 end
 
 return m

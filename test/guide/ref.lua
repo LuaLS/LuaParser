@@ -76,13 +76,13 @@ TEST [[
 <!a!> = <!a!>
 ]]
 
-do return end
 TEST [[
 local t
 t.<?a?> = 1
 t.<!a!> = t.<!a!>
 ]]
 
+do return end
 TEST [[
 t.<?a?> = 1
 t.<!a!> = t.<!a!>
