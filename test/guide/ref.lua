@@ -123,7 +123,11 @@ local t = {
 print(t.<!a!>)
 ]]
 
-do return end
+TEST [[
+t[<?'a'?>] = 1
+print(t.<!a!>)
+]]
+
 TEST [[
 local t = {
     [<?'a'?>] = 1
@@ -131,6 +135,7 @@ local t = {
 print(t.<!a!>)
 ]]
 
+do return end
 --TEST [[
 --local <!mt!> = {}
 --function <!mt!>:a()

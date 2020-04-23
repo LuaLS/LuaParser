@@ -499,8 +499,6 @@ function m.getName(obj)
     elseif tp == 'field'
     or     tp == 'method' then
         return obj[1]
-    elseif tp == 'index' then
-        return m.getNameOfLiteral(obj.index)
     end
     return m.getNameOfLiteral(obj)
 end
@@ -561,8 +559,6 @@ function m.getKeyName(obj)
     elseif tp == 'getindex'
     or     tp == 'setindex'
     or     tp == 'tableindex' then
-        return m.getKeyNameOfLiteral(obj.index)
-    elseif tp == 'index' then
         return m.getKeyNameOfLiteral(obj.index)
     elseif tp == 'field'
     or     tp == 'method' then
@@ -733,7 +729,9 @@ local function stepFieldOfLocal(loc)
                 if nxt.type == 'setfield'
                 or nxt.type == 'getfield'
                 or nxt.type == 'setmethod'
-                or nxt.type == 'getmethod' then
+                or nxt.type == 'getmethod'
+                or nxt.type == 'setindex'
+                or nxt.type == 'getindex' then
                     results[#results+1] = nxt
                 end
             end
@@ -772,10 +770,13 @@ local function buildSimpleList(obj)
         if cur.type == 'setfield'
         or cur.type == 'getfield'
         or cur.type == 'setmethod'
-        or cur.type == 'getmethod' then
+        or cur.type == 'getmethod'
+        or cur.type == 'setindex'
+        or cur.type == 'getindex' then
             list[i] = cur
             cur = cur.node
-        elseif cur.type == 'tablefield' then
+        elseif cur.type == 'tablefield'
+        or     cur.type == 'tableindex' then
             list[i] = cur
             cur = cur.parent.parent
         elseif cur.type == 'getglobal'
@@ -799,7 +800,10 @@ function m.getSimple(obj)
     if obj.type == 'getfield'
     or obj.type == 'setfield'
     or obj.type == 'getmethod'
-    or obj.type == 'setmethod' then
+    or obj.type == 'setmethod'
+    or obj.type == 'getindex'
+    or obj.type == 'setindex'
+    or obj.type == 'tableindex' then
         simpleList = buildSimpleList(obj)
     elseif obj.type == 'field'
     or     obj.type == 'method' then
@@ -828,7 +832,9 @@ function m.checkAsNextRef(sim, ref)
     if nextRef.type == 'setfield'
     or nextRef.type == 'getfield'
     or nextRef.type == 'setmethod'
-    or nextRef.type == 'getmethod' then
+    or nextRef.type == 'getmethod'
+    or nextRef.type == 'setindex'
+    or nextRef.type == 'getindex' then
         if m.isSameField(sim, nextRef) then
             return nextRef
         end
@@ -870,6 +876,10 @@ function m.getSameSimple(frame, simple, results)
         elseif ref.type == 'setmethod'
         or     ref.type == 'getmethod' then
             results[#results+1] = ref.method
+        elseif ref.type == 'setindex'
+        or     ref.type == 'getindex'
+        or     ref.type == 'tableindex' then
+            results[#results+1] = ref.index
         else
             results[#results+1] = ref
         end
@@ -877,10 +887,28 @@ function m.getSameSimple(frame, simple, results)
     end
 end
 
+function m.getIndexOfLiteral(obj)
+    if obj.type == 'nil'
+    or obj.type == 'number'
+    or obj.type == 'integer'
+    or obj.type == 'boolean'
+    or obj.type == 'string' then
+        local parent = obj.parent
+        if parent.type == 'tableindex'
+        or parent.type == 'setindex'
+        or parent.type == 'getindex' then
+            return parent
+        end
+    end
+    return obj
+end
+
 function m.getRef(frame, obj)
     local results = {}
 
     frame.depth = frame.depth + 1
+
+    obj = m.getIndexOfLiteral(obj)
 
     -- 1. 检查单步引用
     local res = m.getStepRef(obj)
