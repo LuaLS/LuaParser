@@ -816,26 +816,52 @@ function m.isSameField(a, b)
     return m.getKeyName(a) == m.getKeyName(b)
 end
 
+function m.checkAsNextRef(sim, ref)
+    local nextRef = ref.next
+    if not nextRef then
+        return nil
+    end
+    if nextRef.type == 'setfield'
+    or nextRef.type == 'getfield'
+    or nextRef.type == 'setmethod'
+    or nextRef.type == 'getmethod' then
+        if m.isSameField(sim, nextRef) then
+            return nextRef
+        end
+    end
+    return nil
+end
+
+function m.checkAsTableField(sim, ref)
+    local value = ref.value
+    if not value then
+        return nil
+    end
+    if value.type == 'table' then
+        for i = 1, #value do
+            local field = value[i]
+            if m.isSameField(sim, field) then
+                return field
+            end
+        end
+    end
+    return nil
+end
+
 function m.getSameSimple(frame, simple, results)
     local firstRefs = m.getRef(frame, simple[1])
     for i = 1, #firstRefs do
         local ref = firstRefs[i]
         for x = 2, #simple do
-            ref = ref.next
+            ref =  m.checkAsNextRef(simple[x], ref)
+                or m.checkAsTableField(simple[x], ref)
             if not ref then
                 goto NEXT_REF
             end
-            if ref.type == 'setfield'
-            or ref.type == 'getfield'
-            or ref.type == 'setmethod'
-            or ref.type == 'getmethod' then
-                if not m.isSameField(simple[x], ref) then
-                    goto NEXT_REF
-                end
-            end
         end
         if     ref.type == 'setfield'
-        or     ref.type == 'getfield' then
+        or     ref.type == 'getfield'
+        or     ref.type == 'tablefield' then
             results[#results+1] = ref.field
         elseif ref.type == 'setmethod'
         or     ref.type == 'getmethod' then

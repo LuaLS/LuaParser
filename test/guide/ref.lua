@@ -109,7 +109,6 @@ local <?a?> = 1
 <!a!> = <!a!>
 ]]
 
-do return end
 TEST [[
 local t = {
     <!a!> = 1
@@ -117,6 +116,7 @@ local t = {
 print(t.<?a?>)
 ]]
 
+do return end
 TEST [[
 local t = {
     <?a?> = 1
