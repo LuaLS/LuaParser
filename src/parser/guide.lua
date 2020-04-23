@@ -775,10 +775,14 @@ local function buildSimpleList(obj)
         or cur.type == 'getmethod' then
             list[i] = cur
             cur = cur.node
+        elseif cur.type == 'tablefield' then
+            list[i] = cur
+            cur = cur.parent.parent
         elseif cur.type == 'getglobal'
         or     cur.type == 'setglobal'
         or     cur.type == 'getlocal'
-        or     cur.type == 'setlocal' then
+        or     cur.type == 'setlocal'
+        or     cur.type == 'local' then
             list[i] = cur
             break
         elseif cur.type == 'function'
