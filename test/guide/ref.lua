@@ -48,10 +48,10 @@ end
 
 function TEST(script)
     local target = catch_target(script)
-    local start  = script:find('<?', 1, true)
-    local finish = script:find('?>', 1, true)
+    local start  = script:find('<[?~]')
+    local finish = script:find('[?~]>')
     local pos = (start + finish) // 2 + 1
-    local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
+    local new_script = script:gsub('<[!?~]', '  '):gsub('[!?~]>', '  ')
     local source = find_source(new_script, pos)
 
     local results = guide.getRef(guide.frame(), source)
@@ -135,13 +135,18 @@ local t = {
 print(t.<!a!>)
 ]]
 
-do return end
 --TEST [[
 --local <!mt!> = {}
 --function <!mt!>:a()
 --    <?self?>:remove()
 --end
 --]]
+
+TEST [[
+table.<!dump!>()
+function table.<?dump?>()
+end
+]]
 
 TEST [[
 local function f()
@@ -159,12 +164,6 @@ local function f()
 end
 
 local _, <!f2!> = f()
-]]
-
-TEST [[
-table.<!dump!>()
-function table.<?dump?>()
-end
 ]]
 
 TEST [[

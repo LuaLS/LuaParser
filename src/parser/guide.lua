@@ -858,7 +858,7 @@ function m.checkAsTableField(sim, ref)
     return nil
 end
 
-function m.getSameSimple(frame, simple, results)
+function m.searchSameSimple(frame, simple, results)
     local firstRefs = m.getRef(frame, simple[1])
     for i = 1, #firstRefs do
         local ref = firstRefs[i]
@@ -884,6 +884,13 @@ function m.getSameSimple(frame, simple, results)
             results[#results+1] = ref
         end
         ::NEXT_REF::
+    end
+end
+
+function m.searchFunctionReturnValue(frame, obj, results)
+    -- 只有 function 才搜索返回值引用
+    if obj.type ~= 'function' then
+        return
     end
 end
 
@@ -921,8 +928,12 @@ function m.getRef(frame, obj)
     if frame.depth <= 5 then
         local simple = m.getSimple(obj)
         if simple then
-            m.getSameSimple(frame, simple, results)
+            m.searchSameSimple(frame, simple, results)
         end
+    end
+    -- 3. 检查函数返回值
+    if frame.depth <= 5 then
+        m.searchFunctionReturnValue(frame, obj, results)
     end
 
     frame.depth = frame.depth - 1
