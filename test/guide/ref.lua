@@ -135,13 +135,6 @@ local t = {
 print(t.<!a!>)
 ]]
 
---TEST [[
---local <!mt!> = {}
---function <!mt!>:a()
---    <?self?>:remove()
---end
---]]
-
 TEST [[
 table.<!dump!>()
 function table.<?dump?>()
@@ -166,43 +159,12 @@ end
 local _, <!f2!> = f()
 ]]
 
-do return end
-TEST [[
-local mt = {}
-local <?obj?> = setmetatable({}, mt)
-]]
-
-TEST [[
-local mt = {}
-mt.x = 1
-local obj = setmetatable({}, mt)
-print(obj.<?x?>)
-]]
-
-TEST [[
-local x
-local function f()
-    return x
-end
-local <?y?> = f()
-]]
-
 TEST [[
 local <?x?>
 local function f()
     return <!x!>
 end
 local y = f()
-]]
-
-TEST [[
-local x
-local function f()
-    return function ()
-        return x
-    end
-end
-local <?y?> = f()()
 ]]
 
 TEST [[
@@ -215,6 +177,7 @@ end
 local y = f()()
 ]]
 
+do return end
 TEST [[
 local mt = {}
 mt.__index = mt
