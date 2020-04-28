@@ -177,48 +177,17 @@ end
 local y = f()()
 ]]
 
-do return end
-TEST [[
-local mt = {}
-mt.__index = mt
-
-function mt:add(a, b)
-end
-
-local function init()
-    return setmetatable({}, mt)
-end
-
-local <!t!> = init()
-<?t?>:add()
-]]
-
-TEST [[
-local mt = {}
-mt.__index = mt
-
-function mt:add(a, b)
-end
-
-local function init()
-    return setmetatable({}, mt)
-end
-
-local t = init()
-t:<?add?>()
-]]
-
 TEST [[
 local t = {}
 t.<?x?> = 1
 t[a.b.x] = 1
 ]]
 
---TEST [[
---local t = {}
---t.x = 1
---t[a.b.<?x?>] = 1
---]]
+TEST [[
+local t = {}
+t.x = 1
+t[a.b.<?x?>] = 1
+]]
 
 TEST [[
 local t
