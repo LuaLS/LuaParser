@@ -667,6 +667,9 @@ end
 local function stepRefOfLocal(loc)
     local results = { loc }
     local refs = loc.ref
+    if not refs then
+        return results
+    end
     for i = 1, #refs do
         local ref = refs[i]
         results[#results+1] = ref
@@ -858,8 +861,8 @@ function m.checkAsTableField(sim, ref)
     return nil
 end
 
-function m.searchSameSimple(frame, simple, results)
-    local firstRefs = m.getRef(frame, simple[1])
+function m.searchSameFields(frame, simple, results)
+    local firstRefs = m.searchRefOfFields(frame, simple[1], {})
     for i = 1, #firstRefs do
         local ref = firstRefs[i]
         for x = 2, #simple do
@@ -887,11 +890,75 @@ function m.searchSameSimple(frame, simple, results)
     end
 end
 
-function m.searchFunctionReturnValue(frame, obj, results)
+function m.searchRefOfFunctionReturn(frame, obj, results)
     -- 只有 function 才搜索返回值引用
     if obj.type ~= 'function' then
         return
     end
+    results[#results+1] = obj
+    -- 搜索所在函数
+    local currentFunc = m.getParentFunction(obj)
+    local returns = currentFunc.returns
+    if not returns then
+        return
+    end
+    -- 看看他是第几个返回值
+    local index
+    for i = 1, #returns do
+        local rtn = returns[i]
+        if m.isContain(rtn, obj.start) then
+            for j = 1, #rtn do
+                if obj == rtn[j] then
+                    index = j
+                    goto BREAK
+                end
+            end
+        end
+    end
+    ::BREAK::
+    if not index then
+        return
+    end
+    -- 搜索所有所在函数的调用者
+    local funcRefs = {}
+    m.searchRefOfValue(frame, currentFunc, funcRefs)
+
+    if #funcRefs == 0 then
+        return
+    end
+    local calls = {}
+    for i = 1, #funcRefs do
+        local call = funcRefs[i].parent
+        if call.type == 'call' then
+            calls[#calls+1] = call
+        end
+    end
+    -- 搜索调用者的返回值
+    if #calls == 0 then
+        return
+    end
+    local selects = {}
+    for i = 1, #calls do
+        local parent = calls[i].parent
+        if parent.type == 'select' and parent.index == index then
+            selects[#selects+1] = parent.parent
+        end
+        local extParent = calls[i].extParent
+        if extParent then
+            for j = 1, #extParent do
+                local ext = extParent[j]
+                if ext.type == 'select' and ext.index == index then
+                    selects[#selects+1] = ext.parent
+                end
+            end
+        end
+    end
+    -- 搜索调用者的引用
+    for i = 1, #selects do
+        m.searchRefOfFields(frame, selects[i], results)
+    end
+
+    return results
 end
 
 function m.getIndexOfLiteral(obj)
@@ -910,9 +977,7 @@ function m.getIndexOfLiteral(obj)
     return obj
 end
 
-function m.getRef(frame, obj)
-    local results = {}
-
+function m.searchRefOfFields(frame, obj, results)
     frame.depth = frame.depth + 1
 
     obj = m.getIndexOfLiteral(obj)
@@ -928,15 +993,31 @@ function m.getRef(frame, obj)
     if frame.depth <= 5 then
         local simple = m.getSimple(obj)
         if simple then
-            m.searchSameSimple(frame, simple, results)
+            m.searchSameFields(frame, simple, results)
         end
-    end
-    -- 3. 检查函数返回值
-    if frame.depth <= 5 then
-        m.searchFunctionReturnValue(frame, obj, results)
     end
 
     frame.depth = frame.depth - 1
+
+    return results
+end
+
+function m.searchRefOfValue(frame, obj, results)
+    local var = obj.parent
+    if var.type == 'local'
+    or var.type == 'set' then
+        return m.searchRefOfFields(frame, var, results)
+    end
+end
+
+function m.requestReference(obj)
+    local frame = m.frame()
+    local results = {}
+    -- 根据 field 搜索引用
+    m.searchRefOfFields(frame, obj, results)
+
+    -- 搜索函数返回值的引用
+    m.searchRefOfFunctionReturn(frame, obj, results)
 
     return results
 end

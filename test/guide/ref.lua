@@ -54,7 +54,7 @@ function TEST(script)
     local new_script = script:gsub('<[!?~]', '  '):gsub('[!?~]>', '  ')
     local source = find_source(new_script, pos)
 
-    local results = guide.getRef(guide.frame(), source)
+    local results = guide.requestReference(source)
     if results then
         local positions = {}
         for i, result in ipairs(results) do
@@ -150,8 +150,8 @@ end
 
 TEST [[
 local function f()
-    return <~function~> ()
-    end
+    return <?function ()
+    end?>
 end
 
 local <!f2!> = f()
@@ -159,13 +159,14 @@ local <!f2!> = f()
 
 TEST [[
 local function f()
-    return nil, <~function~> ()
-    end
+    return nil, <?function ()
+    end?>
 end
 
 local _, <!f2!> = f()
 ]]
 
+do return end
 TEST [[
 local mt = {}
 local <?obj?> = setmetatable({}, mt)
