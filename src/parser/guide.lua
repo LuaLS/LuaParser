@@ -727,6 +727,7 @@ function m.getStepDef(obj)
     local results = {}
     for _, r in ipairs(res) do
         if r.type == 'local'
+        or r.type == 'setlocal'
         or r.type == 'label'
         or r.type == 'setglobal' then
             results[#results+1] = r

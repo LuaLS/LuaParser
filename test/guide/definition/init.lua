@@ -84,7 +84,7 @@ function TEST(script)
 end
 
 require 'guide.definition.local'
---require 'guide.definition.set'
+require 'guide.definition.set'
 --require 'guide.definition.arg'
 --require 'guide.definition.function'
 --require 'guide.definition.table'
