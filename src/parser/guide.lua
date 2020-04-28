@@ -716,6 +716,23 @@ function m.getStepRef(obj)
     or obj.type == 'setglobal' then
         return stepRefOfGlobal(obj)
     end
+    return nil
+end
+
+function m.getStepDef(obj)
+    local res = m.getStepRef(obj)
+    if not res then
+        return nil
+    end
+    local results = {}
+    for _, r in ipairs(res) do
+        if r.type == 'local'
+        or r.type == 'label'
+        or r.type == 'setglobal' then
+            results[#results+1] = r
+        end
+    end
+    return results
 end
 
 -- 根据语法，单步搜索field
@@ -863,7 +880,7 @@ function m.checkAsTableField(sim, ref)
     return nil
 end
 
-function m.searchSameFields(status, simple)
+function m.searchSameFieldsOfRef(status, simple)
     local fristStatus = m.status(status)
     m.searchRefOfFields(fristStatus, simple[1])
     for _, ref in ipairs(fristStatus.results) do
@@ -887,6 +904,30 @@ function m.searchSameFields(status, simple)
             status.results[#status.results+1] = ref.index
         else
             status.results[#status.results+1] = ref
+        end
+        ::NEXT_REF::
+    end
+end
+
+function m.searchSameFieldsOfDef(status, simple)
+    local fristStatus = m.status(status)
+    m.searchRefOfFields(fristStatus, simple[1])
+    for _, ref in ipairs(fristStatus.results) do
+        for x = 2, #simple do
+            ref =  m.checkAsNextRef(simple[x], ref)
+                or m.checkAsTableField(simple[x], ref)
+            if not ref then
+                goto NEXT_REF
+            end
+        end
+        if     ref.type == 'setfield'
+        or     ref.type == 'tablefield' then
+            status.results[#status.results+1] = ref.field
+        elseif ref.type == 'setmethod' then
+            status.results[#status.results+1] = ref.method
+        elseif ref.type == 'setindex'
+        or     ref.type == 'tableindex' then
+            status.results[#status.results+1] = ref.index
         end
         ::NEXT_REF::
     end
@@ -961,26 +1002,8 @@ function m.searchRefOfFunctionReturn(status, obj)
     end
 end
 
-function m.getIndexOfLiteral(obj)
-    if obj.type == 'nil'
-    or obj.type == 'number'
-    or obj.type == 'integer'
-    or obj.type == 'boolean'
-    or obj.type == 'string' then
-        local parent = obj.parent
-        if parent.type == 'tableindex'
-        or parent.type == 'setindex'
-        or parent.type == 'getindex' then
-            return parent
-        end
-    end
-    return obj
-end
-
 function m.searchRefOfFields(status, obj)
     status.depth = status.depth + 1
-
-    obj = m.getIndexOfLiteral(obj)
 
     -- 1. 检查单步引用
     local res = m.getStepRef(obj)
@@ -993,14 +1016,35 @@ function m.searchRefOfFields(status, obj)
     if status.depth <= 5 then
         local simple = m.getSimple(obj)
         if simple then
-            m.searchSameFields(status, simple)
+            m.searchSameFieldsOfRef(status, simple)
         end
     end
 
     status.depth = status.depth - 1
 end
 
-function m.searchRefOfValue(status, obj, results)
+function m.searchDefOfFields(status, obj)
+    status.depth = status.depth + 1
+
+    -- 1. 检查单步定义
+    local res = m.getStepDef(obj)
+    if res then
+        for i = 1, #res do
+            status.results[#status.results+1] = res[i]
+        end
+    end
+    -- 2. 检查simple
+    if status.depth <= 5 then
+        local simple = m.getSimple(obj)
+        if simple then
+            m.searchSameFieldsOfDef(status, simple)
+        end
+    end
+
+    status.depth = status.depth - 1
+end
+
+function m.searchRefOfValue(status, obj)
     local var = obj.parent
     if var.type == 'local'
     or var.type == 'set' then

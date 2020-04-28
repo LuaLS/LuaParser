@@ -33,16 +33,33 @@ local function founded(targets, results)
     return true
 end
 
+local accept = {
+    ['local']       = true,
+    ['setlocal']    = true,
+    ['getlocal']    = true,
+    ['label']       = true,
+    ['goto']        = true,
+    ['field']       = true,
+    ['method']      = true,
+    ['setindex']    = true,
+    ['getindex']    = true,
+    ['tableindex']  = true,
+    ['setglobal']   = true,
+    ['getglobal']   = true,
+    ['function']    = true,
+}
+
 local function find_source(str, pos)
     local len = 999
     local result
     local ast = parser:compile(str)
     guide.eachSourceContain(ast.ast, pos, function (source)
-        if source.finish - source.start < len then
+        if source.finish - source.start < len and accept[source.type] then
             result = source
             len = source.finish - source.start
         end
     end)
+    assert(result)
     return result
 end
 

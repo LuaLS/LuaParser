@@ -66,7 +66,7 @@ function TEST(script)
     end
 end
 
---require 'guide.definition.local'
+require 'guide.definition.local'
 --require 'guide.definition.set'
 --require 'guide.definition.arg'
 --require 'guide.definition.function'
