@@ -816,13 +816,13 @@ function m.getSimple(obj)
     return simpleList
 end
 
-function m.frame(parentFrame)
-    local frame = {
-        cache = parentFrame and parentFrame.cache or {},
-        depth = parentFrame and parentFrame.depth or 0,
+function m.status(parentStatus)
+    local status = {
+        cache = parentStatus and parentStatus.cache or {},
+        depth = parentStatus and parentStatus.depth or 0,
         results = {},
     }
-    return frame
+    return status
 end
 
 function m.isSameField(a, b)
@@ -863,10 +863,10 @@ function m.checkAsTableField(sim, ref)
     return nil
 end
 
-function m.searchSameFields(frame, simple)
-    local fristFrame = m.frame(frame)
-    m.searchRefOfFields(fristFrame, simple[1])
-    for _, ref in ipairs(fristFrame.results) do
+function m.searchSameFields(status, simple)
+    local fristStatus = m.status(status)
+    m.searchRefOfFields(fristStatus, simple[1])
+    for _, ref in ipairs(fristStatus.results) do
         for x = 2, #simple do
             ref =  m.checkAsNextRef(simple[x], ref)
                 or m.checkAsTableField(simple[x], ref)
@@ -877,27 +877,27 @@ function m.searchSameFields(frame, simple)
         if     ref.type == 'setfield'
         or     ref.type == 'getfield'
         or     ref.type == 'tablefield' then
-            frame.results[#frame.results+1] = ref.field
+            status.results[#status.results+1] = ref.field
         elseif ref.type == 'setmethod'
         or     ref.type == 'getmethod' then
-            frame.results[#frame.results+1] = ref.method
+            status.results[#status.results+1] = ref.method
         elseif ref.type == 'setindex'
         or     ref.type == 'getindex'
         or     ref.type == 'tableindex' then
-            frame.results[#frame.results+1] = ref.index
+            status.results[#status.results+1] = ref.index
         else
-            frame.results[#frame.results+1] = ref
+            status.results[#status.results+1] = ref
         end
         ::NEXT_REF::
     end
 end
 
-function m.searchRefOfFunctionReturn(frame, obj)
+function m.searchRefOfFunctionReturn(status, obj)
     -- 只有 function 才搜索返回值引用
     if obj.type ~= 'function' then
         return
     end
-    frame.results[#frame.results+1] = obj
+    status.results[#status.results+1] = obj
     -- 搜索所在函数
     local currentFunc = m.getParentFunction(obj)
     local returns = currentFunc.returns
@@ -922,7 +922,7 @@ function m.searchRefOfFunctionReturn(frame, obj)
         return
     end
     -- 搜索所有所在函数的调用者
-    local funcRefs = m.frame(frame)
+    local funcRefs = m.status(status)
     m.searchRefOfValue(funcRefs, currentFunc)
 
     if #funcRefs.results == 0 then
@@ -957,7 +957,7 @@ function m.searchRefOfFunctionReturn(frame, obj)
     end
     -- 搜索调用者的引用
     for i = 1, #selects do
-        m.searchRefOfFields(frame, selects[i])
+        m.searchRefOfFields(status, selects[i])
     end
 end
 
@@ -977,8 +977,8 @@ function m.getIndexOfLiteral(obj)
     return obj
 end
 
-function m.searchRefOfFields(frame, obj)
-    frame.depth = frame.depth + 1
+function m.searchRefOfFields(status, obj)
+    status.depth = status.depth + 1
 
     obj = m.getIndexOfLiteral(obj)
 
@@ -986,37 +986,52 @@ function m.searchRefOfFields(frame, obj)
     local res = m.getStepRef(obj)
     if res then
         for i = 1, #res do
-            frame.results[#frame.results+1] = res[i]
+            status.results[#status.results+1] = res[i]
         end
     end
     -- 2. 检查simple
-    if frame.depth <= 5 then
+    if status.depth <= 5 then
         local simple = m.getSimple(obj)
         if simple then
-            m.searchSameFields(frame, simple)
+            m.searchSameFields(status, simple)
         end
     end
 
-    frame.depth = frame.depth - 1
+    status.depth = status.depth - 1
 end
 
-function m.searchRefOfValue(frame, obj, results)
+function m.searchRefOfValue(status, obj, results)
     local var = obj.parent
     if var.type == 'local'
     or var.type == 'set' then
-        return m.searchRefOfFields(frame, var)
+        return m.searchRefOfFields(status, var)
     end
 end
 
+--- 请求对象的引用，包括 `a.b.c` 形式
+--- 与 `return function` 形式。
+--- 不穿透 `setmetatable` ，考虑由
+--- 业务层进行反向 def 搜索。
 function m.requestReference(obj)
-    local frame = m.frame()
+    local status = m.status()
     -- 根据 field 搜索引用
-    m.searchRefOfFields(frame, obj)
+    m.searchRefOfFields(status, obj)
 
     -- 搜索函数返回值的引用
-    m.searchRefOfFunctionReturn(frame, obj)
+    m.searchRefOfFunctionReturn(status, obj)
 
-    return frame.results
+    return status.results
+end
+
+--- 请求对象的定义，包括 `a.b.c` 形式
+--- 与 `return function` 形式。
+--- 穿透 `setmetatable` 。
+function m.requestDefinition(obj)
+    local status = m.status()
+    -- 根据 field 搜索定义
+    m.searchDefOfFields(status, obj)
+
+    return status.results
 end
 
 return m

@@ -1,3 +1,4 @@
 require 'guide.stepRef'
 require 'guide.stepField'
-require 'guide.ref'
+require 'guide.reference'
+require 'guide.definition'
