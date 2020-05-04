@@ -1045,6 +1045,28 @@ function m.searchRefOfSelf(status)
     m.copyStatusResults(status, nodeStatus)
 end
 
+function m.searchDefOfSelf(status)
+    local hasSelf
+    local results = status.results
+    for i = #results, 1, -1 do
+        local res = results[i]
+        if res.tag == 'self' then
+            hasSelf = res
+            results[i] = results[#results]
+            results[#results] = nil
+        end
+    end
+    if not hasSelf then
+        return
+    end
+    local method = hasSelf.method
+    local node = method.node
+    local nodeStatus = m.status(status)
+    nodeStatus.flag = nodeStatus.flag ~ m.SearchFlag.METHOD
+    m.searchDefOfFields(nodeStatus, node)
+    m.copyStatusResults(status, nodeStatus)
+end
+
 function m.searchRefOfMT(status)
     local results = status.results
     for i = #results, 1, -1 do
@@ -1099,7 +1121,7 @@ function m.searchRefOfFields(status, obj)
             if simple then
                 m.searchSameFieldsOfRef(status, simple)
             end
-        else
+        elseif m.debugMode then
             error('stack overflow')
         end
     end
@@ -1121,20 +1143,28 @@ function m.searchDefOfFields(status, obj)
     status.depth = status.depth + 1
 
     -- 1. 检查单步定义
-    local res = m.getStepDef(obj)
-    if res then
-        for i = 1, #res do
-            status.results[#status.results+1] = res[i]
+    if status.flag & m.SearchFlag.STEP ~= 0 then
+        local res = m.getStepDef(obj)
+        if res then
+            for i = 1, #res do
+                status.results[#status.results+1] = res[i]
+            end
         end
     end
     -- 2. 检查simple
-    if status.depth <= 10 then
-        local simple = m.getSimple(obj)
-        if simple then
-            m.searchSameFieldsOfDef(status, simple)
+    if status.flag & m.SearchFlag.STEP ~= 0 then
+        if status.depth <= 10 then
+            local simple = m.getSimple(obj)
+            if simple then
+                m.searchSameFieldsOfDef(status, simple)
+            end
+        elseif m.debugMode then
+            error('stack overflow')
         end
-    else
-        error('stack overflow')
+    end
+    -- 3. 转换self
+    if status.flag & m.SearchFlag.SELF ~= 0 then
+        m.searchDefOfSelf(status)
     end
 
     status.depth = status.depth - 1
