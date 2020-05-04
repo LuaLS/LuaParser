@@ -679,6 +679,9 @@ local function stepRefOfLocal(loc)
 end
 local function stepRefOfLabel(label)
     local results = { label }
+    if not label then
+        return results
+    end
     local refs = label.ref
     for i = 1, #refs do
         local ref = refs[i]
@@ -834,13 +837,30 @@ function m.getSimple(obj)
     return simpleList
 end
 
+m.SearchFlag = {
+    STEP   = 1 << 0,
+    SIMPLE = 1 << 1,
+    SELF   = 1 << 2,
+    METHOD = 1 << 3,
+    ALL    = 0xffff,
+}
+
 function m.status(parentStatus)
     local status = {
-        cache = parentStatus and parentStatus.cache or {},
-        depth = parentStatus and parentStatus.depth or 0,
+        cache   = parentStatus and parentStatus.cache or {},
+        depth   = parentStatus and parentStatus.depth or 0,
+        flag    = m.SearchFlag.ALL,
         results = {},
     }
     return status
+end
+
+function m.copyStatusResults(a, b)
+    local ra = a.results
+    local rb = b.results
+    for i = 1, #rb do
+        ra[#ra+1] = rb[i]
+    end
 end
 
 function m.isSameField(a, b)
@@ -1003,60 +1023,7 @@ function m.searchRefOfFunctionReturn(status, obj)
     end
 end
 
-function m.searchRefOfFields(status, obj)
-    status.depth = status.depth + 1
-
-    -- 1. 检查单步引用
-    local res = m.getStepRef(obj)
-    if res then
-        for i = 1, #res do
-            status.results[#status.results+1] = res[i]
-        end
-    end
-    -- 2. 检查simple
-    if status.depth <= 5 then
-        local simple = m.getSimple(obj)
-        if simple then
-            m.searchSameFieldsOfRef(status, simple)
-        end
-    end
-
-    status.depth = status.depth - 1
-end
-
-function m.searchDefOfFields(status, obj)
-    status.depth = status.depth + 1
-
-    -- 1. 检查单步定义
-    local res = m.getStepDef(obj)
-    if res then
-        for i = 1, #res do
-            status.results[#status.results+1] = res[i]
-        end
-    end
-    -- 2. 检查simple
-    if status.depth <= 5 then
-        local simple = m.getSimple(obj)
-        if simple then
-            m.searchSameFieldsOfDef(status, simple)
-        end
-    end
-
-    -- 转化 self 定义
-    m.convertSelf(status)
-
-    status.depth = status.depth - 1
-end
-
-function m.searchRefOfValue(status, obj)
-    local var = obj.parent
-    if var.type == 'local'
-    or var.type == 'set' then
-        return m.searchRefOfFields(status, var)
-    end
-end
-
-function m.convertSelf(status)
+function m.searchRefOfSelf(status)
     local hasSelf
     local results = status.results
     for i = #results, 1, -1 do
@@ -1072,7 +1039,115 @@ function m.convertSelf(status)
     end
     local method = hasSelf.method
     local node = method.node
-    m.searchDefOfFields(status, node)
+    local nodeStatus = m.status(status)
+    nodeStatus.flag = nodeStatus.flag ~ m.SearchFlag.METHOD
+    m.searchRefOfFields(nodeStatus, node)
+    m.copyStatusResults(status, nodeStatus)
+end
+
+function m.searchRefOfMT(status)
+    local results = status.results
+    for i = #results, 1, -1 do
+        local res = results[i]
+        local nxt = res.next
+        if nxt and nxt.type == 'setmethod' then
+            local func = nxt.value
+            if func and func.type == 'function' then
+                local locals = func.locals
+                local self = locals and locals[1]
+                if self and self.tag == 'self' then
+                    local selfStatus = m.status(status)
+                    selfStatus.flag = selfStatus.flag ~ m.SearchFlag.SELF
+                    m.searchRefOfFields(selfStatus, self)
+                    m.copyStatusResults(status, selfStatus)
+                end
+            end
+        end
+    end
+end
+
+function m.cleanResults(results)
+    local mark = {}
+    for i = #results, 1, -1 do
+        local res = results[i]
+        if res.tag == 'self'
+        or mark[res] then
+            results[i] = results[#results]
+            results[#results] = nil
+        else
+            mark[res] = true
+        end
+    end
+end
+
+function m.searchRefOfFields(status, obj)
+    status.depth = status.depth + 1
+
+    -- 1. 检查单步引用
+    if status.flag & m.SearchFlag.STEP ~= 0 then
+        local res = m.getStepRef(obj)
+        if res then
+            for i = 1, #res do
+                status.results[#status.results+1] = res[i]
+            end
+        end
+    end
+    -- 2. 检查simple
+    if status.flag & m.SearchFlag.SIMPLE ~= 0 then
+        if status.depth <= 10 then
+            local simple = m.getSimple(obj)
+            if simple then
+                m.searchSameFieldsOfRef(status, simple)
+            end
+        else
+            error('stack overflow')
+        end
+    end
+    -- 3. 转换self
+    if status.flag & m.SearchFlag.SELF ~= 0 then
+        m.searchRefOfSelf(status)
+    end
+    -- 4. 搜索method
+    if status.flag & m.SearchFlag.METHOD ~= 0 then
+        m.searchRefOfMT(status)
+    end
+
+    status.depth = status.depth - 1
+
+    m.cleanResults(status.results)
+end
+
+function m.searchDefOfFields(status, obj)
+    status.depth = status.depth + 1
+
+    -- 1. 检查单步定义
+    local res = m.getStepDef(obj)
+    if res then
+        for i = 1, #res do
+            status.results[#status.results+1] = res[i]
+        end
+    end
+    -- 2. 检查simple
+    if status.depth <= 10 then
+        local simple = m.getSimple(obj)
+        if simple then
+            m.searchSameFieldsOfDef(status, simple)
+        end
+    else
+        error('stack overflow')
+    end
+
+    status.depth = status.depth - 1
+
+    m.cleanResults(status.results)
+end
+
+function m.searchRefOfValue(status, obj)
+    local var = obj.parent
+    if var.type == 'local'
+    or var.type == 'set' then
+        return m.searchRefOfFields(status, var)
+    end
 end
 
 --- 请求对象的引用，包括 `a.b.c` 形式
@@ -1097,7 +1172,6 @@ function m.requestDefinition(obj)
     local status = m.status()
     -- 根据 field 搜索定义
     m.searchDefOfFields(status, obj)
-
 
     return status.results
 end

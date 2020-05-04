@@ -231,6 +231,34 @@ a.b.<?c?> = 1
 print(a.b.<!c!>)
 ]]
 
+TEST [[
+local <!mt!> = {}
+function <!mt!>:x()
+    <?self?>:x()
+end
+]]
+
+TEST [[
+local <?mt?> = {}
+function <!mt!>:x()
+    <!self!>:x()
+end
+]]
+
+TEST [[
+local mt = {}
+function mt:<!x!>()
+    self:<?x?>()
+end
+]]
+
+TEST [[
+local mt = {}
+function mt:<?x?>()
+    self:<!x!>()
+end
+]]
+
 --TEST [[
 -----@class <!Class!>
 -----@type <?Class?>
