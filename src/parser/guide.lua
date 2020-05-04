@@ -1,10 +1,13 @@
-local util       = require 'utility'
-local error      = error
-local type       = type
-local next       = next
-local tostring   = tostring
-local print      = print
-local ipairs     = ipairs
+local util        = require 'utility'
+local error       = error
+local type        = type
+local next        = next
+local tostring    = tostring
+local print       = print
+local ipairs      = ipairs
+local tableInsert = table.insert
+local tableUnpack = table.unpack
+local tableRemove = table.remove
 
 _ENV = nil
 
@@ -666,14 +669,25 @@ end
 
 -- 根据语法，单步搜索定义
 local function stepRefOfLocal(loc)
-    local results = { loc }
+    local results = {}
+    if loc.start ~= 0 then
+        results[#results+1] = loc
+    end
     local refs = loc.ref
     if not refs then
         return results
     end
     for i = 1, #refs do
         local ref = refs[i]
-        results[#results+1] = ref
+        if ref.start == 0 then
+            goto CONTINUE
+        end
+        if ref.type == 'local'
+        or ref.type == 'setlocal'
+        or ref.type == 'getlocal' then
+            results[#results+1] = ref
+        end
+        ::CONTINUE::
     end
     return results
 end
@@ -804,12 +818,17 @@ local function buildSimpleList(obj)
         or     cur.type == 'tableindex' then
             list[i] = cur
             cur = cur.parent.parent
-        elseif cur.type == 'getglobal'
-        or     cur.type == 'setglobal'
-        or     cur.type == 'getlocal'
+        elseif cur.type == 'getlocal'
         or     cur.type == 'setlocal'
         or     cur.type == 'local' then
             list[i] = cur
+            break
+        elseif cur.type == 'setglobal'
+        or     cur.type == 'getglobal' then
+            list[i] = cur
+            if m.Version >= 52 then
+                list[i+1] = m.getLocal(cur, '_ENV', cur.start)
+            end
             break
         elseif cur.type == 'function'
         or     cur.type == 'main' then
@@ -828,6 +847,8 @@ function m.getSimple(obj)
     or obj.type == 'setmethod'
     or obj.type == 'getindex'
     or obj.type == 'setindex'
+    or obj.type == 'setglobal'
+    or obj.type == 'getglobal'
     or obj.type == 'tableindex' then
         simpleList = buildSimpleList(obj)
     elseif obj.type == 'field'
@@ -844,6 +865,7 @@ m.SearchFlag = {
     METHOD = 1 << 3,
     ALL    = 0xffff,
 }
+m.Version = 52
 
 function m.status(parentStatus)
     local status = {
@@ -901,10 +923,8 @@ function m.checkAsTableField(sim, ref)
     return nil
 end
 
-function m.searchSameFieldsOfRef(status, simple)
-    local fristStatus = m.status(status)
-    m.searchRefOfFields(fristStatus, simple[1])
-    for _, ref in ipairs(fristStatus.results) do
+function m.copySameFieldsResultsOfRef(a, b, simple)
+    for _, ref in ipairs(b.results) do
         for x = 2, #simple do
             ref =  m.checkAsNextRef(simple[x], ref)
                 or m.checkAsTableField(simple[x], ref)
@@ -915,25 +935,23 @@ function m.searchSameFieldsOfRef(status, simple)
         if     ref.type == 'setfield'
         or     ref.type == 'getfield'
         or     ref.type == 'tablefield' then
-            status.results[#status.results+1] = ref.field
+            a.results[#a.results+1] = ref.field
         elseif ref.type == 'setmethod'
         or     ref.type == 'getmethod' then
-            status.results[#status.results+1] = ref.method
+            a.results[#a.results+1] = ref.method
         elseif ref.type == 'setindex'
         or     ref.type == 'getindex'
         or     ref.type == 'tableindex' then
-            status.results[#status.results+1] = ref.index
+            a.results[#a.results+1] = ref.index
         else
-            status.results[#status.results+1] = ref
+            a.results[#a.results+1] = ref
         end
         ::NEXT_REF::
     end
 end
 
-function m.searchSameFieldsOfDef(status, simple)
-    local fristStatus = m.status(status)
-    m.searchRefOfFields(fristStatus, simple[1])
-    for _, ref in ipairs(fristStatus.results) do
+function m.copySameFieldsResultsOfDef(a, b, simple)
+    for _, ref in ipairs(b.results) do
         for x = 2, #simple do
             ref =  m.checkAsNextRef(simple[x], ref)
                 or m.checkAsTableField(simple[x], ref)
@@ -943,15 +961,31 @@ function m.searchSameFieldsOfDef(status, simple)
         end
         if     ref.type == 'setfield'
         or     ref.type == 'tablefield' then
-            status.results[#status.results+1] = ref.field
+            a.results[#a.results+1] = ref.field
         elseif ref.type == 'setmethod' then
-            status.results[#status.results+1] = ref.method
+            a.results[#a.results+1] = ref.method
         elseif ref.type == 'setindex'
         or     ref.type == 'tableindex' then
-            status.results[#status.results+1] = ref.index
+            a.results[#a.results+1] = ref.index
+        elseif ref.type == 'setglobal' then
+            a.results[#a.results+1] = ref
         end
         ::NEXT_REF::
     end
+end
+
+function m.searchSameFieldsOfRef(status, simple)
+    local first = simple[1]
+    local fristStatus = m.status(status)
+    m.searchRefOfFields(fristStatus, first)
+    m.copySameFieldsResultsOfRef(status, fristStatus, simple)
+end
+
+function m.searchSameFieldsOfDef(status, simple)
+    local first = simple[1]
+    local fristStatus = m.status(status)
+    m.searchRefOfFields(fristStatus, first)
+    m.copySameFieldsResultsOfDef(status, fristStatus, simple)
 end
 
 function m.searchRefOfFunctionReturn(status, obj)
@@ -1105,7 +1139,7 @@ end
 function m.searchRefOfFields(status, obj)
     status.depth = status.depth + 1
 
-    -- 1. 检查单步引用
+    -- 检查单步引用
     if status.flag & m.SearchFlag.STEP ~= 0 then
         local res = m.getStepRef(obj)
         if res then
@@ -1114,7 +1148,7 @@ function m.searchRefOfFields(status, obj)
             end
         end
     end
-    -- 2. 检查simple
+    -- 检查simple
     if status.flag & m.SearchFlag.SIMPLE ~= 0 then
         if status.depth <= 10 then
             local simple = m.getSimple(obj)
@@ -1125,11 +1159,11 @@ function m.searchRefOfFields(status, obj)
             error('stack overflow')
         end
     end
-    -- 3. 转换self
+    -- 转换self
     if status.flag & m.SearchFlag.SELF ~= 0 then
         m.searchRefOfSelf(status)
     end
-    -- 4. 搜索method
+    -- 搜索method
     if status.flag & m.SearchFlag.METHOD ~= 0 then
         m.searchRefOfMT(status)
     end
@@ -1142,7 +1176,7 @@ end
 function m.searchDefOfFields(status, obj)
     status.depth = status.depth + 1
 
-    -- 1. 检查单步定义
+    -- 检查单步定义
     if status.flag & m.SearchFlag.STEP ~= 0 then
         local res = m.getStepDef(obj)
         if res then
@@ -1151,7 +1185,7 @@ function m.searchDefOfFields(status, obj)
             end
         end
     end
-    -- 2. 检查simple
+    -- 检查simple
     if status.flag & m.SearchFlag.STEP ~= 0 then
         if status.depth <= 10 then
             local simple = m.getSimple(obj)
@@ -1162,7 +1196,7 @@ function m.searchDefOfFields(status, obj)
             error('stack overflow')
         end
     end
-    -- 3. 转换self
+    -- 转换self
     if status.flag & m.SearchFlag.SELF ~= 0 then
         m.searchDefOfSelf(status)
     end

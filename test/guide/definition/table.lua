@@ -116,20 +116,3 @@ local t;t = {
 }
 t.<?insert?>()
 ]]
-
---TEST[[
---local t = {
---    <!insert!> = 1,
---}
---y.<?insert?>()
---]]
-
---TEST[[
---local t = {
---    <!insert!> = 1,
---}
---local y = {
---    insert = 1,
---}
---t.<?insert?>()
---]]

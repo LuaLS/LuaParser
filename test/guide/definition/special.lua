@@ -9,6 +9,16 @@ print(<?x?>)
 ]]
 
 TEST [[
+<!x!> = 1
+print(_ENV.<?x?>)
+]]
+
+TEST [[
+<!x!> = 1
+print(_G.<?x?>)
+]]
+
+TEST [[
 <!rawset(_G, 'x', 1)!>
 print(<?x?>)
 ]]

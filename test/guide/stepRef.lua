@@ -92,3 +92,8 @@ TEST [[
 <!x!> = 1
 print(<?x?>)
 ]]
+
+TEST [[
+p = 1
+print(<?_ENV?>)
+]]
