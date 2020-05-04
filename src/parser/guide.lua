@@ -1042,6 +1042,9 @@ function m.searchDefOfFields(status, obj)
         end
     end
 
+    -- 转化 self 定义
+    m.convertSelf(status)
+
     status.depth = status.depth - 1
 end
 
@@ -1051,6 +1054,25 @@ function m.searchRefOfValue(status, obj)
     or var.type == 'set' then
         return m.searchRefOfFields(status, var)
     end
+end
+
+function m.convertSelf(status)
+    local hasSelf
+    local results = status.results
+    for i = #results, 1, -1 do
+        local res = results[i]
+        if res.tag == 'self' then
+            hasSelf = res
+            results[i] = results[#results]
+            results[#results] = nil
+        end
+    end
+    if not hasSelf then
+        return
+    end
+    local method = hasSelf.method
+    local node = method.node
+    m.searchDefOfFields(status, node)
 end
 
 --- 请求对象的引用，包括 `a.b.c` 形式
@@ -1075,6 +1097,7 @@ function m.requestDefinition(obj)
     local status = m.status()
     -- 根据 field 搜索定义
     m.searchDefOfFields(status, obj)
+
 
     return status.results
 end
