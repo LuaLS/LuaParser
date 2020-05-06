@@ -52,17 +52,7 @@ local vmMap = {
             if ENVMode == '_ENV' then
                 local node = guide.getLocal(obj, '_ENV', obj.start)
                 if node then
-                    local env = Compile({
-                        type   = 'getlocal',
-                        start  = 0,
-                        finish = 0,
-                        effect = 0,
-                        tag    = '_ENV',
-                        special= '_G',
-                        [1]    = '_ENV',
-                        next   = obj,
-                    }, obj)
-                    addRef(node, env)
+                    addRef(node, obj)
                 end
             end
             local name = obj[1]
@@ -218,17 +208,7 @@ local vmMap = {
             if ENVMode == '_ENV' then
                 local node = guide.getLocal(obj, '_ENV', obj.start)
                 if node then
-                    local env = Compile({
-                        type   = 'setlocal',
-                        start  = 0,
-                        finish = 0,
-                        effect = 0,
-                        tag    = '_ENV',
-                        special= '_G',
-                        [1]    = '_ENV',
-                        next   = obj,
-                    }, obj)
-                    addRef(node, env)
+                    addRef(node, obj)
                 end
             end
         end

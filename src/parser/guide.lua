@@ -8,6 +8,7 @@ local ipairs      = ipairs
 local tableInsert = table.insert
 local tableUnpack = table.unpack
 local tableRemove = table.remove
+local tableMove   = table.move
 
 _ENV = nil
 
@@ -826,9 +827,6 @@ local function buildSimpleList(obj)
         elseif cur.type == 'setglobal'
         or     cur.type == 'getglobal' then
             list[i] = cur
-            if m.Version >= 52 then
-                list[i+1] = m.getLocal(cur, '_ENV', cur.start)
-            end
             break
         elseif cur.type == 'function'
         or     cur.type == 'main' then
@@ -974,18 +972,51 @@ function m.copySameFieldsResultsOfDef(a, b, simple)
     end
 end
 
-function m.searchSameFieldsOfRef(status, simple)
+function m.convertSimple(simple)
+    if #simple <= 1 then
+        return
+    end
     local first = simple[1]
-    local fristStatus = m.status(status)
-    m.searchRefOfFields(fristStatus, first)
-    m.copySameFieldsResultsOfRef(status, fristStatus, simple)
+    if first.tag == '_ENV' then
+        simple.type = 'global'
+        tableRemove(simple, 1)
+    elseif first.type == 'local'
+    or     first.type == 'getlocal'
+    or     first.type == 'setlocal' then
+        simple.type = 'local'
+    else
+        simple.type = 'global'
+    end
+end
+
+function m.searchRefOfFirstInSimple(status, simple)
+    m.convertSimple(simple)
+    if simple.type == 'local' then
+        local firstStatus = m.status(status)
+        m.searchRefOfFields(firstStatus, simple[1])
+        return firstStatus
+    else
+        if #simple <= 1 then
+            return nil
+        end
+        local firstStatus = m.status(status)
+        m.searchRefOfFields(firstStatus, simple[1])
+        return firstStatus
+    end
+end
+
+function m.searchSameFieldsOfRef(status, simple)
+    local firstStatus = m.searchRefOfFirstInSimple(status, simple)
+    if firstStatus then
+        m.copySameFieldsResultsOfRef(status, firstStatus, simple)
+    end
 end
 
 function m.searchSameFieldsOfDef(status, simple)
-    local first = simple[1]
-    local fristStatus = m.status(status)
-    m.searchRefOfFields(fristStatus, first)
-    m.copySameFieldsResultsOfDef(status, fristStatus, simple)
+    local firstStatus = m.searchRefOfFirstInSimple(status, simple)
+    if firstStatus then
+        m.copySameFieldsResultsOfDef(status, firstStatus, simple)
+    end
 end
 
 function m.searchRefOfFunctionReturn(status, obj)
