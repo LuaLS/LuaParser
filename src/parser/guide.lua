@@ -940,7 +940,7 @@ function m.checkSameSimpleInBranch(ref, start, queue)
             for i = 1, #value do
                 local field = value[i]
                 queue[#queue+1] = field
-                queue[field] = start
+                queue[field] = start + 1
             end
         end
     end
@@ -992,8 +992,8 @@ function m.searchSameFieldsCrossMethod(status, ref, start, queue)
         return
     end
     local methodStatus = m.status(status)
+    m.searchRefOfFields(methodStatus, method, 'ref')
     for _, md in ipairs(methodStatus.results) do
-        m.searchRefOfFields(methodStatus, method, 'ref')
         queue[#queue+1] = md
         queue[md] = start
         if md.type == 'setmethod'
@@ -1018,12 +1018,13 @@ function m.checkSameSimple(status, simple, ref, mode, results, queue)
         if m.getSimpleName(ref) ~= sm then
             return
         end
+        -- 穿透 self:func 与 mt:func
+        m.searchSameFieldsCrossMethod(status, ref, i, queue)
         if i == #simple then
             break
         end
         -- 检查形如 a = {} 的分支情况
-        m.checkSameSimpleInBranch(ref, i + 1, queue)
-        m.searchSameFieldsCrossMethod(status, ref, i + 1, queue)
+        m.checkSameSimpleInBranch(ref, i, queue)
         ref = m.getNextRef(ref)
         if not ref then
             return
