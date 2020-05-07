@@ -878,6 +878,7 @@ function m.getSimple(obj)
     or obj.type == 'setmethod'
     or obj.type == 'getindex'
     or obj.type == 'setindex'
+    or obj.type == 'local'
     or obj.type == 'setglobal'
     or obj.type == 'getglobal'
     or obj.type == 'tableindex' then
@@ -932,8 +933,22 @@ function m.getNextRef(ref)
     return nil
 end
 
-function m.checkSameSimple(simple, ref, mode, results)
-    for i = 1, #simple do
+function m.checkSameSimpleInBranch(ref, start, queue)
+    local value = ref.value
+    if value then
+        if value.type == 'table' then
+            for i = 1, #value do
+                local field = value[i]
+                queue[#queue+1] = field
+                queue[field] = start
+            end
+        end
+    end
+end
+
+function m.checkSameSimple(simple, ref, mode, results, queue)
+    local start = queue[ref]
+    for i = start, #simple do
         local sm = simple[i]
         if m.getSimpleName(ref) ~= sm then
             return
@@ -941,8 +956,11 @@ function m.checkSameSimple(simple, ref, mode, results)
         if i == #simple then
             break
         end
-        ref = m.getNextRef(ref)
-        if not ref then
+        local nextRef = m.getNextRef(ref)
+        if nextRef then
+            ref = nextRef
+        else
+            m.checkSameSimpleInBranch(ref, i + 1, queue)
             return
         end
     end
@@ -951,18 +969,27 @@ function m.checkSameSimple(simple, ref, mode, results)
         or ref.type == 'setlocal'
         or ref.type == 'local' then
             results[#results+1] = ref
-        elseif  ref.type == 'setfield' then
+        elseif ref.type == 'setfield'
+        or     ref.type == 'tablefield' then
             results[#results+1] = ref.field
-        elseif  ref.type == 'setmethod' then
+        elseif ref.type == 'setmethod' then
             results[#results+1] = ref.method
+        elseif ref.type == 'setindex'
+        or     ref.type == 'tableindex' then
+            results[#results+1] = ref.index
         end
     else
         if ref.type == 'setfield'
-        or ref.type == 'getfield' then
+        or ref.type == 'getfield'
+        or ref.type == 'tablefield' then
             results[#results+1] = ref.field
         elseif ref.type == 'setmethod'
         or     ref.type == 'getmethod' then
             results[#results+1] = ref.method
+        elseif ref.type == 'setindex'
+        or     ref.type == 'getindex'
+        or     ref.type == 'tableindex' then
+            results[#results+1] = ref.index
         else
             results[#results+1] = ref
         end
@@ -971,18 +998,26 @@ end
 
 function m.searchSameFields(status, simple, mode)
     local first = simple.first
-    if simple.global then
-        if first.ref then
-            for _, ref in ipairs(first.ref) do
-                m.checkSameSimple(simple, ref, mode, status.results)
-            end
+    local fref = first.ref
+    if not fref then
+        return
+    end
+    local queue = {}
+    for i = 1, #fref do
+        local ref = fref[i]
+        queue[i] = ref
+        queue[ref] = 1
+    end
+    if first.type == 'local' then
+        queue[#queue+1] = first
+        queue[first] = 1
+    end
+    for i = 1, 999 do
+        local ref = queue[i]
+        if not ref then
+            return
         end
-    else
-        if first.ref then
-            for _, ref in ipairs(first.ref) do
-                m.checkSameSimple(simple, ref, mode, status.results)
-            end
-        end
+        m.checkSameSimple(simple, ref, mode, status.results, queue)
     end
 end
 
