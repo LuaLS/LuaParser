@@ -572,6 +572,10 @@ function m.getKeyName(obj)
     return m.getKeyNameOfLiteral(obj)
 end
 
+function m.getSimpleName(obj)
+    return m.getKeyName(obj)
+end
+
 function m.getENV(ast)
     if ast.type ~= 'main' then
         return nil
@@ -799,6 +803,34 @@ function m.getStepField(obj)
     end
 end
 
+local function convertSimpleList(list)
+    local simple = {}
+    for i = #list, 1, -1 do
+        local c = list[i]
+        if c.special == '_G' then
+            simple.global = true
+            goto CONTINUE
+        end
+        if c.type == 'getglobal'
+        or c.type == 'setglobal' then
+            simple.global = true
+        end
+        simple[#simple+1] = m.getSimpleName(c)
+        if #simple == 1 then
+            if simple.global then
+                simple.first = m.getLocal(c, '_ENV', c.start)
+            elseif c.type == 'setlocal'
+            or     c.type == 'getlocal' then
+                simple.first = c.node
+            else
+                simple.first = c
+            end
+        end
+        ::CONTINUE::
+    end
+    return simple
+end
+
 -- 搜索 `a.b.c` 的等价表达式
 local function buildSimpleList(obj)
     local list = {}
@@ -835,8 +867,9 @@ local function buildSimpleList(obj)
             return nil
         end
     end
-    return util.revertTable(list)
+    return convertSimpleList(list)
 end
+
 function m.getSimple(obj)
     local simpleList
     if obj.type == 'getfield'
@@ -883,11 +916,7 @@ function m.copyStatusResults(a, b)
     end
 end
 
-function m.isSameField(a, b)
-    return m.getKeyName(a) == m.getKeyName(b)
-end
-
-function m.checkAsNextRef(sim, ref)
+function m.getNextRef(ref)
     local nextRef = ref.next
     if not nextRef then
         return nil
@@ -898,124 +927,62 @@ function m.checkAsNextRef(sim, ref)
     or nextRef.type == 'getmethod'
     or nextRef.type == 'setindex'
     or nextRef.type == 'getindex' then
-        if m.isSameField(sim, nextRef) then
-            return nextRef
-        end
+        return nextRef
     end
     return nil
 end
 
-function m.checkAsTableField(sim, ref)
-    local value = ref.value
-    if not value then
-        return nil
-    end
-    if value.type == 'table' then
-        for i = 1, #value do
-            local field = value[i]
-            if m.isSameField(sim, field) then
-                return field
-            end
+function m.checkSameSimple(simple, ref, mode, results)
+    for i = 1, #simple do
+        local sm = simple[i]
+        if m.getSimpleName(ref) ~= sm then
+            return
+        end
+        if i == #simple then
+            break
+        end
+        ref = m.getNextRef(ref)
+        if not ref then
+            return
         end
     end
-    return nil
-end
-
-function m.copySameFieldsResultsOfRef(a, b, simple)
-    for _, ref in ipairs(b.results) do
-        for x = 2, #simple do
-            ref =  m.checkAsNextRef(simple[x], ref)
-                or m.checkAsTableField(simple[x], ref)
-            if not ref then
-                goto NEXT_REF
-            end
+    if mode == 'def' then
+        if ref.type == 'setglobal'
+        or ref.type == 'setlocal'
+        or ref.type == 'local' then
+            results[#results+1] = ref
+        elseif  ref.type == 'setfield' then
+            results[#results+1] = ref.field
+        elseif  ref.type == 'setmethod' then
+            results[#results+1] = ref.method
         end
-        if     ref.type == 'setfield'
-        or     ref.type == 'getfield'
-        or     ref.type == 'tablefield' then
-            a.results[#a.results+1] = ref.field
+    else
+        if ref.type == 'setfield'
+        or ref.type == 'getfield' then
+            results[#results+1] = ref.field
         elseif ref.type == 'setmethod'
         or     ref.type == 'getmethod' then
-            a.results[#a.results+1] = ref.method
-        elseif ref.type == 'setindex'
-        or     ref.type == 'getindex'
-        or     ref.type == 'tableindex' then
-            a.results[#a.results+1] = ref.index
+            results[#results+1] = ref.method
         else
-            a.results[#a.results+1] = ref
+            results[#results+1] = ref
         end
-        ::NEXT_REF::
     end
 end
 
-function m.copySameFieldsResultsOfDef(a, b, simple)
-    for _, ref in ipairs(b.results) do
-        for x = 2, #simple do
-            ref =  m.checkAsNextRef(simple[x], ref)
-                or m.checkAsTableField(simple[x], ref)
-            if not ref then
-                goto NEXT_REF
+function m.searchSameFields(status, simple, mode)
+    local first = simple.first
+    if simple.global then
+        if first.ref then
+            for _, ref in ipairs(first.ref) do
+                m.checkSameSimple(simple, ref, mode, status.results)
             end
         end
-        if     ref.type == 'setfield'
-        or     ref.type == 'tablefield' then
-            a.results[#a.results+1] = ref.field
-        elseif ref.type == 'setmethod' then
-            a.results[#a.results+1] = ref.method
-        elseif ref.type == 'setindex'
-        or     ref.type == 'tableindex' then
-            a.results[#a.results+1] = ref.index
-        elseif ref.type == 'setglobal' then
-            a.results[#a.results+1] = ref
-        end
-        ::NEXT_REF::
-    end
-end
-
-function m.convertSimple(simple)
-    if #simple <= 1 then
-        return
-    end
-    local first = simple[1]
-    if first.tag == '_ENV' then
-        simple.type = 'global'
-        tableRemove(simple, 1)
-    elseif first.type == 'local'
-    or     first.type == 'getlocal'
-    or     first.type == 'setlocal' then
-        simple.type = 'local'
     else
-        simple.type = 'global'
-    end
-end
-
-function m.searchRefOfFirstInSimple(status, simple)
-    m.convertSimple(simple)
-    if simple.type == 'local' then
-        local firstStatus = m.status(status)
-        m.searchRefOfFields(firstStatus, simple[1])
-        return firstStatus
-    else
-        if #simple <= 1 then
-            return nil
+        if first.ref then
+            for _, ref in ipairs(first.ref) do
+                m.checkSameSimple(simple, ref, mode, status.results)
+            end
         end
-        local firstStatus = m.status(status)
-        m.searchRefOfFields(firstStatus, simple[1])
-        return firstStatus
-    end
-end
-
-function m.searchSameFieldsOfRef(status, simple)
-    local firstStatus = m.searchRefOfFirstInSimple(status, simple)
-    if firstStatus then
-        m.copySameFieldsResultsOfRef(status, firstStatus, simple)
-    end
-end
-
-function m.searchSameFieldsOfDef(status, simple)
-    local firstStatus = m.searchRefOfFirstInSimple(status, simple)
-    if firstStatus then
-        m.copySameFieldsResultsOfDef(status, firstStatus, simple)
     end
 end
 
@@ -1184,7 +1151,7 @@ function m.searchRefOfFields(status, obj)
         if status.depth <= 10 then
             local simple = m.getSimple(obj)
             if simple then
-                m.searchSameFieldsOfRef(status, simple)
+                m.searchSameFields(status, simple, 'ref')
             end
         elseif m.debugMode then
             error('stack overflow')
@@ -1221,7 +1188,7 @@ function m.searchDefOfFields(status, obj)
         if status.depth <= 10 then
             local simple = m.getSimple(obj)
             if simple then
-                m.searchSameFieldsOfDef(status, simple)
+                m.searchSameFields(status, simple, 'def')
             end
         elseif m.debugMode then
             error('stack overflow')
