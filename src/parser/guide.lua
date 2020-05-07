@@ -879,6 +879,8 @@ function m.getSimple(obj)
     or obj.type == 'getindex'
     or obj.type == 'setindex'
     or obj.type == 'local'
+    or obj.type == 'getlocal'
+    or obj.type == 'setlocal'
     or obj.type == 'setglobal'
     or obj.type == 'getglobal'
     or obj.type == 'tableindex' then
@@ -893,8 +895,6 @@ end
 m.SearchFlag = {
     STEP   = 1 << 0,
     SIMPLE = 1 << 1,
-    SELF   = 1 << 2,
-    METHOD = 1 << 3,
     ALL    = 0xffff,
 }
 m.Version = 52
@@ -946,7 +946,72 @@ function m.checkSameSimpleInBranch(ref, start, queue)
     end
 end
 
-function m.checkSameSimple(simple, ref, mode, results, queue)
+function m.searchSameMethodCrossSelf(ref, mark)
+    local selfNode
+    if ref.tag == 'self' then
+        selfNode = ref
+    else
+        if ref.type == 'getlocal'
+        or ref.type == 'setlocal' then
+            local node = ref.node
+            if node.tag == 'self' then
+                selfNode = node
+            end
+        end
+    end
+    if selfNode then
+        if mark[selfNode] then
+            return nil
+        end
+        mark[selfNode] = true
+        return selfNode.method.method
+    end
+end
+
+function m.searchSameMethod(ref, mark)
+    if mark['method'] then
+        return nil
+    end
+    if ref.type == 'setmethod'
+    or ref.type == 'getmethod' then
+        mark['method'] = true
+        return ref.method
+    end
+    return nil
+end
+
+function m.searchSameFieldsCrossMethod(status, ref, start, queue)
+    local mark = status.cache.crossMethodMark
+    if not mark then
+        mark = {}
+        status.cache.crossMethodMark = mark
+    end
+    local method = m.searchSameMethod(ref, mark)
+                or m.searchSameMethodCrossSelf(ref, mark)
+    if not method then
+        return
+    end
+    local methodStatus = m.status(status)
+    for _, md in ipairs(methodStatus.results) do
+        m.searchRefOfFields(methodStatus, method, 'ref')
+        queue[#queue+1] = md
+        queue[md] = start
+        if md.type == 'setmethod'
+        or md.type == 'getmethod' then
+            local func = md.value
+            if func then
+                local selfNode = func.locals and func.locals[1]
+                if selfNode then
+                    queue[#queue+1] = selfNode
+                    queue[selfNode] = start
+                    mark[selfNode] = true
+                end
+            end
+        end
+    end
+end
+
+function m.checkSameSimple(status, simple, ref, mode, results, queue)
     local start = queue[ref]
     for i = start, #simple do
         local sm = simple[i]
@@ -956,11 +1021,11 @@ function m.checkSameSimple(simple, ref, mode, results, queue)
         if i == #simple then
             break
         end
-        local nextRef = m.getNextRef(ref)
-        if nextRef then
-            ref = nextRef
-        else
-            m.checkSameSimpleInBranch(ref, i + 1, queue)
+        -- 检查形如 a = {} 的分支情况
+        m.checkSameSimpleInBranch(ref, i + 1, queue)
+        m.searchSameFieldsCrossMethod(status, ref, i + 1, queue)
+        ref = m.getNextRef(ref)
+        if not ref then
             return
         end
     end
@@ -1017,7 +1082,7 @@ function m.searchSameFields(status, simple, mode)
         if not ref then
             return
         end
-        m.checkSameSimple(simple, ref, mode, status.results, queue)
+        m.checkSameSimple(status, simple, ref, mode, status.results, queue)
     end
 end
 
@@ -1090,38 +1155,6 @@ function m.searchRefOfFunctionReturn(status, obj)
     end
 end
 
-function m.searchRefOfSelf(status, mode)
-    local hasSelf
-    local results = status.results
-    for i = #results, 1, -1 do
-        local res = results[i]
-        if res.tag == 'self' then
-            hasSelf = res
-            results[i] = results[#results]
-            results[#results] = nil
-        else
-            if not hasSelf then
-                if res.type == 'getlocal'
-                or res.type == 'setlocal' then
-                    local node = res.node
-                    if node.tag == 'self' then
-                        hasSelf = node
-                    end
-                end
-            end
-        end
-    end
-    if not hasSelf then
-        return
-    end
-    local method = hasSelf.method
-    local node = method.node
-    local nodeStatus = m.status(status)
-    nodeStatus.flag = nodeStatus.flag ~ m.SearchFlag.METHOD
-    m.searchRefOfFields(nodeStatus, node, mode)
-    m.copyStatusResults(status, nodeStatus)
-end
-
 function m.searchRefOfMT(status)
     local results = status.results
     for i = #results, 1, -1 do
@@ -1174,19 +1207,11 @@ function m.searchRefOfFields(status, obj, mode)
         if status.depth <= 10 then
             local simple = m.getSimple(obj)
             if simple then
-                m.searchSameFields(status, simple, 'ref')
+                m.searchSameFields(status, simple, mode)
             end
         elseif m.debugMode then
             error('stack overflow')
         end
-    end
-    -- 转换self
-    if status.flag & m.SearchFlag.SELF ~= 0 then
-        m.searchRefOfSelf(status, mode)
-    end
-    -- 搜索method
-    if mode == 'ref' and status.flag & m.SearchFlag.METHOD ~= 0 then
-        m.searchRefOfMT(status)
     end
 
     status.depth = status.depth - 1
