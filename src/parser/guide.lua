@@ -1090,7 +1090,7 @@ function m.searchRefOfFunctionReturn(status, obj)
     end
 end
 
-function m.searchRefOfSelf(status)
+function m.searchRefOfSelf(status, mode)
     local hasSelf
     local results = status.results
     for i = #results, 1, -1 do
@@ -1099,6 +1099,16 @@ function m.searchRefOfSelf(status)
             hasSelf = res
             results[i] = results[#results]
             results[#results] = nil
+        else
+            if not hasSelf then
+                if res.type == 'getlocal'
+                or res.type == 'setlocal' then
+                    local node = res.node
+                    if node.tag == 'self' then
+                        hasSelf = node
+                    end
+                end
+            end
         end
     end
     if not hasSelf then
@@ -1108,29 +1118,7 @@ function m.searchRefOfSelf(status)
     local node = method.node
     local nodeStatus = m.status(status)
     nodeStatus.flag = nodeStatus.flag ~ m.SearchFlag.METHOD
-    m.searchRefOfFields(nodeStatus, node)
-    m.copyStatusResults(status, nodeStatus)
-end
-
-function m.searchDefOfSelf(status)
-    local hasSelf
-    local results = status.results
-    for i = #results, 1, -1 do
-        local res = results[i]
-        if res.tag == 'self' then
-            hasSelf = res
-            results[i] = results[#results]
-            results[#results] = nil
-        end
-    end
-    if not hasSelf then
-        return
-    end
-    local method = hasSelf.method
-    local node = method.node
-    local nodeStatus = m.status(status)
-    nodeStatus.flag = nodeStatus.flag ~ m.SearchFlag.METHOD
-    m.searchDefOfFields(nodeStatus, node)
+    m.searchRefOfFields(nodeStatus, node, mode)
     m.copyStatusResults(status, nodeStatus)
 end
 
@@ -1169,7 +1157,7 @@ function m.cleanResults(results)
     end
 end
 
-function m.searchRefOfFields(status, obj)
+function m.searchRefOfFields(status, obj, mode)
     status.depth = status.depth + 1
 
     -- 检查单步引用
@@ -1194,44 +1182,11 @@ function m.searchRefOfFields(status, obj)
     end
     -- 转换self
     if status.flag & m.SearchFlag.SELF ~= 0 then
-        m.searchRefOfSelf(status)
+        m.searchRefOfSelf(status, mode)
     end
     -- 搜索method
-    if status.flag & m.SearchFlag.METHOD ~= 0 then
+    if mode == 'ref' and status.flag & m.SearchFlag.METHOD ~= 0 then
         m.searchRefOfMT(status)
-    end
-
-    status.depth = status.depth - 1
-
-    m.cleanResults(status.results)
-end
-
-function m.searchDefOfFields(status, obj)
-    status.depth = status.depth + 1
-
-    -- 检查单步定义
-    if status.flag & m.SearchFlag.STEP ~= 0 then
-        local res = m.getStepDef(obj)
-        if res then
-            for i = 1, #res do
-                status.results[#status.results+1] = res[i]
-            end
-        end
-    end
-    -- 检查simple
-    if status.flag & m.SearchFlag.STEP ~= 0 then
-        if status.depth <= 10 then
-            local simple = m.getSimple(obj)
-            if simple then
-                m.searchSameFields(status, simple, 'def')
-            end
-        elseif m.debugMode then
-            error('stack overflow')
-        end
-    end
-    -- 转换self
-    if status.flag & m.SearchFlag.SELF ~= 0 then
-        m.searchDefOfSelf(status)
     end
 
     status.depth = status.depth - 1
@@ -1243,7 +1198,7 @@ function m.searchRefOfValue(status, obj)
     local var = obj.parent
     if var.type == 'local'
     or var.type == 'set' then
-        return m.searchRefOfFields(status, var)
+        return m.searchRefOfFields(status, var, 'ref')
     end
 end
 
@@ -1254,7 +1209,7 @@ end
 function m.requestReference(obj)
     local status = m.status()
     -- 根据 field 搜索引用
-    m.searchRefOfFields(status, obj)
+    m.searchRefOfFields(status, obj, 'ref')
 
     -- 搜索函数返回值的引用
     m.searchRefOfFunctionReturn(status, obj)
@@ -1268,7 +1223,7 @@ end
 function m.requestDefinition(obj)
     local status = m.status()
     -- 根据 field 搜索定义
-    m.searchDefOfFields(status, obj)
+    m.searchRefOfFields(status, obj, 'def')
 
     return status.results
 end
