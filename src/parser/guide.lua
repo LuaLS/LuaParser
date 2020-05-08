@@ -939,8 +939,10 @@ function m.checkSameSimpleInBranch(ref, start, queue)
         if value.type == 'table' then
             for i = 1, #value do
                 local field = value[i]
-                queue[#queue+1] = field
-                queue[field] = start + 1
+                queue[#queue+1] = {
+                    obj   = field,
+                    start = start + 1,
+                }
             end
         end
     end
@@ -972,10 +974,13 @@ function m.searchSameMethod(ref, mark)
     if mark['method'] then
         return nil
     end
-    if ref.type == 'setmethod'
-    or ref.type == 'getmethod' then
+    local nxt = ref.next
+    if not nxt then
+        return nil
+    end
+    if nxt.type == 'setmethod' then
         mark['method'] = true
-        return ref.node
+        return ref
     end
     return nil
 end
@@ -994,28 +999,46 @@ function m.searchSameFieldsCrossMethod(status, ref, start, queue)
     local methodStatus = m.status(status)
     m.searchRefOfFields(methodStatus, method, 'ref')
     for _, md in ipairs(methodStatus.results) do
-        queue[#queue+1] = md
-        queue[md] = start + 1
-        if md.type == 'setmethod'
-        or md.type == 'getmethod' then
-            local func = md.value
-            if func then
-                local selfNode = func.locals and func.locals[1]
-                if selfNode then
-                    queue[#queue+1] = selfNode
-                    queue[selfNode] = start + 1
-                    mark[selfNode] = true
-                end
+        queue[#queue+1] = {
+            obj   = md,
+            start = start,
+            eq    = true,
+        }
+        local nxt = md.next
+        if not nxt then
+            goto CONTINUE
+        end
+        if nxt.type == 'setmethod' then
+            local func = nxt.value
+            if not func then
+                goto CONTINUE
+            end
+            local selfNode = func.locals and func.locals[1]
+            if not selfNode or not selfNode.ref then
+                goto CONTINUE
+            end
+            if mark[selfNode] then
+                goto CONTINUE
+            end
+            mark[selfNode] = true
+            for _, selfRef in ipairs(selfNode.ref) do
+                queue[#queue+1] = {
+                    obj   = selfRef,
+                    start = start,
+                    eq    = true,
+                }
             end
         end
+        ::CONTINUE::
     end
 end
 
-function m.checkSameSimple(status, simple, ref, mode, results, queue)
-    local start = queue[ref]
+function m.checkSameSimple(status, simple, data, mode, results, queue)
+    local ref = data.obj
+    local start = data.start
     for i = start, #simple do
         local sm = simple[i]
-        if m.getSimpleName(ref) ~= sm then
+        if not data.eq and m.getSimpleName(ref) ~= sm then
             return
         end
         -- 穿透 self:func 与 mt:func
@@ -1071,19 +1094,23 @@ function m.searchSameFields(status, simple, mode)
     local queue = {}
     for i = 1, #fref do
         local ref = fref[i]
-        queue[i] = ref
-        queue[ref] = 1
+        queue[i] = {
+            obj   = ref,
+            start = 1,
+        }
     end
     if first.type == 'local' then
-        queue[#queue+1] = first
-        queue[first] = 1
+        queue[#queue+1] = {
+            obj   = first,
+            start = 1,
+        }
     end
     for i = 1, 999 do
-        local ref = queue[i]
-        if not ref then
+        local data = queue[i]
+        if not data then
             return
         end
-        m.checkSameSimple(status, simple, ref, mode, status.results, queue)
+        m.checkSameSimple(status, simple, data, mode, status.results, queue)
     end
 end
 
