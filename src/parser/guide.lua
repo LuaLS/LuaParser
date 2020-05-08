@@ -964,7 +964,7 @@ function m.searchSameMethodCrossSelf(ref, mark)
             return nil
         end
         mark[selfNode] = true
-        return selfNode.method.method
+        return selfNode.method.node
     end
 end
 
@@ -975,7 +975,7 @@ function m.searchSameMethod(ref, mark)
     if ref.type == 'setmethod'
     or ref.type == 'getmethod' then
         mark['method'] = true
-        return ref.method
+        return ref.node
     end
     return nil
 end
@@ -995,7 +995,7 @@ function m.searchSameFieldsCrossMethod(status, ref, start, queue)
     m.searchRefOfFields(methodStatus, method, 'ref')
     for _, md in ipairs(methodStatus.results) do
         queue[#queue+1] = md
-        queue[md] = start
+        queue[md] = start + 1
         if md.type == 'setmethod'
         or md.type == 'getmethod' then
             local func = md.value
@@ -1003,7 +1003,7 @@ function m.searchSameFieldsCrossMethod(status, ref, start, queue)
                 local selfNode = func.locals and func.locals[1]
                 if selfNode then
                     queue[#queue+1] = selfNode
-                    queue[selfNode] = start
+                    queue[selfNode] = start + 1
                     mark[selfNode] = true
                 end
             end
