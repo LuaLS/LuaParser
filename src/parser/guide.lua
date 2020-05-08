@@ -673,7 +673,7 @@ function m.getPath(a, b, sameFunction)
 end
 
 -- 根据语法，单步搜索定义
-local function stepRefOfLocal(loc)
+local function stepRefOfLocal(loc, mode)
     local results = {}
     if loc.start ~= 0 then
         results[#results+1] = loc
@@ -687,18 +687,26 @@ local function stepRefOfLocal(loc)
         if ref.start == 0 then
             goto CONTINUE
         end
-        if ref.type == 'local'
-        or ref.type == 'setlocal'
-        or ref.type == 'getlocal' then
-            results[#results+1] = ref
+        if mode == 'def' then
+            if ref.type == 'local'
+            or ref.type == 'setlocal' then
+                results[#results+1] = ref
+            end
+        else
+            if ref.type == 'local'
+            or ref.type == 'setlocal'
+            or ref.type == 'getlocal' then
+                results[#results+1] = ref
+            end
         end
         ::CONTINUE::
     end
     return results
 end
-local function stepRefOfLabel(label)
+
+local function stepRefOfLabel(label, mode)
     local results = { label }
-    if not label then
+    if not label or mode == 'def' then
         return results
     end
     local refs = label.ref
@@ -708,54 +716,45 @@ local function stepRefOfLabel(label)
     end
     return results
 end
-local function stepRefOfGlobal(obj)
+
+local function stepRefOfGlobal(obj, mode)
     local results = {}
     local name = m.getKeyName(obj)
     local refs = obj.node.ref
     for i = 1, #refs do
         local ref = refs[i]
         if m.getKeyName(ref) == name then
-            results[#results+1] = ref
+            if mode == 'def' then
+                if obj == 'setglobal' then
+                    results[#results+1] = ref
+                end
+            else
+                results[#results+1] = ref
+            end
         end
     end
     return results
 end
-function m.getStepRef(obj)
+
+function m.getStepRef(obj, mode)
     if obj.type == 'getlocal'
     or obj.type == 'setlocal' then
-        return stepRefOfLocal(obj.node)
+        return stepRefOfLocal(obj.node, mode)
     end
     if obj.type == 'local' then
-        return stepRefOfLocal(obj)
+        return stepRefOfLocal(obj, mode)
     end
     if obj.type == 'label' then
-        return stepRefOfLabel(obj)
+        return stepRefOfLabel(obj, mode)
     end
     if obj.type == 'goto' then
-        return stepRefOfLabel(obj.node)
+        return stepRefOfLabel(obj.node, mode)
     end
     if obj.type == 'getglobal'
     or obj.type == 'setglobal' then
-        return stepRefOfGlobal(obj)
+        return stepRefOfGlobal(obj, mode)
     end
     return nil
-end
-
-function m.getStepDef(obj)
-    local res = m.getStepRef(obj)
-    if not res then
-        return nil
-    end
-    local results = {}
-    for _, r in ipairs(res) do
-        if r.type == 'local'
-        or r.type == 'setlocal'
-        or r.type == 'label'
-        or r.type == 'setglobal' then
-            results[#results+1] = r
-        end
-    end
-    return results
 end
 
 -- 根据语法，单步搜索field
@@ -1034,13 +1033,15 @@ function m.searchSameFieldsCrossMethod(status, ref, start, queue)
 end
 
 function m.checkSameSimple(status, simple, data, mode, results, queue)
-    local ref = data.obj
+    local ref   = data.obj
     local start = data.start
+    local eq    = data.eq
     for i = start, #simple do
         local sm = simple[i]
-        if not data.eq and m.getSimpleName(ref) ~= sm then
+        if not eq and m.getSimpleName(ref) ~= sm then
             return
         end
+        eq = false
         -- 穿透 self:func 与 mt:func
         m.searchSameFieldsCrossMethod(status, ref, i, queue)
         if i == #simple then
@@ -1223,7 +1224,7 @@ function m.searchRefOfFields(status, obj, mode)
 
     -- 检查单步引用
     if status.flag & m.SearchFlag.STEP ~= 0 then
-        local res = m.getStepRef(obj)
+        local res = m.getStepRef(obj, mode)
         if res then
             for i = 1, #res do
                 status.results[#status.results+1] = res[i]
