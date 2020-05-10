@@ -1032,6 +1032,9 @@ function m.searchSameFieldsCrossMethod(status, ref, start, queue)
     end
 end
 
+function m.searchSameFieldsCrossENV(status, ref, i, queue)
+end
+
 function m.checkSameSimple(status, simple, data, mode, results, queue)
     local ref   = data.obj
     local start = data.start
@@ -1100,7 +1103,15 @@ function m.searchSameFields(status, simple, mode)
             start = 1,
         }
     end
-    if first.type == 'local' then
+    if simple.global then
+        for i = 1, #queue do
+            local data = queue[i]
+            local obj  = data.obj
+            if obj.special == '_G' and obj.next then
+                data.obj = obj.next
+            end
+        end
+    else
         queue[#queue+1] = {
             obj   = first,
             start = 1,
@@ -1181,27 +1192,6 @@ function m.searchRefOfFunctionReturn(status, obj)
     -- 搜索调用者的引用
     for i = 1, #selects do
         m.searchRefOfFields(status, selects[i])
-    end
-end
-
-function m.searchRefOfMT(status)
-    local results = status.results
-    for i = #results, 1, -1 do
-        local res = results[i]
-        local nxt = res.next
-        if nxt and nxt.type == 'setmethod' then
-            local func = nxt.value
-            if func and func.type == 'function' then
-                local locals = func.locals
-                local self = locals and locals[1]
-                if self and self.tag == 'self' then
-                    local selfStatus = m.status(status)
-                    selfStatus.flag = selfStatus.flag ~ m.SearchFlag.SELF
-                    m.searchRefOfFields(selfStatus, self)
-                    m.copyStatusResults(status, selfStatus)
-                end
-            end
-        end
     end
 end
 
