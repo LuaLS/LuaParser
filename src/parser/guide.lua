@@ -573,6 +573,10 @@ function m.getKeyName(obj)
 end
 
 function m.getSimpleName(obj)
+    if obj.type == 'call' then
+        local key = obj.args[2]
+        return m.getKeyName(key)
+    end
     return m.getKeyName(obj)
 end
 
@@ -916,19 +920,46 @@ function m.copyStatusResults(a, b)
     end
 end
 
-function m.getNextRef(ref)
-    local nextRef = ref.next
-    if not nextRef then
+function m.getCallAndArgIndex(callarg)
+    local callargs = callarg.parent
+    if not callargs or callargs.type ~= 'callargs' then
         return nil
     end
-    if nextRef.type == 'setfield'
-    or nextRef.type == 'getfield'
-    or nextRef.type == 'setmethod'
-    or nextRef.type == 'getmethod'
-    or nextRef.type == 'setindex'
-    or nextRef.type == 'getindex' then
-        return nextRef
+    local index
+    for i = 1, #callargs do
+        if callargs[i] == callarg then
+            index = i
+            break
+        end
     end
+    local call = callargs.parent
+    return call, index
+end
+
+function m.getNextRef(ref)
+    local nextRef = ref.next
+    if nextRef then
+        if nextRef.type == 'setfield'
+        or nextRef.type == 'getfield'
+        or nextRef.type == 'setmethod'
+        or nextRef.type == 'getmethod'
+        or nextRef.type == 'setindex'
+        or nextRef.type == 'getindex' then
+            return nextRef
+        end
+    else
+        -- 穿透 rawget 与 rawset
+        local call, index = m.getCallAndArgIndex(ref)
+        if call then
+            if call.node.special == 'rawset' and index == 1 then
+                return call
+            end
+            if call.node.special == 'rawget' and index == 1 then
+                return call
+            end
+        end
+    end
+
     return nil
 end
 
@@ -1070,6 +1101,10 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         elseif ref.type == 'setindex'
         or     ref.type == 'tableindex' then
             results[#results+1] = ref.index
+        elseif ref.type == 'call' then
+            if ref.node.special == 'rawset' then
+                results[#results+1] = ref
+            end
         end
     else
         if ref.type == 'setfield'
@@ -1107,8 +1142,9 @@ function m.searchSameFields(status, simple, mode)
         for i = 1, #queue do
             local data = queue[i]
             local obj  = data.obj
-            if obj.special == '_G' and obj.next then
-                data.obj = obj.next
+            local nxt  = m.getNextRef(obj)
+            if nxt and obj.special == '_G' then
+                data.obj = nxt
             end
         end
     else
