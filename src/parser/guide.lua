@@ -900,7 +900,7 @@ m.SearchFlag = {
     SIMPLE = 1 << 1,
     ALL    = 0xffff,
 }
-m.Version = 52
+m.Version = 53
 
 function m.status(parentStatus)
     local status = {
@@ -964,7 +964,15 @@ function m.getNextRef(ref)
 end
 
 function m.checkSameSimpleInBranch(ref, start, queue)
-    local value = ref.value
+    local value
+    -- 穿透 rawset
+    if ref.type == 'call' then
+        if ref.node.special == 'rawset' then
+            value = ref.args[3]
+        end
+    else
+        value = ref.value
+    end
     if value then
         if value.type == 'table' then
             for i = 1, #value do
@@ -1061,9 +1069,6 @@ function m.searchSameFieldsCrossMethod(status, ref, start, queue)
         end
         ::CONTINUE::
     end
-end
-
-function m.searchSameFieldsCrossENV(status, ref, i, queue)
 end
 
 function m.checkSameSimple(status, simple, data, mode, results, queue)

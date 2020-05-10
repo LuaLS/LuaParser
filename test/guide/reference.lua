@@ -259,6 +259,11 @@ function mt:<?x?>()
 end
 ]]
 
+TEST [[
+a.<!b!>.c = 1
+print(a.<?b?>.c)
+]]
+
 --TEST [[
 -----@class <!Class!>
 -----@type <?Class?>

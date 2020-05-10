@@ -24,6 +24,13 @@ print(<?x?>)
 ]]
 
 TEST [[
+rawset(_G, 'x', {
+    <!y!> = 1,
+})
+print(x.<?y?>)
+]]
+
+TEST [[
 local mt
 mt.__index = mt
 function mt:<!method1!>()
