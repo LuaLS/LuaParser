@@ -977,17 +977,29 @@ function m.checkSameSimpleInValueOfTable(status, value, start, queue)
     end
 end
 
-function m.searchFields(status, obj, field)
-    local newStatus = m.status(status)
-    local simple = m.getSimple(obj, 1)
-    if not simple then
-        return nil
+function m.searchFields(status, obj, key)
+    if obj.type == 'table' then
+        local keyName = key and ('s|' .. key)
+        local results = {}
+        for i = 1, #obj do
+            local field = obj[i]
+            if not keyName or keyName == m.getSimpleName(field) then
+                results[#results+1] = field
+            end
+        end
+        return results
+    else
+        local newStatus = m.status(status)
+        local simple = m.getSimple(obj, 1)
+        if not simple then
+            return nil
+        end
+        simple[2] = key and ('s|' .. key) or '*'
+        m.searchSameFields(newStatus, simple, 'def')
+        local results = newStatus.results
+        m.cleanResults(results)
+        return results
     end
-    simple[2] = field and ('s|' .. field) or '*'
-    m.searchSameFields(newStatus, simple, 'def')
-    local results = newStatus.results
-    m.cleanResults(results)
-    return results
 end
 
 function m.getObjectValue(obj)
@@ -998,7 +1010,34 @@ function m.getObjectValue(obj)
     or obj.type == 'method' then
         return obj.parent.value
     end
+    if obj.type == 'call' then
+        if obj.node.special == 'rawset' then
+            return obj.args[3]
+        end
+    end
     return nil
+end
+
+function m.checkSameSimpleInValueInMetaTable(status, mt, start, queue)
+    local indexes = m.searchFields(status, mt, '__index')
+    if not indexes then
+        return
+    end
+    local refsStatus = m.status(status)
+    for i = 1, #indexes do
+        local indexValue = m.getObjectValue(indexes[i])
+        if indexValue then
+            m.searchRefs(refsStatus, indexValue, 'ref')
+        end
+    end
+    for i = 1, #refsStatus.results do
+        local obj = refsStatus.results[i]
+        queue[#queue+1] = {
+            obj   = obj,
+            start = start,
+            force = true,
+        }
+    end
 end
 
 function m.checkSameSimpleInValueOfSetMetaTable(status, value, start, queue)
@@ -1023,42 +1062,36 @@ function m.checkSameSimpleInValueOfSetMetaTable(status, value, start, queue)
         }
     end
     if mt then
-        local indexes = m.searchFields(status, mt, '__index')
-        if not indexes then
-            return
-        end
-        local refsStatus = m.status(status)
-        for i = 1, #indexes do
-            local indexValue = m.getObjectValue(indexes[i])
-            if indexValue then
-                m.searchRefs(refsStatus, indexValue, 'ref')
-            end
-        end
-        for i = 1, #refsStatus.results do
-            local obj = refsStatus.results[i]
-            queue[#queue+1] = {
-                obj   = obj,
-                start = start,
-                force = true,
-            }
-        end
+        m.checkSameSimpleInValueInMetaTable(status, mt, start, queue)
+    end
+end
+
+function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, queue)
+    local args = obj.parent
+    if not args or args.type ~= 'callargs' then
+        return
+    end
+    if args[1] ~= obj then
+        return
+    end
+    local mt = args[2]
+    if mt then
+        m.checkSameSimpleInValueInMetaTable(status, mt, start, queue)
     end
 end
 
 function m.checkSameSimpleInBranch(status, ref, start, queue)
-    local value
-    -- 穿透 rawset
-    if ref.type == 'call' then
-        if ref.node.special == 'rawset' then
-            value = ref.args[3]
-        end
-    else
-        value = ref.value
-    end
+    -- 根据赋值扩大搜索范围
+    local value = m.getObjectValue(ref)
     if value then
+        -- 检查赋值是字面量表的情况
         m.checkSameSimpleInValueOfTable(status, value, start, queue)
+        -- 检查赋值是 setmetatable 调用的情况
         m.checkSameSimpleInValueOfSetMetaTable(status, value, start, queue)
     end
+
+    -- 检查自己作为 setmetatable 第一个参数的情况
+    m.checkSameSimpleInArg1OfSetMetaTable(status, ref, start, queue)
 end
 
 function m.searchSameMethodCrossSelf(ref, mark)

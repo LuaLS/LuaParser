@@ -89,19 +89,19 @@ api:<?method1?>()
 --obj:x()
 --]]
 
---TEST [[
---local mt
---function mt:x()
---    self.a.<?out?>()
---end
---
---local obj = setmetatable({
---    a = {
---        <!out!> = 1,
---    }
---}, { __index = mt })
---obj:x()
---]]
+TEST [[
+local mt
+function mt:x()
+    self.a.<?out?>()
+end
+
+local obj = setmetatable({
+    a = {
+        <!out!> = 1,
+    }
+}, { __index = mt })
+obj:x()
+]]
 
 TEST [[
 local sm = setmetatable
@@ -114,28 +114,26 @@ local obj = sm({}, mt)
 obj:<?method1?>()
 ]]
 
--- TODO
---TEST [[
---local mt = {}
---function mt:<!x!>()
---end
---
---local obj = setmetatable({}, {__index = mt})
---function obj:x()
---end
---
---mt:<?x?>()
---]]
+TEST [[
+local mt = {}
+function mt:<!x!>()
+end
 
--- TODO 通过代码执行顺序来判断
---TEST [[
---local mt = {}
---function mt:x()
---end
---
---local obj = setmetatable({}, {__index = mt})
---function obj:<!x!>()
---end
---
---obj:<?x?>()
---]]
+local obj = setmetatable({}, {__index = mt})
+function obj:x()
+end
+
+mt:<?x?>()
+]]
+
+TEST [[
+local mt = {}
+function mt:<!x!>()
+end
+
+local obj = setmetatable({}, {__index = mt})
+function obj:<!x!>()
+end
+
+obj:<?x?>()
+]]
