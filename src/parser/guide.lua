@@ -835,11 +835,12 @@ local function convertSimpleList(list)
 end
 
 -- 搜索 `a.b.c` 的等价表达式
-local function buildSimpleList(obj)
+local function buildSimpleList(obj, max)
     local list = {}
     local cur = obj
-    for i = 1, 11 do
-        if i == 11 then
+    local limit = max and (max + 1) or 11
+    for i = 1, max or limit do
+        if i == limit then
             return nil
         end
         if cur.type == 'setfield'
@@ -873,7 +874,7 @@ local function buildSimpleList(obj)
     return convertSimpleList(list)
 end
 
-function m.getSimple(obj)
+function m.getSimple(obj, max)
     local simpleList
     if obj.type == 'getfield'
     or obj.type == 'setfield'
@@ -887,10 +888,10 @@ function m.getSimple(obj)
     or obj.type == 'setglobal'
     or obj.type == 'getglobal'
     or obj.type == 'tableindex' then
-        simpleList = buildSimpleList(obj)
+        simpleList = buildSimpleList(obj, max)
     elseif obj.type == 'field'
     or     obj.type == 'method' then
-        simpleList = buildSimpleList(obj.parent)
+        simpleList = buildSimpleList(obj.parent, max)
     end
     return simpleList
 end
@@ -963,7 +964,88 @@ function m.getNextRef(ref)
     return nil
 end
 
-function m.checkSameSimpleInBranch(ref, start, queue)
+function m.checkSameSimpleInValueOfTable(status, value, start, queue)
+    if value.type ~= 'table' then
+        return
+    end
+    for i = 1, #value do
+        local field = value[i]
+        queue[#queue+1] = {
+            obj   = field,
+            start = start + 1,
+        }
+    end
+end
+
+function m.searchFields(status, obj, field)
+    local newStatus = m.status(status)
+    local simple = m.getSimple(obj, 1)
+    if not simple then
+        return nil
+    end
+    simple[2] = field and ('s|' .. field) or '*'
+    m.searchSameFields(newStatus, simple, 'def')
+    local results = newStatus.results
+    m.cleanResults(results)
+    return results
+end
+
+function m.getObjectValue(obj)
+    if obj.value then
+        return obj.value
+    end
+    if obj.type == 'field'
+    or obj.type == 'method' then
+        return obj.parent.value
+    end
+    return nil
+end
+
+function m.checkSameSimpleInValueOfSetMetaTable(status, value, start, queue)
+    if value.type ~= 'select' then
+        return
+    end
+    local vararg = value.vararg
+    if not vararg or vararg.type ~= 'call' then
+        return
+    end
+    local func = vararg.node
+    if not func or func.special ~= 'setmetatable' then
+        return
+    end
+    local args = vararg.args
+    local obj = args[1]
+    local mt = args[2]
+    if obj then
+        queue[#queue+1] = {
+            obj   = obj,
+            start = start,
+        }
+    end
+    if mt then
+        local indexes = m.searchFields(status, mt, '__index')
+        if not indexes then
+            return
+        end
+        local refsStatus = m.status(status)
+        for i = 1, #indexes do
+            local indexValue = m.getObjectValue(indexes[i])
+            if indexValue then
+                m.searchRefs(refsStatus, indexValue, 'ref')
+            end
+        end
+        for i = 1, #refsStatus.results do
+            local obj = refsStatus.results[i]
+            queue[#queue+1] = {
+                obj   = obj,
+                start = start,
+                force = true,
+            }
+        end
+    end
+end
+
+function m.checkSameSimpleInBranch(status, ref, start, queue)
     local value
     -- 穿透 rawset
     if ref.type == 'call' then
@@ -974,15 +1056,8 @@ function m.checkSameSimpleInBranch(ref, start, queue)
         value = ref.value
     end
     if value then
-        if value.type == 'table' then
-            for i = 1, #value do
-                local field = value[i]
-                queue[#queue+1] = {
-                    obj   = field,
-                    start = start + 1,
-                }
-            end
-        end
+        m.checkSameSimpleInValueOfTable(status, value, start, queue)
+        m.checkSameSimpleInValueOfSetMetaTable(status, value, start, queue)
     end
 end
 
@@ -1035,12 +1110,12 @@ function m.searchSameFieldsCrossMethod(status, ref, start, queue)
         return
     end
     local methodStatus = m.status(status)
-    m.searchRefOfFields(methodStatus, method, 'ref')
+    m.searchRefs(methodStatus, method, 'ref')
     for _, md in ipairs(methodStatus.results) do
         queue[#queue+1] = {
             obj   = md,
             start = start,
-            eq    = true,
+            force = true,
         }
         local nxt = md.next
         if not nxt then
@@ -1063,7 +1138,7 @@ function m.searchSameFieldsCrossMethod(status, ref, start, queue)
                 queue[#queue+1] = {
                     obj   = selfRef,
                     start = start,
-                    eq    = true,
+                    force = true,
                 }
             end
         end
@@ -1074,20 +1149,20 @@ end
 function m.checkSameSimple(status, simple, data, mode, results, queue)
     local ref   = data.obj
     local start = data.start
-    local eq    = data.eq
+    local force = data.force
     for i = start, #simple do
         local sm = simple[i]
-        if not eq and m.getSimpleName(ref) ~= sm then
+        if sm ~= '*' and not force and m.getSimpleName(ref) ~= sm then
             return
         end
-        eq = false
+        force = false
         -- 穿透 self:func 与 mt:func
         m.searchSameFieldsCrossMethod(status, ref, i, queue)
         if i == #simple then
             break
         end
         -- 检查形如 a = {} 的分支情况
-        m.checkSameSimpleInBranch(ref, i, queue)
+        m.checkSameSimpleInBranch(status, ref, i, queue)
         ref = m.getNextRef(ref)
         if not ref then
             return
@@ -1167,7 +1242,7 @@ function m.searchSameFields(status, simple, mode)
     end
 end
 
-function m.searchRefOfFunctionReturn(status, obj)
+function m.searchRefsAsFunctionReturn(status, obj)
     -- 只有 function 才搜索返回值引用
     if obj.type ~= 'function' then
         return
@@ -1232,7 +1307,7 @@ function m.searchRefOfFunctionReturn(status, obj)
     end
     -- 搜索调用者的引用
     for i = 1, #selects do
-        m.searchRefOfFields(status, selects[i])
+        m.searchRefs(status, selects[i])
     end
 end
 
@@ -1250,7 +1325,7 @@ function m.cleanResults(results)
     end
 end
 
-function m.searchRefOfFields(status, obj, mode)
+function m.searchRefs(status, obj, mode)
     status.depth = status.depth + 1
 
     -- 检查单步引用
@@ -1283,7 +1358,7 @@ function m.searchRefOfValue(status, obj)
     local var = obj.parent
     if var.type == 'local'
     or var.type == 'set' then
-        return m.searchRefOfFields(status, var, 'ref')
+        return m.searchRefs(status, var, 'ref')
     end
 end
 
@@ -1294,10 +1369,10 @@ end
 function m.requestReference(obj)
     local status = m.status()
     -- 根据 field 搜索引用
-    m.searchRefOfFields(status, obj, 'ref')
+    m.searchRefs(status, obj, 'ref')
 
-    -- 搜索函数返回值的引用
-    m.searchRefOfFunctionReturn(status, obj)
+    -- 检查自己作为返回函数时的引用
+    m.searchRefsAsFunctionReturn(status, obj)
 
     return status.results
 end
@@ -1308,7 +1383,7 @@ end
 function m.requestDefinition(obj)
     local status = m.status()
     -- 根据 field 搜索定义
-    m.searchRefOfFields(status, obj, 'def')
+    m.searchRefs(status, obj, 'def')
 
     return status.results
 end
