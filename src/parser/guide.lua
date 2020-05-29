@@ -994,7 +994,7 @@ function m.searchFields(status, obj, key)
         if not simple then
             return nil
         end
-        simple[2] = key and ('s|' .. key) or '*'
+        simple[#simple+1] = key and ('s|' .. key) or '*'
         m.searchSameFields(newStatus, simple, 'def')
         local results = newStatus.results
         m.cleanResults(results)
@@ -1242,7 +1242,7 @@ end
 
 function m.searchSameFields(status, simple, mode)
     local first = simple.first
-    local fref = first.ref
+    local fref = first and first.ref
     local queue = {}
     if fref then
         for i = 1, #fref do
