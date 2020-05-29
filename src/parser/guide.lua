@@ -1261,6 +1261,9 @@ function m.searchSameFields(status, simple, mode)
                 data.obj = nxt
             end
         end
+        if first and first.tag ~= '_ENV' then
+            m.checkSameSimpleInBranch(status, first, 0, queue)
+        end
     else
         queue[#queue+1] = {
             obj   = first,
