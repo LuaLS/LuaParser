@@ -46,7 +46,6 @@ local accept = {
     ['tableindex']  = true,
     ['setglobal']   = true,
     ['getglobal']   = true,
-    ['function']    = true,
 }
 
 local function find_source(str, pos)
