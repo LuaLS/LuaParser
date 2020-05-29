@@ -89,19 +89,19 @@ api:<?method1?>()
 --obj:x()
 --]]
 
-TEST [[
-local mt
-function mt:x()
-    self.a.<?out?>()
-end
-
-local obj = setmetatable({
-    a = {
-        <!out!> = 1,
-    }
-}, { __index = mt })
-obj:x()
-]]
+--TEST [[
+--local mt
+--function mt:x()
+--    self.a.<?out?>()
+--end
+--
+--local obj = setmetatable({
+--    a = {
+--        <!out!> = 1,
+--    }
+--}, { __index = mt })
+--obj:x()
+--]]
 
 TEST [[
 local sm = setmetatable
