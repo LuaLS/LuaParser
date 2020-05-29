@@ -87,3 +87,13 @@ local <?t?> = setmetatable({
 })
 ]]
 {'a', 'b', 'c'}
+
+TEST [[
+local mt = {
+    a = 1,
+    b = 2,
+    c = 3,
+}
+local <?t?> = setmetatable({}, {__index = mt})
+]]
+{'a', 'b', 'c'}
