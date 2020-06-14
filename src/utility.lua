@@ -395,8 +395,9 @@ end
 local esc = {
     ["'"]  = [[\']],
     ['"']  = [[\"]],
-    ['\r'] = [[\r]],
-    ['\n'] = '\\\n',
+    ['\r'] = [[\\r]],
+    ['\n'] = [[\\n]],
+    ['\\'] = [[\\]],
 }
 
 function m.viewString(str, quo)
@@ -413,12 +414,12 @@ function m.viewString(str, quo)
         str = str:gsub('[\000-\008\011-\012\014-\031\127]', function (char)
             return ('\\%03d'):format(char:byte())
         end)
-        return quo .. str:gsub([=[['\r\n]]=], esc) .. quo
+        return quo .. str:gsub("['\r\n\\]", esc) .. quo
     elseif quo == '"' then
         str = str:gsub('[\000-\008\011-\012\014-\031\127]', function (char)
             return ('\\%03d'):format(char:byte())
         end)
-        return quo .. str:gsub([=[["\r\n]]=], esc) .. quo
+        return quo .. str:gsub('["\r\n\\]', esc) .. quo
     else
         if str:find '\r' then
             return m.viewString(str)
@@ -469,6 +470,34 @@ function m.revertTable(t)
         t[x], t[y] = t[y], t[x]
     end
     return t
+end
+
+function m.tableMultiRemove(t, index)
+    local mark = {}
+    for i = 1, #index do
+        local v = index[i]
+        mark[v] = true
+    end
+    local offset = 0
+    local me = 1
+    local len = #t
+    while true do
+        local it = me + offset
+        if it > len then
+            for i = me, len do
+                t[i] = nil
+            end
+            break
+        end
+        if mark[it] then
+            offset = offset + 1
+        else
+            if me ~= it then
+                t[me] = t[it]
+            end
+            me = me + 1
+        end
+    end
 end
 
 return m
