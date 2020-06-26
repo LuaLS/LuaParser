@@ -369,7 +369,7 @@ end
 --- 遍历所有的source
 function m.eachSource(ast, callback)
     local list = { ast }
-    local mark
+    local mark = {}
     local index = 1
     while true do
         local obj = list[index]
