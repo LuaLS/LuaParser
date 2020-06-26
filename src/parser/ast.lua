@@ -298,6 +298,7 @@ local Defs = {
                 },
             }
         end
+        return str
     end,
     CLongComment = function (start1, finish1, start2, finish2)
         PushError {
