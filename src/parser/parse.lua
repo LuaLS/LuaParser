@@ -3,6 +3,7 @@ local ast = require 'parser.ast'
 return function (self, lua, mode, version)
     local errs  = {}
     local diags = {}
+    local comments = {}
     local state = {
         version = version,
         lua = lua,
@@ -10,6 +11,7 @@ return function (self, lua, mode, version)
         root = {},
         errs = errs,
         diags = diags,
+        comments = comments,
         pushError = function (err)
             if err.finish < err.start then
                 err.finish = err.start
@@ -29,7 +31,14 @@ return function (self, lua, mode, version)
                 diags[code] = {}
             end
             diags[code][#diags[code]+1] = info
-        end
+        end,
+        pushComment = function (start, finish, comment)
+            comments[#comments+1] = {
+                start   = start,
+                finish  = finish,
+                comment = comment,
+            }
+        end,
     }
     ast.init(state)
     local suc, res, err = xpcall(self.grammar, debug.traceback, self, lua, mode)

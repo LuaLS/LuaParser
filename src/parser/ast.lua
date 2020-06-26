@@ -14,6 +14,7 @@ _ENV = nil
 local State
 local PushError
 local PushDiag
+local PushComment
 
 -- goto 单独处理
 local RESERVED = {
@@ -332,6 +333,9 @@ local Defs = {
                 },
             }
         }
+    end,
+    Comment = function (start, comment, finish)
+        PushComment(start, finish, comment)
     end,
     String = function (start, quote, str, finish)
         return {
@@ -1730,9 +1734,10 @@ local Defs = {
 --end
 
 local function init(state)
-    State     = state
-    PushError = state.pushError
-    PushDiag  = state.pushDiag
+    State       = state
+    PushError   = state.pushError
+    PushDiag    = state.pushDiag
+    PushComment = state.pushComment
     emmy.init(State)
 end
 

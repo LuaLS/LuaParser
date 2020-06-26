@@ -80,8 +80,8 @@ local function errorpos(pos, err)
 end
 
 grammar 'Comment' [[
-Comment         <-  LongComment
-                /   '--' ShortComment
+Comment         <-  ({} (LongComment / '--' ShortComment) {})
+                ->  Comment
 LongComment     <-  ('--[' {} {:eq: '='* :} {} '[' 
                     {(!CommentClose .)*}
                     (CommentClose / {}))
