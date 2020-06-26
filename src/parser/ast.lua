@@ -381,6 +381,7 @@ local Defs = {
                 },
             }
         end
+        str = str:gsub('\r\n', '\n'):gsub('\r', '\n')
         return '[' .. ('='):rep(afterEq-beforeEq) .. '[', str
     end,
     Char10 = function (char)
