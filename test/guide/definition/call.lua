@@ -6,3 +6,11 @@ end
 local <!y!> = f()
 print(<?y?>)
 ]]
+
+TEST [[
+function f()
+end
+
+local y = f()
+print(y.<?z?>)
+]]
