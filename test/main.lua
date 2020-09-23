@@ -23,7 +23,7 @@ local function main()
     unitTest 'lines'
     unitTest 'grammar_check'
     unitTest 'syntax_check'
-    unitTest 'guide'
+    --unitTest 'guide'
     unitTest 'perform'
 
     print('测试完成')

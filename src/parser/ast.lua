@@ -14,7 +14,6 @@ _ENV = nil
 local State
 local PushError
 local PushDiag
-local PushComment
 
 -- goto 单独处理
 local RESERVED = {
@@ -298,7 +297,6 @@ local Defs = {
                 },
             }
         end
-        return str
     end,
     CLongComment = function (start1, finish1, start2, finish2)
         PushError {
@@ -334,9 +332,6 @@ local Defs = {
                 },
             }
         }
-    end,
-    Comment = function (start, comment, finish)
-        PushComment(start, finish, comment)
     end,
     String = function (start, quote, str, finish)
         return {
@@ -386,7 +381,6 @@ local Defs = {
                 },
             }
         end
-        str = str:gsub('\r\n', '\n'):gsub('\r', '\n')
         return '[' .. ('='):rep(afterEq-beforeEq) .. '[', str
     end,
     Char10 = function (char)
@@ -1735,17 +1729,16 @@ local Defs = {
 --end
 
 local function init(state)
-    State       = state
-    PushError   = state.pushError
-    PushDiag    = state.pushDiag
-    PushComment = state.pushComment
+    State     = state
+    PushError = state.pushError
+    PushDiag  = state.pushDiag
     emmy.init(State)
 end
 
 local function close()
     State     = nil
-    PushError = nil
-    PushDiag  = nil
+    PushError = function () end
+    PushDiag  = function () end
 end
 
 return {
