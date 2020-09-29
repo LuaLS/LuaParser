@@ -1,6 +1,5 @@
-EMMY [[
+Annotation [[
 ---@class Class
-local x = 1
 ]]
 {
     [1] = {
@@ -16,6 +15,7 @@ local x = 1
     },
 }
 
+do return end
 EMMY [[
 ---@class Class : SuperClass
 local x = 1
