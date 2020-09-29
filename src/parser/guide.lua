@@ -218,6 +218,14 @@ function m.getUri(obj)
     return ''
 end
 
+function m.getENV(source, start)
+    if not start then
+        start = 1
+    end
+    return m.getLocal(source, '_ENV', start)
+        or m.getLocal(source, '@env', start)
+end
+
 --- 寻找函数的不定参数，返回不定参在第几个参数上，以及该参数对象。
 --- 如果函数是主函数，则返回`0, nil`。
 ---@return table
@@ -493,20 +501,28 @@ function m.offsetOf(lines, row, col)
     end
 end
 
-function m.lineContent(lines, text, row)
+function m.lineContent(lines, text, row, ignoreNL)
     local line = lines[row]
     if not line then
         return ''
     end
-    return text:sub(line.start, line.finish)
+    if ignoreNL then
+        return text:sub(line.start, line.range)
+    else
+        return text:sub(line.start, line.finish)
+    end
 end
 
-function m.lineRange(lines, row)
+function m.lineRange(lines, row, ignoreNL)
     local line = lines[row]
     if not line then
         return 0, 0
     end
-    return line.start, line.finish
+    if ignoreNL then
+        return line.start, line.range
+    else
+        return line.start, line.finish
+    end
 end
 
 function m.getNameOfLiteral(obj)
@@ -532,10 +548,10 @@ function m.getName(obj)
     elseif tp == 'getfield'
     or     tp == 'setfield'
     or     tp == 'tablefield' then
-        return obj.field[1]
+        return obj.field and obj.field[1]
     elseif tp == 'getmethod'
     or     tp == 'setmethod' then
-        return obj.method[1]
+        return obj.method and obj.method[1]
     elseif tp == 'getindex'
     or     tp == 'setindex'
     or     tp == 'tableindex' then
@@ -625,13 +641,6 @@ function m.getSimpleName(obj)
         return ('s|%s'):format(obj.name)
     end
     return m.getKeyName(obj)
-end
-
-function m.getENV(ast)
-    if ast.type ~= 'main' then
-        return nil
-    end
-    return ast.locals[1]
 end
 
 --- 测试 a 到 b 的路径（不经过函数，不考虑 goto），
@@ -794,7 +803,7 @@ end
 local function stepRefOfGlobal(obj, mode)
     local results = {}
     local name = m.getKeyName(obj)
-    local refs = getRefsByName(obj.node.ref, name) or {}
+    local refs = getRefsByName(obj.node and obj.node.ref, name) or {}
     for i = 1, #refs do
         local ref = refs[i]
         if m.getKeyName(ref) == name then
@@ -883,7 +892,9 @@ local function convertSimpleList(list)
     local simple = {}
     for i = #list, 1, -1 do
         local c = list[i]
-        if c.special == '_G' then
+        if  c.special == '_G'
+        and c.type ~= 'getglobal'
+        and c.type ~= 'setglobal' then
             simple.global = list[i+1] or c
         else
             simple[#simple+1] = m.getSimpleName(c)
@@ -894,7 +905,7 @@ local function convertSimpleList(list)
         end
         if #simple <= 1 then
             if simple.global then
-                simple.first = m.getLocal(c, '_ENV', c.start)
+                simple.first = m.getENV(c, c.start)
             elseif c.type == 'setlocal'
             or     c.type == 'getlocal' then
                 simple.first = c.node
@@ -917,6 +928,9 @@ local function buildSimpleList(obj, max)
         end
         while cur.type == 'paren' do
             cur = cur.exp
+            if not cur then
+                return nil
+            end
         end
         if cur.type == 'setfield'
         or cur.type == 'getfield'
@@ -1018,7 +1032,7 @@ end
 function m.isGlobal(source)
     if source.type == 'setglobal'
     or source.type == 'getglobal' then
-        if source.node.tag == '_ENV' then
+        if source.node and source.node.tag == '_ENV' then
             return true
         end
     end
@@ -1115,6 +1129,12 @@ function m.searchFields(status, obj, key, interface)
             end
         end
         return results
+    elseif obj.type == 'library' then
+        local results = {}
+        for i = 1, #obj.fields do
+            results[i] = obj.fields[i]
+        end
+        return results
     else
         local newStatus = m.status(status, interface)
         local simple = m.getSimple(obj)
@@ -1132,6 +1152,9 @@ end
 function m.getObjectValue(obj)
     while obj.type == 'paren' do
         obj = obj.exp
+        if not obj then
+            return nil
+        end
     end
     if obj.library then
         return nil
@@ -1718,6 +1741,9 @@ end
 
 function m.searchSameFields(status, simple, mode)
     local first = simple.first
+    if not first then
+        return
+    end
     local refs = getRefsByName(first.ref, m.getSimpleName(simple.global or first)) or {}
     local queue = {}
     for i = 1, #refs do
@@ -2016,6 +2042,7 @@ function m.mergeTypes(types)
     local results = {}
     local mark = {}
     local hasAny
+    -- 这里把 any 去掉
     for i = 1, #types do
         local tp = types[i]
         if tp == 'any' then
@@ -2029,6 +2056,7 @@ function m.mergeTypes(types)
     if #results == 0 then
         return 'any'
     end
+    -- 只有显性的 nil 与 any 时，取 any
     if #results == 1 then
         if results[1] == 'nil' and hasAny then
             return 'any'
@@ -2036,22 +2064,19 @@ function m.mergeTypes(types)
             return results[1]
         end
     end
+    -- 同时包含 number 与 integer 时，去掉 integer
+    if mark['number'] and mark['integer'] then
+        for i = 1, #results do
+            if results[i] == 'integer' then
+                tableRemove(results, i)
+                break
+            end
+        end
+    end
     tableSort(results, function (a, b)
-        local sa = TypeSort[a]
-        local sb = TypeSort[b]
-        if sa and sb then
-            return sa < sb
-        end
-        if not sa and not sb then
-            return a < b
-        end
-        if sa and not sb then
-            return true
-        end
-        if not sa and sb then
-            return false
-        end
-        return false
+        local sa = TypeSort[a] or 100
+        local sb = TypeSort[b] or 100
+        return sa < sb
     end)
     return tableConcat(results, '|')
 end
@@ -2755,10 +2780,19 @@ local function mergeLibraryFunctionReturns(status, source, index)
     end
     local rtn = returns[index]
     if rtn then
-        status.results[#status.results+1] = {
-            type   = rtn.type,
-            source = rtn,
-        }
+        if type(rtn.type) == 'table' then
+            for _, tp in ipairs(rtn.type) do
+                status.results[#status.results+1] = {
+                    type   = tp,
+                    source = rtn,
+                }
+            end
+        else
+            status.results[#status.results+1] = {
+                type   = rtn.type,
+                source = rtn,
+            }
+        end
     end
 end
 
@@ -2771,7 +2805,10 @@ local function mergeFunctionReturns(status, source, index)
         local rtn = returns[i]
         if rtn[index] then
             if rtn[index].type == 'call' then
-                m.inferByCallReturnAndIndex(status, rtn[index], index)
+                if not m.checkReturnMark(status, rtn[index]) then
+                    m.checkReturnMark(status, rtn[index], true)
+                    m.inferByCallReturnAndIndex(status, rtn[index], index)
+                end
             else
                 local newStatus = m.status(status)
                 m.searchInfer(newStatus, rtn[index])
@@ -2799,13 +2836,19 @@ function m.inferByCallReturnAndIndex(status, call, index)
             if src.type == 'library' then
                 mergeLibraryFunctionReturns(status, src.value, index)
             else
-                mergeFunctionReturns(status, src.value, index)
+                if not m.checkReturnMark(status, src.value, true) then
+                    mergeFunctionReturns(status, src.value, index)
+                end
             end
         end
     end
 end
 
 function m.inferByCallReturn(status, source)
+    if source.type == 'call' then
+        m.inferByCallReturnAndIndex(status, source, 1)
+        return
+    end
     if source.type ~= 'select' then
         if source.value and source.value.type == 'select' then
             source = source.value
@@ -2876,10 +2919,16 @@ end
 function m.searchInfer(status, obj)
     while obj.type == 'paren' do
         obj = obj.exp
+        if not obj then
+            return
+        end
     end
-    obj = m.getObjectValue(obj) or obj
-    if obj.type == 'select' then
-        obj = obj.parent
+    while true do
+        local value = m.getObjectValue(obj)
+        if not value or value == obj then
+            break
+        end
+        obj = value
     end
 
     local cache, makeCache
