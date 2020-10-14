@@ -213,7 +213,11 @@ local function buildLuaDoc(comment)
         doc = text:sub(3)
     end
     parseTokens(doc)
-    return convertTokens()
+    local result = convertTokens()
+    if result then
+        result.comment = lastComment
+    end
+    return result
 end
 
 return function (_, state)
