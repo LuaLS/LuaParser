@@ -1,4 +1,4 @@
-Annotation [[
+LuaDoc [[
 ---@class Class
 ]]
 {
@@ -16,7 +16,7 @@ Annotation [[
 }
 
 do return end
-EMMY [[
+LuaDoc [[
 ---@class Class : SuperClass
 local x = 1
 ]]
@@ -40,7 +40,7 @@ local x = 1
     },
 }
 
-EMMY [[
+LuaDoc [[
 ---@class Class
 x = 1
 ]]
@@ -58,7 +58,7 @@ x = 1
     },
 }
 
-EMMY [[
+LuaDoc [[
 ---@type Type
 x = 1
 ]]
@@ -84,7 +84,7 @@ x = 1
     },
 }
 
-EMMY [[
+LuaDoc [[
 ---@type Type1|Type2|Type3
 x = 1
 ]]
@@ -132,7 +132,7 @@ x = 1
     },
 }
 
-EMMY [[
+LuaDoc [[
 ---@type x | "'a'" | "'b'"
 ]]
 {
@@ -172,7 +172,7 @@ EMMY [[
     }
 }
 
-EMMY [[
+LuaDoc [[
 ---@type "'a'" | "'b'" | "'c'"
 ]]
 {
@@ -208,7 +208,7 @@ EMMY [[
 }
 
 do return end
-EMMY [[
+LuaDoc [[
 ---@alias Handler LongType
 x = 1
 ]]
@@ -253,7 +253,7 @@ x = 1
 }
 
 do return end
-EMMY [[
+LuaDoc [[
 ---@param a1 t1
 ---@param a2 t2
 ---@param a3 t3
@@ -327,7 +327,7 @@ EMMY [[
     },
 }
 
-EMMY [[
+LuaDoc [[
 ---@return Type1|Type2|Type3
 ]]
 {
@@ -361,7 +361,7 @@ EMMY [[
     },
 }
 
-EMMY [[
+LuaDoc [[
 ---@field open function
 ]]
 {
@@ -390,7 +390,7 @@ EMMY [[
     },
 }
 
-EMMY [[
+LuaDoc [[
 ---@field private open function|string
 ]]
 {
@@ -425,7 +425,7 @@ EMMY [[
     },
 }
 
-EMMY [[
+LuaDoc [[
 ---@generic T
 ]]
 {
@@ -446,7 +446,7 @@ EMMY [[
     }
 }
 
-EMMY [[
+LuaDoc [[
 ---@generic T : handle
 ]]
 {
@@ -478,7 +478,7 @@ EMMY [[
     }
 }
 
-EMMY [[
+LuaDoc [[
 ---@generic T : handle, K : handle
 ]]
 {
@@ -531,7 +531,7 @@ EMMY [[
     }
 }
 
-EMMY [[
+LuaDoc [[
 ---@vararg string
 ]]
 {
@@ -553,7 +553,7 @@ EMMY [[
     }
 }
 
-EMMY [[
+LuaDoc [[
 ---@language JSON
 ]]
 {
@@ -570,7 +570,7 @@ EMMY [[
     }
 }
 
-EMMY [[
+LuaDoc [[
 ---@type Type[]
 ]]
 {
@@ -587,7 +587,7 @@ EMMY [[
     }
 }
 
-EMMY [[
+LuaDoc [[
 ---@type (Type1|Type2)[]
 ]]
 {
@@ -610,7 +610,7 @@ EMMY [[
     }
 }
 
-EMMY [[
+LuaDoc [[
 ---@type table<key, value>
 ]]
 {
@@ -643,7 +643,7 @@ EMMY [[
     }
 }
 
-EMMY [[
+LuaDoc [[
 ---@type fun(key1:t1|t2[], key2:t3):table<t5, t6>
 ]]
 {
@@ -701,7 +701,7 @@ EMMY [[
     }
 }
 
-EMMY [[
+LuaDoc [[
 ---@param event string | "'onClosed'" | "'onData'"
 ]]
 {
@@ -743,7 +743,7 @@ EMMY [[
     },
 }
 
-EMMY [[
+LuaDoc [[
 ---@see loli#pants
 ]]
 {
@@ -766,7 +766,7 @@ EMMY [[
     }
 }
 
-EMMY [[
+LuaDoc [[
 
 ---@class Class
 ]]
@@ -784,7 +784,7 @@ EMMY [[
     },
 }
 
-EMMY [[
+LuaDoc [[
 ---@
 ---@cl
 ]]
@@ -803,7 +803,7 @@ EMMY [[
     },
 }
 
-EMMY [[
+LuaDoc [[
 local t = {
     ---@type string
     x = 1,
@@ -854,7 +854,7 @@ local t = {
     },
 }
 
-EMMY [[
+LuaDoc [[
 local function f()
     ---@
 end
@@ -881,7 +881,7 @@ end
     },
 }
 
-EMMY '---@type fun'
+LuaDoc '---@type fun'
 {
     [1] = {
         type   = "emmyFunctionType",
@@ -890,7 +890,7 @@ EMMY '---@type fun'
     },
 }
 
-EMMY [[
+LuaDoc [[
 ---123
 --- 456
 ---  789
@@ -902,7 +902,7 @@ EMMY [[
     }
 }
 
-EMMY [[
+LuaDoc [[
 ---@overload fun(a:number):number
 ]]
 {
@@ -932,7 +932,7 @@ EMMY [[
     },
 }
 
-EMMY [[
+LuaDoc [[
 ---@param x string {xx = 1, yy = "zz", zz = false} | "fff"
 ]]
 {
@@ -972,7 +972,7 @@ EMMY [[
     },
 }
 
-EMMY [[
+LuaDoc [[
 ---@param event string
 ---|   "'onClosed'" # 12345
 ---| > "'onData'"   # 22222
@@ -1019,7 +1019,7 @@ EMMY [[
     },
 }
 
-EMMY [[
+LuaDoc [[
 ---123
 ---| 456
 ---|  789
@@ -1031,7 +1031,7 @@ EMMY [[
     }
 }
 
-EMMY [[
+LuaDoc [[
 ---@return string {name = 'key'}
 ]]
 {
@@ -1056,7 +1056,7 @@ EMMY [[
     }
 }
 
-EMMY [[
+LuaDoc [[
 ---@overload fun():number,boolean
 ]]
 {

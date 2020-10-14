@@ -130,7 +130,7 @@ local function test(type)
             end
         end
     end
-    Annotation = function (buf)
+    LuaDoc = function (buf)
         return function (target_ast)
             local state, err = parser:compile(buf, 'type', 'Lua 5.4')
             if not state then
@@ -157,4 +157,4 @@ test 'Exp'
 test 'Action'
 test 'Lua'
 test 'Dirty'
-test 'Annotation'
+test 'LuaDoc'

@@ -25,7 +25,7 @@ local function parseTokens(text)
     TokenContents = {}
 end
 
-local function buildAnnotation(comment)
+local function buildLuaDoc(comment)
     local text = comment.text
     if text:sub(1, 4) ~= '---@' then
         return
@@ -50,6 +50,6 @@ return function (_, state)
     ast.annotations = {}
 
     for _, comment in ipairs(comments) do
-        ast.annotations[#ast.annotations+1] = buildAnnotation(comment)
+        ast.annotations[#ast.annotations+1] = buildLuaDoc(comment)
     end
 end
