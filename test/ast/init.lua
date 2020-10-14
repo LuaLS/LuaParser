@@ -137,9 +137,9 @@ local function test(type)
                 error(('语法树生成失败：%s'):format(err))
             end
             parser:luadoc(state)
-            if not eq(state.ast.luadocs, target_doc) then
+            if not eq(state.ast.docs, target_doc) then
                 fs.create_directory(ROOT / 'test' / 'log')
-                utility.saveFile((ROOT / 'test' / 'log' / 'my_doc.ast'):string(), utility.dump(state.ast.luadocs, option))
+                utility.saveFile((ROOT / 'test' / 'log' / 'my_doc.ast'):string(), utility.dump(state.ast.docs, option))
                 utility.saveFile((ROOT / 'test' / 'log' / 'target_doc.ast'):string(), utility.dump(target_doc, option))
                 --autoFix(state.ast.luadocs, target_doc)
                 error(('语法树不相等：%s\n%s'):format(type, buf))

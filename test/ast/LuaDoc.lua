@@ -4,7 +4,7 @@ LuaDoc [[
 {
     [1] = {
         type   = 'class',
-        start  = 1,
+        start  = 5,
         finish = 15,
         class  = {
             type   = 'name',
@@ -15,7 +15,6 @@ LuaDoc [[
     },
 }
 
-do return end
 LuaDoc [[
 ---@class Class : SuperClass
 local x = 1
@@ -23,7 +22,7 @@ local x = 1
 {
     [1] = {
         type   = 'class',
-        start  = 1,
+        start  = 5,
         finish = 28,
         class  = {
             type   = 'name',
@@ -47,7 +46,7 @@ x = 1
 {
     [1] = {
         type   = 'class',
-        start  = 1,
+        start  = 5,
         finish = 15,
         class  = {
             type   = 'name',
@@ -58,6 +57,7 @@ x = 1
     },
 }
 
+do return end
 LuaDoc [[
 ---@type Type
 x = 1
