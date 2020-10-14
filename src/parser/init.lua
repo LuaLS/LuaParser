@@ -6,7 +6,7 @@ local api = {
     calcline   = require 'parser.calcline',
     lines      = require 'parser.lines',
     guide      = require 'parser.guide',
-    annotation = require 'parser.annotation',
+    luadoc     = require 'parser.luadoc',
 }
 
 return api

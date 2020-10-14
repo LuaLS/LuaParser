@@ -131,17 +131,17 @@ local function test(type)
         end
     end
     LuaDoc = function (buf)
-        return function (target_ast)
+        return function (target_doc)
             local state, err = parser:compile(buf, 'type', 'Lua 5.4')
             if not state then
                 error(('语法树生成失败：%s'):format(err))
             end
-            parser:annotation(state)
-            if not eq(state.ast.annotations, target_ast) then
+            parser:luadoc(state)
+            if not eq(state.ast.luadocs, target_doc) then
                 fs.create_directory(ROOT / 'test' / 'log')
-                utility.saveFile((ROOT / 'test' / 'log' / 'my_ann.ast'):string(), utility.dump(state.ast.annotations, option))
-                utility.saveFile((ROOT / 'test' / 'log' / 'target_ann.ast'):string(), utility.dump(target_ast, option))
-                --autoFix(state.ast.annotations, target_ast)
+                utility.saveFile((ROOT / 'test' / 'log' / 'my_doc.ast'):string(), utility.dump(state.ast.luadocs, option))
+                utility.saveFile((ROOT / 'test' / 'log' / 'target_doc.ast'):string(), utility.dump(target_doc, option))
+                --autoFix(state.ast.luadocs, target_doc)
                 error(('语法树不相等：%s\n%s'):format(type, buf))
             end
         end
