@@ -75,22 +75,25 @@ Symbol              <-  ({} {'.' / '|' / ':'} {})
         return ''
     end,
     Name = function (start, content, finish)
-        TokenTypes[#TokenTypes+1]       = 'name'
-        TokenStarts[#TokenStarts+1]     = start
-        TokenFinishs[#TokenFinishs+1]   = finish - 1
-        TokenContents[#TokenContents+1] = content
+        Ci = Ci + 1
+        TokenTypes[Ci]    = 'name'
+        TokenStarts[Ci]   = start
+        TokenFinishs[Ci]  = finish - 1
+        TokenContents[Ci] = content
     end,
     String = function (start, content, finish)
-        TokenTypes[#TokenTypes+1]       = 'string'
-        TokenStarts[#TokenStarts+1]     = start
-        TokenFinishs[#TokenFinishs+1]   = finish - 1
-        TokenContents[#TokenContents+1] = content
+        Ci = Ci + 1
+        TokenTypes[Ci]    = 'string'
+        TokenStarts[Ci]   = start
+        TokenFinishs[Ci]  = finish - 1
+        TokenContents[Ci] = content
     end,
     Symbol = function (start, content, finish)
-        TokenTypes[#TokenTypes+1]       = 'symbol'
-        TokenStarts[#TokenStarts+1]     = start
-        TokenFinishs[#TokenFinishs+1]   = finish - 1
-        TokenContents[#TokenContents+1] = content
+        Ci = Ci + 1
+        TokenTypes[Ci]    = 'symbol'
+        TokenStarts[Ci]   = start
+        TokenFinishs[Ci]  = finish - 1
+        TokenContents[Ci] = content
     end,
 })
 
@@ -101,6 +104,7 @@ local function parseTokens(text)
     TokenFinishs  = {}
     TokenContents = {}
     Parser:match(text)
+    Ci = 0
 end
 
 local function peekToken()
@@ -183,7 +187,10 @@ local function convertTokensOfClass()
 end
 
 local function convertTokens()
-    local tp, text = peekToken()
+    local tp, text = nextToken()
+    if not tp then
+        return
+    end
     if tp ~= 'name' then
         pushError {
             type  = 'LUADOC_MISS_CATE_NAME',
@@ -192,7 +199,6 @@ local function convertTokens()
         }
         return nil
     end
-    nextToken()
     if text == 'class' then
         return convertTokensOfClass()
     end
