@@ -4,7 +4,7 @@ LuaDoc [[
 {
     [1] = {
         type   = 'doc.class',
-        start  = 5,
+        start  = 11,
         finish = 15,
         class  = {
             type   = 'doc.class.name',
@@ -23,7 +23,7 @@ local x = 1
 {
     [1] = {
         type   = 'doc.class',
-        start  = 5,
+        start  = 11,
         finish = 28,
         class  = {
             type   = 'doc.class.name',
@@ -43,32 +43,13 @@ local x = 1
 }
 
 LuaDoc [[
----@class Class
-x = 1
-]]
-{
-    [1] = {
-        type   = 'doc.class',
-        start  = 5,
-        finish = 15,
-        class  = {
-            type   = 'doc.class.name',
-            start  = 11,
-            finish = 15,
-            parent = "<IGNORE>",
-            [1]    = 'Class',
-        },
-    },
-}
-
-LuaDoc [[
 ---@type Type
 x = 1
 ]]
 {
     [1] = {
         type   = 'doc.type',
-        start  = 5,
+        start  = 10,
         finish = 13,
         types  = {
             {
@@ -90,7 +71,7 @@ x = 1
 {
     [1] = {
         type   = 'doc.type',
-        start  = 5,
+        start  = 10,
         finish = 26,
         types  = {
             {
@@ -125,7 +106,7 @@ LuaDoc [[
 {
     [1] = {
         type   = 'doc.type',
-        start  = 5,
+        start  = 10,
         finish = 26,
         types  = {
             {
@@ -161,7 +142,7 @@ LuaDoc [[
 {
     [1] = {
         type   = 'doc.type',
-        start  = 5,
+        start  = 10,
         finish = 30,
         types  = {},
         enums  = {
@@ -190,49 +171,39 @@ LuaDoc [[
     }
 }
 
-do return end
 LuaDoc [[
 ---@alias Handler LongType
 x = 1
 ]]
 {
     [1] = {
-        type   = 'emmyAlias',
+        type   = 'doc.alias',
         start  = 11,
         finish = 26,
-        [1]  = {
-            type   = 'emmyName',
+        alias  = {
+            type   = 'doc.alias.name',
             start  = 11,
             finish = 17,
+            parent = "<IGNORE>",
             [1]    = 'Handler',
         },
-        [2]  = {
-            type   = 'emmyType',
+        extends = {
+            type   = 'doc.type',
             start  = 19,
             finish = 26,
-            [1]    = {
-                type   = 'emmyName',
-                start  = 19,
-                finish = 26,
-                [1]    = 'LongType'
+            parent = "<IGNORE>",
+            types  = {
+                [1] = {
+                    type   = 'doc.type.name',
+                    start  = 19,
+                    finish = 26,
+                    parent = "<IGNORE>",
+                    [1]    = 'LongType',
+                }
             },
+            enums = {},
         },
     },
-    [2] = {
-        type = 'set',
-        [1]  = {
-            type   = 'name',
-            start  = 28,
-            finish = 28,
-            [1]    = 'x',
-        },
-        [2]  = {
-            type   = 'number',
-            start  = 32,
-            finish = 32,
-            [1]    = 1,
-        }
-    }
 }
 
 do return end

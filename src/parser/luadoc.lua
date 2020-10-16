@@ -113,6 +113,10 @@ end
 
 local function nextToken()
     Ci = Ci + 1
+    if not TokenTypes[Ci] then
+        Ci = Ci - 1
+        return nil
+    end
     return TokenTypes[Ci], TokenContents[Ci]
 end
 
@@ -130,84 +134,84 @@ local function getFinish()
     return TokenFinishs[Ci] + Offset
 end
 
-local function convertTokensOfClass()
-    local result = {
-        type   = 'doc.class',
-        start  = getStart(),
-        finish = getFinish(),
-    }
+local function parseName(tp, parent)
     local nameTp, nameText = nextToken()
     if nameTp ~= 'name' then
-        pushError {
-            type   = 'LUADOC_MISS_CLASS_NAME',
-            start  = result.finish,
-            finish = result.finish,
-        }
         return nil
     end
     local class = {
-        type   = 'doc.class.name',
+        type   = tp,
         start  = getStart(),
         finish = getFinish(),
-        parent = result,
+        parent = parent,
         [1]    = nameText,
     }
-    result.finish = class.finish
-    result.class  = class
-    if not peekToken() then
-        return result
-    end
-    if not checkToken('symbol', ':', 1) then
-        pushError {
-            type   = 'LUADOC_MISS_EXTENSION_SYMBOL',
-            start  = result.finish,
-            finish = result.finish,
-        }
-        return result
-    end
-    nextToken()
-    result.finish = getFinish()
-    local tp, text = nextToken()
-    if tp ~= 'name' then
-        pushError {
-            type   = 'LUADOC_MISS_EXTENDS_NAME',
-            start  = result.finish,
-            finish = result.finish,
-        }
-        return result
-    end
-    local extends = {
-        type   = 'doc.extends.name',
-        start  = getStart(),
-        finish = getFinish(),
-        parent = result,
-        [1]    = text
-    }
-    result.finish  = extends.finish
-    result.extends = extends
-    return result
+    return class
 end
 
-local function convertTokensOfType()
+local function parseClass(parent)
     local result = {
-        type   = 'doc.type',
-        start  = getStart(),
-        finish = getFinish(),
-        types  = {},
-        enums  = {},
+        type   = 'doc.class',
+        parent = parent,
     }
-    if not peekToken() then
+    result.class = parseName('doc.class.name', result)
+    if not result.class then
         pushError {
-            type   = 'LUADOC_MISS_TYPE_NAME',
-            start  = result.finish,
-            finish = result.finish,
+            type   = 'LUADOC_MISS_CLASS_NAME',
+            start  = getFinish(),
+            finish = getFinish(),
         }
         return nil
     end
+    result.start  = getStart()
+    result.finish = getFinish()
+    if not peekToken() then
+        return result
+    end
+    nextToken()
+    if not checkToken('symbol', ':') then
+        pushError {
+            type   = 'LUADOC_MISS_EXTENSION_SYMBOL',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+        return result
+    end
+    result.extends = parseName('doc.extends.name', result)
+    if not result.extends then
+        pushError {
+            type   = 'LUADOC_MISS_EXTENDS_NAME',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+        return result
+    end
+    result.finish = getFinish()
+    return result
+end
+
+local function parseType(parent)
+    if not peekToken() then
+        pushError {
+            type   = 'LUADOC_MISS_TYPE_NAME',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+        return nil
+    end
+    local result = {
+        type   = 'doc.type',
+        parent = parent,
+        types  = {},
+        enums  = {},
+    }
     while true do
         local tp, content = nextToken()
         if not tp then
             break
+        end
+        if not result.start then
+            result.start = getStart()
         end
         if tp == 'name' then
             local typeName = {
@@ -217,7 +221,6 @@ local function convertTokensOfType()
                 parent = result,
                 [1]    = content,
             }
-            result.finish = typeName.finish
             result.types[#result.types+1] = typeName
         elseif tp == 'string' then
             local typeEnum = {
@@ -227,7 +230,6 @@ local function convertTokensOfType()
                 parent = result,
                 [1]    = content,
             }
-            result.finish = typeEnum.finish
             result.enums[#result.enums+1] = typeEnum
         end
         nextToken()
@@ -235,6 +237,34 @@ local function convertTokensOfType()
             break
         end
     end
+    result.finish = getFinish()
+    return result
+end
+
+local function parseAlias()
+    local result = {
+        type   = 'doc.alias',
+    }
+    result.alias = parseName('doc.alias.name', result)
+    if not result.alias then
+        pushError {
+            type   = 'LUADOC_MISS_ALIAS_NAME',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+        return nil
+    end
+    result.start  = getStart()
+    result.extends = parseType(result)
+    if not result.extends then
+        pushError {
+            type   = 'LUADOC_MISS_ALIAS_EXTENDS',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+        return nil
+    end
+    result.finish = getFinish()
     return result
 end
 
@@ -252,9 +282,11 @@ local function convertTokens()
         return nil
     end
     if     text == 'class' then
-        return convertTokensOfClass()
+        return parseClass()
     elseif text == 'type' then
-        return convertTokensOfType()
+        return parseType()
+    elseif text == 'alias' then
+        return parseAlias()
     end
 end
 
