@@ -9,7 +9,7 @@ Sp                  <-  %s+
 X16                 <-  [a-fA-F0-9]
 Word                <-  [a-zA-Z0-9_]
 Token               <-  Name / String / Symbol
-Name                <-  ({} {[a-zA-Z_] [a-zA-Z0-9_]*} {})
+Name                <-  ({} {[a-zA-Z_] [a-zA-Z0-9_.]*} {})
                     ->  Name
 String              <-  ({} StringDef {})
                     ->  String
@@ -132,7 +132,7 @@ end
 
 local function convertTokensOfClass()
     local result = {
-        type   = 'class',
+        type   = 'doc.class',
         start  = getStart(),
         finish = getFinish(),
     }
@@ -146,9 +146,10 @@ local function convertTokensOfClass()
         return nil
     end
     local class = {
-        type   = 'name',
+        type   = 'doc.class.name',
         start  = getStart(),
         finish = getFinish(),
+        parent = result,
         [1]    = nameText,
     }
     result.finish = class.finish
@@ -176,13 +177,64 @@ local function convertTokensOfClass()
         return result
     end
     local extends = {
-        type   = 'name',
+        type   = 'doc.extends.name',
         start  = getStart(),
         finish = getFinish(),
+        parent = result,
         [1]    = text
     }
     result.finish  = extends.finish
     result.extends = extends
+    return result
+end
+
+local function convertTokensOfType()
+    local result = {
+        type   = 'doc.type',
+        start  = getStart(),
+        finish = getFinish(),
+        types  = {},
+        enums  = {},
+    }
+    if not peekToken() then
+        pushError {
+            type   = 'LUADOC_MISS_TYPE_NAME',
+            start  = result.finish,
+            finish = result.finish,
+        }
+        return nil
+    end
+    while true do
+        local tp, content = nextToken()
+        if not tp then
+            break
+        end
+        if tp == 'name' then
+            local typeName = {
+                type   = 'doc.type.name',
+                start  = getStart(),
+                finish = getFinish(),
+                parent = result,
+                [1]    = content,
+            }
+            result.finish = typeName.finish
+            result.types[#result.types+1] = typeName
+        elseif tp == 'string' then
+            local typeEnum = {
+                type   = 'doc.type.enum',
+                start  = getStart(),
+                finish = getFinish(),
+                parent = result,
+                [1]    = content,
+            }
+            result.finish = typeEnum.finish
+            result.enums[#result.enums+1] = typeEnum
+        end
+        nextToken()
+        if not checkToken('symbol', '|') then
+            break
+        end
+    end
     return result
 end
 
@@ -199,8 +251,10 @@ local function convertTokens()
         }
         return nil
     end
-    if text == 'class' then
+    if     text == 'class' then
         return convertTokensOfClass()
+    elseif text == 'type' then
+        return convertTokensOfType()
     end
 end
 

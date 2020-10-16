@@ -3,13 +3,14 @@ LuaDoc [[
 ]]
 {
     [1] = {
-        type   = 'class',
+        type   = 'doc.class',
         start  = 5,
         finish = 15,
         class  = {
-            type   = 'name',
+            type   = 'doc.class.name',
             start  = 11,
             finish = 15,
+            parent = "<IGNORE>",
             [1]    = 'Class',
         },
     },
@@ -21,19 +22,21 @@ local x = 1
 ]]
 {
     [1] = {
-        type   = 'class',
+        type   = 'doc.class',
         start  = 5,
         finish = 28,
         class  = {
-            type   = 'name',
+            type   = 'doc.class.name',
             start  = 11,
             finish = 15,
+            parent = "<IGNORE>",
             [1]    = 'Class',
         },
         extends= {
-            type   = 'name',
+            type   = 'doc.extends.name',
             start  = 19,
             finish = 28,
+            parent = "<IGNORE>",
             [1]    = 'SuperClass',
         },
     },
@@ -45,39 +48,35 @@ x = 1
 ]]
 {
     [1] = {
-        type   = 'class',
+        type   = 'doc.class',
         start  = 5,
         finish = 15,
         class  = {
-            type   = 'name',
+            type   = 'doc.class.name',
             start  = 11,
             finish = 15,
+            parent = "<IGNORE>",
             [1]    = 'Class',
         },
     },
 }
 
-do return end
 LuaDoc [[
 ---@type Type
 x = 1
 ]]
 {
     [1] = {
-        type   = 'type',
-        start  = 1,
+        type   = 'doc.type',
+        start  = 5,
         finish = 13,
         types  = {
             {
-                type   = 'common',
+                type   = 'doc.type.name',
                 start  = 10,
                 finish = 13,
-                name   = {
-                    type   = 'name',
-                    start  = 10,
-                    finish = 13,
-                    [1]    = 'Type',
-                }
+                parent = "<IGNORE>",
+                [1]    = 'Type',
             }
         },
         enums = {},
@@ -90,42 +89,30 @@ x = 1
 ]]
 {
     [1] = {
-        type   = 'type',
-        start  = 1,
+        type   = 'doc.type',
+        start  = 5,
         finish = 26,
         types  = {
             {
-                type   = 'common',
+                type   = 'doc.type.name',
                 start  = 10,
                 finish = 14,
-                name   = {
-                    type   = 'name',
-                    start  = 10,
-                    finish = 14,
-                    [1]    = 'Type1',
-                }
+                parent = "<IGNORE>",
+                [1]    = 'Type1',
             },
             {
-                type   = 'common',
+                type   = 'doc.type.name',
                 start  = 16,
                 finish = 20,
-                name   = {
-                    type   = 'name',
-                    start  = 16,
-                    finish = 20,
-                    [1]    = 'Type2',
-                }
+                parent = "<IGNORE>",
+                [1]    = 'Type2',
             },
             {
-                type   = 'common',
+                type   = 'doc.type.name',
                 start  = 22,
                 finish = 26,
-                name   = {
-                    type   = 'name',
-                    start  = 22,
-                    finish = 26,
-                    [1]    = 'Type3',
-                }
+                parent = "<IGNORE>",
+                [1]    = 'Type3',
             },
         },
         enums = {},
@@ -137,36 +124,32 @@ LuaDoc [[
 ]]
 {
     [1] = {
-        type   = 'type',
-        start  = 1,
+        type   = 'doc.type',
+        start  = 5,
         finish = 26,
         types  = {
             {
-                type   = 'common',
+                type   = 'doc.type.name',
                 start  = 10,
                 finish = 10,
-                name   = {
-                    type   = 'name',
-                    start  = 10,
-                    finish = 10,
-                    [1]    = 'x',
-                }
+                parent = "<IGNORE>",
+                [1]    = 'x',
             }
         },
         enums  = {
             {
-                type   = 'enum',
+                type   = 'doc.type.enum',
                 start  = 14,
                 finish = 18,
+                parent = "<IGNORE>",
                 [1]    = [['a']],
-                [2]    = '"',
             },
             {
-                type   = 'enum',
+                type   = 'doc.type.enum',
                 start  = 22,
                 finish = 26,
+                parent = "<IGNORE>",
                 [1]    = [['b']],
-                [2]    = '"',
             },
         }
     }
@@ -177,31 +160,31 @@ LuaDoc [[
 ]]
 {
     [1] = {
-        type   = 'type',
-        start  = 1,
+        type   = 'doc.type',
+        start  = 5,
         finish = 30,
         types  = {},
         enums  = {
             {
-                type   = 'enum',
+                type   = 'doc.type.enum',
                 start  = 10,
                 finish = 14,
+                parent = "<IGNORE>",
                 [1]    = [['a']],
-                [2]    = '"',
             },
             {
-                type   = 'enum',
+                type   = 'doc.type.enum',
                 start  = 18,
                 finish = 22,
+                parent = "<IGNORE>",
                 [1]    = [['b']],
-                [2]    = '"',
             },
             {
-                type   = 'enum',
+                type   = 'doc.type.enum',
                 start  = 26,
                 finish = 30,
+                parent = "<IGNORE>",
                 [1]    = [['c']],
-                [2]    = '"',
             },
         }
     }
