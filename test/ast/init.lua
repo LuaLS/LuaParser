@@ -102,9 +102,7 @@ for _, key in ipairs(ignoreList) do
 end
 
 
-local function autoFix(myAst, targetAst)
-    local myBuf = utility.dump(myAst, option)
-    local targetBuf = utility.dump(targetAst, option)
+local function autoFix(myBuf, targetBuf)
     local info = debug.getinfo(3, 'Sl')
     local filename = info.source:sub(2)
     local fileBuf = utility.loadFile(filename)
@@ -121,12 +119,14 @@ local function test(type)
             if not state then
                 error(('语法树生成失败：%s'):format(err))
             end
-            if not eq(state.ast, target_ast) then
+            local result = utility.dump(state.ast, option)
+            local expect = utility.dump(target_ast, option)
+            if result ~= expect then
                 fs.create_directory(ROOT / 'test' / 'log')
-                utility.saveFile((ROOT / 'test' / 'log' / 'my_ast.ast'):string(), utility.dump(state.ast, option))
-                utility.saveFile((ROOT / 'test' / 'log' / 'target_ast.ast'):string(), utility.dump(target_ast, option))
-                autoFix(state.ast, target_ast)
-                --error(('语法树不相等：%s\n%s'):format(type, buf))
+                utility.saveFile((ROOT / 'test' / 'log' / 'my_ast.ast'):string(), result)
+                utility.saveFile((ROOT / 'test' / 'log' / 'target_ast.ast'):string(), expect)
+                autoFix(result, expect)
+                error(('语法树不相等：%s\n%s'):format(type, buf))
             end
         end
     end
@@ -137,10 +137,12 @@ local function test(type)
                 error(('语法树生成失败：%s'):format(err))
             end
             parser:luadoc(state)
-            if not eq(state.ast.docs, target_doc) then
+            local result = utility.dump(state.ast.docs, option)
+            local expect = utility.dump(target_doc, option)
+            if result ~= expect then
                 fs.create_directory(ROOT / 'test' / 'log')
-                utility.saveFile((ROOT / 'test' / 'log' / 'my_doc.ast'):string(), utility.dump(state.ast.docs, option))
-                utility.saveFile((ROOT / 'test' / 'log' / 'target_doc.ast'):string(), utility.dump(target_doc, option))
+                utility.saveFile((ROOT / 'test' / 'log' / 'my_doc.ast'):string(), result)
+                utility.saveFile((ROOT / 'test' / 'log' / 'target_doc.ast'):string(), expect)
                 --autoFix(state.ast.luadocs, target_doc)
                 error(('语法树不相等：%s\n%s'):format(type, buf))
             end
