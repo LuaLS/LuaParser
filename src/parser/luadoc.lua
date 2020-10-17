@@ -374,6 +374,52 @@ local function parseField()
     return result
 end
 
+local function parseGeneric()
+    local result = {
+        type = 'doc.generic',
+        generics = {},
+    }
+    while true do
+        local object = {
+            type = 'doc.generic.object',
+            parent = result,
+        }
+        object.generic = parseName('doc.generic.name', object)
+        if not object.generic then
+            pushError {
+                type   = 'LUADOC_MISS_GENERIC_NAME',
+                start  = getFinish(),
+                finish = getFinish(),
+            }
+            return nil
+        end
+        object.start = object.generic.start
+        if not result.start then
+            result.start = object.start
+        end
+        if checkToken('symbol', ':', 1) then
+            nextToken()
+            object.extends = parseName('doc.extends.name', object)
+            if not object.extends then
+                pushError {
+                    type   = 'LUADOC_MISS_EXTENDS_NAME',
+                    start  = getFinish(),
+                    finish = getFinish(),
+                }
+                return nil
+            end
+        end
+        object.finish = getFinish()
+        result.generics[#result.generics+1] = object
+        if not checkToken('symbol', ',', 1) then
+            break
+        end
+        nextToken()
+    end
+    result.finish = getFinish()
+    return result
+end
+
 local function convertTokens()
     local tp, text = nextToken()
     if not tp then
@@ -399,6 +445,8 @@ local function convertTokens()
         return parseReturn()
     elseif text == 'field' then
         return parseField()
+    elseif text == 'generic' then
+        return parseGeneric()
     end
 end
 

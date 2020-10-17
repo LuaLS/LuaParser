@@ -417,24 +417,28 @@ LuaDoc [[
     },
 }
 
-do return end
 LuaDoc [[
 ---@generic T
 ]]
 {
     [1] = {
-        type = 'emmyGeneric',
+        type = 'doc.generic',
         start  = 13,
         finish = 13,
-        [1]  = {
-            start  = 13,
-            finish = 13,
-            [1] = {
-                type   = 'emmyName',
-                start  = 13,
-                finish = 13,
-                [1]    = 'T',
-            }
+        generics = {
+            {
+                type    = 'doc.generic.object',
+                start   = 13,
+                finish  = 13,
+                parent  = '<IGNORE>',
+                generic = {
+                    type   = 'doc.generic.name',
+                    start  = 13,
+                    finish = 13,
+                    parent = '<IGNORE>',
+                    [1]    = 'T',
+                }
+            },
         }
     }
 }
@@ -444,26 +448,27 @@ LuaDoc [[
 ]]
 {
     [1] = {
-        type = 'emmyGeneric',
-        start  = 13,
-        finish = 22,
-        [1]  = {
-            start  = 13,
-            finish = 22,
-            [1] = {
-                type   = 'emmyName',
-                start  = 13,
-                finish = 13,
-                [1]    = 'T',
-            },
-            [2] = {
-                type   = 'emmyType',
-                start  = 17,
-                finish = 22,
-                [1]  = {
-                    type   = 'emmyName',
+        type     = 'doc.generic',
+        start    = 13,
+        finish   = 22,
+        generics = {
+            [1]  = {
+                type    = 'doc.generic.object',
+                start   = 13,
+                finish  = 22,
+                parent  = '<IGNORE>',
+                generic = {
+                    type   = 'doc.generic.name',
+                    start  = 13,
+                    finish = 13,
+                    parent = '<IGNORE>',
+                    [1]    = 'T',
+                },
+                extends = {
+                    type   = 'doc.extends.name',
                     start  = 17,
                     finish = 22,
+                    parent = '<IGNORE>',
                     [1]    = 'handle',
                 }
             }
@@ -476,54 +481,55 @@ LuaDoc [[
 ]]
 {
     [1] = {
-        type = 'emmyGeneric',
-        start  = 13,
-        finish = 34,
-        [1]  = {
-            start  = 13,
-            finish = 22,
-            [1] = {
-                type   = 'emmyName',
-                start  = 13,
-                finish = 13,
-                [1]    = 'T',
-            },
-            [2] = {
-                type   = 'emmyType',
-                start  = 17,
-                finish = 22,
-                [1] = {
-                    type   = 'emmyName',
+        type     = 'doc.generic',
+        start    = 13,
+        finish   = 34,
+        generics = {
+            [1]  = {
+                type    = 'doc.generic.object',
+                start   = 13,
+                finish  = 22,
+                parent  = '<IGNORE>',
+                generic = {
+                    type   = 'doc.generic.name',
+                    start  = 13,
+                    finish = 13,
+                    parent = '<IGNORE>',
+                    [1]    = 'T',
+                },
+                extends = {
+                    type   = 'doc.extends.name',
                     start  = 17,
                     finish = 22,
+                    parent = '<IGNORE>',
                     [1]    = 'handle',
                 }
-            }
-        },
-        [2]  = {
-            start  = 25,
-            finish = 34,
-            [1] = {
-                type   = 'emmyName',
-                start  = 25,
-                finish = 25,
-                [1]    = 'K',
             },
-            [2] = {
-                type   = 'emmyType',
-                start  = 29,
-                finish = 34,
-                [1]  = {
-                    type   = 'emmyName',
+            [2]  = {
+                type    = 'doc.generic.object',
+                start   = 25,
+                finish  = 34,
+                parent  = '<IGNORE>',
+                generic = {
+                    type   = 'doc.generic.name',
+                    start  = 25,
+                    finish = 25,
+                    parent = '<IGNORE>',
+                    [1]    = 'K',
+                },
+                extends = {
+                    type   = 'doc.extends.name',
                     start  = 29,
                     finish = 34,
+                    parent = '<IGNORE>',
                     [1]    = 'handle',
                 }
-            }
-        },
+            },
+        }
     }
 }
 
+do return end
 LuaDoc [[
 ---@vararg string
 ]]
