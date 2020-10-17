@@ -206,81 +206,41 @@ x = 1
     },
 }
 
-do return end
 LuaDoc [[
 ---@param a1 t1
----@param a2 t2
----@param a3 t3
 ]]
 {
     [1]  = {
-        type   = 'emmyParam',
+        type   = 'doc.param',
         start  = 11,
         finish = 15,
-        [1]  = {
-            type   = 'emmyName',
+        param  = {
+            type   = 'doc.param.name',
             start  = 11,
             finish = 12,
+            parent = "<IGNORE>",
             [1]    = 'a1',
         },
-        [2] = {
-            type   = 'emmyType',
+        extends = {
+            type   = 'doc.type',
             start  = 14,
             finish = 15,
-            [1]    = {
-                type   = 'emmyName',
-                start  = 14,
-                finish = 15,
-                [1]    = 't1',
-            }
-        }
-    },
-    [2]  = {
-        type   = 'emmyParam',
-        start  = 27,
-        finish = 31,
-        [1]  = {
-            type   = 'emmyName',
-            start  = 27,
-            finish = 28,
-            [1]    = 'a2',
-        },
-        [2] = {
-            type   = 'emmyType',
-            start  = 30,
-            finish = 31,
-            [1]    = {
-                type   = 'emmyName',
-                start  = 30,
-                finish = 31,
-                [1]    = 't2',
-            }
-        }
-    },
-    [3]  = {
-        type   = 'emmyParam',
-        start  = 43,
-        finish = 47,
-        [1]  = {
-            type   = 'emmyName',
-            start  = 43,
-            finish = 44,
-            [1]    = 'a3',
-        },
-        [2] = {
-            type   = 'emmyType',
-            start  = 46,
-            finish = 47,
-            [1]    = {
-                type   = 'emmyName',
-                start  = 46,
-                finish = 47,
-                [1]    = 't3',
-            }
+            parent = "<IGNORE>",
+            types  = {
+                [1] = {
+                    type   = 'doc.type.name',
+                    start  = 14,
+                    finish = 15,
+                    parent = "<IGNORE>",
+                    [1]    = 't1',
+                },
+            },
+            enums  = {},
         }
     },
 }
 
+do return end
 LuaDoc [[
 ---@return Type1|Type2|Type3
 ]]

@@ -268,6 +268,33 @@ local function parseAlias()
     return result
 end
 
+local function  parseParam()
+    local result = {
+        type   = 'doc.param',
+    }
+    result.param = parseName('doc.param.name', result)
+    if not result.param then
+        pushError {
+            type   = 'LUADOC_MISS_PARAM_NAME',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+        return nil
+    end
+    result.start = getStart()
+    result.extends = parseType(result)
+    if not result.extends then
+        pushError {
+            type   = 'LUADOC_MISS_PARAM_EXTENDS',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+        return nil
+    end
+    result.finish = getFinish()
+    return result
+end
+
 local function convertTokens()
     local tp, text = nextToken()
     if not tp then
@@ -287,6 +314,8 @@ local function convertTokens()
         return parseType()
     elseif text == 'alias' then
         return parseAlias()
+    elseif text == 'param' then
+        return parseParam()
     end
 end
 
