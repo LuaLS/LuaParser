@@ -311,23 +311,63 @@ local function parseReturn()
         type    = 'doc.return',
         returns = {},
     }
-    local suc = try(function ()
-        while true do
-            local docType = parseType(result)
-            if not docType then
-                return false
-            end
-            if not result.start then
-                result.start = docType.start
-            end
-            result.returns[#result.returns+1] = docType
-            if not checkToken('symbol', ',', 1) then
+    while true do
+        local docType = parseType(result)
+        if not docType then
+            break
+        end
+        if not result.start then
+            result.start = docType.start
+        end
+        result.returns[#result.returns+1] = docType
+        if not checkToken('symbol', ',', 1) then
+            break
+        end
+        nextToken()
+    end
+    if #result.returns == 0 then
+        return nil
+    end
+    result.finish = getFinish()
+    return result
+end
+
+local function parseField()
+    local result = {
+        type = 'doc.field',
+    }
+    try(function ()
+        local tp, value = nextToken()
+        if tp == 'name' then
+            if value == 'public'
+            or value == 'protected'
+            or value == 'private' then
+                result.visible = value
+                result.start = getStart()
                 return true
             end
-            nextToken()
         end
+        return false
     end)
-    if not suc then
+    result.field = parseName('doc.field.name', result)
+    if not result.field then
+        pushError {
+            type   = 'LUADOC_MISS_FIELD_NAME',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+        return nil
+    end
+    if not result.start then
+        result.start = result.field.start
+    end
+    result.extends = parseType(result)
+    if not result.extends then
+        pushError {
+            type   = 'LUADOC_MISS_FIELD_EXTENDS',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
         return nil
     end
     result.finish = getFinish()
@@ -357,6 +397,8 @@ local function convertTokens()
         return parseParam()
     elseif text == 'return' then
         return parseReturn()
+    elseif text == 'field' then
+        return parseField()
     end
 end
 

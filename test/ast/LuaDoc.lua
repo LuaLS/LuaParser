@@ -341,32 +341,36 @@ LuaDoc [[
     },
 }
 
-do return end
 LuaDoc [[
 ---@field open function
 ]]
 {
     [1] = {
-        type   = 'emmyField',
+        type   = 'doc.field',
         start  = 11,
         finish = 23,
-        [1]  = 'public',
-        [2]  = {
-            type   = 'emmyName',
+        field  = {
+            type   = 'doc.field.name',
             start  = 11,
             finish = 14,
+            parent = '<IGNORE>',
             [1]    = 'open',
         },
-        [3]  = {
-            type   = 'emmyType',
+        extends = {
+            type   = 'doc.type',
             start  = 16,
             finish = 23,
-            [1]  = {
-                type   = 'emmyName',
-                start  = 16,
-                finish = 23,
-                [1]    = 'function',
-            }
+            parent = '<IGNORE>',
+            types  = {
+                {
+                    type   = 'doc.type.name',
+                    start  = 16,
+                    finish = 23,
+                    parent = '<IGNORE>',
+                    [1]    = 'function',
+                }
+            },
+            enums  = {},
         }
     },
 }
@@ -376,36 +380,44 @@ LuaDoc [[
 ]]
 {
     [1] = {
-        type   = 'emmyField',
-        start  = 19,
-        finish = 38,
-        [1]  = 'private',
-        [2]  = {
-            type   = 'emmyName',
+        type    = 'doc.field',
+        start   = 11,
+        finish  = 38,
+        visible = 'private',
+        field   = {
+            type   = 'doc.field.name',
             start  = 19,
             finish = 22,
+            parent = '<IGNORE>',
             [1]    = 'open',
         },
-        [3]  = {
-            type   = 'emmyType',
+        extends = {
+            type   = 'doc.type',
             start  = 24,
             finish = 38,
-            [1]  = {
-                type   = 'emmyName',
-                start  = 24,
-                finish = 31,
-                [1]    = 'function',
+            parent = '<IGNORE>',
+            types  = {
+                [1]  = {
+                    type   = 'doc.type.name',
+                    start  = 24,
+                    finish = 31,
+                    parent = '<IGNORE>',
+                    [1]    = 'function',
+                },
+                [2]  = {
+                    type   = 'doc.type.name',
+                    start  = 33,
+                    finish = 38,
+                    parent = '<IGNORE>',
+                    [1]    = 'string',
+                }
             },
-            [2]  = {
-                type   = 'emmyName',
-                start  = 33,
-                finish = 38,
-                [1]    = 'string',
-            }
-        }
+            enums = {},
+        },
     },
 }
 
+do return end
 LuaDoc [[
 ---@generic T
 ]]
