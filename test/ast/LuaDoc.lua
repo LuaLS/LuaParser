@@ -240,41 +240,108 @@ LuaDoc [[
     },
 }
 
-do return end
 LuaDoc [[
 ---@return Type1|Type2|Type3
 ]]
 {
     [1] = {
-        type = 'emmyReturn',
+        type    = 'doc.return',
+        start   = 12,
+        finish  = 28,
+        returns = {
+            [1]  = {
+                type   = 'doc.type',
+                start  = 12,
+                finish = 28,
+                parent = "<IGNORE>",
+                types  = {
+                    [1]  = {
+                        type   = 'doc.type.name',
+                        start  = 12,
+                        finish = 16,
+                        parent = "<IGNORE>",
+                        [1]    = 'Type1',
+                    },
+                    [2]  = {
+                        type   = 'doc.type.name',
+                        start  = 18,
+                        finish = 22,
+                        parent = "<IGNORE>",
+                        [1]    = 'Type2',
+                    },
+                    [3]  = {
+                        type   = 'doc.type.name',
+                        start  = 24,
+                        finish = 28,
+                        parent = "<IGNORE>",
+                        [1]    = 'Type3',
+                    },
+                },
+                enums = {},
+            }
+        }
+    },
+}
+
+LuaDoc [[
+---@return Type1,Type2,Type3
+]]
+{
+    [1] = {
+        type = 'doc.return',
         start  = 12,
         finish = 28,
-        [1]  = {
-            type   = 'emmyType',
-            start  = 12,
-            finish = 28,
+        returns = {
             [1]  = {
-                type   = 'emmyName',
+                type   = 'doc.type',
                 start  = 12,
                 finish = 16,
-                [1]    = 'Type1',
+                parent = "<IGNORE>",
+                types  = {
+                    {
+                        type   = 'doc.type.name',
+                        start  = 12,
+                        finish = 16,
+                        parent = "<IGNORE>",
+                        [1]    = 'Type1',
+                    }
+                }
             },
             [2]  = {
-                type   = 'emmyName',
+                type   = 'doc.type',
                 start  = 18,
                 finish = 22,
-                [1]    = 'Type2',
+                parent = "<IGNORE>",
+                types  = {
+                    {
+                        type   = 'doc.type.name',
+                        start  = 18,
+                        finish = 22,
+                        parent = "<IGNORE>",
+                        [1]    = 'Type2',
+                    }
+                }
             },
             [3]  = {
-                type   = 'emmyName',
+                type   = 'doc.type',
                 start  = 24,
                 finish = 28,
-                [1]    = 'Type3',
+                parent = "<IGNORE>",
+                types  = {
+                    {
+                        type   = 'doc.type.name',
+                        start  = 24,
+                        finish = 28,
+                        parent = "<IGNORE>",
+                        [1]    = 'Type3',
+                    }
+                }
             },
         }
     },
 }
 
+do return end
 LuaDoc [[
 ---@field open function
 ]]

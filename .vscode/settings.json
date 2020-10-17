@@ -3,5 +3,7 @@
         "root"
     ],
     "Lua.runtime.version": "Lua 5.4",
-    "Lua.awakened.cat": true
+    "Lua.awakened.cat": true,
+    "Lua.develop.enable": true,
+    "Lua.develop.debuggerPort": 11419
 }

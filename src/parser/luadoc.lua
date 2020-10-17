@@ -40,7 +40,7 @@ EChar               <-  'a' -> ea
                     /   ('x' {X16 X16})       -> Char16
                     /   ([0-9] [0-9]? [0-9]?) -> Char10
                     /   ('u{' {Word*} '}')    -> CharUtf8
-Symbol              <-  ({} {'.' / '|' / ':'} {})
+Symbol              <-  ({} {':' / '|' / ','} {})
                     ->  Symbol
 ]], {
     s  = m.S' \t',
@@ -134,11 +134,22 @@ local function getFinish()
     return TokenFinishs[Ci] + Offset
 end
 
+local function try(callback)
+    local savePoint = Ci
+    -- rollback
+    local suc = callback()
+    if not suc then
+        Ci = savePoint
+    end
+    return suc
+end
+
 local function parseName(tp, parent)
-    local nameTp, nameText = nextToken()
+    local nameTp, nameText = peekToken()
     if nameTp ~= 'name' then
         return nil
     end
+    nextToken()
     local class = {
         type   = tp,
         start  = getStart(),
@@ -232,10 +243,10 @@ local function parseType(parent)
             }
             result.enums[#result.enums+1] = typeEnum
         end
-        nextToken()
-        if not checkToken('symbol', '|') then
+        if not checkToken('symbol', '|', 1) then
             break
         end
+        nextToken()
     end
     result.finish = getFinish()
     return result
@@ -268,7 +279,7 @@ local function parseAlias()
     return result
 end
 
-local function  parseParam()
+local function parseParam()
     local result = {
         type   = 'doc.param',
     }
@@ -289,6 +300,34 @@ local function  parseParam()
             start  = getFinish(),
             finish = getFinish(),
         }
+        return nil
+    end
+    result.finish = getFinish()
+    return result
+end
+
+local function parseReturn()
+    local result = {
+        type    = 'doc.return',
+        returns = {},
+    }
+    local suc = try(function ()
+        while true do
+            local docType = parseType(result)
+            if not docType then
+                return false
+            end
+            if not result.start then
+                result.start = docType.start
+            end
+            result.returns[#result.returns+1] = docType
+            if not checkToken('symbol', ',', 1) then
+                return true
+            end
+            nextToken()
+        end
+    end)
+    if not suc then
         return nil
     end
     result.finish = getFinish()
@@ -316,6 +355,8 @@ local function convertTokens()
         return parseAlias()
     elseif text == 'param' then
         return parseParam()
+    elseif text == 'return' then
+        return parseReturn()
     end
 end
 
