@@ -529,46 +529,33 @@ LuaDoc [[
     }
 }
 
-do return end
 LuaDoc [[
 ---@vararg string
 ]]
 {
     [1] = {
-        type = 'emmyVararg',
+        type   = 'doc.vararg',
         start  = 12,
         finish = 17,
-        [1]  = {
-            type   = 'emmyType',
+        vararg = {
+            type   = 'doc.type',
             start  = 12,
             finish = 17,
-            [1]  = {
-                type   = 'emmyName',
-                start  = 12,
-                finish = 17,
-                [1]    = 'string',
-            }
+            parent = '<IGNORE>',
+            types  = {
+                [1]  = {
+                    type   = 'doc.type.name',
+                    start  = 12,
+                    finish = 17,
+                    [1]    = 'string',
+                }
+            },
+            enums  = {},
         }
     }
 }
 
-LuaDoc [[
----@language JSON
-]]
-{
-    [1] = {
-        type = 'emmyLanguage',
-        start  = 14,
-        finish = 17,
-        [1]  = {
-            type   = 'emmyName',
-            start  = 14,
-            finish = 17,
-            [1]    = 'JSON',
-        }
-    }
-}
-
+do return end
 LuaDoc [[
 ---@type Type[]
 ]]
