@@ -547,6 +547,7 @@ LuaDoc [[
                     type   = 'doc.type.name',
                     start  = 12,
                     finish = 17,
+                    parent = '<IGNORE>',
                     [1]    = 'string',
                 }
             },

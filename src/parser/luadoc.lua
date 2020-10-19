@@ -420,6 +420,24 @@ local function parseGeneric()
     return result
 end
 
+local function parseVararg()
+    local result = {
+        type = 'doc.vararg',
+    }
+    result.vararg = parseType(result)
+    if not result.vararg then
+        pushError {
+            type   = 'LUADOC_MISS_VARARG_TYPE',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+        return
+    end
+    result.start = result.vararg.start
+    result.finish = result.vararg.finish
+    return result
+end
+
 local function convertTokens()
     local tp, text = nextToken()
     if not tp then
@@ -447,6 +465,8 @@ local function convertTokens()
         return parseField()
     elseif text == 'generic' then
         return parseGeneric()
+    elseif text == 'vararg' then
+        return parseVararg()
     end
 end
 
