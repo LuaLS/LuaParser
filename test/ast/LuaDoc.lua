@@ -578,40 +578,59 @@ LuaDoc [[
     }
 }
 
-do return end
 LuaDoc [[
 ---@type table<key, value>
 ]]
 {
     [1] = {
-        type = 'emmyTableType',
+        type   = 'doc.type',
         start  = 10,
         finish = 26,
-        [1]    = {
-            type   = 'emmyType',
-            start  = 16,
-            finish = 18,
-            [1]  = {
-                type   = 'emmyName',
-                start  = 16,
-                finish = 18,
-                [1]    = 'key',
+        types  = {
+            [1] = {
+                type   = 'doc.type.table',
+                start  = 10,
+                finish = 26,
+                parent = '<IGNORE>',
+                key    = {
+                    type   = 'doc.type',
+                    start  = 16,
+                    finish = 18,
+                    parent = '<IGNORE>',
+                    types  = {
+                        [1] = {
+                            type   = 'doc.type.name',
+                            start  = 16,
+                            finish = 18,
+                            parent = '<IGNORE>',
+                            [1]    = 'key',
+                        },
+                    },
+                    enums  = {},
+                },
+                value  = {
+                    type   = 'doc.type',
+                    start  = 21,
+                    finish = 25,
+                    parent = '<IGNORE>',
+                    types  = {
+                        [1] = {
+                            type   = 'doc.type.name',
+                            start  = 21,
+                            finish = 25,
+                            parent = '<IGNORE>',
+                            [1]    = 'value',
+                        },
+                    },
+                    enums  = {},
+                }
             }
         },
-        [2]    = {
-            type   = 'emmyType',
-            start  = 21,
-            finish = 25,
-            [1]  = {
-                type   = 'emmyName',
-                start  = 21,
-                finish = 25,
-                [1]    = 'value',
-            }
-        }
+        enums  = {},
     }
 }
 
+do return end
 LuaDoc [[
 ---@type fun(key1:t1|t2[], key2:t3):table<t5, t6>
 ]]

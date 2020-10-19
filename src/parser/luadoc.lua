@@ -3,6 +3,7 @@ local re         = require 'parser.relabel'
 
 local TokenTypes, TokenStarts, TokenFinishs, TokenContents
 local Ci, Offset, pushError
+local parseType
 local Parser = re.compile([[
 Main                <-  (Token / Sp)*
 Sp                  <-  %s+
@@ -201,7 +202,70 @@ local function parseClass(parent)
     return result
 end
 
-local function parseType(parent)
+local function nextSymbolOrError(symbol)
+    if checkToken('symbol', symbol, 1) then
+        nextToken()
+        return true
+    end
+    pushError {
+        type   = 'LUADOC_MISS_SYMBOL',
+        start  = getFinish(),
+        finish = getFinish(),
+        info   = {
+            symbol = symbol,
+        }
+    }
+    return false
+end
+
+local function parseTypeUnitTable()
+    local typeUnit = {
+        type   = 'doc.type.table',
+        start  = getStart(),
+    }
+    if not nextSymbolOrError('<') then
+        return nil
+    end
+    local key = parseType(typeUnit)
+    if not key or not nextSymbolOrError(',') then
+        return nil
+    end
+    local value = parseType(typeUnit)
+    if not value then
+        return nil
+    end
+    nextSymbolOrError('>')
+    typeUnit.key    = key
+    typeUnit.value  = value
+    typeUnit.finish = getFinish()
+    return typeUnit
+end
+
+local function parseTypeUnit(parent, content)
+    local typeUnit
+    if content == 'table' then
+        typeUnit = parseTypeUnitTable()
+    else
+        typeUnit = {
+            type   = 'doc.type.name',
+            start  = getStart(),
+            finish = getFinish(),
+            [1]    = content,
+        }
+    end
+    if not typeUnit then
+        return nil
+    end
+    typeUnit.parent = parent
+    if checkToken('symbol', '[]', 1) then
+        nextToken()
+        typeUnit.array = true
+        typeUnit.finish = getFinish()
+    end
+    return typeUnit
+end
+
+function parseType(parent)
     if not peekToken() then
         pushError {
             type   = 'LUADOC_MISS_TYPE_NAME',
@@ -217,28 +281,22 @@ local function parseType(parent)
         enums  = {},
     }
     while true do
-        local tp, content = nextToken()
+        local tp, content = peekToken()
         if not tp then
             break
         end
-        if not result.start then
-            result.start = getStart()
-        end
         if tp == 'name' then
-            local typeName = {
-                type   = 'doc.type.name',
-                start  = getStart(),
-                finish = getFinish(),
-                parent = result,
-                [1]    = content,
-            }
-            if checkToken('symbol', '[]', 1) then
-                nextToken()
-                typeName.array = true
-                typeName.finish = getFinish()
+            nextToken()
+            local typeUnit = parseTypeUnit(result, content)
+            if not typeUnit then
+                break
             end
-            result.types[#result.types+1] = typeName
+            result.types[#result.types+1] = typeUnit
+            if not result.start then
+                result.start = typeUnit.start
+            end
         elseif tp == 'string' then
+            nextToken()
             local typeEnum = {
                 type   = 'doc.type.enum',
                 start  = getStart(),
@@ -247,6 +305,9 @@ local function parseType(parent)
                 [1]    = content,
             }
             result.enums[#result.enums+1] = typeEnum
+            if not result.start then
+                result.start = typeEnum.start
+            end
         end
         if not checkToken('symbol', '|', 1) then
             break
@@ -254,6 +315,9 @@ local function parseType(parent)
         nextToken()
     end
     result.finish = getFinish()
+    if #result.types == 0 and #result.enums == 0 then
+        return nil
+    end
     return result
 end
 
