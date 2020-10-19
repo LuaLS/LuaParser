@@ -702,49 +702,60 @@ LuaDoc [[
     }
 }
 
-do return end
+OPTION.format['returns'] = function ()
+    return '"<IGNORE>"'
+end
+OPTION.format['extends'] = nil
 LuaDoc [[
 ---@param event string | "'onClosed'" | "'onData'"
 ]]
 {
     [1]  = {
-        type = 'emmyParam',
+        type   = 'doc.param',
         start  = 11,
         finish = 50,
-        [1]  = {
-            type   = 'emmyName',
+        param  = {
+            type   = 'doc.param.name',
             start  = 11,
             finish = 15,
+            parent = '<IGNORE>',
             [1]    = 'event',
         },
-        [2] = {
-            type   = 'emmyType',
+        extends = {
+            type   = 'doc.type',
             start  = 17,
-            finish = 22,
-            [1]    = {
-                type   = 'emmyName',
-                start  = 17,
-                finish = 22,
-                [1]    = 'string',
-            },
-        },
-        [3] = {
-            type   = 'emmyEnum',
-            start  = 26,
-            finish = 37,
-            [1]    = "'onClosed'",
-            [2]    = '"',
-        },
-        [4] = {
-            type   = 'emmyEnum',
-            start  = 41,
             finish = 50,
-            [1]    = "'onData'",
-            [2]    = '"',
-        },
+            parent = '<IGNORE>',
+            types  = {
+                {
+                    type   = 'doc.type.name',
+                    start  = 17,
+                    finish = 22,
+                    parent = '<IGNORE>',
+                    [1]    = 'string',
+                }
+            },
+            enums  = {
+                {
+                    type   = 'doc.type.enum',
+                    start  = 26,
+                    finish = 37,
+                    parent = "<IGNORE>",
+                    [1]    = [['onClosed']],
+                },
+                {
+                    type   = 'doc.type.enum',
+                    start  = 41,
+                    finish = 50,
+                    parent = "<IGNORE>",
+                    [1]    = [['onData']],
+                },
+            }
+        }
     },
 }
 
+do return end
 LuaDoc [[
 ---@overload fun(a:number):number
 ]]
