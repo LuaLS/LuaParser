@@ -755,37 +755,73 @@ LuaDoc [[
     },
 }
 
-do return end
 LuaDoc [[
 ---@overload fun(a:number):number
 ]]
 {
     [1] = {
-        type   = "emmyOverLoad",
-        start  = 14,
-        finish = 33,
-        args   = {
-            [1] = {
-                type   = "emmyName",
-                start  = 18,
-                finish = 18,
-                [1]    = "a",
-            },
-            [2] = {
-                type   = "emmyType",
-                start  = 20,
-                finish = 25,
+        type     = "doc.overload",
+        start    = 14,
+        finish   = 33,
+        overload = {
+            type    = 'doc.type.function',
+            start   = 14,
+            finish  = 33,
+            parent  = '<IGNORE>',
+            args    = {
                 [1] = {
-                    type   = "emmyName",
-                    start  = 20,
+                    type   = 'doc.type.arg',
+                    start  = 18,
                     finish = 25,
-                    [1]    = "number",
+                    parent = '<IGNORE>',
+                    name   = {
+                        type   = 'doc.type.name',
+                        start  = 18,
+                        finish = 18,
+                        parent = '<IGNORE>',
+                        [1]    = 'a',
+                    },
+                    extends = {
+                        type   = "doc.type",
+                        start  = 20,
+                        finish = 25,
+                        parent = "<IGNORE>",
+                        types  = {
+                            [1] = {
+                                type   = "doc.type.name",
+                                start  = 20,
+                                finish = 25,
+                                parent = "<IGNORE>",
+                                [1]    = "number",
+                            },
+                        },
+                        enums  = {},
+                    },
                 },
             },
+            returns = {
+                [1] = {
+                    type   = 'doc.type',
+                    start  = 28,
+                    finish = 33,
+                    parent = '<IGNORE>',
+                    types  = {
+                        {
+                            type   = 'doc.type.name',
+                            start  = 28,
+                            finish = 33,
+                            parent = '<IGNORE>',
+                            [1]    = 'number',
+                        }
+                    },
+                    enums  = {},
+                }
+            }
         },
     },
 }
 
+do return end
 LuaDoc [[
 ---@param x string | "fff"
 ]]

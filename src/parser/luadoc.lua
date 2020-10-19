@@ -585,6 +585,30 @@ local function parseVararg()
     return result
 end
 
+local function parseOverload()
+    local tp, name = peekToken()
+    if tp ~= 'name' or name ~= 'fun' then
+        pushError {
+            type   = 'LUADOC_MISS_FUN_AFTER_OVERLOAD',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+        return nil
+    end
+    nextToken()
+    local result = {
+        type = 'doc.overload',
+    }
+    result.overload = parseTypeUnitFunction()
+    if not result.overload then
+        return nil
+    end
+    result.overload.parent = result
+    result.start = result.overload.start
+    result.finish = result.overload.finish
+    return result
+end
+
 local function convertTokens()
     local tp, text = nextToken()
     if not tp then
@@ -614,6 +638,8 @@ local function convertTokens()
         return parseGeneric()
     elseif text == 'vararg' then
         return parseVararg()
+    elseif text == 'overload' then
+        return parseOverload()
     end
 end
 
