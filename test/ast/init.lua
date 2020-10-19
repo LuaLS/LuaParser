@@ -101,6 +101,7 @@ for _, key in ipairs(ignoreList) do
     end
 end
 
+OPTION = option
 
 local function autoFix(myBuf, targetBuf)
     local info = debug.getinfo(3, 'Sl')

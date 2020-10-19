@@ -630,6 +630,10 @@ LuaDoc [[
     }
 }
 
+OPTION.format['returns'] = nil
+OPTION.format['extends'] = function ()
+    return '"<IGNORE>"'
+end
 LuaDoc [[
 ---@type fun(key1:t1, key2:t2):t3
 ]]
@@ -646,7 +650,7 @@ LuaDoc [[
                 parent  = '<IGNORE>',
                 args    = {
                     [1] = {
-                        type   = 'doc.type.function.arg',
+                        type   = 'doc.type.arg',
                         start  = 14,
                         finish = 20,
                         parent = '<IGNORE>',
@@ -660,7 +664,7 @@ LuaDoc [[
                         extends = '<IGNORE>',
                     },
                     [2] = {
-                        type   = 'doc.type.function.arg',
+                        type   = 'doc.type.arg',
                         start  = 23,
                         finish = 29,
                         parent = '<IGNORE>',
@@ -680,7 +684,16 @@ LuaDoc [[
                         start  = 32,
                         finish = 33,
                         parent = '<IGNORE>',
-                        [1]    = 't3',
+                        types  = {
+                            {
+                                type   = 'doc.type.name',
+                                start  = 32,
+                                finish = 33,
+                                parent = '<IGNORE>',
+                                [1]    = 't3',
+                            }
+                        },
+                        enums  = {},
                     }
                 }
             }

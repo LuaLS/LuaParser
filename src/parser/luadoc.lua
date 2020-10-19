@@ -41,7 +41,16 @@ EChar               <-  'a' -> ea
                     /   ('x' {X16 X16})       -> Char16
                     /   ([0-9] [0-9]? [0-9]?) -> Char10
                     /   ('u{' {Word*} '}')    -> CharUtf8
-Symbol              <-  ({} {':' / '|' / ',' / '[]' / '<' / '>'} {})
+Symbol              <-  ({} {
+                            ':'
+                        /   '|'
+                        /   ','
+                        /   '[]'
+                        /   '<'
+                        /   '>'
+                        /   '('
+                        /   ')'
+                        } {})
                     ->  Symbol
 ]], {
     s  = m.S' \t',
@@ -241,10 +250,79 @@ local function parseTypeUnitTable()
     return typeUnit
 end
 
+local function  parseTypeUnitFunction()
+    local typeUnit = {
+        type    = 'doc.type.function',
+        start   = getStart(),
+        args    = {},
+        returns = {},
+    }
+    if not nextSymbolOrError('(') then
+        return nil
+    end
+    while true do
+        if checkToken('symbol', ')', 1) then
+            nextToken()
+            break
+        end
+        local arg = {
+            type   = 'doc.type.arg',
+            parent = typeUnit,
+        }
+        arg.name = parseName('doc.type.name', arg)
+        if not arg.name then
+            pushError {
+                type   = 'LUADOC_MISS_ARG_NAME',
+                start  = getFinish(),
+                finish = getFinish(),
+            }
+            break
+        end
+        if not arg.start then
+            arg.start = arg.name.start
+        end
+        arg.finish = getFinish()
+        if not nextSymbolOrError(':') then
+            break
+        end
+        arg.extends = parseType(arg)
+        if not arg.extends then
+            break
+        end
+        arg.finish = getFinish()
+        typeUnit.args[#typeUnit.args+1] = arg
+        if checkToken('symbol', ',', 1) then
+            nextToken()
+        else
+            nextSymbolOrError(')')
+            break
+        end
+    end
+    if checkToken('symbol', ':', 1) then
+        nextToken()
+        while true do
+            local rtn = parseType(arg)
+            if not rtn then
+                break
+            end
+            typeUnit.returns[#typeUnit.returns+1] = rtn
+            if checkToken('symbol', ',', 1) then
+                nextToken()
+            else
+                break
+            end
+        end
+    end
+    typeUnit.finish = getFinish()
+    return typeUnit
+end
+
 local function parseTypeUnit(parent, content)
     local typeUnit
     if content == 'table' then
         typeUnit = parseTypeUnitTable()
+    elseif content == 'fun' then
+        typeUnit = parseTypeUnitFunction()
     else
         typeUnit = {
             type   = 'doc.type.name',
