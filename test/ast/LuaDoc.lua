@@ -630,65 +630,66 @@ LuaDoc [[
     }
 }
 
-do return end
 LuaDoc [[
----@type fun(key1:t1|t2[], key2:t3):table<t5, t6>
+---@type fun(key1:t1, key2:t2):t3
 ]]
 {
     [1] = {
-        type   = 'emmyFunctionType',
+        type   = 'doc.type',
         start  = 10,
-        finish = 49,
-        args   = {
-            [1]  = {
-                type   = 'emmyName',
-                start  = 14,
-                finish = 17,
-                [1]    = 'key1',
-            },
-            [2]  = {
-                type   = 'emmyType',
-                start  = 19,
-                finish = 25,
-                [1]    = {
-                    type   = 'emmyName',
-                    start  = 19,
-                    finish = 20,
-                    [1]    = 't1',
-                },
-                [2]    = {
-                    type   = 'emmyArrayType',
-                    start  = 22,
-                    finish = 25,
-                    [1]    = {
-                        type   = 'emmyName',
-                        start  = 22,
-                        finish = 23,
-                        [1]    = 't2'
+        finish = 33,
+        types  = {
+            [1] = {
+                type    = 'doc.type.function',
+                start   = 10,
+                finish  = 33,
+                parent  = '<IGNORE>',
+                args    = {
+                    [1] = {
+                        type   = 'doc.type.function.arg',
+                        start  = 14,
+                        finish = 20,
+                        parent = '<IGNORE>',
+                        name   = {
+                            type   = 'doc.type.name',
+                            start  = 14,
+                            finish = 17,
+                            parent = '<IGNORE>',
+                            [1]    = 'key1',
+                        },
+                        extends = '<IGNORE>',
                     },
+                    [2] = {
+                        type   = 'doc.type.function.arg',
+                        start  = 23,
+                        finish = 29,
+                        parent = '<IGNORE>',
+                        name   = {
+                            type   = 'doc.type.name',
+                            start  = 23,
+                            finish = 26,
+                            parent = '<IGNORE>',
+                            [1]    = 'key2',
+                        },
+                        extends = '<IGNORE>',
+                    },
+                },
+                returns = {
+                    [1] = {
+                        type   = 'doc.type',
+                        start  = 32,
+                        finish = 33,
+                        parent = '<IGNORE>',
+                        [1]    = 't3',
+                    }
                 }
-            },
-            [3]  = {
-                type   = 'emmyName',
-                start  = 28,
-                finish = 31,
-                [1]    = 'key2',
-            },
-            [4]  = {
-                type   = 'emmyType',
-                start  = 33,
-                finish = 34,
-                [1]    = {
-                    type   = 'emmyName',
-                    start  = 33,
-                    finish = 34,
-                    [1]    = 't3',
-                }
-            },
+            }
         },
+        enums  = {},
     }
 }
 
+do return end
 LuaDoc [[
 ---@param event string | "'onClosed'" | "'onData'"
 ]]
