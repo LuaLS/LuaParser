@@ -40,7 +40,7 @@ EChar               <-  'a' -> ea
                     /   ('x' {X16 X16})       -> Char16
                     /   ([0-9] [0-9]? [0-9]?) -> Char10
                     /   ('u{' {Word*} '}')    -> CharUtf8
-Symbol              <-  ({} {':' / '|' / ','} {})
+Symbol              <-  ({} {':' / '|' / ',' / '[]' / '<' / '>'} {})
                     ->  Symbol
 ]], {
     s  = m.S' \t',
@@ -232,6 +232,11 @@ local function parseType(parent)
                 parent = result,
                 [1]    = content,
             }
+            if checkToken('symbol', '[]', 1) then
+                nextToken()
+                typeName.array = true
+                typeName.finish = getFinish()
+            end
             result.types[#result.types+1] = typeName
         elseif tp == 'string' then
             local typeEnum = {

@@ -556,47 +556,29 @@ LuaDoc [[
     }
 }
 
-do return end
 LuaDoc [[
 ---@type Type[]
 ]]
 {
     [1] = {
-        type   = 'emmyArrayType',
+        type   = 'doc.type',
         start  = 10,
         finish = 15,
-        [1]    = {
-            type   = 'emmyName',
-            start  = 10,
-            finish = 13,
-            [1]    = 'Type'
+        types  = {
+            [1]    = {
+                type   = 'doc.type.name',
+                start  = 10,
+                finish = 15,
+                array  = true,
+                parent = '<IGNORE>',
+                [1]    = 'Type'
+            },
         },
+        enums  = {}
     }
 }
 
-LuaDoc [[
----@type (Type1|Type2)[]
-]]
-{
-    [1] = {
-        type   = 'emmyArrayType',
-        start  = 10,
-        finish = 24,
-        [1]    = {
-            type   = 'emmyName',
-            start  = 11,
-            finish = 15,
-            [1]    = 'Type1'
-        },
-        [2]    = {
-            type   = 'emmyName',
-            start  = 17,
-            finish = 21,
-            [1]    = 'Type2'
-        },
-    }
-}
-
+do return end
 LuaDoc [[
 ---@type table<key, value>
 ]]
@@ -731,165 +713,6 @@ LuaDoc [[
 }
 
 LuaDoc [[
----@see loli#pants
-]]
-{
-    [1] = {
-        type   = 'emmySee',
-        start  = 9,
-        finish = 18,
-        [1]  = {
-            type   = 'emmyName',
-            start  = 9,
-            finish = 12,
-            [1]    = 'loli',
-        },
-        [2]  = {
-            type   = 'emmyName',
-            start  = 14,
-            finish = 18,
-            [1]    = 'pants',
-        }
-    }
-}
-
-LuaDoc [[
-
----@class Class
-]]
-{
-    [1] = {
-        type   = 'emmyClass',
-        start  = 12,
-        finish = 16,
-        [1]    = {
-            type   = 'emmyName',
-            start  = 12,
-            finish = 16,
-            [1]    = 'Class',
-        },
-    },
-}
-
-LuaDoc [[
----@
----@cl
-]]
-{
-    [1] = {
-        type   = 'emmyIncomplete',
-        start  = 4,
-        finish = 4,
-        [1]    = '',
-    },
-    [2] = {
-        type   = 'emmyIncomplete',
-        start  = 10,
-        finish = 11,
-        [1]    = 'cl',
-    },
-}
-
-LuaDoc [[
-local t = {
-    ---@type string
-    x = 1,
-}
-]]
-{
-    [1] = {
-        type = "local",
-        [1] = {
-            type   = "name",
-            start  = 7,
-            finish = 7,
-            [1]    = "t",
-        },
-        [2] = {
-            type   = "table",
-            start  = 11,
-            finish = 44,
-            [1]    = {
-                type = "emmyType",
-                start  = 26,
-                finish = 31,
-                [1]  = {
-                    type   = "emmyName",
-                    start  = 26,
-                    finish = 31,
-                    [1]    = "string",
-                },
-            },
-            [2]    = {
-                type   = "pair",
-                start  = 37,
-                finish = 41,
-                [1] = {
-                    type   = "name",
-                    start  = 37,
-                    finish = 37,
-                    [1]    = "x",
-                },
-                [2] = {
-                    type   = "number",
-                    start  = 41,
-                    finish = 41,
-                    [1]    = 1,
-                },
-            },
-        },
-    },
-}
-
-LuaDoc [[
-local function f()
-    ---@
-end
-]]
-{
-    [1] = {
-        type      = "localfunction",
-        start     = 1,
-        finish    = 31,
-        argStart  = 17,
-        argFinish = 18,
-        name      = {
-            [1]    = "f",
-            finish = 16,
-            start  = 16,
-            type   = "name",
-        },
-        [1]       = {
-            type   = "emmyIncomplete",
-            start  = 27,
-            finish = 27,
-            [1]    = "",
-        },
-    },
-}
-
-LuaDoc '---@type fun'
-{
-    [1] = {
-        type   = "emmyFunctionType",
-        start  = 10,
-        finish = 12,
-    },
-}
-
-LuaDoc [[
----123
---- 456
----  789
-]]
-{
-    [1] = {
-        type   = 'emmyComment',
-        [1]    = '123 456 789',
-    }
-}
-
-LuaDoc [[
 ---@overload fun(a:number):number
 ]]
 {
@@ -920,7 +743,7 @@ LuaDoc [[
 }
 
 LuaDoc [[
----@param x string {xx = 1, yy = "zz", zz = false} | "fff"
+---@param x string | "fff"
 ]]
 {
     [1] = {
@@ -957,90 +780,6 @@ LuaDoc [[
             [2]    = '"',
         },
     },
-}
-
-LuaDoc [[
----@param event string
----|   "'onClosed'" # 12345
----| > "'onData'"   # 22222
-]]
-{
-    [1]  = {
-        type = 'emmyParam',
-        start  = 11,
-        finish = 68,
-        [1]  = {
-            type   = 'emmyName',
-            start  = 11,
-            finish = 15,
-            [1]    = 'event',
-        },
-        [2] = {
-            type   = 'emmyType',
-            start  = 17,
-            finish = 22,
-            [1]    = {
-                type   = 'emmyName',
-                start  = 17,
-                finish = 22,
-                [1]    = 'string',
-            },
-        },
-        [3] = {
-            type    = 'emmyEnum',
-            start   = 31,
-            finish  = 42,
-            comment = "12345",
-            [1]     = "'onClosed'",
-            [2]     = '"',
-        },
-        [4] = {
-            type    = 'emmyEnum',
-            start   = 59,
-            finish  = 68,
-            comment = "22222",
-            default = true,
-            [1]     = "'onData'",
-            [2]     = '"',
-        },
-    },
-}
-
-LuaDoc [[
----123
----| 456
----|  789
-]]
-{
-    [1] = {
-        type   = 'emmyComment',
-        [1]    = '123\n 456\n  789',
-    }
-}
-
-LuaDoc [[
----@return string {name = 'key'}
-]]
-{
-    [1] = {
-        type   = 'emmyReturn',
-        start  = 12,
-        finish = 17,
-        option = {
-            name = 'key'
-        },
-        [1]    = {
-            type   = 'emmyType',
-            start  = 12,
-            finish = 17,
-            [1] = {
-                type   = 'emmyName',
-                start  = 12,
-                finish = 17,
-                [1]    = 'string',
-            },
-        }
-    }
 }
 
 LuaDoc [[
