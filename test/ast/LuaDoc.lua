@@ -629,6 +629,7 @@ LuaDoc [[
     }
 }
 
+-- TODO 以后改为泛型实现
 LuaDoc [[
 ---@type table<key, value>
 ]]
