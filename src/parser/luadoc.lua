@@ -671,7 +671,10 @@ return function (_, state)
     table.sort(comments, function (a, b)
         return a.start < b.start
     end)
-    ast.docs = {}
+    ast.docs = {
+        type   = 'doc',
+        parent = ast,
+    }
 
     pushError = state.pushError
 
@@ -679,6 +682,7 @@ return function (_, state)
         local doc = buildLuaDoc(comment)
         if doc then
             ast.docs[#ast.docs+1] = doc
+            doc.parent = ast.docs
         end
     end
 end

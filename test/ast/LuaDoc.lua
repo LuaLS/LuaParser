@@ -2,10 +2,13 @@ LuaDoc [[
 ---@class Class
 ]]
 {
+    type   = 'doc',
+    parent = "<IGNORE>",
     [1] = {
         type   = 'doc.class',
         start  = 11,
         finish = 15,
+        parent = "<IGNORE>",
         class  = {
             type   = 'doc.class.name',
             start  = 11,
@@ -21,10 +24,13 @@ LuaDoc [[
 local x = 1
 ]]
 {
+    type   = 'doc',
+    parent = "<IGNORE>",
     [1] = {
         type   = 'doc.class',
         start  = 11,
         finish = 28,
+        parent = "<IGNORE>",
         class  = {
             type   = 'doc.class.name',
             start  = 11,
@@ -47,10 +53,13 @@ LuaDoc [[
 x = 1
 ]]
 {
+    type   = 'doc',
+    parent = "<IGNORE>",
     [1] = {
         type   = 'doc.type',
         start  = 10,
         finish = 13,
+        parent = "<IGNORE>",
         types  = {
             {
                 type   = 'doc.type.name',
@@ -69,10 +78,13 @@ LuaDoc [[
 x = 1
 ]]
 {
+    type   = 'doc',
+    parent = "<IGNORE>",
     [1] = {
         type   = 'doc.type',
         start  = 10,
         finish = 26,
+        parent = "<IGNORE>",
         types  = {
             {
                 type   = 'doc.type.name',
@@ -104,10 +116,13 @@ LuaDoc [[
 ---@type x | "'a'" | "'b'"
 ]]
 {
+    type   = 'doc',
+    parent = "<IGNORE>",
     [1] = {
         type   = 'doc.type',
         start  = 10,
         finish = 26,
+        parent = "<IGNORE>",
         types  = {
             {
                 type   = 'doc.type.name',
@@ -140,10 +155,13 @@ LuaDoc [[
 ---@type "'a'" | "'b'" | "'c'"
 ]]
 {
+    type   = 'doc',
+    parent = "<IGNORE>",
     [1] = {
         type   = 'doc.type',
         start  = 10,
         finish = 30,
+        parent = "<IGNORE>",
         types  = {},
         enums  = {
             {
@@ -176,10 +194,13 @@ LuaDoc [[
 x = 1
 ]]
 {
+    type   = 'doc',
+    parent = "<IGNORE>",
     [1] = {
         type   = 'doc.alias',
         start  = 11,
         finish = 26,
+        parent = "<IGNORE>",
         alias  = {
             type   = 'doc.alias.name',
             start  = 11,
@@ -210,10 +231,13 @@ LuaDoc [[
 ---@param a1 t1
 ]]
 {
+    type   = 'doc',
+    parent = "<IGNORE>",
     [1]  = {
         type   = 'doc.param',
         start  = 11,
         finish = 15,
+        parent = "<IGNORE>",
         param  = {
             type   = 'doc.param.name',
             start  = 11,
@@ -244,10 +268,13 @@ LuaDoc [[
 ---@return Type1|Type2|Type3
 ]]
 {
+    type   = 'doc',
+    parent = "<IGNORE>",
     [1] = {
         type    = 'doc.return',
         start   = 12,
         finish  = 28,
+        parent = "<IGNORE>",
         returns = {
             [1]  = {
                 type   = 'doc.type',
@@ -287,10 +314,13 @@ LuaDoc [[
 ---@return Type1,Type2,Type3
 ]]
 {
+    type   = 'doc',
+    parent = "<IGNORE>",
     [1] = {
         type = 'doc.return',
         start  = 12,
         finish = 28,
+        parent = "<IGNORE>",
         returns = {
             [1]  = {
                 type   = 'doc.type',
@@ -345,10 +375,13 @@ LuaDoc [[
 ---@field open function
 ]]
 {
+    type   = 'doc',
+    parent = "<IGNORE>",
     [1] = {
         type   = 'doc.field',
         start  = 11,
         finish = 23,
+        parent = "<IGNORE>",
         field  = {
             type   = 'doc.field.name',
             start  = 11,
@@ -379,10 +412,13 @@ LuaDoc [[
 ---@field private open function|string
 ]]
 {
+    type   = 'doc',
+    parent = "<IGNORE>",
     [1] = {
         type    = 'doc.field',
         start   = 11,
         finish  = 38,
+        parent  = "<IGNORE>",
         visible = 'private',
         field   = {
             type   = 'doc.field.name',
@@ -421,10 +457,13 @@ LuaDoc [[
 ---@generic T
 ]]
 {
+    type   = 'doc',
+    parent = "<IGNORE>",
     [1] = {
-        type = 'doc.generic',
+        type   = 'doc.generic',
         start  = 13,
         finish = 13,
+        parent = "<IGNORE>",
         generics = {
             {
                 type    = 'doc.generic.object',
@@ -447,10 +486,13 @@ LuaDoc [[
 ---@generic T : handle
 ]]
 {
+    type   = 'doc',
+    parent = "<IGNORE>",
     [1] = {
         type     = 'doc.generic',
         start    = 13,
         finish   = 22,
+        parent   = "<IGNORE>",
         generics = {
             [1]  = {
                 type    = 'doc.generic.object',
@@ -480,10 +522,13 @@ LuaDoc [[
 ---@generic T : handle, K : handle
 ]]
 {
+    type   = 'doc',
+    parent = "<IGNORE>",
     [1] = {
         type     = 'doc.generic',
         start    = 13,
         finish   = 34,
+        parent   = "<IGNORE>",
         generics = {
             [1]  = {
                 type    = 'doc.generic.object',
@@ -533,10 +578,13 @@ LuaDoc [[
 ---@vararg string
 ]]
 {
+    type   = 'doc',
+    parent = "<IGNORE>",
     [1] = {
         type   = 'doc.vararg',
         start  = 12,
         finish = 17,
+        parent = "<IGNORE>",
         vararg = {
             type   = 'doc.type',
             start  = 12,
@@ -560,10 +608,13 @@ LuaDoc [[
 ---@type Type[]
 ]]
 {
+    type   = 'doc',
+    parent = "<IGNORE>",
     [1] = {
         type   = 'doc.type',
         start  = 10,
         finish = 15,
+        parent = "<IGNORE>",
         types  = {
             [1]    = {
                 type   = 'doc.type.name',
@@ -582,10 +633,13 @@ LuaDoc [[
 ---@type table<key, value>
 ]]
 {
+    type   = 'doc',
+    parent = "<IGNORE>",
     [1] = {
         type   = 'doc.type',
         start  = 10,
         finish = 26,
+        parent = "<IGNORE>",
         types  = {
             [1] = {
                 type   = 'doc.type.table',
@@ -638,10 +692,13 @@ LuaDoc [[
 ---@type fun(key1:t1, key2:t2):t3
 ]]
 {
+    type   = 'doc',
+    parent = "<IGNORE>",
     [1] = {
         type   = 'doc.type',
         start  = 10,
         finish = 33,
+        parent = "<IGNORE>",
         types  = {
             [1] = {
                 type    = 'doc.type.function',
@@ -710,10 +767,13 @@ LuaDoc [[
 ---@param event string | "'onClosed'" | "'onData'"
 ]]
 {
+    type   = 'doc',
+    parent = "<IGNORE>",
     [1]  = {
         type   = 'doc.param',
         start  = 11,
         finish = 50,
+        parent = "<IGNORE>",
         param  = {
             type   = 'doc.param.name',
             start  = 11,
@@ -759,10 +819,13 @@ LuaDoc [[
 ---@overload fun(a:number):number
 ]]
 {
+    type   = 'doc',
+    parent = "<IGNORE>",
     [1] = {
         type     = "doc.overload",
         start    = 14,
         finish   = 33,
+        parent   = "<IGNORE>",
         overload = {
             type    = 'doc.type.function',
             start   = 14,
