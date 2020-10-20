@@ -228,6 +228,9 @@ local function nextSymbolOrError(symbol)
 end
 
 local function parseTypeUnitTable()
+    if not checkToken('symbol', '<', 1) then
+        return nil
+    end
     local typeUnit = {
         type   = 'doc.type.table',
         start  = getStart(),
@@ -323,7 +326,8 @@ local function parseTypeUnit(parent, content)
         typeUnit = parseTypeUnitTable()
     elseif content == 'fun' then
         typeUnit = parseTypeUnitFunction()
-    else
+    end
+    if not typeUnit then
         typeUnit = {
             type   = 'doc.type.name',
             start  = getStart(),
@@ -683,6 +687,12 @@ return function (_, state)
         if doc then
             ast.docs[#ast.docs+1] = doc
             doc.parent = ast.docs
+            if ast.start > doc.start then
+                ast.start = doc.start
+            end
+            if ast.finish < doc.finish then
+                ast.finish = doc.finish
+            end
         end
     end
 end
