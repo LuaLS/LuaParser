@@ -138,6 +138,9 @@ local function test(type)
                 error(('语法树生成失败：%s'):format(err))
             end
             parser:luadoc(state)
+            for _, doc in ipairs(state.ast.docs) do
+                doc.bind = nil
+            end
             local result = utility.dump(state.ast.docs, option)
             local expect = utility.dump(target_doc, option)
             if result ~= expect then

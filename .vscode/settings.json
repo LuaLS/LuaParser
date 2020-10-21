@@ -1,6 +1,7 @@
 {
     "Lua.diagnostics.globals": [
-        "root"
+        "root",
+        "log"
     ],
     "Lua.runtime.version": "Lua 5.4",
     "Lua.awakened.cat": true,
