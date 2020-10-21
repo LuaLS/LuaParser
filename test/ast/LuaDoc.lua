@@ -629,7 +629,6 @@ LuaDoc [[
     }
 }
 
--- TODO 以后改为泛型实现
 LuaDoc [[
 ---@type table<key, value>
 ]]
@@ -643,11 +642,13 @@ LuaDoc [[
         parent = "<IGNORE>",
         types  = {
             [1] = {
-                type   = 'doc.type.table',
-                start  = 10,
-                finish = 26,
-                parent = '<IGNORE>',
-                key    = {
+                type    = 'doc.type.name',
+                start   = 10,
+                finish  = 26,
+                generic = true,
+                parent  = '<IGNORE>',
+                [1]     = 'table',
+                key     = {
                     type   = 'doc.type',
                     start  = 16,
                     finish = 18,
