@@ -18,6 +18,12 @@ local assert       = assert
 local select       = select
 local osClock      = os.clock
 local DEVELOP      = _G.DEVELOP
+local log          = log
+local debug        = debug
+
+local function logWarn(...)
+    log.warn(...)
+end
 
 _ENV = nil
 
@@ -44,7 +50,7 @@ local breakBlockTypes = {
 }
 
 m.childMap = {
-    ['main']        = {'#'},
+    ['main']        = {'#', 'docs'},
     ['repeat']      = {'#', 'filter'},
     ['while']       = {'filter', '#'},
     ['in']          = {'keys', '#'},
@@ -75,7 +81,21 @@ m.childMap = {
     ['getfield']    = {'node', 'field'},
     ['list']        = {'#'},
     ['binary']      = {1, 2},
-    ['unary']       = {1}
+    ['unary']       = {1},
+
+    ['doc']                = {'#'},
+    ['doc.class']          = {'class', 'extends'},
+    ['doc.type']           = {'#types', '#enums'},
+    ['doc.alias']          = {'alias', 'extends'},
+    ['doc.param']          = {'param', 'extends'},
+    ['doc.return']         = {'#returns'},
+    ['doc.field']          = {'field', 'extends'},
+    ['doc.generic']        = {'#generics'},
+    ['doc.generic.object'] = {'generic', 'extends'},
+    ['doc.vararg']         = {'vararg'},
+    ['doc.type.table']     = {'key', 'value'},
+    ['doc.type.function']  = {'#args', '#returns'},
+    ['doc.overload']       = {'overload'},
 }
 
 m.actionMap = {
@@ -189,6 +209,18 @@ function m.getBreakBlock(obj)
         end
     end
     error('guide.getBreakBlock overstack')
+end
+
+--- 寻找doc的主体
+function m.getDocState(obj)
+    for _ = 1, 1000 do
+        local parent = obj.parent
+        if parent.type == 'doc' then
+            return obj
+        end
+        obj = parent
+    end
+    error('guide.getDocState overstack')
 end
 
 --- 寻找根区块
@@ -327,24 +359,70 @@ function m.getLabel(block, name)
     error('guide.getLocal overstack')
 end
 
+function m.getStartFinish(source)
+    local start  = source.start
+    local finish = source.finish
+    if not start then
+        local first = source[1]
+        if not first then
+            return nil, nil
+        end
+        local last  = source[#source]
+        start  = first.start
+        finish = last.finish
+    end
+    return start, finish
+end
+
+function m.getRange(source)
+    local start  = source.vstart or source.start
+    local finish = source.range  or source.finish
+    if not start then
+        local first = source[1]
+        if not first then
+            return nil, nil
+        end
+        local last  = source[#source]
+        start  = first.vstart or first.start
+        finish = last.range   or last.finish
+    end
+    return start, finish
+end
+
 --- 判断source是否包含offset
 function m.isContain(source, offset)
-    return source.start <= offset and source.finish >= offset - 1
+    local start, finish = m.getStartFinish(source)
+    if not start then
+        return false
+    end
+    return start <= offset and finish >= offset - 1
 end
 
 --- 判断offset在source的影响范围内
 ---
 --- 主要针对赋值等语句时，key包含value
 function m.isInRange(source, offset)
-    return (source.vstart or source.start) <= offset and (source.range or source.finish) >= offset - 1
+    local start, finish = m.getRange(source)
+    if not start then
+        return false
+    end
+    return start <= offset and finish >= offset - 1
 end
 
-function m.isBetween(source, start, finish)
-    return source.start <= finish and source.finish >= start - 1
+function m.isBetween(source, tStart, tFinish)
+    local start, finish = m.getStartFinish(source)
+    if not start then
+        return false
+    end
+    return start <= tFinish and finish >= tStart - 1
 end
 
-function m.isBetweenRange(source, start, finish)
-    return (source.vstart or source.start) <= finish and (source.range or source.finish) >= start - 1
+function m.isBetweenRange(source, tStart, tFinish)
+    local start, finish = m.getRange(source)
+    if not start then
+        return false
+    end
+    return start <= tFinish and finish >= tStart - 1
 end
 
 --- 添加child
@@ -357,8 +435,14 @@ function m.addChilds(list, obj, map)
                 for i = 1, #obj do
                     list[#list+1] = obj[i]
                 end
-            else
+            elseif obj[key] then
                 list[#list+1] = obj[key]
+            elseif type(key) == 'string'
+            and key:sub(1, 1) == '#' then
+                key = key:sub(2)
+                for i = 1, #obj[key] do
+                    list[#list+1] = obj[key][i]
+                end
             end
         end
     end
@@ -856,7 +940,28 @@ local function stepRefOfGlobal(obj, mode)
     return results
 end
 
-function m.getStepRef(obj, mode)
+local function stepRefOfDocType(status, obj, mode)
+    local results = {}
+    local name = obj[1]
+    if not name or not status.interface.docType then
+        return results
+    end
+    local docs = status.interface.docType(name)
+    for i = 1, #docs do
+        local doc = docs[i]
+        if mode == 'def' then
+            if doc.type == 'doc.class.name'
+            or doc.type == 'doc.alias.name' then
+                results[#results+1] = doc
+            end
+        else
+            results[#results+1] = doc
+        end
+    end
+    return results
+end
+
+function m.getStepRef(status, obj, mode)
     if obj.type == 'getlocal'
     or obj.type == 'setlocal' then
         return stepRefOfLocal(obj.node, mode)
@@ -876,6 +981,12 @@ function m.getStepRef(obj, mode)
     end
     if obj.type == 'library' then
         return { obj }
+    end
+    if obj.type == 'doc.class.name'
+    or obj.type == 'doc.type.name'
+    or obj.type == 'doc.extends.name'
+    or obj.type == 'doc.alias.name' then
+        return stepRefOfDocType(status, obj, mode)
     end
     return nil
 end
@@ -1074,6 +1185,10 @@ function m.isGlobal(source)
         end
     end
     return false
+end
+
+function m.isDoc(source)
+    return source.type:sub(1, 4) == 'doc.'
 end
 
 --- 根据函数的调用参数，获取：调用，参数索引
@@ -1283,6 +1398,46 @@ function m.checkSameSimpleInSpecialBranch(status, obj, start, queue)
     end
 end
 
+function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
+    if not obj.bindDocs then
+        return
+    end
+    if status.cache.searchingBindedDoc then
+        return
+    end
+    local results = {}
+    for _, doc in ipairs(obj.bindDocs) do
+        if     doc.type == 'doc.class' then
+            results = stepRefOfDocType(status, doc.class, mode)
+        elseif doc.type == 'doc.type' then
+            for _, piece in ipairs(doc.types) do
+                local pieceResult = stepRefOfDocType(status, piece, mode)
+                for _, res in ipairs(pieceResult) do
+                    results[#results+1] = res
+                end
+            end
+        end
+    end
+    local mark = {}
+    local newStatus = m.status(status)
+    newStatus.cache.searchingBindedDoc = true
+    for _, res in ipairs(results) do
+        local source = m.getDocState(res)
+        local ref = source.bind
+        if not mark[ref] then
+            mark[ref] = true
+            m.searchRefs(newStatus, ref, mode)
+        end
+    end
+    for _, res in ipairs(newStatus.results) do
+        queue[#queue+1] = {
+            obj   = res,
+            start = start,
+            force = true,
+        }
+    end
+end
+
 function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, queue)
     local args = obj.parent
     if not args or args.type ~= 'callargs' then
@@ -1407,6 +1562,9 @@ function m.checkSameSimpleInCallInSameFile(status, func, args, index)
 end
 
 function m.checkSameSimpleInCall(status, ref, start, queue, mode)
+    if status.simple then
+        return
+    end
     local func, args, index = m.getCallValue(ref)
     if not func then
         return
@@ -1414,6 +1572,11 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
     if m.checkCallMark(status, func.parent, true) then
         return
     end
+    status.cache.crossCallCount = status.cache.crossCallCount or 0
+    if status.cache.crossCallCount >= 5 then
+        return
+    end
+    status.cache.crossCallCount = status.cache.crossCallCount + 1
     -- 检查赋值是 semetatable() 的情况
     m.checkSameSimpleInValueOfSetMetaTable(status, func, start, queue)
     -- 检查赋值是 func() 的情况
@@ -1437,6 +1600,7 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
             force = true,
         }
     end
+    status.cache.crossCallCount = status.cache.crossCallCount - 1
     for _, obj in ipairs(newStatus.results) do
         queue[#queue+1] = {
             obj   = obj,
@@ -1533,6 +1697,7 @@ function m.searchSameFieldsInValue(status, ref, start, queue, mode)
     }
     -- 检查形如 a = f() 的分支情况
     m.checkSameSimpleInCall(status, value, start, queue, mode)
+
     -- 检查自己是字面量表的情况
     --m.checkSameSimpleInValueOfTable(status, value, start, queue)
 end
@@ -1751,8 +1916,10 @@ function m.checkSameSimple(status, simple, data, mode, results, queue)
         m.checkSameSimpleInArg1OfSetMetaTable(status, ref, i, queue)
         -- 检查自己作为 setmetatable 调用的情况
         m.checkSameSimpleInValueOfCallMetaTable(status, ref, i, queue)
-        -- 检查自己是特殊分支的情况
+        -- 检查自己是特殊变量的分支的情况
         m.checkSameSimpleInSpecialBranch(status, ref, i, queue)
+        -- 检查 doc
+        m.checkSameSimpleByBindDocs(status, ref, i, queue, cmode)
         if cmode == 'ref' and not status.simple then
             -- 检查形如 { a = f } 的情况
             m.checkSameSimpleAsTableField(status, ref, i, queue)
@@ -2013,8 +2180,6 @@ function m.getRefCache(status, obj, mode)
 end
 
 function m.searchRefs(status, obj, mode)
-    status.depth = status.depth + 1
-
     local cache, makeCache = m.getRefCache(status, obj, mode)
     if cache then
         for i = 1, #cache do
@@ -2023,8 +2188,9 @@ function m.searchRefs(status, obj, mode)
         return
     end
 
+    status.depth = status.depth + 1
     -- 检查单步引用
-    local res = m.getStepRef(obj, mode)
+    local res = m.getStepRef(status, obj, mode)
     if res then
         for i = 1, #res do
             status.results[#status.results+1] = res[i]
@@ -2036,8 +2202,13 @@ function m.searchRefs(status, obj, mode)
         if simple then
             m.searchSameFields(status, simple, mode)
         end
-    elseif m.debugMode then
-        error('stack overflow')
+    else
+        if m.debugMode then
+            error('status.depth overflow')
+        elseif DEVELOP then
+            --log.warn(debug.traceback('status.depth overflow'))
+            logWarn('status.depth overflow')
+        end
     end
 
     status.depth = status.depth - 1
@@ -2293,6 +2464,49 @@ function m.inferCheckLibrary(status, source)
         source = source,
     }
     return true
+end
+
+local function getDocTypeUnitName(unit)
+    local typeName
+    if unit.type == 'doc.type.name' then
+        typeName = unit[1]
+    elseif unit.type == 'doc.type.function' then
+        typeName = 'function'
+    end
+    if unit.array then
+        typeName = typeName .. '[]'
+    end
+    return typeName
+end
+
+function m.inferByDoc(status, source)
+    local binds = source.bindDocs
+    if not binds then
+        return
+    end
+    status.results = {}
+    for _, doc in ipairs(binds) do
+        if doc.type == 'doc.class' then
+            status.results[#status.results+1] = {
+                type   = doc.class[1],
+                source = doc,
+            }
+        elseif doc.type == 'doc.type' then
+            for _, unit in ipairs(doc.types) do
+                local typeName = getDocTypeUnitName(unit)
+                status.results[#status.results+1] = {
+                    type   = typeName,
+                    source = doc,
+                }
+            end
+            for _, enum in ipairs(doc.enums) do
+                status.results[#status.results+1] = {
+                    type   = enum[1],
+                    source = doc,
+                }
+            end
+        end
+    end
 end
 
 function m.inferCheckUnary(status, source)
@@ -2983,7 +3197,8 @@ function m.searchInfer(status, obj)
         status.cache.clock = status.cache.clock or osClock()
     end
 
-    local checked = m.inferCheckLibrary(status, obj)
+    local checked = m.inferByDoc(status, obj)
+                 or m.inferCheckLibrary(status, obj)
                  or m.inferCheckLiteral(status, obj)
                  or m.inferCheckUnary(status, obj)
                  or m.inferCheckBinary(status, obj)
