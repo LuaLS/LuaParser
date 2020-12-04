@@ -61,3 +61,10 @@ CHECK'0X1.921FB54442D18P+1'
     finish = 20,
     [1]    = 0x1.921fb54442d18p+1,
 }
+CHECK'-345'
+{
+    type   = "number",
+    start  = 1,
+    finish = 4,
+    [1]    = -345,
+}

@@ -203,22 +203,11 @@ CHECK'1 ^ -2'
         [1]    = 1,
     },
     [2]    = {
-        type   = "unary",
+        type   = "number",
         start  = 5,
         finish = 6,
         parent = "<IGNORE>",
-        op     = {
-            type   = "-",
-            start  = 5,
-            finish = 5,
-        },
-        [1]    = {
-            type   = "number",
-            start  = 6,
-            finish = 6,
-            parent = "<IGNORE>",
-            [1]    = 2,
-        },
+        [1]    = -2,
     },
 }
 CHECK'...'

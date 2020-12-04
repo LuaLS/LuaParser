@@ -258,7 +258,7 @@ StringClose <-  ']' =eq ']'
 ]]
 
 grammar 'Number' [[
-Number      <-  Sp ({} {NumberDef} {}) -> Number
+Number      <-  Sp ({} {'-'? NumberDef} {}) -> Number
                 NumberSuffix?
                 ErrNumber?
 NumberDef   <-  Number16 / Number10
