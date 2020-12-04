@@ -87,10 +87,7 @@ TEST[[
 <!？？？!>
 ]]
 {
-    type = 'UNKNOWN_SYMBOL',
-    info = {
-        symbol = '？？？',
-    }
+    type = 'UNICODE_NAME',
 }
 
 TEST[[

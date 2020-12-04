@@ -534,6 +534,9 @@ return function (self, lua, mode)
         local err = errorpos(pos)
         return nil, err
     end
+    if type(r) ~= 'table' then
+        return nil
+    end
 
     return r
 end

@@ -56,7 +56,7 @@ for i, v in ipairs(sortList) do
     sortList[v] = i
 end
 local ignoreList = {
-    'specials', 'locals', 'ref', 'node', 'parent', 'extParent', 'returns',
+    'specials', 'locals', 'ref', 'node', 'parent', 'extParent', 'returns', 'state',
 }
 
 local option = {
@@ -120,6 +120,7 @@ local function test(type)
             if not state then
                 error(('语法树生成失败：%s'):format(err))
             end
+            state.ast.state = nil
             local result = utility.dump(state.ast, option)
             local expect = utility.dump(target_ast, option)
             if result ~= expect then
@@ -139,8 +140,10 @@ local function test(type)
             end
             parser:luadoc(state)
             for _, doc in ipairs(state.ast.docs) do
-                doc.bind = nil
+                doc.bindGroup = nil
+                doc.bindSources = nil
             end
+            state.ast.docs.groups = nil
             local result = utility.dump(state.ast.docs, option)
             local expect = utility.dump(target_doc, option)
             if result ~= expect then
@@ -163,4 +166,4 @@ test 'Exp'
 test 'Action'
 test 'Lua'
 test 'Dirty'
-test 'LuaDoc'
+--test 'LuaDoc'

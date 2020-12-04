@@ -263,15 +263,3 @@ TEST [[
 a.<!b!>.c = 1
 print(a.<?b?>.c)
 ]]
-
---TEST [[
------@class <!Class!>
------@type <?Class?>
------@type <!Class!>
---]]
---
---TEST [[
------@class <?Class?>
------@type <!Class!>
------@type <!Class!>
---]]
