@@ -212,6 +212,15 @@ local vmMap = {
             if node then
                 addRef(node, obj)
             end
+            local name = obj[1]
+            if specials[name] then
+                addSpecial(name, obj)
+            elseif Options and Options.special then
+                local asName = Options.special[name]
+                if specials[asName] then
+                    addSpecial(asName, obj)
+                end
+            end
         end
     end,
     ['local'] = function (obj)
@@ -524,7 +533,7 @@ local function PostCompile()
 end
 
 return function (self, lua, mode, version, options)
-    local state, err = self:parse(lua, mode, version)
+    local state, err = self:parse(lua, mode, version, options)
     if not state then
         return nil, err
     end
@@ -539,6 +548,7 @@ return function (self, lua, mode, version, options)
     LocalCount = 0
     Version = version
     Root = state.ast
+    Root.state = state
     Options = options
     state.ENVMode = ENVMode
     if type(state.ast) == 'table' then
