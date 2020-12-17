@@ -713,3 +713,28 @@ call(,-,not,1)
         },
     },
 }
+
+CHECK [[
+{
+    ;,-;,1
+}
+]]
+{
+    type   = "main",
+    start  = 1,
+    finish = 14,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "table",
+        start  = 1,
+        finish = 14,
+        parent = "<IGNORE>",
+        [1]    = {
+            type   = "number",
+            start  = 12,
+            finish = 12,
+            parent = "<IGNORE>",
+            [1]    = 1,
+        },
+    },
+}

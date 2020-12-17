@@ -365,7 +365,7 @@ TableField  <-  COMMA
             /   SEMICOLON
             /   NewIndex
             /   NewField
-            /   Exp
+            /   Exp->NoNil
 Index       <-  BL DirtyExp DirtyBR
 NewIndex    <-  Sp ({} Index NeedAssign DirtyExp {})
             ->  NewIndex
@@ -434,7 +434,7 @@ Break       <-  Sp ({} BREAK {})
 Return      <-  Sp ({} RETURN ReturnExpList {})
             ->  Return
 ReturnExpList 
-            <-  Sp {| Exp (Sp ',' MaybeExp)* |}
+            <-  Sp {| Exp->NoNil (Sp ',' MaybeExp)* |}
             /   Sp {| !Exp !',' |}
             /   ExpList
 
