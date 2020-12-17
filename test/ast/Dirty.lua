@@ -635,26 +635,51 @@ return
 }
 
 CHECK [[
-return
+return;
 ::::
-return
+return;
 ]]
 {
     type    = "main",
     start   = 1,
-    finish  = 19,
+    finish  = 20,
     locals  = "<IGNORE>",
     returns = "<IGNORE>",
     [1]     = {
         type   = "return",
         start  = 1,
-        finish = 7,
+        finish = 6,
         parent = "<IGNORE>",
     },
     [2]     = {
         type   = "return",
-        start  = 13,
+        start  = 14,
         finish = 19,
+        parent = "<IGNORE>",
+    },
+}
+
+CHECK [[
+return;
+goto;
+return;
+]]
+{
+    type    = "main",
+    start   = 1,
+    finish  = 21,
+    locals  = "<IGNORE>",
+    returns = "<IGNORE>",
+    [1]     = {
+        type   = "return",
+        start  = 1,
+        finish = 6,
+        parent = "<IGNORE>",
+    },
+    [2]     = {
+        type   = "return",
+        start  = 15,
+        finish = 20,
         parent = "<IGNORE>",
     },
 }
