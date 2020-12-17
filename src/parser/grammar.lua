@@ -58,6 +58,12 @@ end
 defs.None = function () end
 defs.np = m.Cp() / function (n) return n+1 end
 defs.NameBody = m.R('az', 'AZ', '__', '\x80\xff') * m.R('09', 'az', 'AZ', '__', '\x80\xff')^0
+defs.NoNil = function (o)
+    if o == nil then
+        return
+    end
+    return o
+end
 
 m.setmaxstack(1000)
 
@@ -321,7 +327,7 @@ Single      <-  FreeName
 Suffix      <-  SuffixWithoutCall
             /   ({} PL SuffixCall DirtyPR {})
             ->  Call
-SuffixCall  <-  Sp ({} {| (COMMA / Exp)+ |} {})
+SuffixCall  <-  Sp ({} {| (COMMA / Exp->NoNil)+ |} {})
             ->  PackExpList
             /   %nil
 SuffixWithoutCall
@@ -461,7 +467,7 @@ LoopBody    <-  FOR LoopArgs NeedDo
                     {} {| (!END Action)* |}
                 NeedEnd
 LoopArgs    <-  MustName AssignOrEQ
-                ({} {| (COMMA / !DO !END Exp)* |} {})
+                ({} {| (COMMA / !DO !END Exp->NoNil)* |} {})
             ->  PackLoopArgs
 
 In          <-  InBody
@@ -469,9 +475,9 @@ In          <-  InBody
 InBody      <-  FOR InNameList NeedIn InExpList NeedDo
                     {} {| (!END Action)* |}
                 NeedEnd
-InNameList  <-  ({} {| (COMMA / !IN !DO !END Name)* |} {})
+InNameList  <-  ({} {| (COMMA / !IN !DO !END Name->NoNil)* |} {})
             ->  PackInNameList
-InExpList   <-  ({} {| (COMMA / !DO !DO !END Exp)*  |} {})
+InExpList   <-  ({} {| (COMMA / !DO !DO !END Exp->NoNil)*  |} {})
             ->  PackInExpList
 
 While       <-  WhileBody

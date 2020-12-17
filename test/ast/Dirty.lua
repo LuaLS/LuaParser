@@ -683,3 +683,33 @@ return;
         parent = "<IGNORE>",
     },
 }
+
+CHECK [[
+call(,-,not,1)
+]]
+{
+    type   = "main",
+    start  = 1,
+    finish = 14,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "call",
+        start  = 1,
+        finish = 14,
+        parent = "<IGNORE>",
+        node   = "<IGNORE>",
+        args   = {
+            type   = "callargs",
+            start  = 5,
+            finish = 14,
+            parent = "<IGNORE>",
+            [1]    = {
+                type   = "number",
+                start  = 13,
+                finish = 13,
+                parent = "<IGNORE>",
+                [1]    = 1,
+            },
+        },
+    },
+}
