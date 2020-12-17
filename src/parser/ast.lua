@@ -1197,7 +1197,7 @@ local Defs = {
             return
         end
         if not name then
-            return nil
+            return
         end
         name.type = 'label'
         return name

@@ -633,3 +633,28 @@ return
         parent = "<IGNORE>",
     },
 }
+
+CHECK [[
+return
+::::
+return
+]]
+{
+    type    = "main",
+    start   = 1,
+    finish  = 19,
+    locals  = "<IGNORE>",
+    returns = "<IGNORE>",
+    [1]     = {
+        type   = "return",
+        start  = 1,
+        finish = 7,
+        parent = "<IGNORE>",
+    },
+    [2]     = {
+        type   = "return",
+        start  = 13,
+        finish = 19,
+        parent = "<IGNORE>",
+    },
+}
