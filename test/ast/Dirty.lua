@@ -738,3 +738,37 @@ CHECK [[
         },
     },
 }
+
+CHECK [[
+local a,b,,d
+]]
+{
+    type   = "main",
+    start  = 1,
+    finish = 12,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "local",
+        start  = 7,
+        finish = 7,
+        effect = 13,
+        parent = "<IGNORE>",
+        [1]    = "a",
+    },
+    [2]    = {
+        type   = "local",
+        start  = 9,
+        finish = 9,
+        effect = 13,
+        parent = "<IGNORE>",
+        [1]    = "b",
+    },
+    [3]    = {
+        type   = "local",
+        start  = 12,
+        finish = 12,
+        effect = 13,
+        parent = "<IGNORE>",
+        [1]    = "d",
+    },
+}
