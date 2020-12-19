@@ -568,6 +568,108 @@ CHECK'1 .. 2 .. 3'
         },
     },
 }
+CHECK'1 + - - - - - - - 1'
+{
+    type   = "binary",
+    start  = 1,
+    finish = 19,
+    op     = {
+        type   = "+",
+        start  = 3,
+        finish = 3,
+    },
+    [1]    = {
+        type   = "number",
+        start  = 1,
+        finish = 1,
+        parent = "<IGNORE>",
+        [1]    = 1,
+    },
+    [2]    = {
+        type   = "unary",
+        start  = 5,
+        finish = 19,
+        parent = "<IGNORE>",
+        op     = {
+            type   = "-",
+            start  = 5,
+            finish = 5,
+        },
+        [1]    = {
+            type   = "unary",
+            start  = 7,
+            finish = 19,
+            parent = "<IGNORE>",
+            op     = {
+                type   = "-",
+                start  = 7,
+                finish = 7,
+            },
+            [1]    = {
+                type   = "unary",
+                start  = 9,
+                finish = 19,
+                parent = "<IGNORE>",
+                op     = {
+                    type   = "-",
+                    start  = 9,
+                    finish = 9,
+                },
+                [1]    = {
+                    type   = "unary",
+                    start  = 11,
+                    finish = 19,
+                    parent = "<IGNORE>",
+                    op     = {
+                        type   = "-",
+                        start  = 11,
+                        finish = 11,
+                    },
+                    [1]    = {
+                        type   = "unary",
+                        start  = 13,
+                        finish = 19,
+                        parent = "<IGNORE>",
+                        op     = {
+                            type   = "-",
+                            start  = 13,
+                            finish = 13,
+                        },
+                        [1]    = {
+                            type   = "unary",
+                            start  = 15,
+                            finish = 19,
+                            parent = "<IGNORE>",
+                            op     = {
+                                type   = "-",
+                                start  = 15,
+                                finish = 15,
+                            },
+                            [1]    = {
+                                type   = "unary",
+                                start  = 17,
+                                finish = 19,
+                                parent = "<IGNORE>",
+                                op     = {
+                                    type   = "-",
+                                    start  = 17,
+                                    finish = 17,
+                                },
+                                [1]    = {
+                                    type   = "number",
+                                    start  = 19,
+                                    finish = 19,
+                                    parent = "<IGNORE>",
+                                    [1]    = 1,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+}
 CHECK'(1)'
 {
     type   = "paren",
