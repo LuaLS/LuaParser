@@ -1248,31 +1248,43 @@ local test = <!function!> ( a , b , c , ... )
 }
 
 TEST[[
-a = 3 <!/!> / 2
+a = 3 / <!/!> 2
 ]]
 {
-    type = 'MISS_EXP',
+    type = 'UNEXPECT_SYMBOL',
+    info = {
+        symbol = '/',
+    },
 }
 
 TEST[[
-b = 1 <!&!>& 1
+b = 1 &<!&!> 1
 ]]
 {
-    type = 'MISS_EXP',
+    type = 'UNEXPECT_SYMBOL',
+    info = {
+        symbol = '&',
+    },
 }
 
 TEST[[
-b = 1 <!<!>> 0
+b = 1 <<!>!> 0
 ]]
 {
-    type = 'MISS_EXP',
+    type = 'UNEXPECT_SYMBOL',
+    info = {
+        symbol = '>',
+    },
 }
 
 TEST[[
-b = 1 <!<!> < 0
+b = 1 < <!<!> 0
 ]]
 {
-    type = 'MISS_EXP',
+    type = 'UNEXPECT_SYMBOL',
+    info = {
+        symbol = '<',
+    },
 }
 
 TEST[[

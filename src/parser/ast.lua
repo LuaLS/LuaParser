@@ -792,6 +792,10 @@ local Defs = {
         return final
     end,
     ExpUnit = function (_, pos, exp)
+        -- 如果第一个符号是 '//'，则拒绝继续匹配
+        if not State.IsInExpList and exp.type == '//' then
+            return false
+        end
         -- 如果连续2个都不是符号，则拒绝继续匹配
         if UnaryOps[exp.type] or BinaryOps[exp.type] then
             State.IsLastExpUnit = false
@@ -801,10 +805,12 @@ local Defs = {
             end
             State.IsLastExpUnit = true
         end
+        State.IsInExpList = true
         return pos, exp
     end,
     ExpFinish = function (_, _, ...)
         State.IsLastExpUnit = false
+        State.IsInExpList = false
         return true, ...
     end,
     Exp = function (first, ...)
@@ -871,7 +877,7 @@ local Defs = {
                             start  = obj.start,
                             finish = obj.finish,
                             info = {
-                                symbol = obj[1],
+                                symbol = obj.type,
                             }
                         }
                         goto CONTINUE
@@ -882,7 +888,7 @@ local Defs = {
                         start  = obj.start,
                         finish = obj.finish,
                         info = {
-                            symbol = obj[1],
+                            symbol = obj.type,
                         }
                     }
                     goto CONTINUE
@@ -924,9 +930,15 @@ local Defs = {
                 local lastUn = stacks[#stacks]
                 if lastUn and lastUn.type == 'unary' then
                     stacks[#stacks] = nil
-                    lastUn[1]     = obj
-                    lastUn.finish = obj.finish
-                    obj           = lastUn
+                    if  lastUn.op.type == '-'
+                    and obj.type == 'number' then
+                        obj[1]    = - obj[1]
+                        obj.start = lastUn.start
+                    else
+                        lastUn[1]     = obj
+                        lastUn.finish = obj.finish
+                        obj           = lastUn
+                    end
                 else
                     break
                 end
