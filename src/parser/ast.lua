@@ -833,7 +833,7 @@ local Defs = {
         -- ((1 + 2) + ((#(#(#3))) * 4)) + (5 ^ (6 ^ 7))
         -- (((1 + 2) + ((#(#(#3))) * 4)) + (5 ^ (6 ^ 7)))
 
-        local list  = {first, ...}
+        local list   = {first, ...}
         local stacks = {}
         for i = 1, #list do
             local obj = list[i]
@@ -843,10 +843,36 @@ local Defs = {
                     type   = 'unary',
                     op     = obj,
                     start  = obj.start,
+                    finish = obj.finish,
                 }
                 goto CONTINUE
             end
             if BinaryOps[obj.type] then
+                local last = stacks[#stacks]
+                if last then
+                    if (last.type == 'unary'  and not last[1])
+                    or (last.type == 'binary' and not last[2]) then
+                        PushError {
+                            type   = 'UNEXPECT_SYMBOL',
+                            start  = obj.start,
+                            finish = obj.finish,
+                            info = {
+                                symbol = obj[1],
+                            }
+                        }
+                        goto CONTINUE
+                    end
+                else
+                    PushError {
+                        type   = 'UNEXPECT_SYMBOL',
+                        start  = obj.start,
+                        finish = obj.finish,
+                        info = {
+                            symbol = obj[1],
+                        }
+                    }
+                    goto CONTINUE
+                end
                 checkOpVersion(obj)
                 -- 向前搜索 binary 符号，递归从左向右合并为 binary 表达式
                 for _ = 1, 10000 do
@@ -874,6 +900,7 @@ local Defs = {
                     type   = 'binary',
                     op     = obj,
                     start  = lastExp.start,
+                    finish = obj.finish,
                     [1]    = lastExp,
                 }
                 goto CONTINUE
@@ -894,11 +921,26 @@ local Defs = {
             ::CONTINUE::
         end
         -- 最后，从右向左合并 binary 表达式
-        for i = #stacks - 1, 1, -1 do
+        for i = #stacks, 1, -1 do
+            if i == #stacks then
+                local exp = stacks[i]
+                if exp.type == 'binary' then
+                    PushError {
+                        type   = 'MISS_EXP',
+                        start  = exp.finish,
+                        finish = exp.finish,
+                    }
+                else
+                    goto CONTINUE
+                end
+            end
             local bin   = stacks[i]
             local right = stacks[i+1]
-            bin[2]      = right
-            bin.finish  = right.finish
+            if right then
+                bin[2]      = right
+                bin.finish  = right.finish
+            end
+            ::CONTINUE::
         end
         return stacks[1]
     end,
