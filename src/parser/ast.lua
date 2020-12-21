@@ -7,6 +7,7 @@ local tableRemove = table.remove
 local pairs       = pairs
 local tableSort   = table.sort
 local print       = print
+local select      = select
 
 _ENV = nil
 
@@ -14,6 +15,8 @@ local State
 local PushError
 local PushDiag
 local PushComment
+local ExpStack = {}
+local ExpSize  = 0
 
 -- goto 单独处理
 local RESERVED = {
@@ -840,14 +843,17 @@ local Defs = {
         -- ((1 + 2) + ((#(#(#3))) * 4)) + (5 ^ (6 ^ 7))
         -- (((1 + 2) + ((#(#(#3))) * 4)) + (5 ^ (6 ^ 7)))
 
-        local list   = {first, ...}
-        local stacks = {}
-        for i = 1, #list do
-            local obj = list[i]
+        local len = select('#', ...)
+        ExpSize = 0
+        for i = 0, len do
+            local obj = first
+            if i > 0 then
+                obj = select(i, ...)
+            end
             if UnaryOps[obj.type] then
                 if obj.type == '-'
                 or obj.type == '~' then
-                    local last = stacks[#stacks]
+                    local last = ExpStack[ExpSize]
                     if last then
                         if  last.type ~= 'unary'
                         and last.type ~= 'binary' then
@@ -860,7 +866,8 @@ local Defs = {
                     end
                 end
                 checkOpVersion(obj)
-                stacks[#stacks+1] =  {
+                ExpSize = ExpSize + 1
+                ExpStack[ExpSize] =  {
                     type   = 'unary',
                     op     = obj,
                     start  = obj.start,
@@ -869,7 +876,7 @@ local Defs = {
                 goto CONTINUE
             end
             if BinaryOps[obj.type] then
-                local last = stacks[#stacks]
+                local last = ExpStack[ExpSize]
                 if last then
                     if (last.type == 'unary'  and not last[1])
                     or (last.type == 'binary' and not last[2]) then
@@ -897,7 +904,7 @@ local Defs = {
                 checkOpVersion(obj)
                 -- 向前搜索 binary 符号，递归从左向右合并为 binary 表达式
                 for _ = 1, 10000 do
-                    local lastBin = stacks[#stacks-1]
+                    local lastBin = ExpStack[ExpSize-1]
                     if lastBin and lastBin.type == 'binary' then
                         local level1 = BinaryLevel[lastBin.op.type]
                         local level2 = BinaryLevel[obj.type]
@@ -907,17 +914,16 @@ local Defs = {
                         if level1 == level2 and not BinaryForward[level1] then
                             break
                         end
-                        local lastExp   = stacks[#stacks]
-                        stacks[#stacks] = nil
+                        local lastExp   = ExpStack[ExpSize]
+                        ExpSize         = ExpSize - 1
                         lastBin[2]      = lastExp
                         lastBin.finish  = lastExp.finish
                     else
                         break
                     end
                 end
-                local lastExp     = stacks[#stacks]
-                stacks[#stacks]   = nil
-                stacks[#stacks+1] = {
+                local lastExp     = ExpStack[ExpSize]
+                ExpStack[ExpSize] = {
                     type   = 'binary',
                     op     = obj,
                     start  = lastExp.start,
@@ -928,9 +934,9 @@ local Defs = {
             end
             -- 向前搜索 unary 符号，递归合并为 unary 表达式
             for _ = 1, 10000 do
-                local lastUn = stacks[#stacks]
+                local lastUn = ExpStack[ExpSize]
                 if lastUn and lastUn.type == 'unary' then
-                    stacks[#stacks] = nil
+                    ExpSize = ExpSize - 1
                     if  lastUn.op.type == '-'
                     and obj.type == 'number' then
                         obj[1]    = - obj[1]
@@ -944,13 +950,14 @@ local Defs = {
                     break
                 end
             end
-            stacks[#stacks+1] = obj
+            ExpSize = ExpSize + 1
+            ExpStack[ExpSize] = obj
             ::CONTINUE::
         end
         -- 最后，从右向左合并 binary 表达式
-        for i = #stacks, 1, -1 do
-            if i == #stacks then
-                local exp = stacks[i]
+        for i = ExpSize, 1, -1 do
+            if i == ExpSize then
+                local exp = ExpStack[i]
                 if (exp.type == 'binary' and not exp[2])
                 or (exp.type == 'unary'  and not exp[1]) then
                     PushError {
@@ -962,15 +969,15 @@ local Defs = {
                     goto CONTINUE
                 end
             end
-            local bin   = stacks[i]
-            local right = stacks[i+1]
-            if right then
+            local bin   = ExpStack[i]
+            if i < ExpSize then
+                local right = ExpStack[i+1]
                 bin[2]      = right
                 bin.finish  = right.finish
             end
             ::CONTINUE::
         end
-        return stacks[1]
+        return ExpStack[1]
     end,
     Paren = function (start, exp, finish)
         if exp and exp.type == 'paren' then
