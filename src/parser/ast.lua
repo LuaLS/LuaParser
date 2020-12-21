@@ -833,7 +833,7 @@ local Defs = {
             if BinaryOps[obj.type] then
                 checkOpVersion(obj)
                 -- 向前搜索 binary 符号，递归从左向右合并为 binary 表达式
-                while true do
+                for _ = 1, 10000 do
                     local lastBin = stacks[#stacks-1]
                     if lastBin and lastBin.type == 'binary' then
                         local level1 = BinaryLevel[lastBin.op.type]
@@ -844,10 +844,10 @@ local Defs = {
                         if level1 == level2 and not BinaryForward[level1] then
                             break
                         end
-                        local lastExp  = stacks[#stacks]
-                        list[#list]  = nil
-                        lastBin[2]     = lastExp
-                        lastBin.finish = lastExp.finish
+                        local lastExp   = stacks[#stacks]
+                        stacks[#stacks] = nil
+                        lastBin[2]      = lastExp
+                        lastBin.finish  = lastExp.finish
                     else
                         break
                     end
@@ -863,7 +863,7 @@ local Defs = {
                 goto CONTINUE
             end
             -- 向前搜索 unary 符号，递归合并为 unary 表达式
-            while true do
+            for _ = 1, 10000 do
                 local lastUn = stacks[#stacks]
                 if lastUn and lastUn.type == 'unary' then
                     stacks[#stacks] = nil
