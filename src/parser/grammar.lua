@@ -301,9 +301,7 @@ DirtyName   <-  {} -> DirtyName
 ]]
 
 grammar 'Exp' [[
-Exp         <-  ((ExpUnit BinaryOp / UnaryOp / BinaryOp)* ExpUnit)
-            ->  Exp
-            /   (UnaryOp / BinaryOp)+
+Exp         <-  ((ExpUnit / UnaryOp ExpUnit?) (BinaryOp ExpUnit? / UnaryOp ExpUnit?)*)
             ->  Exp
 ExpUnit     <-  Nil
             /   Boolean
