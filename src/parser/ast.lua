@@ -233,6 +233,37 @@ local BinaryForward = {
     [11]  = false,
 }
 
+local UnaryOps = {
+    ['not'] = true,
+    ['#']   = true,
+    ['-']   = true,
+    ['~']   = true,
+}
+
+local BinaryOps = {
+    ['or']  = true,
+    ['and'] = true,
+    ['<=']  = true,
+    ['>=']  = true,
+    ['<']   = true,
+    ['>']   = true,
+    ['~=']  = true,
+    ['==']  = true,
+    ['|']   = true,
+    ['~']   = true,
+    ['&']   = true,
+    ['<<']  = true,
+    ['>>']  = true,
+    ['..']  = true,
+    ['+']   = true,
+    ['-']   = true,
+    ['*']   = true,
+    ['//']  = true,
+    ['/']   = true,
+    ['%']   = true,
+    ['^']   = true,
+}
+
 local Defs = {
     Nil = function (pos)
         return {
@@ -759,6 +790,101 @@ local Defs = {
             checkOpVersion(op)
         end
         return final
+    end,
+    Exp = function (first, ...)
+        -- 对只有一个exp的情况进行特殊判断
+        if not ... then
+            local isExp = not UnaryOps[first.type]
+                      and not BinaryOps[first.type]
+            if isExp then
+                return first
+            end
+        end
+
+        -- 表达式：1 + 2 + ###3 * 4 + 5 ^ 6 ^ 7
+        -- 1 + 2
+        -- (1 + 2) +
+        -- (1 + 2) + ###3
+        -- (1 + 2) + (#(#(#3)))
+        -- (1 + 2) + (#(#(#3))) * 4
+        -- (1 + 2) + ((#(#(#3))) * 4) +
+        -- ((1 + 2) + ((#(#(#3))) * 4)) +
+        -- ((1 + 2) + ((#(#(#3))) * 4)) + 5
+        -- ((1 + 2) + ((#(#(#3))) * 4)) + 5 ^
+        -- ((1 + 2) + ((#(#(#3))) * 4)) + 5 ^ 6
+        -- ((1 + 2) + ((#(#(#3))) * 4)) + 5 ^ 6 ^ 7
+        -- ((1 + 2) + ((#(#(#3))) * 4)) + 5 ^ (6 ^ 7)
+        -- ((1 + 2) + ((#(#(#3))) * 4)) + (5 ^ (6 ^ 7))
+        -- (((1 + 2) + ((#(#(#3))) * 4)) + (5 ^ (6 ^ 7)))
+
+        local stack  = {first, ...}
+        local stacks = {}
+        for i = 1, #stack do
+            local obj = stack[i]
+            if UnaryOps[obj.type] then
+                checkOpVersion(obj)
+                stacks[#stacks+1] =  {
+                    type   = 'unary',
+                    op     = obj,
+                    start  = obj.start,
+                }
+                goto CONTINUE
+            end
+            if BinaryOps[obj.type] then
+                checkOpVersion(obj)
+                -- 向前搜索 binary 符号，递归从左向右合并为 binary 表达式
+                while true do
+                    local lastBin = stacks[#stacks-1]
+                    if lastBin and BinaryOps[lastBin.type] then
+                        local level1 = BinaryLevel[lastBin.type]
+                        local level2 = BinaryLevel[obj.type]
+                        if level1 < level2 then
+                            break
+                        end
+                        if level1 == level2 and not BinaryForward(level1) then
+                            break
+                        end
+                        local lastExp  = stacks[#stacks]
+                        stack[#stack]  = nil
+                        lastBin[2]     = lastExp
+                        lastBin.finish = lastExp.finish
+                    else
+                        break
+                    end
+                end
+                local lastExp     = stacks[#stacks]
+                stacks[#stacks]   = nil
+                stacks[#stacks+1] = {
+                    type   = 'binary',
+                    op     = obj,
+                    start  = lastExp.start,
+                    [1]    = lastExp,
+                }
+                goto CONTINUE
+            end
+            -- 向前搜索 unary 符号，递归合并为 unary 表达式
+            while true do
+                local lastUn = stack[#stack]
+                if lastUn and UnaryOps[lastUn.type] then
+                    stack[#stack] = nil
+                    lastUn[1]     = obj
+                    lastUn.finish = obj.finish
+                    obj           = lastUn
+                else
+                    break
+                end
+            end
+            stacks[#stacks+1] = obj
+            ::CONTINUE::
+        end
+        -- 最后，从右向左合并 binary 表达式
+        for i = #stacks - 1, 1, -1 do
+            local bin   = stacks[i]
+            local right = stacks[i+1]
+            bin[2]      = right
+            bin.finish  = right.finish
+        end
+        return stacks[1]
     end,
     Paren = function (start, exp, finish)
         if exp and exp.type == 'paren' then
