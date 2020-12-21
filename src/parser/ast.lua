@@ -791,6 +791,22 @@ local Defs = {
         end
         return final
     end,
+    ExpUnit = function (_, pos, exp)
+        -- 如果连续2个都不是符号，则拒绝继续匹配
+        if UnaryOps[exp.type] or BinaryOps[exp.type] then
+            State.IsLastExpUnit = false
+        else
+            if State.IsLastExpUnit then
+                return false
+            end
+            State.IsLastExpUnit = true
+        end
+        return pos, exp
+    end,
+    ExpFinish = function (_, _, ...)
+        State.IsLastExpUnit = false
+        return true, ...
+    end,
     Exp = function (first, ...)
         -- 对只有一个exp的情况进行特殊判断
         if not ... then
