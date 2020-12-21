@@ -453,8 +453,8 @@ CHECK 'local x = (a && b)'
                 parent = "<IGNORE>",
                 op     = {
                     type   = "&",
-                    start  = 14,
-                    finish = 14,
+                    start  = 15,
+                    finish = 15,
                 },
                 [1]    = {
                     type   = "getglobal",
@@ -497,8 +497,8 @@ CHECK 'return 1 + + 1'
             parent = "<IGNORE>",
             op     = {
                 type   = "+",
-                start  = 10,
-                finish = 10,
+                start  = 12,
+                finish = 12,
             },
             [1]    = {
                 type   = "number",
@@ -537,8 +537,8 @@ CHECK 'return 1 + # + 2'
             parent = "<IGNORE>",
             op     = {
                 type   = "+",
-                start  = 10,
-                finish = 10,
+                start  = 14,
+                finish = 14,
             },
             [1]    = {
                 type   = "number",
@@ -548,22 +548,11 @@ CHECK 'return 1 + # + 2'
                 [1]    = 1,
             },
             [2]    = {
-                type   = "unary",
-                start  = 12,
+                type   = "number",
+                start  = 16,
                 finish = 16,
                 parent = "<IGNORE>",
-                op     = {
-                    type   = "#",
-                    start  = 12,
-                    finish = 12,
-                },
-                [1]    = {
-                    type   = "number",
-                    start  = 16,
-                    finish = 16,
-                    parent = "<IGNORE>",
-                    [1]    = 2,
-                },
+                [1]    = 2,
             },
         },
     },
@@ -588,8 +577,8 @@ CHECK 'return 1 + 2 + # + 3'
             parent = "<IGNORE>",
             op     = {
                 type   = "+",
-                start  = 14,
-                finish = 14,
+                start  = 18,
+                finish = 18,
             },
             [1]    = {
                 type   = "binary",
@@ -617,22 +606,11 @@ CHECK 'return 1 + 2 + # + 3'
                 },
             },
             [2]    = {
-                type   = "unary",
-                start  = 16,
+                type   = "number",
+                start  = 20,
                 finish = 20,
                 parent = "<IGNORE>",
-                op     = {
-                    type   = "#",
-                    start  = 16,
-                    finish = 16,
-                },
-                [1]    = {
-                    type   = "number",
-                    start  = 20,
-                    finish = 20,
-                    parent = "<IGNORE>",
-                    [1]    = 3,
-                },
+                [1]    = 3,
             },
         },
     },
@@ -649,17 +627,6 @@ return
     locals  = "<IGNORE>",
     returns = "<IGNORE>",
     [1]     = {
-        type   = "unary",
-        start  = 1,
-        finish = 1,
-        parent = "<IGNORE>",
-        op     = {
-            type   = "-",
-            start  = 1,
-            finish = 1,
-        },
-    },
-    [2]     = {
         type   = "return",
         start  = 3,
         finish = 9,
@@ -737,28 +704,6 @@ call(,-,not,1)
             finish = 14,
             parent = "<IGNORE>",
             [1]    = {
-                type   = "unary",
-                start  = 7,
-                finish = 7,
-                parent = "<IGNORE>",
-                op     = {
-                    type   = "-",
-                    start  = 7,
-                    finish = 7,
-                },
-            },
-            [2]    = {
-                type   = "unary",
-                start  = 9,
-                finish = 11,
-                parent = "<IGNORE>",
-                op     = {
-                    type   = "not",
-                    start  = 9,
-                    finish = 11,
-                },
-            },
-            [3]    = {
                 type   = "number",
                 start  = 13,
                 finish = 13,
@@ -785,17 +730,6 @@ CHECK [[
         finish = 14,
         parent = "<IGNORE>",
         [1]    = {
-            type   = "unary",
-            start  = 9,
-            finish = 9,
-            parent = "<IGNORE>",
-            op     = {
-                type   = "-",
-                start  = 9,
-                finish = 9,
-            },
-        },
-        [2]    = {
             type   = "number",
             start  = 12,
             finish = 12,

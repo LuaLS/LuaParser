@@ -6,8 +6,6 @@ local mathType    = math.type
 local tableRemove = table.remove
 local pairs       = pairs
 local tableSort   = table.sort
-local print       = print
-local select      = select
 
 _ENV = nil
 
@@ -15,8 +13,6 @@ local State
 local PushError
 local PushDiag
 local PushComment
-local ExpStack = {}
-local ExpSize  = 0
 
 -- goto 单独处理
 local RESERVED = {
@@ -235,37 +231,6 @@ local BinaryForward = {
     [09]  = true,
     [10]  = true,
     [11]  = false,
-}
-
-local UnaryOps = {
-    ['not'] = true,
-    ['#']   = true,
-    ['-']   = true,
-    ['~']   = true,
-}
-
-local BinaryOps = {
-    ['or']  = true,
-    ['and'] = true,
-    ['<=']  = true,
-    ['>=']  = true,
-    ['<']   = true,
-    ['>']   = true,
-    ['~=']  = true,
-    ['==']  = true,
-    ['|']   = true,
-    ['~']   = true,
-    ['&']   = true,
-    ['<<']  = true,
-    ['>>']  = true,
-    ['..']  = true,
-    ['+']   = true,
-    ['-']   = true,
-    ['*']   = true,
-    ['//']  = true,
-    ['/']   = true,
-    ['%']   = true,
-    ['^']   = true,
 }
 
 local Defs = {
@@ -794,190 +759,6 @@ local Defs = {
             checkOpVersion(op)
         end
         return final
-    end,
-    ExpUnit = function (_, pos, exp)
-        -- 如果第一个符号是 '//'，则拒绝继续匹配
-        if not State.IsInExpList and exp.type == '//' then
-            return false
-        end
-        -- 如果连续2个都不是符号，则拒绝继续匹配
-        if UnaryOps[exp.type] or BinaryOps[exp.type] then
-            State.IsLastExpUnit = false
-        else
-            if State.IsLastExpUnit then
-                return false
-            end
-            State.IsLastExpUnit = true
-        end
-        State.IsInExpList = true
-        return pos, exp
-    end,
-    ExpFinish = function (_, _, ...)
-        State.IsLastExpUnit = false
-        State.IsInExpList = false
-        return true, ...
-    end,
-    Exp = function (first, ...)
-        -- 对只有一个exp的情况进行特殊判断
-        if not ... then
-            local isExp = not UnaryOps[first.type]
-                      and not BinaryOps[first.type]
-            if isExp then
-                return first
-            end
-        end
-
-        -- 表达式：1 + 2 + ###3 * 4 + 5 ^ 6 ^ 7
-        -- 1 + 2
-        -- (1 + 2) +
-        -- (1 + 2) + ###3
-        -- (1 + 2) + (#(#(#3)))
-        -- (1 + 2) + (#(#(#3))) * 4
-        -- (1 + 2) + ((#(#(#3))) * 4) +
-        -- ((1 + 2) + ((#(#(#3))) * 4)) +
-        -- ((1 + 2) + ((#(#(#3))) * 4)) + 5
-        -- ((1 + 2) + ((#(#(#3))) * 4)) + 5 ^
-        -- ((1 + 2) + ((#(#(#3))) * 4)) + 5 ^ 6
-        -- ((1 + 2) + ((#(#(#3))) * 4)) + 5 ^ 6 ^ 7
-        -- ((1 + 2) + ((#(#(#3))) * 4)) + 5 ^ (6 ^ 7)
-        -- ((1 + 2) + ((#(#(#3))) * 4)) + (5 ^ (6 ^ 7))
-        -- (((1 + 2) + ((#(#(#3))) * 4)) + (5 ^ (6 ^ 7)))
-
-        local len = select('#', ...)
-        ExpSize = 0
-        for i = 0, len do
-            local obj = first
-            if i > 0 then
-                obj = select(i, ...)
-            end
-            if UnaryOps[obj.type] then
-                if obj.type == '-'
-                or obj.type == '~' then
-                    local last = ExpStack[ExpSize]
-                    if last then
-                        if  last.type ~= 'unary'
-                        and last.type ~= 'binary' then
-                            goto CONTINUE
-                        end
-                        if (last.type == 'unary'  and last[1])
-                        or (last.type == 'binary' and last[2]) then
-                            goto CONTINUE
-                        end
-                    end
-                end
-                checkOpVersion(obj)
-                ExpSize = ExpSize + 1
-                ExpStack[ExpSize] =  {
-                    type   = 'unary',
-                    op     = obj,
-                    start  = obj.start,
-                    finish = obj.finish,
-                }
-                goto CONTINUE
-            end
-            if BinaryOps[obj.type] then
-                local last = ExpStack[ExpSize]
-                if last then
-                    if (last.type == 'unary'  and not last[1])
-                    or (last.type == 'binary' and not last[2]) then
-                        PushError {
-                            type   = 'UNEXPECT_SYMBOL',
-                            start  = obj.start,
-                            finish = obj.finish,
-                            info = {
-                                symbol = obj.type,
-                            }
-                        }
-                        goto CONTINUE
-                    end
-                else
-                    PushError {
-                        type   = 'UNEXPECT_SYMBOL',
-                        start  = obj.start,
-                        finish = obj.finish,
-                        info = {
-                            symbol = obj.type,
-                        }
-                    }
-                    goto CONTINUE
-                end
-                checkOpVersion(obj)
-                -- 向前搜索 binary 符号，递归从左向右合并为 binary 表达式
-                for _ = 1, 10000 do
-                    local lastBin = ExpStack[ExpSize-1]
-                    if lastBin and lastBin.type == 'binary' then
-                        local level1 = BinaryLevel[lastBin.op.type]
-                        local level2 = BinaryLevel[obj.type]
-                        if level1 < level2 then
-                            break
-                        end
-                        if level1 == level2 and not BinaryForward[level1] then
-                            break
-                        end
-                        local lastExp   = ExpStack[ExpSize]
-                        ExpSize         = ExpSize - 1
-                        lastBin[2]      = lastExp
-                        lastBin.finish  = lastExp.finish
-                    else
-                        break
-                    end
-                end
-                local lastExp     = ExpStack[ExpSize]
-                ExpStack[ExpSize] = {
-                    type   = 'binary',
-                    op     = obj,
-                    start  = lastExp.start,
-                    finish = obj.finish,
-                    [1]    = lastExp,
-                }
-                goto CONTINUE
-            end
-            -- 向前搜索 unary 符号，递归合并为 unary 表达式
-            for _ = 1, 10000 do
-                local lastUn = ExpStack[ExpSize]
-                if lastUn and lastUn.type == 'unary' then
-                    ExpSize = ExpSize - 1
-                    if  lastUn.op.type == '-'
-                    and obj.type == 'number' then
-                        obj[1]    = - obj[1]
-                        obj.start = lastUn.start
-                    else
-                        lastUn[1]     = obj
-                        lastUn.finish = obj.finish
-                        obj           = lastUn
-                    end
-                else
-                    break
-                end
-            end
-            ExpSize = ExpSize + 1
-            ExpStack[ExpSize] = obj
-            ::CONTINUE::
-        end
-        -- 最后，从右向左合并 binary 表达式
-        for i = ExpSize, 1, -1 do
-            if i == ExpSize then
-                local exp = ExpStack[i]
-                if (exp.type == 'binary' and not exp[2])
-                or (exp.type == 'unary'  and not exp[1]) then
-                    PushError {
-                        type   = 'MISS_EXP',
-                        start  = exp.op.start,
-                        finish = exp.op.finish,
-                    }
-                else
-                    goto CONTINUE
-                end
-            end
-            local bin   = ExpStack[i]
-            if i < ExpSize then
-                local right = ExpStack[i+1]
-                bin[2]      = right
-                bin.finish  = right.finish
-            end
-            ::CONTINUE::
-        end
-        return ExpStack[1]
     end,
     Paren = function (start, exp, finish)
         if exp and exp.type == 'paren' then

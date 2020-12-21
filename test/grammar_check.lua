@@ -425,7 +425,7 @@ x = 1 <!and!>
 }
 
 TEST[[
-x = <!#!>
+x = #<!!>
 ]]
 {
     type = 'MISS_EXP',
@@ -1248,43 +1248,31 @@ local test = <!function!> ( a , b , c , ... )
 }
 
 TEST[[
-a = 3 / <!/!> 2
+a = 3 <!/!> / 2
 ]]
 {
-    type = 'UNEXPECT_SYMBOL',
-    info = {
-        symbol = '/',
-    },
+    type = 'MISS_EXP',
 }
 
 TEST[[
-b = 1 &<!&!> 1
+b = 1 <!&!>& 1
 ]]
 {
-    type = 'UNEXPECT_SYMBOL',
-    info = {
-        symbol = '&',
-    },
+    type = 'MISS_EXP',
 }
 
 TEST[[
-b = 1 <<!>!> 0
+b = 1 <!<!>> 0
 ]]
 {
-    type = 'UNEXPECT_SYMBOL',
-    info = {
-        symbol = '>',
-    },
+    type = 'MISS_EXP',
 }
 
 TEST[[
-b = 1 < <!<!> 0
+b = 1 <!<!> < 0
 ]]
 {
-    type = 'UNEXPECT_SYMBOL',
-    info = {
-        symbol = '<',
-    },
+    type = 'MISS_EXP',
 }
 
 TEST[[
