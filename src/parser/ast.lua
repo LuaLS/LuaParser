@@ -817,10 +817,10 @@ local Defs = {
         -- ((1 + 2) + ((#(#(#3))) * 4)) + (5 ^ (6 ^ 7))
         -- (((1 + 2) + ((#(#(#3))) * 4)) + (5 ^ (6 ^ 7)))
 
-        local stack  = {first, ...}
+        local list  = {first, ...}
         local stacks = {}
-        for i = 1, #stack do
-            local obj = stack[i]
+        for i = 1, #list do
+            local obj = list[i]
             if UnaryOps[obj.type] then
                 checkOpVersion(obj)
                 stacks[#stacks+1] =  {
@@ -835,17 +835,17 @@ local Defs = {
                 -- 向前搜索 binary 符号，递归从左向右合并为 binary 表达式
                 while true do
                     local lastBin = stacks[#stacks-1]
-                    if lastBin and BinaryOps[lastBin.type] then
-                        local level1 = BinaryLevel[lastBin.type]
+                    if lastBin and lastBin.type == 'binary' then
+                        local level1 = BinaryLevel[lastBin.op.type]
                         local level2 = BinaryLevel[obj.type]
                         if level1 < level2 then
                             break
                         end
-                        if level1 == level2 and not BinaryForward(level1) then
+                        if level1 == level2 and not BinaryForward[level1] then
                             break
                         end
                         local lastExp  = stacks[#stacks]
-                        stack[#stack]  = nil
+                        list[#list]  = nil
                         lastBin[2]     = lastExp
                         lastBin.finish = lastExp.finish
                     else
@@ -864,9 +864,9 @@ local Defs = {
             end
             -- 向前搜索 unary 符号，递归合并为 unary 表达式
             while true do
-                local lastUn = stack[#stack]
-                if lastUn and UnaryOps[lastUn.type] then
-                    stack[#stack] = nil
+                local lastUn = stacks[#stacks]
+                if lastUn and lastUn.type == 'unary' then
+                    stacks[#stacks] = nil
                     lastUn[1]     = obj
                     lastUn.finish = obj.finish
                     obj           = lastUn
