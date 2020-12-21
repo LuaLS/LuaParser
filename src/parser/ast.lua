@@ -838,6 +838,20 @@ local Defs = {
         for i = 1, #list do
             local obj = list[i]
             if UnaryOps[obj.type] then
+                if obj.type == '-'
+                or obj.type == '~' then
+                    local last = stacks[#stacks]
+                    if last then
+                        if  last.type ~= 'unary'
+                        and last.type ~= 'binary' then
+                            goto CONTINUE
+                        end
+                        if (last.type == 'unary'  and last[1])
+                        or (last.type == 'binary' and last[2]) then
+                            goto CONTINUE
+                        end
+                    end
+                end
                 checkOpVersion(obj)
                 stacks[#stacks+1] =  {
                     type   = 'unary',
@@ -924,11 +938,12 @@ local Defs = {
         for i = #stacks, 1, -1 do
             if i == #stacks then
                 local exp = stacks[i]
-                if exp.type == 'binary' then
+                if (exp.type == 'binary' and not exp[2])
+                or (exp.type == 'unary'  and not exp[1]) then
                     PushError {
                         type   = 'MISS_EXP',
-                        start  = exp.finish,
-                        finish = exp.finish,
+                        start  = exp.op.start,
+                        finish = exp.op.finish,
                     }
                 else
                     goto CONTINUE

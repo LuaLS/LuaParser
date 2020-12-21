@@ -425,7 +425,7 @@ x = 1 <!and!>
 }
 
 TEST[[
-x = #<!!>
+x = <!#!>
 ]]
 {
     type = 'MISS_EXP',
