@@ -18,6 +18,7 @@ local assert       = assert
 local select       = select
 local osClock      = os.clock
 local tonumber     = tonumber
+local tointeger    = math.tointeger
 local DEVELOP      = _G.DEVELOP
 local log          = log
 local _G           = _G
@@ -26,13 +27,11 @@ local function logWarn(...)
     log.warn(...)
 end
 
-_ENV = nil
-
+---@class guide
+---@field debugMode boolean
 local m = {}
 
-m.ANY = {"ANY"}
-
-m.ANYNOTGET = {"ANYNOTGET"}
+m.ANY = {"<ANY>"}
 
 local blockTypes = {
     ['while']       = true,
@@ -100,6 +99,7 @@ m.childMap = {
     ['doc.vararg']         = {'vararg', 'comment'},
     ['doc.type.table']     = {'key', 'value', 'comment'},
     ['doc.type.function']  = {'#args', '#returns', 'comment'},
+    ['doc.type.typeliteral']  = {'node'},
     ['doc.overload']       = {'overload', 'comment'},
     ['doc.see']            = {'name', 'field'},
 }
@@ -178,6 +178,9 @@ function m.getBlock(obj)
         local tp = obj.type
         if blockTypes[tp] then
             return obj
+        end
+        if obj == obj.parent then
+            error('obj == obj.parent?', obj.type)
         end
         obj = obj.parent
     end
@@ -665,6 +668,10 @@ function m.lineRange(lines, row, ignoreNL)
     end
 end
 
+function m.lineData(lines, row)
+    return lines[row]
+end
+
 function m.getKeyTypeOfLiteral(obj)
     if not obj then
         return nil
@@ -792,8 +799,16 @@ end
 
 function m.getSimpleName(obj)
     if obj.type == 'call' then
-        local key = obj.args and obj.args[2]
-        return m.getKeyName(key)
+        local node = obj.node
+        if not node then
+            return
+        end
+        if node.special == 'rawset'
+        or node.special == 'rawget' then
+            local key = obj.args and obj.args[2]
+            return m.getKeyName(key)
+        end
+        return ('%p'):format(obj)
     elseif obj.type == 'table' then
         return ('%p'):format(obj)
     elseif obj.type == 'select' then
@@ -1141,7 +1156,8 @@ local function buildSimpleList(obj, max)
             list[i] = cur
             break
         elseif cur.type == 'select'
-        or     cur.type == 'table' then
+        or     cur.type == 'table'
+        or     cur.type == 'call' then
             list[i] = cur
             break
         elseif cur.type == 'string' then
@@ -1182,6 +1198,7 @@ function m.getSimple(obj, max)
     or obj.type == 'tablefield'
     or obj.type == 'tableindex'
     or obj.type == 'select'
+    or obj.type == 'call'
     or obj.type == 'table'
     or obj.type == 'string'
     or obj.type == 'doc.class.name'
@@ -1206,6 +1223,7 @@ function m.status(parentStatus, interface, deep)
         searchDeep= parentStatus and parentStatus.searchDeep  or deep or -999,
         interface = parentStatus and parentStatus.interface   or {},
         deep      = parentStatus and parentStatus.deep,
+        clock     = parentStatus and parentStatus.clock       or osClock(),
         results   = {},
     }
     if interface then
@@ -1335,6 +1353,10 @@ function m.getCallValue(source)
     else
         return
     end
+    if call.node.special == 'pcall'
+    or call.node.special == 'xpcall' then
+        return call.args[1], call.args, index - 1
+    end
     return call.node, call.args, index
 end
 
@@ -1364,16 +1386,13 @@ function m.getNextRef(ref)
     return nil
 end
 
-function m.checkSameSimpleInValueOfTable(status, value, start, queue)
+function m.checkSameSimpleInValueOfTable(status, value, start, pushQueue)
     if value.type ~= 'table' then
         return
     end
     for i = 1, #value do
         local field = value[i]
-        queue[#queue+1] = {
-            obj   = field,
-            start = start + 1,
-        }
+        pushQueue(field, start + 1)
     end
 end
 
@@ -1384,6 +1403,16 @@ function m.searchFields(status, obj, key)
     end
     simple[#simple+1] = key or m.ANY
     m.searchSameFields(status, simple, 'field')
+    m.cleanResults(status.results)
+end
+
+function m.searchDefFields(status, obj, key)
+    local simple = m.getSimple(obj)
+    if not simple then
+        return
+    end
+    simple[#simple+1] = key or m.ANY
+    m.searchSameFields(status, simple, 'deffield')
     m.cleanResults(status.results)
 end
 
@@ -1405,11 +1434,13 @@ function m.getObjectValue(obj)
     end
     if obj.type == 'field'
     or obj.type == 'method' then
-        return obj.parent.value
+        return obj.parent and obj.parent.value
     end
     if obj.type == 'call' then
         if obj.node.special == 'rawset' then
             return obj.args[3]
+        else
+            return obj
         end
     end
     if obj.type == 'select' then
@@ -1418,9 +1449,9 @@ function m.getObjectValue(obj)
     return nil
 end
 
-function m.checkSameSimpleInValueInMetaTable(status, mt, start, queue)
+function m.checkSameSimpleInValueInMetaTable(status, mt, start, pushQueue)
     local newStatus = m.status(status)
-    m.searchFields(newStatus, mt, '__index')
+    m.searchDefFields(newStatus, mt, '__index')
     local refsStatus = m.status(status)
     for i = 1, #newStatus.results do
         local indexValue = m.getObjectValue(newStatus.results[i])
@@ -1430,14 +1461,10 @@ function m.checkSameSimpleInValueInMetaTable(status, mt, start, queue)
     end
     for i = 1, #refsStatus.results do
         local obj = refsStatus.results[i]
-        queue[#queue+1] = {
-            obj   = obj,
-            start = start,
-            force = true,
-        }
+        pushQueue(obj, start, true)
     end
 end
-function m.checkSameSimpleInValueOfSetMetaTable(status, func, start, queue)
+function m.checkSameSimpleInValueOfSetMetaTable(status, func, start, pushQueue)
     if not func or func.special ~= 'setmetatable' then
         return
     end
@@ -1446,48 +1473,60 @@ function m.checkSameSimpleInValueOfSetMetaTable(status, func, start, queue)
     local obj = args[1]
     local mt = args[2]
     if obj then
-        queue[#queue+1] = {
-            obj   = obj,
-            start = start,
-            force = true,
-        }
+        pushQueue(obj, start, true)
     end
     if mt then
-        m.checkSameSimpleInValueInMetaTable(status, mt, start, queue)
+        m.checkSameSimpleInValueInMetaTable(status, mt, start, pushQueue)
     end
 end
 
-function m.checkSameSimpleInValueOfCallMetaTable(status, call, start, queue)
+function m.checkSameSimpleInValueOfCallMetaTable(status, call, start, pushQueue)
     if status.crossMetaTableMark then
         return
     end
     status.crossMetaTableMark = true
     if call.type == 'call' then
-        m.checkSameSimpleInValueOfSetMetaTable(status, call.node, start, queue)
+        m.checkSameSimpleInValueOfSetMetaTable(status, call.node, start, pushQueue)
     end
     status.crossMetaTableMark = false
 end
 
-function m.checkSameSimpleInSpecialBranch(status, obj, start, queue)
+function m.checkSameSimpleInSpecialBranch(status, obj, start, pushQueue)
     if status.interface.index then
         local results = status.interface.index(obj)
         if not results then
             return
         end
         for _, res in ipairs(results) do
-            queue[#queue+1] = {
-                obj   = res,
-                start = start + 1,
-            }
+            pushQueue(obj, start + 1)
         end
     end
 end
 
-local function stepRefOfGeneric(status, typeUnit, args, mode)
-    if not args then
-        return nil
+local function appendValidGenericType(results, status, typeName, obj)
+    if typeName.parent.type == 'doc.type.typeliteral' then
+        if obj.type == 'string' and status.interface.docType then
+            local docs = status.interface.docType(obj[1])
+            for i = 1, #docs do
+                local doc = docs[i]
+                if doc.type == 'doc.class.name'
+                or doc.type == 'doc.alias.name' then
+                    results[#results+1] = doc
+                    break
+                end
+            end
+        end
+    else
+        -- 发现没有使用 `T`，则沿用既有逻辑直接返回实参
+        results[#results+1] = obj
     end
+end
+
+local function stepRefOfGeneric(status, typeUnit, args, mode)
     local results = {}
+    if not args then
+        return results
+    end
     local myName = typeUnit[1]
     for _, typeName in ipairs(typeUnit.typeGeneric[myName]) do
         if typeName == typeUnit then
@@ -1507,7 +1546,7 @@ local function stepRefOfGeneric(status, typeUnit, args, mode)
             and source.parent.type == 'funcargs' then
                 for index, arg in ipairs(source.parent) do
                     if arg == source then
-                        results[#results+1] = args[index]
+                        appendValidGenericType(results, status, typeName, args[index])
                     end
                 end
             end
@@ -1541,7 +1580,7 @@ function m.checkSameSimpleByDocType(status, doc, args)
     return results
 end
 
-function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
+function m.checkSameSimpleByBindDocs(status, obj, start, pushQueue, mode)
     if not obj.bindDocs then
         return
     end
@@ -1572,30 +1611,19 @@ function m.checkSameSimpleByBindDocs(status, obj, start, queue, mode)
     for _, res in ipairs(results) do
         if res.type == 'doc.class'
         or res.type == 'doc.type' then
-            queue[#queue+1] = {
-                obj   = res,
-                start = start,
-                force = true,
-            }
+            pushQueue(res, start, true)
             skipInfer = true
         end
         if res.type == 'doc.type.function' then
-            queue[#queue+1] = {
-                obj   = res,
-                start = start,
-                force = true,
-            }
+            pushQueue(res, start, true)
         elseif res.type == 'doc.field' then
-            queue[#queue+1] = {
-                obj   = res,
-                start = start + 1,
-            }
+            pushQueue(res, start + 1)
         end
     end
     return skipInfer
 end
 
-function m.checkSameSimpleOfRefByDocSource(status, obj, start, queue, mode)
+function m.checkSameSimpleOfRefByDocSource(status, obj, start, pushQueue, mode)
     if status.share.searchingBindedDoc then
         return
     end
@@ -1613,15 +1641,25 @@ function m.checkSameSimpleOfRefByDocSource(status, obj, start, queue, mode)
     end
     status.share.searchingBindedDoc = nil
     for _, res in ipairs(newStatus.results) do
-        queue[#queue+1] = {
-            obj   = res,
-            start = start,
-            force = true,
-        }
+        pushQueue(res, start, true)
     end
 end
 
-function m.checkSameSimpleByDoc(status, obj, start, queue, mode)
+local function getArrayLevel(obj)
+    local level = 0
+    while true do
+        local parent = obj.parent
+        if parent.type == 'doc.type.array' then
+            level = level + 1
+        else
+            break
+        end
+        obj = parent
+    end
+    return level
+end
+
+function m.checkSameSimpleByDoc(status, obj, start, pushQueue, mode)
     if obj.type == 'doc.class.name'
     or obj.type == 'doc.class' then
         if obj.type == 'doc.class.name' then
@@ -1635,30 +1673,19 @@ function m.checkSameSimpleByDoc(status, obj, start, queue, mode)
                 classStart = false
             end
             if classStart and doc.type == 'doc.field' then
-                queue[#queue+1] = {
-                    obj   = doc,
-                    start = start + 1,
-                }
+                pushQueue(doc, start + 1)
             end
         end
-        m.checkSameSimpleOfRefByDocSource(status, obj, start, queue, mode)
+        m.checkSameSimpleOfRefByDocSource(status, obj, start, pushQueue, mode)
         if mode == 'ref' then
             local pieceResult = stepRefOfDocType(status, obj.class, 'ref')
             for _, res in ipairs(pieceResult) do
-                queue[#queue+1] = {
-                    obj   = res,
-                    start = start,
-                    force = true,
-                }
+                pushQueue(res, start, true)
             end
             if obj.extends then
                 local pieceResult = stepRefOfDocType(status, obj.extends, 'def')
                 for _, res in ipairs(pieceResult) do
-                    queue[#queue+1] = {
-                        obj   = res,
-                        start = start,
-                        force = true,
-                    }
+                    pushQueue(res, start, true)
                 end
             end
         end
@@ -1667,47 +1694,36 @@ function m.checkSameSimpleByDoc(status, obj, start, queue, mode)
         for _, piece in ipairs(obj.types) do
             local pieceResult = stepRefOfDocType(status, piece, 'def')
             for _, res in ipairs(pieceResult) do
-                queue[#queue+1] = {
-                    obj   = res,
-                    start = start,
-                    force = true,
-                }
+                pushQueue(res, start, true)
             end
         end
         if mode == 'ref' then
-            m.checkSameSimpleOfRefByDocSource(status, obj, start, queue, mode)
+            m.checkSameSimpleOfRefByDocSource(status, obj, start, pushQueue, mode)
         end
         return true
     elseif obj.type == 'doc.type.name'
     or     obj.type == 'doc.see.name' then
         local pieceResult = stepRefOfDocType(status, obj, 'def')
         for _, res in ipairs(pieceResult) do
-            queue[#queue+1] = {
-                obj   = res,
-                start = start,
-                force = true,
-            }
+            pushQueue(res, start, true)
         end
         local state = m.getDocState(obj)
         if state.type == 'doc.type' and mode == 'ref' then
-            m.checkSameSimpleOfRefByDocSource(status, state, start, queue, mode)
+            m.checkSameSimpleOfRefByDocSource(status, state, start - getArrayLevel(obj), pushQueue, mode)
         end
         return true
     elseif obj.type == 'doc.field' then
-        if mode ~= 'field' then
-            return m.checkSameSimpleByDoc(status, obj.extends, start, queue, mode)
+        if  mode ~= 'field'
+        and mode ~= 'deffield' then
+            return m.checkSameSimpleByDoc(status, obj.extends, start, pushQueue, mode)
         end
     elseif obj.type == 'doc.type.array' then
-        queue[#queue+1] = {
-            obj   = obj.node,
-            start = start + 1,
-            force = true,
-        }
+        pushQueue(obj.node, start + 1, true)
         return true
     end
 end
 
-function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, queue)
+function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, pushQueue)
     local args = obj.parent
     if not args or args.type ~= 'callargs' then
         return
@@ -1720,11 +1736,11 @@ function m.checkSameSimpleInArg1OfSetMetaTable(status, obj, start, queue)
         if m.checkValueMark(status, obj, mt) then
             return
         end
-        m.checkSameSimpleInValueInMetaTable(status, mt, start, queue)
+        m.checkSameSimpleInValueInMetaTable(status, mt, start, pushQueue)
     end
 end
 
-function m.searchSameMethodCrossSelf(ref, mark)
+function m.searchSameMethodOutSelf(ref, mark)
     local selfNode
     if ref.tag == 'self' then
         selfNode = ref
@@ -1742,74 +1758,81 @@ function m.searchSameMethodCrossSelf(ref, mark)
             return nil
         end
         mark[selfNode] = true
-        return selfNode.method.node
+        local method = selfNode.method.node
+        if mark[method] then
+            return nil
+        end
+        mark[method] = true
+        return method
     end
 end
 
-function m.searchSameMethod(ref, mark)
-    if mark['method'] then
-        return nil
-    end
+function m.searchSameMethodIntoSelf(ref, mark)
     local nxt = ref.next
     if not nxt then
         return nil
     end
-    if nxt.type == 'setmethod' then
-        mark['method'] = true
-        return ref
+    if nxt.type ~= 'setmethod' then
+        return nil
     end
-    return nil
+    if mark[ref] then
+        return nil
+    end
+    mark[ref] = true
+    local value = nxt.value
+    if not value or value.type ~= 'function' then
+        return nil
+    end
+    local selfRef = value.locals and value.locals[1]
+    if not selfRef or selfRef.tag ~= 'self' then
+        return nil
+    end
+    if mark[selfRef] then
+        return nil
+    end
+    mark[selfRef] = true
+    return selfRef
 end
 
-function m.searchSameFieldsCrossMethod(status, ref, start, queue)
+function m.searchSameFieldsCrossMethod(status, ref, start, pushQueue)
+    if status.share.crossMethodLock then
+        return
+    end
     local mark = status.crossMethodMark
     if not mark then
         mark = {}
         status.crossMethodMark = mark
     end
-    local method = m.searchSameMethod(ref, mark)
-                or m.searchSameMethodCrossSelf(ref, mark)
-    if not method then
+    local selfRef = m.searchSameMethodIntoSelf(ref, mark)
+    if selfRef then
+        tracy.ZoneBeginN 'searchSameFieldsCrossMethod'
+        local _ <close> = tracy.ZoneEnd
+        -- 如果自己是method，则只检查自己内部的self引用
+        local results = m.getStepRef(status, selfRef, 'ref')
+        for _, res in ipairs(results) do
+            pushQueue(res, start, true)
+        end
         return
     end
-    local methodStatus = m.status(status)
-    m.searchRefs(methodStatus, method, 'ref')
-    for _, md in ipairs(methodStatus.results) do
-        queue[#queue+1] = {
-            obj   = md,
-            start = start,
-            force = true,
-        }
-        local nxt = md.next
-        if not nxt then
-            goto CONTINUE
+    local method = m.searchSameMethodOutSelf(ref, mark)
+    if method then
+        tracy.ZoneBeginN 'searchSameFieldsCrossMethod'
+        local _ <close> = tracy.ZoneEnd
+        -- 如果自己是self，则找出父级的method，以及父级method的引用
+        local newStatus = m.status(status)
+        newStatus.crossMethodLock = true
+        m.searchRefs(newStatus, method, 'ref')
+        newStatus.crossMethodLock = false
+        for _, res in ipairs(newStatus.results) do
+            mark[res] = true
+            pushQueue(res, start, true)
         end
-        if nxt.type == 'setmethod' then
-            local func = nxt.value
-            if not func then
-                goto CONTINUE
-            end
-            local selfNode = func.locals and func.locals[1]
-            if not selfNode or not selfNode.ref then
-                goto CONTINUE
-            end
-            if mark[selfNode] then
-                goto CONTINUE
-            end
-            mark[selfNode] = true
-            for _, selfRef in ipairs(selfNode.ref) do
-                queue[#queue+1] = {
-                    obj   = selfRef,
-                    start = start,
-                    force = true,
-                }
-            end
-        end
-        ::CONTINUE::
+        return
     end
 end
 
 local function checkSameSimpleAndMergeFunctionReturnsByDoc(status, results, source, index, args)
+    source = m.getObjectValue(source) or source
     if not source or source.type ~= 'function' then
         return
     end
@@ -1890,7 +1913,7 @@ function m.checkSameSimpleInCallInSameFile(status, func, args, index)
     return results
 end
 
-function m.checkSameSimpleInCall(status, ref, start, queue, mode)
+function m.checkSameSimpleInCall(status, ref, start, pushQueue, mode)
     local func, args, index = m.getCallValue(ref)
     if not func then
         return
@@ -1899,13 +1922,13 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
         return
     end
     status.share.crossCallCount = status.share.crossCallCount or 0
-    if status.share.crossCallCount >= 5 then
+    -- 检查赋值是 semetatable() 的情况
+    m.checkSameSimpleInValueOfSetMetaTable(status, func, start, pushQueue)
+    -- 检查赋值是 func() 的情况
+    if status.share.crossCallCount >= 2 then
         return
     end
     status.share.crossCallCount = status.share.crossCallCount + 1
-    -- 检查赋值是 semetatable() 的情况
-    m.checkSameSimpleInValueOfSetMetaTable(status, func, start, queue)
-    -- 检查赋值是 func() 的情况
     local objs = m.checkSameSimpleInCallInSameFile(status, func, args, index)
     if status.interface.call then
         local cobjs = status.interface.call(func, args, index)
@@ -1918,23 +1941,22 @@ function m.checkSameSimpleInCall(status, ref, start, queue, mode)
         end
     end
     m.cleanResults(objs)
-    local newStatus = m.status(status)
+    local mark = {}
     for _, obj in ipairs(objs) do
+        if mark[obj] then
+            goto CONTINUE
+        end
+        local newStatus = m.status(status)
         m.searchRefs(newStatus, obj, mode)
-        queue[#queue+1] = {
-            obj   = obj,
-            start = start,
-            force = true,
-        }
+        pushQueue(obj, start, true)
+        mark[obj] = true
+        for _, obj in ipairs(newStatus.results) do
+            pushQueue(obj, start, true)
+            mark[obj] = true
+        end
+        ::CONTINUE::
     end
     status.share.crossCallCount = status.share.crossCallCount - 1
-    for _, obj in ipairs(newStatus.results) do
-        queue[#queue+1] = {
-            obj   = obj,
-            start = start,
-            force = true,
-        }
-    end
 end
 
 local function searchRawset(ref, results)
@@ -2002,7 +2024,7 @@ function m.findGlobalsOfName(ast, name)
     return results
 end
 
-function m.checkSameSimpleInGlobal(status, name, source, start, queue)
+function m.checkSameSimpleInGlobal(status, name, source, start, pushQueue)
     if not name then
         return
     end
@@ -2014,11 +2036,7 @@ function m.checkSameSimpleInGlobal(status, name, source, start, queue)
     end
     if objs then
         for _, obj in ipairs(objs) do
-            queue[#queue+1] = {
-                obj   = obj,
-                start = start,
-                force = true,
-            }
+            pushQueue(obj, start, true)
         end
     end
 end
@@ -2059,7 +2077,7 @@ function m.checkReturnMark(status, a, mark)
     return result
 end
 
-function m.searchSameFieldsInValue(status, ref, start, queue, mode)
+function m.searchSameFieldsInValue(status, ref, start, pushQueue, mode)
     local value = m.getObjectValue(ref)
     if not value then
         return
@@ -2070,22 +2088,14 @@ function m.searchSameFieldsInValue(status, ref, start, queue, mode)
     local newStatus = m.status(status)
     m.searchRefs(newStatus, value, mode)
     for _, res in ipairs(newStatus.results) do
-        queue[#queue+1] = {
-            obj   = res,
-            start = start,
-            force = true,
-        }
+        pushQueue(res, start, true)
     end
-    queue[#queue+1] = {
-        obj   = value,
-        start = start,
-        force = true,
-    }
+    pushQueue(value, start, true)
     -- 检查形如 a = f() 的分支情况
-    m.checkSameSimpleInCall(status, value, start, queue, mode)
+    m.checkSameSimpleInCall(status, value, start, pushQueue, mode)
 end
 
-function m.checkSameSimpleAsTableField(status, ref, start, queue)
+function m.checkSameSimpleAsTableField(status, ref, start, pushQueue)
     if not status.deep then
         --return
     end
@@ -2099,11 +2109,7 @@ function m.checkSameSimpleAsTableField(status, ref, start, queue)
     local newStatus = m.status(status)
     m.searchRefs(newStatus, parent.field, 'ref')
     for _, res in ipairs(newStatus.results) do
-        queue[#queue+1] = {
-            obj   = res,
-            start = start,
-            force = true,
-        }
+        pushQueue(res, start, true)
     end
 end
 
@@ -2117,7 +2123,7 @@ function m.checkSearchLevel(status)
     return false
 end
 
-function m.checkSameSimpleAsReturn(status, ref, start, queue)
+function m.checkSameSimpleAsReturn(status, ref, start, pushQueue)
     if not status.deep then
         return
     end
@@ -2134,16 +2140,15 @@ function m.checkSameSimpleAsReturn(status, ref, start, queue)
     m.searchRefsAsFunctionReturn(newStatus, ref, 'ref')
     for _, res in ipairs(newStatus.results) do
         if not m.checkCallMark(status, res) then
-            queue[#queue+1] = {
-                obj   = res,
-                start = start,
-                force = true,
-            }
+            pushQueue(res, start, true)
         end
     end
 end
 
-function m.checkSameSimpleAsSetValue(status, ref, start, queue)
+function m.checkSameSimpleAsSetValue(status, ref, start, pushQueue)
+    if not status.deep then
+        --return
+    end
     if ref.type == 'select' then
         return
     end
@@ -2176,11 +2181,7 @@ function m.checkSameSimpleAsSetValue(status, ref, start, queue)
     local newStatus = m.status(status)
     m.searchRefs(newStatus, obj, 'ref')
     for _, res in ipairs(newStatus.results) do
-        queue[#queue+1] = {
-            obj   = res,
-            start = start,
-            force = true,
-        }
+        pushQueue(res, start, true)
     end
 end
 
@@ -2197,7 +2198,7 @@ local function hasTypeName(doc, name)
     return false
 end
 
-function m.checkSameSimpleInString(status, ref, start, queue, mode)
+function m.checkSameSimpleInString(status, ref, start, pushQueue, mode)
     -- 特殊处理 ('xxx').xxx 的形式
     if  ref.type ~= 'string'
     and not hasTypeName(ref, 'string') then
@@ -2209,6 +2210,13 @@ function m.checkSameSimpleInString(status, ref, start, queue, mode)
     if status.share.searchingBindedDoc then
         return
     end
+    if not status.share.markString then
+        status.share.markString = {}
+    end
+    if status.share.markString[ref] then
+        return
+    end
+    status.share.markString[ref] = true
     local newStatus = m.status(status)
     local docs = status.interface.docType('string*')
     local mark = {}
@@ -2221,12 +2229,10 @@ function m.checkSameSimpleInString(status, ref, start, queue, mode)
             goto CONTINUE
         end
         mark[res] = true
-        queue[#queue+1] = {
-            obj   = res,
-            start = start + 1,
-        }
+        pushQueue(res, start + 1)
         ::CONTINUE::
     end
+    status.share.markString[ref] = nil
     return true
 end
 
@@ -2255,6 +2261,7 @@ function m.pushResult(status, mode, ref, simple)
             results[#results+1] = ref
         elseif ref.type == 'doc.type.function'
         or     ref.type == 'doc.class.name'
+        or     ref.type == 'doc.alias.name'
         or     ref.type == 'doc.field' then
             results[#results+1] = ref
         end
@@ -2297,6 +2304,7 @@ function m.pushResult(status, mode, ref, simple)
             end
         elseif ref.type == 'doc.type.function'
         or     ref.type == 'doc.class.name'
+        or     ref.type == 'doc.alias.name'
         or     ref.type == 'doc.field' then
             results[#results+1] = ref
         end
@@ -2327,18 +2335,30 @@ function m.pushResult(status, mode, ref, simple)
         elseif ref.type == 'setglobal'
         or     ref.type == 'getglobal' then
             results[#results+1] = ref
-        elseif ref.type == 'function' then
-            results[#results+1] = ref
-        elseif ref.type == 'table' then
-            results[#results+1] = ref
         elseif ref.type == 'call' then
             if ref.node.special == 'rawset'
             or ref.node.special == 'rawget' then
                 results[#results+1] = ref
             end
-        elseif ref.type == 'doc.type.function'
-        or     ref.type == 'doc.class.name'
-        or     ref.type == 'doc.field' then
+        elseif ref.type == 'doc.field' then
+            results[#results+1] = ref
+        end
+    elseif mode == 'deffield' then
+        if ref.type == 'setfield'
+        or ref.type == 'tablefield' then
+            results[#results+1] = ref
+        elseif ref.type == 'setmethod' then
+            results[#results+1] = ref
+        elseif ref.type == 'setindex'
+        or     ref.type == 'tableindex' then
+            results[#results+1] = ref
+        elseif ref.type == 'setglobal' then
+            results[#results+1] = ref
+        elseif ref.type == 'call' then
+            if ref.node.special == 'rawset' then
+                results[#results+1] = ref
+            end
+        elseif ref.type == 'doc.field' then
             results[#results+1] = ref
         end
     end
@@ -2346,10 +2366,6 @@ end
 
 function m.checkSameSimpleName(ref, sm)
     if sm == m.ANY then
-        return true
-    end
-
-    if sm == m.ANYNOTGET and not m.isGet(ref) then
         return true
     end
 
@@ -2363,10 +2379,7 @@ function m.checkSameSimpleName(ref, sm)
     return false
 end
 
-function m.checkSameSimple(status, simple, data, mode, queue)
-    local ref    = data.obj
-    local start  = data.start
-    local force  = data.force
+function m.checkSameSimple(status, simple, ref, start, force, mode, pushQueue)
     if start > #simple then
         return
     end
@@ -2381,30 +2394,30 @@ function m.checkSameSimple(status, simple, data, mode, queue)
             cmode = 'ref'
         end
         -- 检查 doc
-        local skipInfer = m.checkSameSimpleByBindDocs(status, ref, i, queue, cmode)
-                    or    m.checkSameSimpleByDoc(status, ref, i, queue, cmode)
+        local skipInfer = m.checkSameSimpleByBindDocs(status, ref, i, pushQueue, cmode)
+                    or    m.checkSameSimpleByDoc(status, ref, i, pushQueue, cmode)
         -- 检查自己是字符串的分支情况
-        m.checkSameSimpleInString(status, ref, i, queue, cmode)
+        m.checkSameSimpleInString(status, ref, i, pushQueue, cmode)
         if not skipInfer then
             -- 穿透 self:func 与 mt:func
-            m.searchSameFieldsCrossMethod(status, ref, i, queue)
+            m.searchSameFieldsCrossMethod(status, ref, i, pushQueue)
             -- 穿透赋值
-            m.searchSameFieldsInValue(status, ref, i, queue, cmode)
+            m.searchSameFieldsInValue(status, ref, i, pushQueue, cmode)
             -- 检查自己是字面量表的情况
-            m.checkSameSimpleInValueOfTable(status, ref, i, queue)
+            m.checkSameSimpleInValueOfTable(status, ref, i, pushQueue)
             -- 检查自己作为 setmetatable 第一个参数的情况
-            m.checkSameSimpleInArg1OfSetMetaTable(status, ref, i, queue)
+            m.checkSameSimpleInArg1OfSetMetaTable(status, ref, i, pushQueue)
             -- 检查自己作为 setmetatable 调用的情况
-            m.checkSameSimpleInValueOfCallMetaTable(status, ref, i, queue)
+            m.checkSameSimpleInValueOfCallMetaTable(status, ref, i, pushQueue)
             -- 检查自己是特殊变量的分支的情况
-            m.checkSameSimpleInSpecialBranch(status, ref, i, queue)
+            m.checkSameSimpleInSpecialBranch(status, ref, i, pushQueue)
             if cmode == 'ref' then
                 -- 检查形如 { a = f } 的情况
-                m.checkSameSimpleAsTableField(status, ref, i, queue)
+                m.checkSameSimpleAsTableField(status, ref, i, pushQueue)
                 -- 检查形如 return m 的情况
-                m.checkSameSimpleAsReturn(status, ref, i, queue)
+                m.checkSameSimpleAsReturn(status, ref, i, pushQueue)
                 -- 检查形如 a = f 的情况
-                m.checkSameSimpleAsSetValue(status, ref, i, queue)
+                m.checkSameSimpleAsSetValue(status, ref, i, pushQueue)
             end
         end
         if i == #simple then
@@ -2422,55 +2435,96 @@ function m.checkSameSimple(status, simple, data, mode, queue)
     end
 end
 
+local queuesPool = {}
+local startsPool = {}
+local forcesPool = {}
+local poolSize = 0
+
+local function allocQueue()
+    if poolSize <= 0 then
+        return {}, {}, {}
+    else
+        local queues = queuesPool[poolSize]
+        local starts = startsPool[poolSize]
+        local forces = forcesPool[poolSize]
+        poolSize = poolSize - 1
+        return queues, starts, forces
+    end
+end
+
+local function deallocQueue(queues, starts, forces)
+    poolSize = poolSize + 1
+    queuesPool[poolSize] = queues
+    startsPool[poolSize] = starts
+    forcesPool[poolSize] = forces
+end
+
 function m.searchSameFields(status, simple, mode)
-    local queue = {}
+    local queues, starts, forces = allocQueue()
+    local queueLen = 0
+    local function pushQueue(obj, start, force)
+        queueLen = queueLen + 1
+        queues[queueLen] = obj
+        starts[queueLen] = start
+        forces[queueLen] = force
+    end
     if simple.mode == 'global' then
         -- 全局变量开头
-        m.checkSameSimpleInGlobal(status, simple[1], simple.node, 1, queue)
+        m.checkSameSimpleInGlobal(status, simple[1], simple.node, 1, pushQueue)
     elseif simple.mode == 'local' then
         -- 局部变量开头
-        queue[1] = {
-            obj   = simple.node,
-            start = 1,
-        }
+        pushQueue(simple.node, 1)
         local refs = simple.node.ref
         if refs then
             for i = 1, #refs do
-                queue[#queue+1] = {
-                    obj   = refs[i],
-                    start = 1,
-                }
+                pushQueue(refs[i], 1)
             end
         end
     else
-        queue[1] = {
-            obj   = simple.node,
-            start = 1,
-        }
+        pushQueue(simple.node, 1)
     end
     local max = 0
     local locks = {}
     for i = 1, 1e6 do
-        local data = queue[i]
-        if not data then
-            return
+        if queueLen <= 0 then
+            break
         end
-        local lock = locks[data.start]
+        local obj   = queues[queueLen]
+        local start = starts[queueLen]
+        local force = forces[queueLen]
+        queues[queueLen] = nil
+        starts[queueLen] = nil
+        forces[queueLen] = nil
+        queueLen = queueLen - 1
+        local lock = locks[start]
         if not lock then
             lock = {}
-            locks[data.start] = lock
+            locks[start] = lock
         end
-        if not lock[data.obj] then
-            lock[data.obj] = true
+        if not lock[obj] then
+            lock[obj] = true
             max = max + 1
             status.share.count = status.share.count + 1
-            m.checkSameSimple(status, simple, data, mode, queue)
+            if status.share.count % 10000 == 0 then
+                if TEST then
+                    print('####', status.share.count, osClock() - status.clock)
+                end
+                if status.interface and status.interface.pulse then
+                    status.interface.pulse()
+                end
+            end
+            --if status.share.count >= 100000 then
+            --    logWarn('Count too large!')
+            --    break
+            --end
+            m.checkSameSimple(status, simple, obj, start, force, mode, pushQueue)
             if max >= 10000 then
                 logWarn('Queue too large!')
                 break
             end
         end
     end
+    --deallocQueue(queues, starts, forces)
 end
 
 function m.getCallerInSameFile(status, func)
@@ -2627,12 +2681,9 @@ end
 --end
 
 function m.getRefCache(status, obj, mode)
-    local cache, globalCache
-    if  status.depth == 1
-    and status.deep then
-        globalCache = status.interface.cache and status.interface.cache() or {}
-    end
-    cache = status.share.refCache or {}
+    local isDeep    = status.deep and status.depth == 1
+    local cache     = status.share.refCache or {}
+    local deepCache = status.interface.cache and status.interface.cache() or {}
     status.share.refCache = cache
     if m.isGlobal(obj) then
         obj = m.getKeyName(obj)
@@ -2640,26 +2691,49 @@ function m.getRefCache(status, obj, mode)
     if not cache[mode] then
         cache[mode] = {}
     end
-    if globalCache and not globalCache[mode] then
-        globalCache[mode] = {}
+    if not deepCache[mode] then
+        deepCache[mode] = {}
     end
-    local sourceCache = globalCache and globalCache[mode][obj] or cache[mode][obj]
+    local sourceCache
+    if isDeep then
+        sourceCache = deepCache[mode][obj]
+    else
+        sourceCache = cache[mode][obj]
+    end
     if sourceCache then
         return sourceCache
     end
     sourceCache = {}
     cache[mode][obj] = sourceCache
-    if globalCache then
-        globalCache[mode][obj] = sourceCache
+    if isDeep then
+        deepCache[mode][obj] = sourceCache
     end
     return nil, function (results)
         for i = 1, #results do
             sourceCache[i] = results[i]
         end
+        if not isDeep then
+            return
+        end
+        if mode == 'ref'
+        or mode == 'def' then
+            for i = 1, #results do
+                local res = results[i]
+                if not deepCache[mode][res] then
+                    cache[mode][res] = sourceCache
+                    if isDeep then
+                        deepCache[mode][res] = sourceCache
+                    end
+                end
+            end
+        end
     end
 end
 
 function m.searchRefs(status, obj, mode)
+    if not obj then
+        return
+    end
     local cache, makeCache = m.getRefCache(status, obj, mode)
     if cache then
         for i = 1, #cache do
@@ -2669,13 +2743,16 @@ function m.searchRefs(status, obj, mode)
     end
 
     -- 检查单步引用
+    tracy.ZoneBeginN('searchRefs getStepRef')
     local res = m.getStepRef(status, obj, mode)
     if res then
         for i = 1, #res do
             status.results[#status.results+1] = res[i]
         end
     end
+    tracy.ZoneEnd()
     -- 检查simple
+    tracy.ZoneBeginN('searchRefs searchSameFields')
     if status.depth <= 100 then
         local simple = m.getSimple(obj)
         if simple then
@@ -2689,6 +2766,7 @@ function m.searchRefs(status, obj, mode)
             logWarn('status.depth overflow')
         end
     end
+    tracy.ZoneEnd()
 
     m.cleanResults(status.results)
 
@@ -3109,6 +3187,13 @@ function m.inferCheckDoc(status, source)
         end
         return true
     end
+    if source.type == 'doc.alias.name' then
+        local results = m.getDocTypeNames(status, m.getDocState(source).extends)
+        for _, res in ipairs(results) do
+            status.results[#status.results+1] = res
+        end
+        return true
+    end
 end
 
 function m.getVarargDocType(status, source)
@@ -3381,6 +3466,8 @@ function m.inferCheckBinary(status, source)
                 or m.getInferLiteral(status, source[1], 'number')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
                 or m.getInferLiteral(status, source[2], 'number')
+        v1 = tonumber(v1)
+        v2 = tonumber(v2)
         local v
         if v1 and v2 then
             v = v1 <= v2
@@ -3397,6 +3484,8 @@ function m.inferCheckBinary(status, source)
                 or m.getInferLiteral(status, source[1], 'number')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
                 or m.getInferLiteral(status, source[2], 'number')
+        v1 = tonumber(v1)
+        v2 = tonumber(v2)
         local v
         if v1 and v2 then
             v = v1 >= v2
@@ -3413,6 +3502,8 @@ function m.inferCheckBinary(status, source)
                 or m.getInferLiteral(status, source[1], 'number')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
                 or m.getInferLiteral(status, source[2], 'number')
+        v1 = tonumber(v1)
+        v2 = tonumber(v2)
         local v
         if v1 and v2 then
             v = v1 < v2
@@ -3429,6 +3520,8 @@ function m.inferCheckBinary(status, source)
                 or m.getInferLiteral(status, source[1], 'number')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
                 or m.getInferLiteral(status, source[2], 'number')
+        v1 = tonumber(v1)
+        v2 = tonumber(v2)
         local v
         if v1 and v2 then
             v = v1 > v2
@@ -3443,6 +3536,8 @@ function m.inferCheckBinary(status, source)
     elseif op.type == '|' then
         local v1 = m.getInferLiteral(status, source[1], 'integer')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
+        v1 = tointeger(v1)
+        v2 = tointeger(v2)
         local v
         if v1 and v2 then
             v = v1 | v2
@@ -3457,6 +3552,8 @@ function m.inferCheckBinary(status, source)
     elseif op.type == '~' then
         local v1 = m.getInferLiteral(status, source[1], 'integer')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
+        v1 = tointeger(v1)
+        v2 = tointeger(v2)
         local v
         if v1 and v2 then
             v = v1 ~ v2
@@ -3471,6 +3568,8 @@ function m.inferCheckBinary(status, source)
     elseif op.type == '&' then
         local v1 = m.getInferLiteral(status, source[1], 'integer')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
+        v1 = tointeger(v1)
+        v2 = tointeger(v2)
         local v
         if v1 and v2 then
             v = v1 & v2
@@ -3485,6 +3584,8 @@ function m.inferCheckBinary(status, source)
     elseif op.type == '<<' then
         local v1 = m.getInferLiteral(status, source[1], 'integer')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
+        v1 = tointeger(v1)
+        v2 = tointeger(v2)
         local v
         if v1 and v2 then
             v = v1 << v2
@@ -3499,6 +3600,8 @@ function m.inferCheckBinary(status, source)
     elseif op.type == '>>' then
         local v1 = m.getInferLiteral(status, source[1], 'integer')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
+        v1 = tointeger(v1)
+        v2 = tointeger(v2)
         local v
         if v1 and v2 then
             v = v1 >> v2
@@ -3513,6 +3616,8 @@ function m.inferCheckBinary(status, source)
     elseif op.type == '..' then
         local v1 = m.getInferLiteral(status, source[1], 'string')
         local v2 = m.getInferLiteral(status, source[2], 'string')
+        v1 = type(v1) == 'string' and v1 or nil
+        v2 = type(v2) == 'string' and v2 or nil
         local v
         if v1 and v2 then
             v = v1 .. v2
@@ -3529,6 +3634,8 @@ function m.inferCheckBinary(status, source)
                 or m.getInferLiteral(status, source[1], 'number')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
                 or m.getInferLiteral(status, source[2], 'number')
+        v1 = tonumber(v1)
+        v2 = tonumber(v2)
         local v
         if v1 and v2 then
             v = v1 ^ v2
@@ -3545,9 +3652,11 @@ function m.inferCheckBinary(status, source)
                 or m.getInferLiteral(status, source[1], 'number')
         local v2 = m.getInferLiteral(status, source[2], 'integer')
                 or m.getInferLiteral(status, source[2], 'number')
+        v1 = tonumber(v1)
+        v2 = tonumber(v2)
         local v
-        if v1 and v2 then
-            v = v1 > v2
+        if v1 and v2 and v2 ~= 0 then
+            v = v1 / v2
         end
         status.results = m.allocInfer {
             type   = 'number',
@@ -3588,7 +3697,7 @@ function m.inferCheckBinary(status, source)
         local int, v1, v2 = mathCheck(status, source[1], source[2])
         status.results = m.allocInfer {
             type   = int,
-            value  = (v1 and v2) and (v1 % v2) or nil,
+            value  = (v1 and v2 and v2 ~= 0) and (v1 % v2) or nil,
             source = source,
             level  = 100,
         }
@@ -3597,7 +3706,7 @@ function m.inferCheckBinary(status, source)
         local int, v1, v2 = mathCheck(status, source[1], source[2])
         status.results = m.allocInfer {
             type   = int,
-            value  = (v1 and v2) and (v1 // v2) or nil,
+            value  = (v1 and v2 and v2 ~= 0) and (v1 // v2) or nil,
             source = source,
             level  = 100,
         }
@@ -3615,14 +3724,24 @@ function m.inferByDef(status, obj)
     status.share.inferedDef[obj] = true
     local mark = {}
     local newStatus = m.status(status, status.interface)
+    tracy.ZoneBeginN('inferByDef searchRefs')
     m.searchRefs(newStatus, obj, 'def')
+    tracy.ZoneEnd()
     for _, src in ipairs(newStatus.results) do
         local inferStatus = m.status(newStatus)
         m.searchInfer(inferStatus, src)
-        for _, infer in ipairs(inferStatus.results) do
-            if not mark[infer.source] then
-                mark[infer.source] = true
-                status.results[#status.results+1] = infer
+        if #inferStatus.results == 0 then
+            status.results[#status.results+1] = {
+                type   = 'any',
+                source = src,
+                level  = 0,
+            }
+        else
+            for _, infer in ipairs(inferStatus.results) do
+                if not mark[infer.source] then
+                    mark[infer.source] = true
+                    status.results[#status.results+1] = infer
+                end
             end
         end
     end
@@ -3650,7 +3769,7 @@ local function inferBySetOfLocal(status, source)
     end
 end
 
-function m.inferBySet(status, source)
+function m.inferByLocalRef(status, source)
     if #status.results ~= 0 then
         return
     end
@@ -3920,6 +4039,9 @@ function m.inferByPCallReturn(status, source)
     if not call or call.type ~= 'call' then
         return
     end
+    if not call.args then
+        return
+    end
     local node = call.node
     local specialName = node.special
     local func, index
@@ -3996,6 +4118,9 @@ function m.searchInfer(status, obj)
         end
         obj = value
     end
+    if not obj then
+        return
+    end
 
     local cache, makeCache = m.getRefCache(status, obj, 'infer')
     if cache then
@@ -4030,16 +4155,16 @@ function m.searchInfer(status, obj)
         return
     end
 
+    m.inferByLocalRef(status, obj)
     if status.deep then
+        tracy.ZoneBeginN('inferByDef')
         m.inferByDef(status, obj)
+        tracy.ZoneEnd()
     end
-    m.inferBySet(status, obj)
     m.inferByCall(status, obj)
     m.inferByGetTable(status, obj)
     m.inferByUnary(status, obj)
     m.inferByBinary(status, obj)
-    m.inferByCallReturn(status, obj)
-    m.inferByPCallReturn(status, obj)
     m.cleanInfers(status.results, obj)
     if makeCache then
         makeCache(status.results)
@@ -4075,12 +4200,22 @@ function m.requestDefinition(obj, interface, deep)
     return status.results, status.share.count
 end
 
---- 请求对象的域
----@param filterKey nil|string|table nil表fields不做限制;string表fields必须同名;table取值为guild.ANYSET表fields必须满足isSet()
+--- 请求对象的字段
+---@param filterKey nil|string|table
 function m.requestFields(obj, interface, deep, filterKey)
     local status = m.status(nil, interface, deep)
 
     m.searchFields(status, obj, filterKey)
+
+    return status.results, status.share.count
+end
+
+--- 请求对象的定义字段
+---@param filterKey nil|string|table
+function m.requestDefFields(obj, interface, deep, filterKey)
+    local status = m.status(nil, interface, deep)
+
+    m.searchDefFields(status, obj, filterKey)
 
     return status.results, status.share.count
 end

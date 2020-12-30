@@ -452,9 +452,9 @@ CHECK 'local x = (a && b)'
                 finish = 17,
                 parent = "<IGNORE>",
                 op     = {
-                    type   = "&",
-                    start  = 15,
-                    finish = 15,
+                    type   = "and",
+                    start  = 14,
+                    finish = 16,
                 },
                 [1]    = {
                     type   = "getglobal",

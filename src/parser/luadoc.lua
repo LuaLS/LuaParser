@@ -56,6 +56,7 @@ Symbol              <-  ({} {
                         /   '...'
                         /   '+'
                         /   '#'
+                        /   '`'
                         } {})
                     ->  Symbol
 ]], {
@@ -256,6 +257,7 @@ local function parseTypeUnitArray(node)
         finish = getFinish(),
         node   = node,
     }
+    node.parent = result
     return result
 end
 
@@ -450,11 +452,40 @@ function parseType(parent)
         if not tp then
             break
         end
+
+        -- 处理 `T` 的情况
+        local typeLiteral = nil
+        if tp == 'symbol' and content == '`' then
+            nextToken()
+            if not checkToken('symbol', '`', 2) then
+                break
+            end
+            tp, content = peekToken()
+            if not tp then
+                break
+            end
+            -- TypeLiteral，指代类型的字面值。比如，对于类 Cat 来说，它的 TypeLiteral 是 "Cat"
+            typeLiteral = {
+                type   = 'doc.type.typeliteral',
+                parent = result,
+                start  = getStart(),
+                finish = nil,
+                node   = nil,
+            }
+        end
+
         if tp == 'name' then
             nextToken()
             local typeUnit = parseTypeUnit(result, content)
             if not typeUnit then
                 break
+            end
+            if typeLiteral then
+                nextToken()
+                typeLiteral.finish = getFinish()
+                typeLiteral.node = typeUnit
+                typeUnit.parent = typeLiteral
+                typeUnit = typeLiteral
             end
             result.types[#result.types+1] = typeUnit
             if not result.start then
@@ -878,10 +909,7 @@ end
 
 local function buildLuaDoc(comment)
     local text = comment.text
-    if text:sub(1, 1) ~= '-' then
-        return
-    end
-    local _, startPos = text:find('%s*@', 2)
+    local _, startPos = text:find('^%-%s*@')
     if not startPos then
         return {
             type    = 'doc.comment',
@@ -910,11 +938,22 @@ local function buildLuaDoc(comment)
     return result
 end
 
+---当前行在注释doc前是否有代码
+local function haveCodeBeforeDocInCurLine(lineData, docStartCol)
+    return docStartCol > lineData.sp + lineData.tab + 3
+end
+
 local function isNextLine(lns, binded, doc)
     if not binded then
         return false
     end
     local lastDoc = binded[#binded]
+    local lastDocStartRow, lastDocStartCol = guide.positionOf(lns, lastDoc.originalComment.start)
+    local lastDocStartLineData = guide.lineData(lns, lastDocStartRow)
+    if haveCodeBeforeDocInCurLine(lastDocStartLineData, lastDocStartCol) then
+        return false
+    end
+
     local lastRow = guide.positionOf(lns, lastDoc.finish)
     local newRow  = guide.positionOf(lns, doc.start)
     return newRow - lastRow == 1
@@ -1037,6 +1076,7 @@ return function (_, state)
             if ast.finish < doc.finish then
                 ast.finish = doc.finish
             end
+            doc.originalComment = comment
         end
     end
 

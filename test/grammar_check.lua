@@ -1044,8 +1044,11 @@ TEST[[
 return a <!!=!> b
 ]]
 {
-    type = 'ERR_UEQ',
+    type = 'ERR_NONSTANDARD_SYMBOL',
     fix  = EXISTS,
+    info = {
+        symbol = '~=',
+    },
 }
 
 TEST[[
@@ -1255,10 +1258,13 @@ a = 3 <!/!> / 2
 }
 
 TEST[[
-b = 1 <!&!>& 1
+b = 1 <!&&!> 1
 ]]
 {
-    type = 'MISS_EXP',
+    type = 'ERR_NONSTANDARD_SYMBOL',
+    info = {
+        symbol = 'and',
+    }
 }
 
 TEST[[
