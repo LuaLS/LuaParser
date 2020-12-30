@@ -772,3 +772,32 @@ local a,b,,d
         [1]    = "d",
     },
 }
+
+CHECK [[
+if /**/ then
+end
+]]
+{
+    type   = "main",
+    start  = 1,
+    finish = 16,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "if",
+        start  = 1,
+        finish = 16,
+        parent = "<IGNORE>",
+        [1]    = {
+            type    = "ifblock",
+            start   = 1,
+            finish  = 12,
+            keyword = {
+                [1] = 1,
+                [2] = 2,
+                [3] = 9,
+                [4] = 12,
+            },
+            parent  = "<IGNORE>",
+        },
+    },
+}
