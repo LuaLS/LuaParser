@@ -261,30 +261,36 @@ local function parseTypeUnitArray(node)
     return result
 end
 
-local function parseTypeUnitGeneric(node)
+local function parseTypeUnitTable(parent, node)
     if not checkToken('symbol', '<', 1) then
         return nil
     end
     if not nextSymbolOrError('<') then
         return nil
     end
-    local key = parseType(node)
+
+    local result = {
+        type   = 'doc.type.table',
+        start  = node.start,
+        node   = node,
+        parent = parent,
+    }
+
+    local key = parseType(result)
     if not key or not nextSymbolOrError(',') then
         return nil
     end
-    local value = parseType(node)
+    local value = parseType(result)
     if not value then
         return nil
     end
     nextSymbolOrError('>')
-    local result = {
-        type   = 'doc.type.generic',
-        start  = node.start,
-        finish = getFinish(),
-        node   = node,
-        key    = key,
-        value  = value,
-    }
+    
+    node.parent = result;
+    result.finish = getFinish()
+    result.key = key
+    result.value = value
+
     return result
 end
 
@@ -398,7 +404,7 @@ local function parseTypeUnit(parent, content)
     result.parent = parent
     while true do
         local newResult = parseTypeUnitArray(result)
-                    or    parseTypeUnitGeneric(result)
+                    or    parseTypeUnitTable(parent, result)
         if not newResult then
             break
         end
@@ -909,12 +915,13 @@ end
 
 local function buildLuaDoc(comment)
     local text = comment.text
-    local _, startPos = text:find('^%-%s*@')
+    local _, startPos = text:find('^%-?%s*@')
     if not startPos then
         return {
             type    = 'doc.comment',
             start   = comment.start,
             finish  = comment.finish,
+            range   = comment.finish,
             comment = comment,
         }
     end
@@ -924,6 +931,7 @@ local function buildLuaDoc(comment)
     parseTokens(doc, comment.start + startPos - 1)
     local result = convertTokens()
     if result then
+        result.range = comment.finish
         local cstart = text:find('%S', result.finish - comment.start + 2)
         if cstart and cstart < comment.finish then
             result.comment = {
@@ -935,7 +943,17 @@ local function buildLuaDoc(comment)
         end
     end
 
-    return result
+    if result then
+        return result
+    end
+
+    return {
+        type    = 'doc.comment',
+        start   = comment.start,
+        finish  = comment.finish,
+        range   = comment.finish,
+        comment = comment,
+    }
 end
 
 ---当前行在注释doc前是否有代码
@@ -980,28 +998,43 @@ local function bindGeneric(binded)
     end
 end
 
-local function bindDocsBetween(state, binded, bindSources, start, finish)
-    guide.eachSourceBetween(state.ast, start, finish, function (src)
-        if src.start and src.start < start then
-            return
+local function bindDocsBetween(sources, binded, bindSources, start, finish)
+    -- 用二分法找到第一个
+    local max = #sources
+    local index
+    local left  = 1
+    local right = max
+    for _ = 1, 1000 do
+        index = left + (right - left) // 2
+        if index <= left then
+            index = left
+            break
+        elseif index >= right then
+            index = right
+            break
         end
-        if src.type == 'local'
-        or src.type == 'setlocal'
-        or src.type == 'setglobal'
-        or src.type == 'setfield'
-        or src.type == 'setmethod'
-        or src.type == 'setindex'
-        or src.type == 'tablefield'
-        or src.type == 'tableindex'
-        or src.type == 'function'
-        or src.type == '...' then
-            src.bindDocs = binded
-            bindSources[#bindSources+1] = src
+        local src = sources[index]
+        if src.start < start then
+            left = index
+        else
+            right = index
         end
-    end)
+    end
+    for i = index - 1, max do
+        local src = sources[i]
+        if src then
+            if src.start > finish then
+                break
+            end
+            if src.start >= start then
+                src.bindDocs = binded
+                bindSources[#bindSources+1] = src
+            end
+        end
+    end
 end
 
-local function bindDoc(state, lns, binded)
+local function bindDoc(sources, lns, binded)
     if not binded then
         return
     end
@@ -1018,24 +1051,42 @@ local function bindDoc(state, lns, binded)
     local row = guide.positionOf(lns, lastDoc.finish)
     local cstart, cfinish  = guide.lineRange(lns, row)
     local nstart, nfinish = guide.lineRange(lns, row + 1)
-    bindDocsBetween(state, binded, bindSources, cstart, cfinish)
+    bindDocsBetween(sources, binded, bindSources, cstart, cfinish)
     if #bindSources == 0 then
-        bindDocsBetween(state, binded, bindSources, nstart, nfinish)
+        bindDocsBetween(sources, binded, bindSources, nstart, nfinish)
     end
 end
 
 local function bindDocs(state)
     local lns = lines(nil, state.lua)
+    local sources = {}
+    guide.eachSource(state.ast, function (src)
+        if src.type == 'local'
+        or src.type == 'setlocal'
+        or src.type == 'setglobal'
+        or src.type == 'setfield'
+        or src.type == 'setmethod'
+        or src.type == 'setindex'
+        or src.type == 'tablefield'
+        or src.type == 'tableindex'
+        or src.type == 'function'
+        or src.type == '...' then
+            sources[#sources+1] = src
+        end
+    end)
+    table.sort(sources, function (a, b)
+        return a.start < b.start
+    end)
     local binded
     for _, doc in ipairs(state.ast.docs) do
         if not isNextLine(lns, binded, doc) then
-            bindDoc(state, lns, binded)
+            bindDoc(sources, lns, binded)
             binded = {}
             state.ast.docs.groups[#state.ast.docs.groups+1] = binded
         end
         binded[#binded+1] = doc
     end
-    bindDoc(state, lns, binded)
+    bindDoc(sources, lns, binded)
 end
 
 return function (_, state)
