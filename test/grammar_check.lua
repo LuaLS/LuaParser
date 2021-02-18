@@ -1442,6 +1442,16 @@ end
     type = 'UNEXPECT_LFUNC_NAME'
 }
 
+TEST [[
+f() <!=!> 1
+]]
+{
+    type = 'UNEXPECT_SYMBOL',
+    info = {
+        symbol = '=',
+    }
+}
+
 Version = 'Lua 5.1'
 TEST[[
 <!::xx::!>
