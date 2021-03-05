@@ -422,3 +422,10 @@ end
 {
     type = 'LOCAL_LIMIT',
 }
+
+TEST [[
+local x <const<!>=!> 1
+]]
+{
+    type = 'MISS_SPACE_BETWEEN',
+}
