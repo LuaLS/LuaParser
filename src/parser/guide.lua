@@ -90,7 +90,7 @@ m.childMap = {
     ['unary']       = {1},
 
     ['doc']                = {'#'},
-    ['doc.class']          = {'class', 'extends', 'comment'},
+    ['doc.class']          = {'class', '#extends', 'comment'},
     ['doc.type']           = {'#types', '#enums', 'name', 'comment'},
     ['doc.alias']          = {'alias', 'extends', 'comment'},
     ['doc.param']          = {'param', 'extends', 'comment'},
@@ -99,9 +99,11 @@ m.childMap = {
     ['doc.generic']        = {'#generics', 'comment'},
     ['doc.generic.object'] = {'generic', 'extends', 'comment'},
     ['doc.vararg']         = {'vararg', 'comment'},
+    ['doc.type.array']     = {'node'},
     ['doc.type.table']     = {'node', 'key', 'value', 'comment'},
     ['doc.type.function']  = {'#args', '#returns', 'comment'},
     ['doc.type.typeliteral']  = {'node'},
+    ['doc.type.arg']       = {'extends'},
     ['doc.overload']       = {'overload', 'comment'},
     ['doc.see']            = {'name', 'field'},
 }
@@ -128,6 +130,8 @@ local TypeSort = {
     ['number']   = 4,
     ['table']    = 5,
     ['function'] = 6,
+    ['true']     = 101,
+    ['false']    = 102,
     ['nil']      = 999,
 }
 
@@ -460,7 +464,7 @@ function m.isContain(source, offset)
     if not start then
         return false
     end
-    return start <= offset and finish >= offset - 1
+    return start <= offset and finish >= offset
 end
 
 --- 判断offset在source的影响范围内
@@ -471,7 +475,7 @@ function m.isInRange(source, offset)
     if not start then
         return false
     end
-    return start <= offset and finish >= offset - 1
+    return start <= offset and finish >= offset
 end
 
 function m.isBetween(source, tStart, tFinish)
@@ -479,7 +483,7 @@ function m.isBetween(source, tStart, tFinish)
     if not start then
         return false
     end
-    return start <= tFinish and finish >= tStart - 1
+    return start <= tFinish and finish >= tStart
 end
 
 function m.isBetweenRange(source, tStart, tFinish)
@@ -487,7 +491,7 @@ function m.isBetweenRange(source, tStart, tFinish)
     if not start then
         return false
     end
-    return start <= tFinish and finish >= tStart - 1
+    return start <= tFinish and finish >= tStart
 end
 
 --- 添加child
@@ -505,8 +509,10 @@ function m.addChilds(list, obj, map)
             elseif type(key) == 'string'
             and key:sub(1, 1) == '#' then
                 key = key:sub(2)
-                for i = 1, #obj[key] do
-                    list[#list+1] = obj[key][i]
+                if obj[key] then
+                    for i = 1, #obj[key] do
+                        list[#list+1] = obj[key][i]
+                    end
                 end
             end
         end
@@ -638,7 +644,7 @@ function m.positionOf(lines, offset)
     end
     local lastLine = lines[#lines]
     if offset > lastLine.finish then
-        return #lines, lastLine.finish - lastLine.start + 1
+        return #lines, offset - lastLine.start
     end
     local min = 1
     local max = #lines
@@ -1012,6 +1018,20 @@ local function stepRefOfDocType(status, obj, mode)
         local name = obj[1]
         if not name or not status.interface.docType then
             return results
+        end
+        if name == 'nil'
+        or name == 'any'
+        or name == 'boolean'
+        or name == 'string'
+        or name == 'table'
+        or name == 'number'
+        or name == 'integer'
+        or name == 'function'
+        or name == 'table'
+        or name == 'thread'
+        or name == 'userdata'
+        or name == 'lightuserdata' then
+            mode = 'def'
         end
         local docs = status.interface.docType(name)
         for i = 1, #docs do
@@ -1494,7 +1514,9 @@ function m.getObjectValue(obj)
     if obj.type == 'boolean'
     or obj.type == 'number'
     or obj.type == 'integer'
-    or obj.type == 'string' then
+    or obj.type == 'string'
+    or obj.type == 'doc.type.table'
+    or obj.type == 'doc.type.arrary' then
         return obj
     end
     if obj.value then
@@ -1629,6 +1651,64 @@ local function appendValidGenericType(results, status, typeName, obj)
     end
 end
 
+local function stepRefOfGenericCrossTable(status, doc, typeName)
+    for _, typeUnit in ipairs(doc.extends.types) do
+        if typeUnit.type == 'doc.type.table' then
+            for _, where in ipairs {'key', 'value'} do
+                local childTypes = typeUnit[where].types
+                for _, childName in ipairs(childTypes) do
+                    if childName[1] == typeName[1] then
+                        return function (obj)
+                            local childStatus = m.status(status)
+                            m.searchRefs(childStatus, obj, 'def')
+                            for _, res in ipairs(childStatus.results) do
+                                if res.type == 'doc.type.table' then
+                                    return res[where]
+                                end
+                                if res.type == 'doc.type.array' then
+                                    if where == 'key' then
+                                        return status.interface and status.interface.docType('integer')[1]
+                                    end
+                                    if where == 'value' then
+                                        return res.node
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+            return function (obj)
+                return nil
+            end
+        elseif typeUnit.type == 'doc.type.array' then
+            return function (obj)
+                local childStatus = m.status(status)
+                m.searchRefs(childStatus, obj, 'def')
+                for _, res in ipairs(childStatus.results) do
+                    if res.type == 'doc.type.array' then
+                        return res.node
+                    end
+                end
+            end
+        end
+    end
+    return nil
+end
+
+local function getIteratorArg(status, args, index)
+    local call = args.parent
+    local node = call.node
+    if not node.iterator then
+        return nil
+    end
+    if node.type ~= 'call' then
+        return nil
+    end
+    local results = m.checkSameSimpleInCallInSameFile(status, node.node, node.args, index + 1)
+    return results[1]
+end
+
 local function stepRefOfGeneric(status, typeUnit, args, mode)
     local results = {}
     if not args then
@@ -1639,25 +1719,56 @@ local function stepRefOfGeneric(status, typeUnit, args, mode)
         if typeName == typeUnit then
             goto CONTINUE
         end
-        local doc = m.getDocState(typeName)
-        if doc.type ~= 'doc.param' then
+        local docArg = m.getParentType(typeName, 'doc.type.arg')
+                   or  m.getParentType(typeName, 'doc.param')
+                   or  m.getParentType(typeName, 'doc.type.array')
+        if not docArg then
             goto CONTINUE
         end
+        local doc = m.getDocState(docArg)
         if not doc.bindSources then
             goto CONTINUE
         end
-        local paramName = doc.param[1]
-        for _, source in ipairs(doc.bindSources) do
-            if  source.type == 'local'
-            and source[1] == paramName
-            and source.parent.type == 'funcargs' then
-                for index, arg in ipairs(source.parent) do
-                    if arg == source then
-                        appendValidGenericType(results, status, typeName, args[index])
+        local crossTable = stepRefOfGenericCrossTable(status, docArg, typeName)
+
+        -- find out param index
+        local genericIndex
+        if docArg.type == 'doc.param' then
+            local paramName = docArg.param[1]
+            for _, source in ipairs(doc.bindSources) do
+                if  source.type == 'local'
+                and source[1] == paramName
+                and source.parent.type == 'funcargs' then
+                    for index, arg in ipairs(source.parent) do
+                        if arg == source then
+                            genericIndex = index
+                            break
+                        end
                     end
                 end
             end
+        elseif docArg.type == 'doc.type.arg' then
+            for index, arg in ipairs(docArg.parent.args) do
+                if arg == docArg then
+                    genericIndex = index
+                    break
+                end
+            end
         end
+
+        local callArg = args[genericIndex]
+                    or  getIteratorArg(status, args, genericIndex)
+
+        if not callArg then
+            goto CONTINUE
+        end
+        if crossTable then
+            callArg = crossTable(callArg)
+            if not callArg then
+                goto CONTINUE
+            end
+        end
+        appendValidGenericType(results, status, typeName, callArg)
         ::CONTINUE::
     end
     return results
@@ -1676,7 +1787,6 @@ function m.checkSameSimpleByDocType(status, doc, args)
             local pieceResult = stepRefOfGeneric(status, piece, args, 'def')
             for _, res in ipairs(pieceResult) do
                 results[#results+1] = res
-                status.hasGenericResult = true
             end
         else
             local pieceResult = stepRefOfDocType(status, piece, 'def')
@@ -1753,6 +1863,53 @@ function m.checkSameSimpleOfRefByDocSource(status, obj, start, pushQueue, mode)
     end
 end
 
+function m.checkSameSimpleOfRefByDocReturn(status, obj, start, pushQueue, mode)
+    if status.share.searchingBindedDoc then
+        return
+    end
+    if not obj.bindSources then
+        return
+    end
+    local index = 0
+    for _, doc in ipairs(obj.bindGroup) do
+        if doc.type == 'doc.return' then
+            index = index + 1
+            if doc == obj then
+                break
+            end
+        end
+    end
+    status.share.searchingBindedDoc = true
+    local mark = {}
+    local newStatus = m.status(status)
+    for _, ref in ipairs(obj.bindSources) do
+        if not mark[ref] then
+            mark[ref] = true
+            m.searchRefs(newStatus, ref, mode)
+        end
+    end
+    status.share.searchingBindedDoc = nil
+    for _, res in ipairs(newStatus.results) do
+        local call = res.parent
+        if call.type == 'call' then
+            if index == 1 then
+                local sel = call.parent
+                if sel.type == 'select' and sel.index == index then
+                    pushQueue(sel.parent, start, true)
+                end
+            else
+                if call.extParent then
+                    for _, sel in ipairs(call.extParent) do
+                        if sel.type == 'select' and sel.index == index then
+                            pushQueue(sel.parent, start, true)
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
 local function getArrayOrTableLevel(obj)
     local level = 0
     while true do
@@ -1799,9 +1956,11 @@ function m.checkSameSimpleByDoc(status, obj, start, pushQueue, mode)
                 pushQueue(res, start, true)
             end
             if obj.extends then
-                local pieceResult = stepRefOfDocType(status, obj.extends, 'def')
-                for _, res in ipairs(pieceResult) do
-                    pushQueue(res, start, true)
+                for _, ext in ipairs(obj.extends) do
+                    local pieceResult = stepRefOfDocType(status, ext, 'def')
+                    for _, res in ipairs(pieceResult) do
+                        pushQueue(res, start, true)
+                    end
                 end
             end
         end
@@ -1824,9 +1983,14 @@ function m.checkSameSimpleByDoc(status, obj, start, pushQueue, mode)
             pushQueue(res, start, true)
         end
 
-        local state = m.getDocState(obj)
-        if state.type == 'doc.type' and mode == 'ref' then
-            m.checkSameSimpleOfRefByDocSource(status, state, start - getArrayOrTableLevel(obj), pushQueue, mode)
+        if mode == 'ref' then
+            local state = m.getDocState(obj)
+            if state.type == 'doc.type' then
+                m.checkSameSimpleOfRefByDocSource(status, state, start - getArrayOrTableLevel(obj), pushQueue, mode)
+            end
+            if state.type == 'doc.return' then
+                m.checkSameSimpleOfRefByDocReturn(status, state, start - getArrayOrTableLevel(obj), pushQueue, mode)
+            end
         end
         return true
     elseif obj.type == 'doc.field' then
@@ -1986,6 +2150,22 @@ local function checkSameSimpleAndMergeFunctionReturnsByDoc(status, results, sour
     return true
 end
 
+local function checkSameSimpleAndMergeDocFunctionReturn(status, results, docFunc, index, args)
+    if docFunc.type ~= 'doc.type.function' then
+        return
+    end
+    local rtn = docFunc.returns[index]
+    if rtn then
+        local types = m.checkSameSimpleByDocType(status, rtn, args)
+        if types then
+            for _, res in ipairs(types) do
+                results[#results+1] = res
+            end
+            return true
+        end
+    end
+end
+
 local function checkSameSimpleAndMergeDocTypeFunctionReturns(status, results, source, index)
     if not source.bindDocs then
         return
@@ -1993,17 +2173,8 @@ local function checkSameSimpleAndMergeDocTypeFunctionReturns(status, results, so
     for _, doc in ipairs(source.bindDocs) do
         if doc.type == 'doc.type' then
             for _, typeUnit in ipairs(doc.types) do
-                if typeUnit.type == 'doc.type.function' then
-                    local rtn = typeUnit.returns[index]
-                    if rtn then
-                        local types = m.checkSameSimpleByDocType(status, rtn)
-                        if types then
-                            for _, res in ipairs(types) do
-                                results[#results+1] = res
-                            end
-                            return true
-                        end
-                    end
+                if checkSameSimpleAndMergeDocFunctionReturn(status, results, typeUnit, index) then
+                    return true
                 end
             end
         end
@@ -2011,16 +2182,33 @@ local function checkSameSimpleAndMergeDocTypeFunctionReturns(status, results, so
 end
 
 function m.checkSameSimpleInCallInSameFile(status, func, args, index)
-    local results = {}
-    if func.special then
+    if not status.share.callResultsCache then
+        status.share.callResultsCache = {}
+    end
+    local cache = status.share.callResultsCache[func]
+    if not cache then
+        cache = {}
+        status.share.callResultsCache[func] = cache
+    end
+    local results = cache[index]
+    if results then
         return results
+    end
+    results = {}
+    if func.special then
+        --return results
     end
     local newStatus = m.status(status)
     m.searchRefs(newStatus, func, 'def')
+    local hasDocReturn
     for _, def in ipairs(newStatus.results) do
-        local hasDocReturn = checkSameSimpleAndMergeDocTypeFunctionReturns(status, results, def, index)
-                        or   checkSameSimpleAndMergeFunctionReturnsByDoc(status, results, def, index, args)
-        if not hasDocReturn then
+        hasDocReturn =   checkSameSimpleAndMergeDocTypeFunctionReturns(status, results, def, index)
+                    or   checkSameSimpleAndMergeFunctionReturnsByDoc(status, results, def, index, args)
+                    or   checkSameSimpleAndMergeDocFunctionReturn(status, results, def, index, args)
+                    or   hasDocReturn
+    end
+    if not hasDocReturn then
+        for _, def in ipairs(newStatus.results) do
             local value = m.getObjectValue(def) or def
             if value.type == 'function' then
                 local returns = value.returns
@@ -2034,6 +2222,8 @@ function m.checkSameSimpleInCallInSameFile(status, func, args, index)
                 end
             end
         end
+        -- generic cannot cache
+        cache[index] = results
     end
     return results
 end
@@ -2389,12 +2579,17 @@ function m.checkSameSimpleAsKeyOrValueInForParis(status, ref, start, pushQueue)
 end
 
 local function hasTypeName(doc, name)
-    if doc.type ~= 'doc.type' then
-        return false
+    if doc.type == 'doc.type' then
+        for _, tunit in ipairs(doc.types) do
+            if  tunit.type == 'doc.type.name'
+            and tunit[1] == name then
+                return true
+            end
+        end
     end
-    for _, tunit in ipairs(doc.types) do
-        if  tunit.type == 'doc.type.name'
-        and tunit[1] == name then
+    if doc.type == 'doc.type.name'
+    or doc.type == 'doc.class.name' then
+        if doc[1] == name then
             return true
         end
     end
@@ -2405,9 +2600,6 @@ function m.checkSameSimpleInString(status, ref, start, pushQueue, mode)
     -- 特殊处理 ('xxx').xxx 的形式
     if  ref.type ~= 'string'
     and not hasTypeName(ref, 'string') then
-        return
-    end
-    if status.depth > 5 then
         return
     end
     if not status.interface.docType then
@@ -2428,7 +2620,7 @@ function m.checkSameSimpleInString(status, ref, start, pushQueue, mode)
     end
     status.share.markString[marked] = true
     local newStatus = m.status(status)
-    local docs = status.interface.docType('string*')
+    local docs = status.interface.docType('stringlib')
     local mark = {}
     for i = 1, #docs do
         local doc = docs[i]
@@ -2472,8 +2664,14 @@ function m.pushResult(status, mode, ref, simple)
         elseif ref.type == 'doc.type.function'
         or     ref.type == 'doc.class.name'
         or     ref.type == 'doc.alias.name'
-        or     ref.type == 'doc.field' then
+        or     ref.type == 'doc.field'
+        or     ref.type == 'doc.type.table'
+        or     ref.type == 'doc.type.array' then
             results[#results+1] = ref
+        elseif ref.type == 'doc.type' then
+            if #ref.enums > 0 or #ref.resumes > 0 then
+                results[#results+1] = ref
+            end
         end
         if ref.parent and ref.parent.type == 'return' then
             if m.getParentFunction(ref) ~= m.getParentFunction(simple.node) then
@@ -2515,8 +2713,14 @@ function m.pushResult(status, mode, ref, simple)
         elseif ref.type == 'doc.type.function'
         or     ref.type == 'doc.class.name'
         or     ref.type == 'doc.alias.name'
-        or     ref.type == 'doc.field' then
+        or     ref.type == 'doc.field'
+        or     ref.type == 'doc.type.table'
+        or     ref.type == 'doc.type.array' then
             results[#results+1] = ref
+        elseif ref.type == 'doc.type' then
+            if #ref.enums > 0 or #ref.resumes > 0 then
+                results[#results+1] = ref
+            end
         end
         if ref.parent and ref.parent.type == 'return' then
             results[#results+1] = ref
@@ -2637,6 +2841,8 @@ function m.checkSameSimple(status, simple, ref, start, force, mode, pushQueue)
             m.checkSameSimpleInSpecialBranch(status, ref, i, pushQueue)
             -- self 的特殊处理
             m.checkSameSimpleInParamSelf(status, ref, i, pushQueue)
+            -- 自己是 call 的情况
+            m.checkSameSimpleInCall(status, ref, i, pushQueue, cmode)
             if cmode == 'ref' then
                 -- 检查形如 { a = f } 的情况
                 m.checkSameSimpleAsTableField(status, ref, i, pushQueue)
@@ -2917,9 +3123,17 @@ end
 
 function m.getRefCache(status, obj, mode)
     local isDeep = status.deep
+    if mode == 'infer' then
+        if not isDeep then
+            return nil, nil
+        end
+    end
     local globalCache = status.interface.cache and status.interface.cache() or {}
     if m.isGlobal(obj) then
         obj = m.getKeyName(obj)
+    end
+    if not obj then
+        return {}
     end
     if not globalCache[mode] then
         globalCache[mode] = {}
@@ -2936,10 +3150,6 @@ function m.getRefCache(status, obj, mode)
     end
     status.share.cacheLock[mode][obj] = {}
     return nil, function ()
-        if status.hasGenericResult then
-            status.share.cacheLock[mode][obj] = nil
-            return
-        end
         sourceCache = {}
         local results = status.results
         for i = 1, #results do
@@ -3027,22 +3237,21 @@ function m.allocInfer(o)
 end
 
 function m.mergeTypes(types)
-    local results = {}
-    local mark = {}
-    local hasAny
-    -- 这里把 any 去掉
-    for i = 1, #types do
-        local tp = types[i]
-        if tp == 'any' then
-            hasAny = true
-        end
-        if not mark[tp] and tp ~= 'any' then
-            mark[tp] = true
-            results[#results+1] = tp
-        end
-    end
-    if #results == 0 then
+    local hasAny = types['any']
+
+    types['any'] = nil
+
+    if not next(types) then
         return 'any'
+    end
+    -- 同时包含 number 与 integer 时，去掉 integer
+    if types['number'] and types['integer'] then
+        types['integer'] = nil
+    end
+
+    local results = {}
+    for tp in pairs(types) do
+        results[#results+1] = tp
     end
     -- 只有显性的 nil 与 any 时，取 any
     if #results == 1 then
@@ -3052,30 +3261,41 @@ function m.mergeTypes(types)
             return results[1]
         end
     end
-    -- 同时包含 number 与 integer 时，去掉 integer
-    if mark['number'] and mark['integer'] then
-        for i = 1, #results do
-            if results[i] == 'integer' then
-                tableRemove(results, i)
-                break
-            end
-        end
-    end
+
     tableSort(results, function (a, b)
         local sa = TypeSort[a] or 100
         local sb = TypeSort[b] or 100
-        return sa < sb
+        if sa == sb then
+            return a < b
+        else
+            return sa < sb
+        end
     end)
+
     return tableConcat(results, '|')
+end
+
+function m.getClassExtends(class)
+    if class.type == 'doc.class.name' then
+        class = class.parent
+    end
+    if not class.extends then
+        return nil
+    end
+    local names = {}
+    for _, ext in ipairs(class.extends) do
+        names[#names+1] = ext[1]
+    end
+    return names
 end
 
 function m.viewInferType(infers)
     if not infers then
         return 'any'
     end
-    local mark = {}
     local types = {}
     local hasDoc
+    local hasDocTable
     for i = 1, #infers do
         local infer = infers[i]
         local src = infer.source
@@ -3086,7 +3306,10 @@ function m.viewInferType(infers)
         or src.type == 'doc.type.table' then
             if infer.type ~= 'any' then
                 hasDoc = true
-                break
+            end
+            if src.type == 'doc.type.array'
+            or src.type == 'doc.type.table' then
+                hasDocTable = true
             end
         end
     end
@@ -3102,10 +3325,27 @@ function m.viewInferType(infers)
             or src.type == 'doc.type.enum'
             or src.type == 'doc.resume' then
                 local tp = infer.type or 'any'
-                if not mark[tp] then
-                    types[#types+1] = tp
+                if hasDocTable and tp == 'table' then
+                    goto CONTINUE
                 end
-                mark[tp] = true
+                if types[tp] == nil then
+                    types[tp] = true
+                end
+            end
+            if src.type == 'doc.class'
+            or src.type == 'doc.class.name' then
+                local extends = m.getClassExtends(src)
+                if extends then
+                    for _, tp in ipairs(extends) do
+                        types[tp] = false
+                    end
+                end
+            end
+            ::CONTINUE::
+        end
+        for k, v in pairs(types) do
+            if not v then
+                types[k] = nil
             end
         end
     else
@@ -3115,10 +3355,7 @@ function m.viewInferType(infers)
                 goto CONTINUE
             end
             local tp = infer.type or 'any'
-            if not mark[tp] then
-                types[#types+1] = tp
-            end
-            mark[tp] = true
+            types[tp] = true
             ::CONTINUE::
         end
     end
@@ -3404,6 +3641,17 @@ function m.inferCheckDoc(status, source)
         end
         return true
     end
+    if source.type == 'doc.type.function'
+    or source.type == 'doc.type.table'
+    or source.type == 'doc.type.array' then
+        local typeName = m.getDocTypeUnitName(status, source)
+        status.results[#status.results+1] = {
+            type   = typeName,
+            source = source,
+            level  = 100,
+        }
+        return true
+    end
     if source.type == 'doc.field' then
         local results = m.getDocTypeNames(status, source.extends)
         for _, res in ipairs(results) do
@@ -3492,7 +3740,8 @@ function m.inferCheckUpDoc(status, source)
         return
     end
     status.results = {}
-    for _, doc in ipairs(binds) do
+    for i = #binds, 1, -1 do
+        local doc = binds[i]
         if doc.type == 'doc.class' then
             status.results[#status.results+1] = {
                 type   = doc.class[1],
@@ -4385,7 +4634,7 @@ function m.searchInfer(status, obj)
         m.inferByDef(status, obj)
         tracy.ZoneEnd()
     end
-    m.inferByCall(status, obj)
+    --m.inferByCall(status, obj)
     m.inferByGetTable(status, obj)
     m.inferByUnary(status, obj)
     m.inferByBinary(status, obj)

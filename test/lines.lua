@@ -100,7 +100,7 @@ do
 
     local row, col = guide.positionOf(lines, 9999)
     assert(row == 3)
-    assert(col == 0)
+    assert(col == 9988)
 
     local row, col = guide.positionOf(lines, 11)
     assert(row == 3)
