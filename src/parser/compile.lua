@@ -1,6 +1,6 @@
 local guide = require 'parser.guide'
-local type = type
-local os   = os
+local type  = type
+local os    = os
 
 local specials = {
     ['_G']           = true,
@@ -540,6 +540,9 @@ return function (self, lua, mode, version, options)
     if not state then
         return nil, err
     end
+    --if options and options.delay then
+    --    options.delay()
+    --end
     local clock = os.clock()
     pushError = state.pushError
     if version == 'Lua 5.1' or version == 'LuaJIT' then
