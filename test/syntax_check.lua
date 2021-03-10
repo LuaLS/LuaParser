@@ -429,3 +429,10 @@ local x <const<!>=!> 1
 {
     type = 'MISS_SPACE_BETWEEN',
 }
+
+TEST [[
+function mt[<!''!>]() end
+]]
+{
+    type = 'INDEX_IN_FUNC_NAME'
+}
