@@ -391,15 +391,23 @@ CHECK 'return local a'
     [1]     = {
         type   = "return",
         start  = 1,
-        finish = 7,
+        finish = 12,
         parent = "<IGNORE>",
+        [1]    = {
+            type   = "getglobal",
+            start  = 8,
+            finish = 12,
+            parent = "<IGNORE>",
+            node   = "<IGNORE>",
+            [1]    = "local",
+        },
     },
     [2]     = {
-        type   = "local",
+        type   = "getglobal",
         start  = 14,
         finish = 14,
-        effect = 15,
         parent = "<IGNORE>",
+        node   = "<IGNORE>",
         [1]    = "a",
     },
 }
@@ -410,6 +418,14 @@ CHECK 'end'
     start  = 1,
     finish = 3,
     locals = "<IGNORE>",
+    [1]    = {
+        type   = "getglobal",
+        start  = 1,
+        finish = 3,
+        parent = "<IGNORE>",
+        node   = "<IGNORE>",
+        [1]    = "end",
+    },
 }
 
 CHECK 'local x = ,'
@@ -621,16 +637,28 @@ CHECK [[
 return
 ]]
 {
-    type    = "main",
-    start   = 1,
-    finish  = 9,
-    locals  = "<IGNORE>",
-    returns = "<IGNORE>",
-    [1]     = {
-        type   = "return",
-        start  = 3,
-        finish = 9,
+    type   = "main",
+    start  = 1,
+    finish = 8,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "unary",
+        start  = 1,
+        finish = 8,
         parent = "<IGNORE>",
+        op     = {
+            type   = "-",
+            start  = 1,
+            finish = 1,
+        },
+        [1]    = {
+            type   = "getglobal",
+            start  = 3,
+            finish = 8,
+            parent = "<IGNORE>",
+            node   = "<IGNORE>",
+            [1]    = "return",
+        },
     },
 }
 
@@ -798,6 +826,37 @@ end
                 [4] = 12,
             },
             parent  = "<IGNORE>",
+        },
+    },
+}
+
+CHECK [[
+f(if)
+]]
+{
+    type   = "main",
+    start  = 1,
+    finish = 5,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "call",
+        start  = 1,
+        finish = 5,
+        parent = "<IGNORE>",
+        node   = "<IGNORE>",
+        args   = {
+            type   = "callargs",
+            start  = 2,
+            finish = 5,
+            parent = "<IGNORE>",
+            [1]    = {
+                type   = "getglobal",
+                start  = 3,
+                finish = 4,
+                parent = "<IGNORE>",
+                node   = "<IGNORE>",
+                [1]    = "if",
+            },
         },
     },
 }
