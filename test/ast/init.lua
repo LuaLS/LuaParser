@@ -38,7 +38,7 @@ end
 
 local sortList = {
     'specials',
-    'type', 'start', 'vstart', 'finish', 'effect', 'range',
+    'type', 'start', 'bstart', 'vstart', 'finish', 'effect', 'range',
     'tag', 'special', 'keyword',
     'parent', 'extParent', 'child',
     'filter',

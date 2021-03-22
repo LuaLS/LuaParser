@@ -145,6 +145,7 @@ CHECK 'x[y] = 1'
 {
     type   = "setindex",
     start  = 1,
+    bstart = 2,
     finish = 4,
     range  = 8,
     node   = "<IGNORE>",

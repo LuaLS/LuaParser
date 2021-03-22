@@ -431,8 +431,16 @@ local x <const<!>=!> 1
 }
 
 TEST [[
-function mt[<!''!>]() end
+function mt<!['']!>() end
 ]]
 {
     type = 'INDEX_IN_FUNC_NAME'
+}
+
+TEST [[
+function mt<![]!>() end
+]]
+{
+    multi = 2,
+    type  = 'INDEX_IN_FUNC_NAME'
 }
