@@ -886,6 +886,32 @@ CHECK'obj:remove()'
     start  = 1,
     finish = 12,
     node   = "<IGNORE>",
+    args   = {
+        type   = "callargs",
+        start  = 1,
+        finish = 12,
+        parent = "<IGNORE>",
+        [1]    = {
+            next   = "<LOOP>",
+            type   = "getmethod",
+            start  = 1,
+            finish = 10,
+            parent = "<IGNORE>",
+            node   = "<IGNORE>",
+            colon  = {
+                type   = ":",
+                start  = 4,
+                finish = 4,
+            },
+            method = {
+                type   = "method",
+                start  = 5,
+                finish = 10,
+                parent = "<IGNORE>",
+                [1]    = "remove",
+            },
+        },
+    },
 }
 CHECK'(...)[1]'
 {

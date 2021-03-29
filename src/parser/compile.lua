@@ -1,6 +1,7 @@
-local guide = require 'parser.guide'
-local type  = type
-local os    = os
+local guide       = require 'parser.guide'
+local type        = type
+local tableInsert = table.insert
+local os          = os
 
 local specials = {
     ['_G']           = true,
@@ -73,6 +74,16 @@ local vmMap = {
     end,
     ['call'] = function (obj)
         Compile(obj.node, obj)
+        if obj.node and obj.node.type == 'getmethod' then
+            if not obj.args then
+                obj.args = {
+                    type   = 'callargs',
+                    start  = obj.start,
+                    finish = obj.finish,
+                }
+            end
+            tableInsert(obj.args, 1, obj.node)
+        end
         Compile(obj.args, obj)
     end,
     ['callargs'] = function (obj)
@@ -135,6 +146,14 @@ local vmMap = {
             tag    = 'self',
             [1]    = 'self',
         }
+        if not obj.args then
+            obj.args = {
+                type   = 'funcargs',
+                start  = obj.start,
+                finish = obj.finish,
+            }
+        end
+        tableInsert(obj.args, 1, value.localself)
         Compile(value, obj)
     end,
     ['function'] = function (obj)
