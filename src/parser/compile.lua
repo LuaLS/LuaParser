@@ -146,14 +146,14 @@ local vmMap = {
             tag    = 'self',
             [1]    = 'self',
         }
-        if not obj.args then
-            obj.args = {
+        if not value.args then
+            value.args = {
                 type   = 'funcargs',
                 start  = obj.start,
                 finish = obj.finish,
             }
         end
-        tableInsert(obj.args, 1, value.localself)
+        tableInsert(value.args, 1, value.localself)
         Compile(value, obj)
     end,
     ['function'] = function (obj)

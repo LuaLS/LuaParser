@@ -1371,21 +1371,6 @@ end]]
     finish = 14,
     range  = 38,
     node   = "<IGNORE>",
-    args   = {
-        type   = "funcargs",
-        start  = 10,
-        finish = 14,
-        [1]    = {
-            type   = "local",
-            start  = 0,
-            finish = 0,
-            effect = 14,
-            tag    = "self",
-            parent = "<IGNORE>",
-            method = "<LOOP>",
-            [1]    = "self",
-        },
-    },
     colon  = {
         type   = ":",
         start  = 13,
@@ -1416,13 +1401,23 @@ end]]
             parent = "<IGNORE>",
             [1]    = {
                 type   = "local",
+                start  = 0,
+                finish = 0,
+                effect = 14,
+                tag    = "self",
+                parent = "<IGNORE>",
+                method = "<LOOP>",
+                [1]    = "self",
+            },
+            [2]    = {
+                type   = "local",
                 start  = 16,
                 finish = 16,
                 effect = 16,
                 parent = "<IGNORE>",
                 [1]    = "a",
             },
-            [2]    = {
+            [3]    = {
                 type   = "local",
                 start  = 19,
                 finish = 19,
@@ -1430,7 +1425,7 @@ end]]
                 parent = "<IGNORE>",
                 [1]    = "b",
             },
-            [3]    = {
+            [4]    = {
                 type   = "local",
                 start  = 22,
                 finish = 22,
@@ -1460,22 +1455,6 @@ end]]
     finish = 12,
     range  = 34,
     node   = "<IGNORE>",
-    args   = {
-        type   = "funcargs",
-        start  = 10,
-        finish = 12,
-        [1]    = {
-            type   = "local",
-            start  = 0,
-            finish = 0,
-            effect = 12,
-            tag    = "self",
-            parent = "<IGNORE>",
-            method = "<LOOP>",
-            ref    = "<IGNORE>",
-            [1]    = "self",
-        },
-    },
     colon  = {
         type   = ":",
         start  = 11,
@@ -1499,6 +1478,23 @@ end]]
             [4] = 34,
         },
         parent  = "<IGNORE>",
+        args    = {
+            type   = "funcargs",
+            start  = 10,
+            finish = 12,
+            parent = "<IGNORE>",
+            [1]    = {
+                type   = "local",
+                start  = 0,
+                finish = 0,
+                effect = 12,
+                tag    = "self",
+                parent = "<IGNORE>",
+                method = "<LOOP>",
+                ref    = "<IGNORE>",
+                [1]    = "self",
+            },
+        },
         locals  = "<IGNORE>",
         returns = "<IGNORE>",
         [1]     = {
