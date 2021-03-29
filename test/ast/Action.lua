@@ -277,13 +277,33 @@ CHECK'func:x(1, 2)'
         finish = 12,
         parent = "<IGNORE>",
         [1]    = {
+            next   = "<LOOP>",
+            type   = "getmethod",
+            start  = 1,
+            finish = 6,
+            parent = "<IGNORE>",
+            node   = "<IGNORE>",
+            colon  = {
+                type   = ":",
+                start  = 5,
+                finish = 5,
+            },
+            method = {
+                type   = "method",
+                start  = 6,
+                finish = 6,
+                parent = "<IGNORE>",
+                [1]    = "x",
+            },
+        },
+        [2]    = {
             type   = "number",
             start  = 8,
             finish = 8,
             parent = "<IGNORE>",
             [1]    = 1,
         },
-        [2]    = {
+        [3]    = {
             type   = "number",
             start  = 11,
             finish = 11,
@@ -304,6 +324,26 @@ CHECK'("%s"):format(1)'
         finish = 16,
         parent = "<IGNORE>",
         [1]    = {
+            next   = "<LOOP>",
+            type   = "getmethod",
+            start  = 1,
+            finish = 13,
+            parent = "<IGNORE>",
+            node   = "<IGNORE>",
+            colon  = {
+                type   = ":",
+                start  = 7,
+                finish = 7,
+            },
+            method = {
+                type   = "method",
+                start  = 8,
+                finish = 13,
+                parent = "<IGNORE>",
+                [1]    = "format",
+            },
+        },
+        [2]    = {
             type   = "number",
             start  = 15,
             finish = 15,
@@ -1360,6 +1400,26 @@ end]]
             finish = 23,
             parent = "<IGNORE>",
             [1]    = {
+                next   = "<LOOP>",
+                type   = "getfield",
+                start  = 10,
+                finish = 12,
+                parent = "<IGNORE>",
+                node   = "<IGNORE>",
+                dot    = {
+                    type   = ".",
+                    start  = 11,
+                    finish = 11,
+                },
+                field  = {
+                    type   = "field",
+                    start  = 12,
+                    finish = 12,
+                    parent = "<IGNORE>",
+                    [1]    = "b",
+                },
+            },
+            [2]    = {
                 type   = "local",
                 start  = 16,
                 finish = 16,
@@ -1367,7 +1427,7 @@ end]]
                 parent = "<IGNORE>",
                 [1]    = "a",
             },
-            [2]    = {
+            [3]    = {
                 type   = "local",
                 start  = 19,
                 finish = 19,
@@ -1375,7 +1435,7 @@ end]]
                 parent = "<IGNORE>",
                 [1]    = "b",
             },
-            [3]    = {
+            [4]    = {
                 type   = "local",
                 start  = 22,
                 finish = 22,
@@ -1428,6 +1488,17 @@ end]]
             [4] = 34,
         },
         parent  = "<IGNORE>",
+        args    = {
+            parent = "<IGNORE>",
+            [1]    = {
+                next   = "<LOOP>",
+                type   = "getglobal",
+                start  = 10,
+                finish = 10,
+                parent = "<IGNORE>",
+                [1]    = "m",
+            },
+        },
         locals  = "<IGNORE>",
         returns = "<IGNORE>",
         [1]     = {
