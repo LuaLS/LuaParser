@@ -40,7 +40,7 @@ local sortList = {
     'specials',
     'type', 'start', 'bstart', 'vstart', 'finish', 'effect', 'range',
     'tag', 'special', 'keyword',
-    'parent', 'extParent', 'child',
+    'parent', 'extParent', 'child', 'mirror', 'dummy',
     'filter',
     'node',
     'op', 'args',
@@ -56,7 +56,7 @@ for i, v in ipairs(sortList) do
     sortList[v] = i
 end
 local ignoreList = {
-    'specials', 'locals', 'ref', 'node', 'parent', 'extParent', 'returns', 'state',
+    'specials', 'locals', 'ref', 'node', 'parent', 'extParent', 'returns', 'state', 'mirror',
 }
 
 local option = {
