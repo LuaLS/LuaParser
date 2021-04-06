@@ -1002,3 +1002,66 @@ z'xxx'
         },
     },
 }
+CHECK[[
+A:B(1):C(2)
+]]
+{
+    type   = "main",
+    start  = 1,
+    finish = 11,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "call",
+        start  = 1,
+        finish = 11,
+        parent = "<IGNORE>",
+        node   = "<IGNORE>",
+        args   = {
+            type   = "callargs",
+            start  = 9,
+            finish = 11,
+            parent = "<IGNORE>",
+            [1]    = {
+                next   = "<IGNORE>",
+                type   = "call",
+                start  = 1,
+                finish = 6,
+                parent = "<IGNORE>",
+                mirror = "<IGNORE>",
+                dummy  = true,
+                node   = "<IGNORE>",
+                args   = {
+                    type   = "callargs",
+                    start  = 4,
+                    finish = 6,
+                    parent = "<IGNORE>",
+                    [1]    = {
+                        next   = "<IGNORE>",
+                        type   = "getglobal",
+                        start  = 1,
+                        finish = 1,
+                        parent = "<IGNORE>",
+                        mirror = "<IGNORE>",
+                        dummy  = true,
+                        node   = "<IGNORE>",
+                        [1]    = "A",
+                    },
+                    [2]    = {
+                        type   = "number",
+                        start  = 5,
+                        finish = 5,
+                        parent = "<IGNORE>",
+                        [1]    = 1,
+                    },
+                },
+            },
+            [2]    = {
+                type   = "number",
+                start  = 10,
+                finish = 10,
+                parent = "<IGNORE>",
+                [1]    = 2,
+            },
+        },
+    },
+}

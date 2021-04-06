@@ -56,7 +56,7 @@ for i, v in ipairs(sortList) do
     sortList[v] = i
 end
 local ignoreList = {
-    'specials', 'locals', 'ref', 'node', 'parent', 'extParent', 'returns', 'state', 'mirror',
+    'specials', 'locals', 'ref', 'node', 'parent', 'extParent', 'returns', 'state', 'mirror', 'next',
 }
 
 local option = {
