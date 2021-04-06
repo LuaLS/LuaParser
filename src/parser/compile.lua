@@ -90,6 +90,7 @@ local vmMap = {
             end
             newNode.mirror = obj.node.node
             newNode.dummy  = true
+            newNode.parent = obj.args
             obj.node.node.mirror = newNode
             tableInsert(obj.args, 1, newNode)
             Compiled[newNode] = true
