@@ -327,7 +327,7 @@ Simple      <-  {| Prefix (Sp Suffix)* |}
 Prefix      <-  Sp ({} PL DirtyExp DirtyPR {})
             ->  Paren
             /   Single
-Single      <-  Name
+Single      <-  !FUNCTION Name
             ->  Single
 Suffix      <-  SuffixWithoutCall
             /   ({} PL SuffixCall DirtyPR {})
@@ -379,6 +379,17 @@ NewField    <-  Sp ({} MustName ASSIGN DirtyExp {})
 
 Function    <-  FunctionBody
             ->  Function
+FunctionBody
+            <-  FUNCTION FuncName FuncArgs
+                    {| (!END Action)* |}
+                NeedEnd
+            /   FUNCTION FuncName FuncArgsMiss
+                    {| %nil |}
+                NeedEnd
+FuncName    <-  {| Single (Sp SuffixWithoutCall)* |}
+            ->  Simple
+            /   %nil
+
 FuncArgs    <-  Sp ({} PL {| FuncArg+ |} DirtyPR {})
             ->  FuncArgs
             /   PL DirtyPR %nil
@@ -386,12 +397,6 @@ FuncArgsMiss<-  {} -> MissPL DirtyPR %nil
 FuncArg     <-  DOTS
             /   Name
             /   COMMA
-FunctionBody<-  FUNCTION FuncArgs
-                    {| (!END Action)* |}
-                NeedEnd
-            /   FUNCTION FuncArgsMiss
-                    {| %nil |}
-                NeedEnd
 
 -- 纯占位，修改了 `relabel.lua` 使重复定义不抛错
 Action      <-  !END .
@@ -409,7 +414,7 @@ CrtAction   <-  Semicolon
             /   For
             /   While
             /   Repeat
-            /   NamedFunction
+            /   Function
             /   LocalFunction
             /   Local
             /   Set
@@ -519,22 +524,8 @@ Call        <-  Simple
             ->  SimpleCall
 
 LocalFunction
-            <-  Sp ({} LOCAL FunctionNamedBody)
+            <-  Sp ({} LOCAL Function)
             ->  LocalFunction
-
-NamedFunction
-            <-  FunctionNamedBody
-            ->  NamedFunction
-FunctionNamedBody
-            <-  FUNCTION FuncName FuncArgs
-                    {| (!END Action)* |}
-                NeedEnd
-            /   FUNCTION FuncName FuncArgsMiss
-                    {| %nil |}
-                NeedEnd
-FuncName    <-  {| Single (Sp SuffixWithoutCall)* |}
-            ->  Simple
-            /   {} -> MissName %nil
 ]]
 
 grammar 'Lua' [[

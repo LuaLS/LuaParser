@@ -645,7 +645,7 @@ end]]
         parent = "<IGNORE>",
         value  = {
             type    = "function",
-            start   = 1,
+            start   = 7,
             finish  = 33,
             keyword = {
                 [1] = 7,
@@ -684,7 +684,7 @@ end]]
         parent = "<IGNORE>",
         value  = {
             type    = "function",
-            start   = 1,
+            start   = 7,
             finish  = 37,
             keyword = {
                 [1] = 7,
@@ -731,7 +731,7 @@ end]]
         parent = "<IGNORE>",
         value  = {
             type    = "function",
-            start   = 1,
+            start   = 7,
             finish  = 37,
             keyword = {
                 [1] = 7,
@@ -838,7 +838,7 @@ y, z = 3, 4
         parent = "<IGNORE>",
         value  = {
             type    = "function",
-            start   = 22,
+            start   = 28,
             finish  = 43,
             keyword = {
                 [1] = 28,

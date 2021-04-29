@@ -193,7 +193,7 @@ CHECK 'local function a'
         parent = "<IGNORE>",
         value  = {
             type    = "function",
-            start   = 1,
+            start   = 7,
             finish  = 16,
             keyword = {
                 [1] = 7,
@@ -231,7 +231,7 @@ CHECK 'local function a(v'
         parent = "<IGNORE>",
         value  = {
             type    = "function",
-            start   = 1,
+            start   = 7,
             finish  = 18,
             keyword = {
                 [1] = 7,
