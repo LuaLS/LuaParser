@@ -319,7 +319,7 @@ ExpUnit     <-  Nil
             /   Number
             /   Dots
             /   Table
-            /   Function
+            /   ExpFunction
             /   Simple
 
 Simple      <-  {| Prefix (Sp Suffix)* |}
@@ -377,6 +377,8 @@ NewIndex    <-  Sp ({} Index NeedAssign DirtyExp {})
 NewField    <-  Sp ({} MustName ASSIGN DirtyExp {})
             ->  NewField
 
+ExpFunction <-  Function
+            ->  ExpFunction
 Function    <-  FunctionBody
             ->  Function
 FunctionBody
@@ -386,7 +388,7 @@ FunctionBody
             /   FUNCTION FuncName FuncArgsMiss
                     {| %nil |}
                 NeedEnd
-FuncName    <-  {| Single (Sp SuffixWithoutCall)* |}
+FuncName    <-  !END {| Single (Sp SuffixWithoutCall)* |}
             ->  Simple
             /   %nil
 
@@ -414,7 +416,7 @@ CrtAction   <-  Semicolon
             /   For
             /   While
             /   Repeat
-            /   Function
+            /   NamedFunction
             /   LocalFunction
             /   Local
             /   Set
@@ -519,6 +521,10 @@ LocalNameList
             <-  {| LocalName (Sp ',' LocalName)* |}
 LocalName   <-  (MustName LocalAttr?)
             ->  LocalName
+
+NamedFunction
+            <-  Function
+            ->  NamedFunction
 
 Call        <-  Simple
             ->  SimpleCall

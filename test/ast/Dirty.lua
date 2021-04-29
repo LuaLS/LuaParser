@@ -213,6 +213,18 @@ CHECK 'local function'
     start  = 1,
     finish = 14,
     locals = "<IGNORE>",
+    [1]    = {
+        type    = "function",
+        start   = 7,
+        finish  = 14,
+        keyword = {
+            [1] = 7,
+            [2] = 14,
+            [3] = 15,
+            [4] = 14,
+        },
+        parent  = "<IGNORE>",
+    },
 }
 
 CHECK 'local function a(v'

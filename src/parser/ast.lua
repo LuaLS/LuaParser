@@ -1020,7 +1020,12 @@ local Defs = {
     end,
     LocalFunction = function (start, name)
         if name.type == 'function' then
-            return
+            PushError {
+                type = 'MISS_NAME',
+                start = name.keyword[2] + 1,
+                finish = name.keyword[2] + 1,
+            }
+            return name
         end
         if name.type ~= 'setname' then
             PushError {
@@ -1035,6 +1040,27 @@ local Defs = {
         loc.localfunction = true
         loc.vstart = name.value.start
         return name
+    end,
+    NamedFunction = function (name)
+        if name.type == 'function' then
+            PushError {
+                type = 'MISS_NAME',
+                start = name.keyword[2] + 1,
+                finish = name.keyword[2] + 1,
+            }
+        end
+        return name
+    end,
+    ExpFunction = function (func)
+        if func.type ~= 'function' then
+            PushError {
+                type = 'UNEXPECT_EFUNC_NAME',
+                start = func.start,
+                finish = func.finish,
+            }
+            return func.value
+        end
+        return func
     end,
     Table = function (start, tbl, finish)
         tbl.type   = 'table'
