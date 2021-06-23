@@ -1,6 +1,6 @@
 CHECK'345'
 {
-    type   = "number",
+    type   = "integer",
     start  = 1,
     finish = 3,
     [1]    = 345,
@@ -14,7 +14,7 @@ CHECK'345.0'
 }
 CHECK'0xff'
 {
-    type   = "number",
+    type   = "integer",
     start  = 1,
     finish = 4,
     [1]    = 255,
@@ -63,7 +63,7 @@ CHECK'0X1.921FB54442D18P+1'
 }
 CHECK'-345'
 {
-    type   = "number",
+    type   = "integer",
     start  = 1,
     finish = 4,
     [1]    = -345,

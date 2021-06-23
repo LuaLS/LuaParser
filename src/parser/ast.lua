@@ -110,7 +110,7 @@ local function getSelect(vararg, index)
         start  = vararg.start,
         finish = vararg.finish,
         vararg = vararg,
-        index  = index,
+        sindex = index,
     }
 end
 
@@ -547,7 +547,7 @@ local Defs = {
         local n = tonumber(number)
         if n then
             State.LastNumber = {
-                type   = 'number',
+                type   = mathType(n) == 'integer' and 'integer' or 'number',
                 start  = start,
                 finish = finish - 1,
                 [1]    = n,
@@ -1460,8 +1460,14 @@ local Defs = {
         local values
         if func then
             local call = createCall(exp, func.finish + 1, exp.finish)
+            if #exp == 0 then
+                exp[1] = getSelect(func, 2)
+                exp[2] = getSelect(func, 3)
+                exp[3] = getSelect(func, 4)
+            end
             call.node = func
-            call.start = func.start
+            call.start = inA
+            call.finish = doB - 1
             func.next = call
             func.iterator = true
             values = { call }
