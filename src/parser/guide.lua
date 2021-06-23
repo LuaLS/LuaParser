@@ -1,33 +1,7 @@
-local util         = require 'utility'
 local error        = error
 local type         = type
-local next         = next
-local tostring     = tostring
-local print        = print
-local ipairs       = ipairs
-local tableInsert  = table.insert
-local tableUnpack  = table.unpack
-local tableRemove  = table.remove
-local tableMove    = table.move
-local tableSort    = table.sort
-local tableConcat  = table.concat
-local mathType     = math.type
-local pairs        = pairs
-local setmetatable = setmetatable
-local assert       = assert
-local select       = select
-local osClock      = os.clock
-local tonumber     = tonumber
-local tointeger    = math.tointeger
-local DEVELOP      = _G.DEVELOP
-local log          = log
-local _G           = _G
 
 ---@class parser.guide.object
-
-local function logWarn(...)
-    log.warn(...)
-end
 
 ---@class guide
 ---@field debugMode boolean
@@ -91,7 +65,7 @@ m.childMap = {
 
     ['doc']                = {'#'},
     ['doc.class']          = {'class', '#extends', 'comment'},
-    ['doc.type']           = {'#types', '#enums', 'name', 'comment'},
+    ['doc.type']           = {'#types', '#enums', '#resumes', 'name', 'comment'},
     ['doc.alias']          = {'alias', 'extends', 'comment'},
     ['doc.param']          = {'param', 'extends', 'comment'},
     ['doc.return']         = {'#returns', 'comment'},
@@ -100,9 +74,9 @@ m.childMap = {
     ['doc.generic.object'] = {'generic', 'extends', 'comment'},
     ['doc.vararg']         = {'vararg', 'comment'},
     ['doc.type.array']     = {'node'},
-    ['doc.type.table']     = {'node', 'key', 'value', 'comment'},
+    ['doc.type.table']     = {'tkey', 'tvalue', 'comment'},
     ['doc.type.function']  = {'#args', '#returns', 'comment'},
-    ['doc.type.typeliteral']  = {'node'},
+    ['doc.type.literal']   = {'node'},
     ['doc.type.arg']       = {'extends'},
     ['doc.overload']       = {'overload', 'comment'},
     ['doc.see']            = {'name', 'field'},
@@ -123,19 +97,31 @@ m.actionMap = {
     ['funcargs']    = {'#'},
 }
 
-local TypeSort = {
-    ['boolean']  = 1,
-    ['string']   = 2,
-    ['integer']  = 3,
-    ['number']   = 4,
-    ['table']    = 5,
-    ['function'] = 6,
-    ['true']     = 101,
-    ['false']    = 102,
-    ['nil']      = 999,
-}
+local inf          = 1 / 0
+local nan          = 0 / 0
 
-local NIL = setmetatable({'<nil>'}, { __tostring = function () return 'nil' end })
+local function isInteger(n)
+    if math.type then
+        return math.type(n) == 'integer'
+    else
+        return type(n) == 'number' and n % 1 == 0
+    end
+end
+
+local function formatNumber(n)
+    if n == inf
+    or n == -inf
+    or n == nan
+    or n ~= n then -- IEEE 标准中，NAN 不等于自己。但是某些实现中没有遵守这个规则
+        return ('%q'):format(n)
+    end
+    if isInteger(n) then
+        return tostring(n)
+    end
+    local str = ('%.10f'):format(n)
+    str = str:gsub('%.?0*$', '')
+    return str
+end
 
 --- 是否是字面量
 ---@param obj parser.guide.object
@@ -180,23 +166,6 @@ function m.getParentFunction(obj)
         end
     end
     return nil
-end
-
---- 寻找父的table类型 doc.type.table
----@param obj parser.guide.object
----@return parser.guide.object
-function m.getParentDocTypeTable(obj)
-    for _ = 1, 1000 do
-        local parent = obj.parent
-        if not parent then
-            return nil
-        end
-        if parent.type == 'doc.type.table' then
-            return obj
-        end
-        obj = parent
-    end
-    error('guide.getParentDocTypeTable overstack')
 end
 
 --- 寻找所在区块
@@ -293,9 +262,18 @@ end
 ---@param obj parser.guide.object
 ---@return parser.guide.object
 function m.getRoot(obj)
+    local source = obj
+    if source._root then
+        return source._root
+    end
     for _ = 1, 1000 do
         if obj.type == 'main' then
+            source._root = obj
             return obj
+        end
+        if obj._root then
+            source._root = obj._root
+            return source._root
         end
         local parent = obj.parent
         if not parent then
@@ -314,7 +292,7 @@ function m.getUri(obj)
     end
     local root = m.getRoot(obj)
     if root then
-        return root.uri
+        return root.uri or ''
     end
     return ''
 end
@@ -501,8 +479,8 @@ function m.addChilds(list, obj, map)
         for i = 1, #keys do
             local key = keys[i]
             if key == '#' then
-                for i = 1, #obj do
-                    list[#list+1] = obj[i]
+                for j = 1, #obj do
+                    list[#list+1] = obj[j]
                 end
             elseif obj[key] then
                 list[#list+1] = obj[key]
@@ -510,8 +488,8 @@ function m.addChilds(list, obj, map)
             and key:sub(1, 1) == '#' then
                 key = key:sub(2)
                 if obj[key] then
-                    for i = 1, #obj[key] do
-                        list[#list+1] = obj[key][i]
+                    for j = 1, #obj[key] do
+                        list[#list+1] = obj[key][j]
                     end
                 end
             end
@@ -613,9 +591,16 @@ function m.eachSource(ast, callback)
         index = index + 1
         if not mark[obj] then
             mark[obj] = true
-            callback(obj)
+            local res = callback(obj)
+            if res == true then
+                goto CONTINUE
+            end
+            if res == false then
+                return
+            end
             m.addChilds(list, obj, m.childMap)
         end
+        ::CONTINUE::
     end
 end
 
@@ -716,6 +701,324 @@ end
 
 function m.lineData(lines, row)
     return lines[row]
+end
+
+function m.isSet(source)
+    local tp = source.type
+    if tp == 'setglobal'
+    or tp == 'local'
+    or tp == 'setlocal'
+    or tp == 'setfield'
+    or tp == 'setmethod'
+    or tp == 'setindex'
+    or tp == 'tablefield'
+    or tp == 'tableindex' then
+        return true
+    end
+    if tp == 'call' then
+        local special = m.getSpecial(source.node)
+        if special == 'rawset' then
+            return true
+        end
+    end
+    return false
+end
+
+function m.isGet(source)
+    local tp = source.type
+    if tp == 'getglobal'
+    or tp == 'getlocal'
+    or tp == 'getfield'
+    or tp == 'getmethod'
+    or tp == 'getindex' then
+        return true
+    end
+    if tp == 'call' then
+        local special = m.getSpecial(source.node)
+        if special == 'rawget' then
+            return true
+        end
+    end
+    return false
+end
+
+function m.getSpecial(source)
+    if not source then
+        return nil
+    end
+    return source.special
+end
+
+function m.getKeyNameOfLiteral(obj)
+    if not obj then
+        return nil
+    end
+    local tp = obj.type
+    if tp == 'field'
+    or     tp == 'method' then
+        return obj[1]
+    elseif tp == 'string' then
+        local s = obj[1]
+        if s then
+            return s
+        end
+    elseif tp == 'number' then
+        local n = obj[1]
+        if n then
+            return ('%s'):format(formatNumber(obj[1]))
+        end
+    elseif tp == 'boolean' then
+        local b = obj[1]
+        if b then
+            return tostring(b)
+        end
+    end
+end
+
+function m.getKeyName(obj)
+    if not obj then
+        return nil
+    end
+    local tp = obj.type
+    if tp == 'getglobal'
+    or tp == 'setglobal' then
+        return obj[1]
+    elseif tp == 'local'
+    or     tp == 'getlocal'
+    or     tp == 'setlocal' then
+        return obj[1]
+    elseif tp == 'getfield'
+    or     tp == 'setfield'
+    or     tp == 'tablefield' then
+        if obj.field then
+            return obj.field[1]
+        end
+    elseif tp == 'getmethod'
+    or     tp == 'setmethod' then
+        if obj.method then
+            return obj.method[1]
+        end
+    elseif tp == 'getindex'
+    or     tp == 'setindex'
+    or     tp == 'tableindex' then
+        return m.getKeyNameOfLiteral(obj.index)
+    elseif tp == 'field'
+    or     tp == 'method'
+    or     tp == 'doc.see.field' then
+        return obj[1]
+    elseif tp == 'doc.class' then
+        return obj.class[1]
+    elseif tp == 'doc.alias' then
+        return obj.alias[1]
+    elseif tp == 'doc.field' then
+        return obj.field[1]
+    elseif tp == 'doc.field.name' then
+        return obj[1]
+    elseif tp == 'dummy' then
+        return obj[1]
+    end
+    return m.getKeyNameOfLiteral(obj)
+end
+
+function m.getKeyTypeOfLiteral(obj)
+    if not obj then
+        return nil
+    end
+    local tp = obj.type
+    if tp == 'field'
+    or     tp == 'method' then
+        return 'string'
+    elseif tp == 'string' then
+        return 'string'
+    elseif tp == 'number' then
+        return 'number'
+    elseif tp == 'boolean' then
+        return 'boolean'
+    end
+end
+
+function m.getKeyType(obj)
+    if not obj then
+        return nil
+    end
+    local tp = obj.type
+    if tp == 'getglobal'
+    or tp == 'setglobal' then
+        return 'string'
+    elseif tp == 'local'
+    or     tp == 'getlocal'
+    or     tp == 'setlocal' then
+        return 'local'
+    elseif tp == 'getfield'
+    or     tp == 'setfield'
+    or     tp == 'tablefield' then
+        return 'string'
+    elseif tp == 'getmethod'
+    or     tp == 'setmethod' then
+        return 'string'
+    elseif tp == 'getindex'
+    or     tp == 'setindex'
+    or     tp == 'tableindex' then
+        return m.getKeyTypeOfLiteral(obj.index)
+    elseif tp == 'field'
+    or     tp == 'method'
+    or     tp == 'doc.see.field' then
+        return 'string'
+    elseif tp == 'doc.class' then
+        return 'string'
+    elseif tp == 'doc.alias' then
+        return 'string'
+    elseif tp == 'doc.field' then
+        return 'string'
+    elseif tp == 'dummy' then
+        return 'string'
+    end
+    if tp == 'doc.field.name' then
+        return 'string'
+    end
+    return m.getKeyTypeOfLiteral(obj)
+end
+
+--- 测试 a 到 b 的路径（不经过函数，不考虑 goto），
+--- 每个路径是一个 block 。
+---
+--- 如果 a 在 b 的前面，返回 `"before"` 加上 2个`list<block>`
+---
+--- 如果 a 在 b 的后面，返回 `"after"` 加上 2个`list<block>`
+---
+--- 否则返回 `false`
+---
+--- 返回的2个 `list` 分别为基准block到达 a 与 b 的路径。
+---@param a table
+---@param b table
+---@return string|boolean mode
+---@return table pathA?
+---@return table pathB?
+function m.getPath(a, b, sameFunction)
+    --- 首先测试双方在同一个函数内
+    if sameFunction and m.getParentFunction(a) ~= m.getParentFunction(b) then
+        return false
+    end
+    local mode
+    local objA
+    local objB
+    if a.finish < b.start then
+        mode = 'before'
+        objA = a
+        objB = b
+    elseif a.start > b.finish then
+        mode = 'after'
+        objA = b
+        objB = a
+    else
+        return 'equal', {}, {}
+    end
+    local pathA = {}
+    local pathB = {}
+    for _ = 1, 1000 do
+        objA = m.getParentBlock(objA)
+        pathA[#pathA+1] = objA
+        if (not sameFunction and objA.type == 'function') or objA.type == 'main' then
+            break
+        end
+    end
+    for _ = 1, 1000 do
+        objB = m.getParentBlock(objB)
+        pathB[#pathB+1] = objB
+        if (not sameFunction and objA.type == 'function') or objB.type == 'main' then
+            break
+        end
+    end
+    -- pathA: {1, 2, 3, 4, 5}
+    -- pathB: {5, 6, 2, 3}
+    local top = #pathB
+    local start
+    for i = #pathA, 1, -1 do
+        local currentBlock = pathA[i]
+        if currentBlock == pathB[top] then
+            start = i
+            break
+        end
+    end
+    if not start then
+        return nil
+    end
+    -- pathA: {   1, 2, 3}
+    -- pathB: {5, 6, 2, 3}
+    local extra = 0
+    local align = top - start
+    for i = start, 1, -1 do
+        local currentA = pathA[i]
+        local currentB = pathB[i+align]
+        if currentA ~= currentB then
+            extra = i
+            break
+        end
+    end
+    -- pathA: {1}
+    local resultA = {}
+    for i = extra, 1, -1 do
+        resultA[#resultA+1] = pathA[i]
+    end
+    -- pathB: {5, 6}
+    local resultB = {}
+    for i = extra + align, 1, -1 do
+        resultB[#resultB+1] = pathB[i]
+    end
+    return mode, resultA, resultB
+end
+
+---是否是全局变量（包括 _G.XXX 形式）
+---@param source parser.guide.object
+---@return boolean
+function m.isGlobal(source)
+    if source._isGlobal ~= nil then
+        return source._isGlobal
+    end
+    if source.special == '_G' then
+        source._isGlobal = true
+        return true
+    end
+    if source.type == 'setglobal'
+    or source.type == 'getglobal' then
+        if source.node and source.node.tag == '_ENV' then
+            source._isGlobal = true
+            return true
+        end
+    end
+    if source.type == 'setfield'
+    or source.type == 'getfield'
+    or source.type == 'setindex'
+    or source.type == 'getindex' then
+        local current = source
+        while current do
+            local node = current.node
+            if not node then
+                break
+            end
+            if node.special == '_G' then
+                source._isGlobal = true
+                return true
+            end
+            if m.getKeyName(node) ~= '_G' then
+                break
+            end
+            current = node
+        end
+    end
+    if source.type == 'call' then
+        local node = source.node
+        if node.special == 'rawget'
+        or node.special == 'rawset' then
+            if source.args and source.args[1] then
+                local isGlobal = source.args[1].special == '_G'
+                source._isGlobal = isGlobal
+                return isGlobal
+            end
+        end
+    end
+    source._isGlobal = false
+    return false
 end
 
 return m

@@ -125,6 +125,7 @@ local vmMap = {
                     vararg.ref = {}
                 end
                 vararg.ref[#vararg.ref+1] = obj
+                obj.node = vararg
             end
         end
     end,
@@ -150,8 +151,8 @@ local vmMap = {
         local value = obj.value
         local localself = {
             type   = 'local',
-            start  = 0,
-            finish = 0,
+            start  = value.start,
+            finish = value.start,
             method = obj,
             effect = obj.finish,
             tag    = 'self',
@@ -459,9 +460,9 @@ local vmMap = {
 function CompileBlock(obj, parent)
     for i = 1, #obj do
         local act = obj[i]
+        act.parent = parent
         local f = vmMap[act.type]
         if f then
-            act.parent = parent
             f(act)
         end
     end
