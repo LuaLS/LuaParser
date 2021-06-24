@@ -1065,3 +1065,54 @@ A:B(1):C(2)
         },
     },
 }
+
+CHECK [[
+f(x: number, y?: table<number, boolean>, z?: number|boolean, 1)
+]]
+{
+    type   = "main",
+    start  = 1,
+    finish = 63,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "call",
+        start  = 1,
+        finish = 63,
+        parent = "<IGNORE>",
+        node   = "<IGNORE>",
+        args   = {
+            type   = "callargs",
+            start  = 2,
+            finish = 63,
+            parent = "<IGNORE>",
+            [1]    = {
+                type   = "name",
+                start  = 3,
+                finish = 3,
+                parent = "<IGNORE>",
+                [1]    = "x",
+            },
+            [2]    = {
+                type   = "name",
+                start  = 14,
+                finish = 14,
+                parent = "<IGNORE>",
+                [1]    = "y",
+            },
+            [3]    = {
+                type   = "name",
+                start  = 42,
+                finish = 42,
+                parent = "<IGNORE>",
+                [1]    = "z",
+            },
+            [4]    = {
+                type   = "integer",
+                start  = 62,
+                finish = 62,
+                parent = "<IGNORE>",
+                [1]    = 1,
+            },
+        },
+    },
+}

@@ -6,6 +6,7 @@ local mathType    = math.type
 local tableRemove = table.remove
 local pairs       = pairs
 local tableSort   = table.sort
+local print       = print
 
 _ENV = nil
 
@@ -1925,6 +1926,9 @@ local Defs = {
                 }
             }
         }
+    end,
+    CallArgSnip = function (name, ...)
+        return name
     end
 }
 
