@@ -1927,7 +1927,15 @@ local Defs = {
             }
         }
     end,
-    CallArgSnip = function (name, ...)
+    CallArgSnip = function (name, tailStart, tailSymbol)
+        PushError {
+            type   = 'UNEXPECT_SYMBOL',
+            start  = tailStart,
+            finish = tailStart,
+            info = {
+                symbol = tailSymbol,
+            }
+        }
         return name
     end
 }

@@ -342,7 +342,7 @@ Suffix      <-  SuffixWithoutCall
 SuffixCall  <-  Sp ({} {| (COMMA / CallArg)+ |} {})
             ->  PackExpList
             /   %nil
-CallArg     <-  Sp (Name {'?'? ':' Sps DocType})
+CallArg     <-  Sp (Name {} {'?'? ':'} Sps DocType)
             ->  CallArgSnip
             /   Exp->NoNil
 SuffixWithoutCall
