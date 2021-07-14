@@ -801,6 +801,7 @@ CHECK [[
             type   = "integer",
             start  = 12,
             finish = 12,
+            tindex = 1,
             parent = "<IGNORE>",
             [1]    = 1,
         },

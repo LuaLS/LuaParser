@@ -1095,6 +1095,7 @@ local Defs = {
         local wantField = true
         local lastStart = start + 1
         local fieldCount = 0
+        local n = 0
         for i = 1, #tbl do
             local field = tbl[i]
             if field.type == ',' or field.type == ';' then
@@ -1119,6 +1120,11 @@ local Defs = {
                 lastStart = field.finish + 1
                 fieldCount = fieldCount + 1
                 tbl[fieldCount] = field
+                if  field.type ~= 'tableindex'
+                and field.type ~= 'tablefield' then
+                    n = n + 1
+                    field.tindex = n
+                end
             end
         end
         for i = fieldCount + 1, #tbl do

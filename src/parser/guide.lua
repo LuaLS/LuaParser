@@ -33,6 +33,7 @@ local type         = type
 ---@field typeGeneric           table<integer, parser.guide.object[]>
 ---@field tkey                  parser.guide.object
 ---@field tvalue                parser.guide.object
+---@field tindex                integer
 ---@field op                    parser.guide.object
 ---@field next                  parser.guide.object
 ---@field docParam              parser.guide.object
