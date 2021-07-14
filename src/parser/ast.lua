@@ -1162,9 +1162,6 @@ local Defs = {
         if not value then
             return
         end
-        if value.type == '...' then
-            return value
-        end
         local obj = {
             type   = 'tableexp',
             start  = start,

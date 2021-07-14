@@ -1018,17 +1018,10 @@ CHECK'{...}'
     start  = 1,
     finish = 5,
     [1]    = {
-        type   = "tableexp",
+        type   = "...",
         start  = 2,
         finish = 4,
-        tindex = 1,
         parent = "<IGNORE>",
-        value  = {
-            type   = "varargs",
-            start  = 2,
-            finish = 4,
-            parent = "<IGNORE>",
-        },
     },
 }
 CHECK'{1, 2, 3}'
