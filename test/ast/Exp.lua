@@ -1018,7 +1018,7 @@ CHECK'{...}'
     start  = 1,
     finish = 5,
     [1]    = {
-        type   = "...",
+        type   = "varargs",
         start  = 2,
         finish = 4,
         parent = "<IGNORE>",

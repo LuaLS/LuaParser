@@ -381,7 +381,7 @@ Table       <-  Sp ({} TL {| TableField* |} DirtyTR {})
             ->  Table
 TableField  <-  COMMA
             /   SEMICOLON
-            /   DOTS
+            /   Dots
             /   NewIndex
             /   NewField
             /   TableExp
