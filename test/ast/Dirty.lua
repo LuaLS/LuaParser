@@ -799,16 +799,9 @@ CHECK [[
         parent = "<IGNORE>",
         [1]    = {
             type   = "tableexp",
-            start  = 9,
-            finish = 9,
-            tindex = 1,
-            parent = "<IGNORE>",
-        },
-        [2]    = {
-            type   = "tableexp",
             start  = 12,
             finish = 12,
-            tindex = 2,
+            tindex = 1,
             parent = "<IGNORE>",
             value  = {
                 type   = "integer",

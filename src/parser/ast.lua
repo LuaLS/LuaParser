@@ -1159,6 +1159,12 @@ local Defs = {
         return obj
     end,
     TableExp = function (start, value, finish)
+        if not value then
+            return
+        end
+        if value.type == '...' then
+            return value
+        end
         local obj = {
             type   = 'tableexp',
             start  = start,
