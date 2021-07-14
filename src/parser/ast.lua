@@ -1120,8 +1120,7 @@ local Defs = {
                 lastStart = field.finish + 1
                 fieldCount = fieldCount + 1
                 tbl[fieldCount] = field
-                if  field.type ~= 'tableindex'
-                and field.type ~= 'tablefield' then
+                if field.type == 'tableexp' then
                     n = n + 1
                     field.tindex = n
                 end
@@ -1157,6 +1156,15 @@ local Defs = {
         if index then
             index.parent = obj
         end
+        return obj
+    end,
+    TableExp = function (start, value, finish)
+        local obj = {
+            type   = 'tableexp',
+            start  = start,
+            finish = finish-1,
+            value  = value,
+        }
         return obj
     end,
     FuncArgs = function (start, args, finish)

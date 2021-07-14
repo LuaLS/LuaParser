@@ -383,12 +383,14 @@ TableField  <-  COMMA
             /   SEMICOLON
             /   NewIndex
             /   NewField
-            /   Exp->NoNil
+            /   TableExp
 Index       <-  BL DirtyExp DirtyBR
 NewIndex    <-  Sp ({} Index NeedAssign DirtyExp {})
             ->  NewIndex
 NewField    <-  Sp ({} MustName ASSIGN DirtyExp {})
             ->  NewField
+TableExp    <-  Sp ({} Exp {})
+            ->  TableExp
 
 ExpFunction <-  Function
             ->  ExpFunction

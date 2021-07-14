@@ -798,12 +798,24 @@ CHECK [[
         finish = 14,
         parent = "<IGNORE>",
         [1]    = {
-            type   = "integer",
-            start  = 12,
-            finish = 12,
+            type   = "tableexp",
+            start  = 9,
+            finish = 9,
             tindex = 1,
             parent = "<IGNORE>",
-            [1]    = 1,
+        },
+        [2]    = {
+            type   = "tableexp",
+            start  = 12,
+            finish = 12,
+            tindex = 2,
+            parent = "<IGNORE>",
+            value  = {
+                type   = "integer",
+                start  = 12,
+                finish = 12,
+                [1]    = 1,
+            },
         },
     },
 }
