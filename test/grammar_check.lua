@@ -1581,6 +1581,17 @@ x = 42<!LL!>
 }
 
 TEST[[
+x = <!0b!>11011
+]]
+{
+    type = 'UNSUPPORT_SYMBOL',
+    version = 'LuaJIT',
+    info = {
+        version = 'Lua 5.4',
+    }
+}
+
+TEST[[
 x = 12.5<!i!>
 ]]
 {
@@ -1611,6 +1622,7 @@ x = 0x2All
 x = 12.5i
 x = 1I
 x = 18446744073709551615ULL
+x = 0b11011
 ]]
 (nil)
 
@@ -1621,5 +1633,15 @@ x = 1.23<!LL!>
     type = 'UNKNOWN_SYMBOL',
     info = {
         symbol = 'LL'
+    }
+}
+
+TEST[[
+x = 0b1<!2!>
+]]
+{
+    type = 'UNKNOWN_SYMBOL',
+    info = {
+        symbol = '2'
     }
 }
