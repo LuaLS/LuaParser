@@ -814,6 +814,7 @@ CHECK [[
                 type   = "integer",
                 start  = 12,
                 finish = 12,
+                parent = "<IGNORE>",
                 [1]    = 1,
             },
         },
