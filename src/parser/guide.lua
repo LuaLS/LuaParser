@@ -245,7 +245,16 @@ function m.getBlock(obj)
         end
         obj = obj.parent
     end
-    error('guide.getBlock overstack')
+    -- make stack
+    local stack = {}
+    for _ = 1, 10 do
+        stack[#stack+1] = ('%s:%s'):format(obj.type, obj.finish)
+        obj = obj.parent
+        if not obj then
+            break
+        end
+    end
+    error('guide.getBlock overstack:' .. table.concat(stack, ' -> '))
 end
 
 --- 寻找所在父区块
@@ -689,7 +698,7 @@ function m.positionOf(lines, offset)
     end
     local lastLine = lines[#lines]
     if offset > lastLine.finish then
-        return #lines, offset - lastLine.start
+        return #lines, offset - lastLine.start + 1
     end
     local min = 1
     local max = #lines
@@ -773,7 +782,10 @@ function m.isSet(source)
     or tp == 'setindex'
     or tp == 'tablefield'
     or tp == 'tableindex'
-    or tp == 'tableexp' then
+    or tp == 'tableexp'
+    or tp == 'doc.field.name'
+    or tp == 'doc.field'
+    or tp == 'doc.type.field' then
         return true
     end
     if tp == 'call' then
@@ -879,11 +891,11 @@ function m.getKeyName(obj)
     elseif tp == 'doc.alias' then
         return obj.alias[1]
     elseif tp == 'doc.field' then
-        return obj.field[1]
+        return tostring(obj.field[1])
     elseif tp == 'doc.field.name' then
-        return obj[1]
+        return tostring(obj[1])
     elseif tp == 'doc.type.field' then
-        return obj.name[1]
+        return tostring(obj.name[1])
     elseif tp == 'dummy' then
         return obj[1]
     end
@@ -943,14 +955,14 @@ function m.getKeyType(obj)
     elseif tp == 'doc.alias' then
         return 'string'
     elseif tp == 'doc.field' then
-        return 'string'
+        return type(obj.field[1])
     elseif tp == 'doc.type.field' then
-        return 'string'
+        return type(obj.name[1])
     elseif tp == 'dummy' then
         return 'string'
     end
     if tp == 'doc.field.name' then
-        return 'string'
+        return type(obj[1])
     end
     return m.getKeyTypeOfLiteral(obj)
 end
