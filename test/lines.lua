@@ -9,7 +9,7 @@ buf = buf:gsub('\r\n', '\n'):gsub('[\r\n]', '\r\n')
 do
     local lines = parser:lines(buf)
     local row, col = guide.positionOf(lines, 0)
-    assert(row == 0)
+    assert(row == 1)
     assert(col == 0)
 
     local row, col = guide.positionOf(lines, 1)
@@ -25,16 +25,16 @@ do
     assert(col == 56)
 
     local row, col = guide.positionOf(lines, 57)
-    assert(row == 1)
-    assert(col == 57)
+    assert(row == 2)
+    assert(col == 0)
 
     local row, col = guide.positionOf(lines, 58)
     assert(row == 2)
     assert(col == 1)
 
     local row, col = guide.positionOf(lines, 59)
-    assert(row == 2)
-    assert(col == 2)
+    assert(row == 3)
+    assert(col == 0)
 
     local row, col = guide.positionOf(lines, 60)
     assert(row == 3)
@@ -50,18 +50,24 @@ do
     assert(offset == 2)
 
     local offset = guide.offsetOf(lines, 1, 56)
-    assert(offset == 56)
+    assert(offset == 55)
 
     local offset = guide.offsetOf(lines, 1, 57)
-    assert(offset == 57)
+    assert(offset == 55)
 
     local offset = guide.offsetOf(lines, 1, 58)
+    assert(offset == 55)
+
+    local offset = guide.offsetOf(lines, 2, 0)
     assert(offset == 57)
 
     local offset = guide.offsetOf(lines, 2, 1)
-    assert(offset == 58)
+    assert(offset == 57)
 
     local offset = guide.offsetOf(lines, 2, 2)
+    assert(offset == 57)
+
+    local offset = guide.offsetOf(lines, 3, 0)
     assert(offset == 59)
 
     local offset = guide.offsetOf(lines, 3, 1)
@@ -78,7 +84,7 @@ do
     assert(pos == 10)
 
     local pos = guide.offsetOf(lines, 2, 9999)
-    assert(pos == 10)
+    assert(pos == 8)
 
     local pos = guide.offsetOf(lines, 3, 3)
     assert(pos == 10)
@@ -89,26 +95,23 @@ do
     local pos = guide.offsetOf(lines, 3, 1)
     assert(pos == 10)
 
-    local pos = guide.offsetOf(lines, 2, 9999)
-    assert(pos == 10)
-
     local pos = guide.offsetOf(lines, 2, 6)
-    assert(pos == 10)
+    assert(pos == 8)
 
     local pos = guide.offsetOf(lines, 2, 5)
-    assert(pos == 10)
+    assert(pos == 8)
 
     local row, col = guide.positionOf(lines, 9999)
     assert(row == 3)
-    assert(col == 9988)
+    assert(col == 0)
 
     local row, col = guide.positionOf(lines, 11)
     assert(row == 3)
     assert(col == 0)
 
     local row, col = guide.positionOf(lines, 10)
-    assert(row == 2)
-    assert(col == 5)
+    assert(row == 3)
+    assert(col == 0)
 
     local row, col = guide.positionOf(lines, 9)
     assert(row == 2)
