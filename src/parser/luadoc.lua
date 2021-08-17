@@ -2,18 +2,21 @@ local m          = require 'lpeglabel'
 local re         = require 'parser.relabel'
 local lines      = require 'parser.lines'
 local guide      = require 'parser.guide'
+local grammar    = require 'parser.grammar'
 
 local TokenTypes, TokenStarts, TokenFinishs, TokenContents
-local Ci, Offset, pushError, Ct, NextComment
+local Ci, Offset, pushError, Ct, NextComment, Lines
 local parseType
 local Parser = re.compile([[
 Main                <-  (Token / Sp)*
 Sp                  <-  %s+
 X16                 <-  [a-fA-F0-9]
 Word                <-  [a-zA-Z0-9_]
-Token               <-  Name / String / Symbol
-Name                <-  ({} {[a-zA-Z0-9_] [a-zA-Z0-9_.*]*} {})
+Token               <-  Integer / Name / String / Symbol
+Name                <-  ({} {[a-zA-Z_0-9] [a-zA-Z0-9_.*-]*} {})
                     ->  Name
+Integer             <-  ({} {[0-9]+} !'.' {})
+                    ->  Integer
 String              <-  ({} StringDef {})
                     ->  String
 StringDef           <-  '"'
@@ -44,19 +47,11 @@ EChar               <-  'a' -> ea
                     /   ([0-9] [0-9]? [0-9]?) -> Char10
                     /   ('u{' {Word*} '}')    -> CharUtf8
 Symbol              <-  ({} {
-                            ':'
-                        /   '|'
-                        /   ','
+                            [:|,<>()?+#`{}]
                         /   '[]'
-                        /   '<'
-                        /   '>'
-                        /   '('
-                        /   ')'
-                        /   '?'
                         /   '...'
-                        /   '+'
-                        /   '#'
-                        /   '`'
+                        /   '['
+                        /   ']'
                         } {})
                     ->  Symbol
 ]], {
@@ -104,6 +99,13 @@ Symbol              <-  ({} {
         TokenStarts[Ci]   = start
         TokenFinishs[Ci]  = finish - 1
         TokenContents[Ci] = content
+    end,
+    Integer = function (start, content, finish)
+        Ci = Ci + 1
+        TokenTypes[Ci]    = 'integer'
+        TokenStarts[Ci]   = start
+        TokenFinishs[Ci]  = finish - 1
+        TokenContents[Ci] = math.tointeger(content)
     end,
     Symbol = function (start, content, finish)
         Ci = Ci + 1
@@ -189,47 +191,6 @@ local function parseName(tp, parent)
     return class
 end
 
-local function parseClass(parent)
-    local result = {
-        type   = 'doc.class',
-        parent = parent,
-    }
-    result.class = parseName('doc.class.name', result)
-    if not result.class then
-        pushError {
-            type   = 'LUADOC_MISS_CLASS_NAME',
-            start  = getFinish(),
-            finish = getFinish(),
-        }
-        return nil
-    end
-    result.start  = getStart()
-    result.finish = getFinish()
-    if not peekToken() then
-        return result
-    end
-    nextToken()
-    if not checkToken('symbol', ':') then
-        pushError {
-            type   = 'LUADOC_MISS_EXTENDS_SYMBOL',
-            start  = result.finish + 1,
-            finish = getStart() - 1,
-        }
-        return result
-    end
-    result.extends = parseName('doc.extends.name', result)
-    if not result.extends then
-        pushError {
-            type   = 'LUADOC_MISS_CLASS_EXTENDS_NAME',
-            start  = getFinish(),
-            finish = getFinish(),
-        }
-        return result
-    end
-    result.finish = getFinish()
-    return result
-end
-
 local function nextSymbolOrError(symbol)
     if checkToken('symbol', symbol, 1) then
         nextToken()
@@ -246,7 +207,85 @@ local function nextSymbolOrError(symbol)
     return false
 end
 
-local function parseTypeUnitArray(node)
+local function parseIndexField(tp, parent)
+    if not checkToken('symbol', '[', 1) then
+        return nil
+    end
+    nextToken()
+    local class = {
+        type   = tp,
+        start  = getStart(),
+        finish = getFinish(),
+        parent = parent,
+    }
+    local indexTP, index = nextToken()
+    if  indexTP ~= 'integer'
+    and indexTP ~= 'string' then
+        pushError {
+            type   = 'LUADOC_INDEX_MUST_INT',
+            start  = getStart(),
+            finish = getFinish(),
+        }
+    end
+    class[1] = index
+    nextSymbolOrError ']'
+    class.finish = getFinish()
+    return class
+end
+
+local function parseClass(parent)
+    local result = {
+        type   = 'doc.class',
+        parent = parent,
+        fields = {},
+    }
+    result.class = parseName('doc.class.name', result)
+    if not result.class then
+        pushError {
+            type   = 'LUADOC_MISS_CLASS_NAME',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+        return nil
+    end
+    result.start  = getStart()
+    result.finish = getFinish()
+    if not peekToken() then
+        return result
+    end
+    if not checkToken('symbol', ':', 1) then
+        pushError {
+            type   = 'LUADOC_MISS_EXTENDS_SYMBOL',
+            start  = result.finish + 1,
+            finish = getStart() - 1,
+        }
+        return result
+    end
+    nextToken()
+
+    result.extends = {}
+
+    while true do
+        local extend = parseName('doc.extends.name', result)
+        if not extend then
+            pushError {
+                type   = 'LUADOC_MISS_CLASS_EXTENDS_NAME',
+                start  = getFinish(),
+                finish = getFinish(),
+            }
+            return result
+        end
+        result.extends[#result.extends+1] = extend
+        result.finish = getFinish()
+        if not checkToken('symbol', ',', 1) then
+            break
+        end
+        nextToken()
+    end
+    return result
+end
+
+local function parseTypeUnitArray(parent, node)
     if not checkToken('symbol', '[]', 1) then
         return nil
     end
@@ -256,6 +295,7 @@ local function parseTypeUnitArray(node)
         start  = node.start,
         finish = getFinish(),
         node   = node,
+        parent = parent,
     }
     node.parent = result
     return result
@@ -285,11 +325,11 @@ local function parseTypeUnitTable(parent, node)
         return nil
     end
     nextSymbolOrError('>')
-    
+
     node.parent = result;
     result.finish = getFinish()
-    result.key = key
-    result.value = value
+    result.tkey = key
+    result.tvalue = value
 
     return result
 end
@@ -385,10 +425,71 @@ local function  parseTypeUnitFunction()
     return typeUnit
 end
 
+local function parseTypeUnitLiteralTable()
+    local typeUnit = {
+        type    = 'doc.type.ltable',
+        start   = getStart(),
+        fields  = {},
+    }
+
+    while true do
+        if checkToken('symbol', '}', 1) then
+            nextToken()
+            break
+        end
+        local field = {
+            type   = 'doc.type.field',
+            parent = typeUnit,
+        }
+
+        do
+            field.name = parseName('doc.field.name', field)
+                    or   parseIndexField('doc.field.name', field)
+            if not field.name then
+                pushError {
+                    type   = 'LUADOC_MISS_FIELD_NAME',
+                    start  = getFinish(),
+                    finish = getFinish(),
+                }
+                break
+            end
+            if not field.start then
+                field.start = field.name.start
+            end
+            if checkToken('symbol', '?', 1) then
+                nextToken()
+                field.optional = true
+            end
+            field.finish = getFinish()
+            if not nextSymbolOrError(':') then
+                break
+            end
+            field.extends = parseType(field)
+            if not field.extends then
+                break
+            end
+            field.finish = getFinish()
+        end
+
+        typeUnit.fields[#typeUnit.fields+1] = field
+        if checkToken('symbol', ',', 1) then
+            nextToken()
+        else
+            nextSymbolOrError('}')
+            break
+        end
+    end
+    typeUnit.finish = getFinish()
+    return typeUnit
+end
+
 local function parseTypeUnit(parent, content)
     local result
     if content == 'fun' then
         result = parseTypeUnitFunction()
+    end
+    if content == '{' then
+        result = parseTypeUnitLiteralTable()
     end
     if not result then
         result = {
@@ -403,7 +504,7 @@ local function parseTypeUnit(parent, content)
     end
     result.parent = parent
     while true do
-        local newResult = parseTypeUnitArray(result)
+        local newResult = parseTypeUnitArray(parent, result)
                     or    parseTypeUnitTable(parent, result)
         if not newResult then
             break
@@ -413,9 +514,10 @@ local function parseTypeUnit(parent, content)
     return result
 end
 
-local function parseResume()
+local function parseResume(parent)
     local result = {
-        type = 'doc.resume'
+        type   = 'doc.resume',
+        parent = parent,
     }
 
     if checkToken('symbol', '>', 1) then
@@ -471,13 +573,7 @@ function parseType(parent)
                 break
             end
             -- TypeLiteral，指代类型的字面值。比如，对于类 Cat 来说，它的 TypeLiteral 是 "Cat"
-            typeLiteral = {
-                type   = 'doc.type.typeliteral',
-                parent = result,
-                start  = getStart(),
-                finish = nil,
-                node   = nil,
-            }
+            typeLiteral = true
         end
 
         if tp == 'name' then
@@ -488,10 +584,7 @@ function parseType(parent)
             end
             if typeLiteral then
                 nextToken()
-                typeLiteral.finish = getFinish()
-                typeLiteral.node = typeUnit
-                typeUnit.parent = typeLiteral
-                typeUnit = typeLiteral
+                typeUnit.literal = true
             end
             result.types[#result.types+1] = typeUnit
             if not result.start then
@@ -509,6 +602,16 @@ function parseType(parent)
             result.enums[#result.enums+1] = typeEnum
             if not result.start then
                 result.start = typeEnum.start
+            end
+        elseif tp == 'symbol' and content == '{' then
+            nextToken()
+            local typeUnit = parseTypeUnit(result, content)
+            if not typeUnit then
+                break
+            end
+            result.types[#result.types+1] = typeUnit
+            if not result.start then
+                result.start = typeUnit.start
             end
         elseif tp == 'symbol' and content == '...' then
             nextToken()
@@ -530,22 +633,66 @@ function parseType(parent)
         nextToken()
     end
     result.finish = getFinish()
+    result.firstFinish = result.finish
 
-    while true do
-        local nextComm = NextComment('peek')
-        if nextComm and nextComm.text:sub(1, 2) == '-|' then
-            NextComment()
-            local finishPos = nextComm.text:find('#', 3) or #nextComm.text
-            parseTokens(nextComm.text:sub(3, finishPos), nextComm.start + 1)
-            local resume = parseResume()
-            if resume then
-                resume.comment = nextComm.text:match('#%s*(.+)', 3)
-                result.resumes[#result.resumes+1] = resume
-                result.finish = resume.finish
+    local row = guide.positionOf(Lines, result.finish)
+
+    local function pushResume()
+        local comments
+        for i = 0, 100 do
+            local nextComm = NextComment(i,'peek')
+            if not nextComm then
+                return false
             end
-        else
-            break
+            local line = Lines[row + i + 1]
+            if not line or line.finish < nextComm.start then
+                return false
+            end
+            if nextComm.text:sub(1, 2) == '-@' then
+                return false
+            else
+                if nextComm.text:sub(1, 2) == '-|' then
+                    NextComment(i)
+                    row = row + i + 1
+                    local finishPos = nextComm.text:find('#', 3) or #nextComm.text
+                    parseTokens(nextComm.text:sub(3, finishPos), nextComm.start + 1)
+                    local resume = parseResume(result)
+                    if resume then
+                        if comments then
+                            resume.comment = table.concat(comments, '\n')
+                        else
+                            resume.comment = nextComm.text:match('#%s*(.+)', 3)
+                        end
+                        result.resumes[#result.resumes+1] = resume
+                        result.finish = resume.finish
+                    end
+                    comments = nil
+                    return true
+                else
+                    if not comments then
+                        comments = {}
+                    end
+                    comments[#comments+1] = nextComm.text:sub(2)
+                end
+            end
         end
+        return false
+    end
+
+    local checkResume = true
+    local nsymbol, ncontent = peekToken()
+    if nsymbol == 'symbol' then
+        if ncontent == ','
+        or ncontent == ':'
+        or ncontent == '|'
+        or ncontent == ')'
+        or ncontent == '}' then
+            checkResume = false
+        end
+    end
+
+    if checkResume then
+        while pushResume() do end
     end
 
     if #result.types == 0 and #result.enums == 0 and #result.resumes == 0 then
@@ -615,6 +762,7 @@ local function parseParam()
         return result
     end
     result.finish = getFinish()
+    result.firstFinish = result.extends.firstFinish
     return result
 end
 
@@ -667,6 +815,7 @@ local function parseField()
         return false
     end)
     result.field = parseName('doc.field.name', result)
+                or parseIndexField('doc.field.name', result)
     if not result.field then
         pushError {
             type   = 'LUADOC_MISS_FIELD_NAME',
@@ -677,6 +826,10 @@ local function parseField()
     end
     if not result.start then
         result.start = result.field.start
+    end
+    if checkToken('symbol', '?', 1) then
+        nextToken()
+        result.optional = true
     end
     result.extends = parseType(result)
     if not result.extends then
@@ -858,6 +1011,59 @@ local function parseSee()
     return result
 end
 
+local function parseDiagnostic()
+    local result = {
+        type = 'doc.diagnostic',
+    }
+    local nextTP, mode = nextToken()
+    if nextTP ~= 'name' then
+        pushError {
+            type   = 'LUADOC_MISS_DIAG_MODE',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+        return nil
+    end
+    result.mode   = mode
+    result.start  = getStart()
+    result.finish = getFinish()
+    if  mode ~= 'disable-next-line'
+    and mode ~= 'disable-line'
+    and mode ~= 'disable'
+    and mode ~= 'enable' then
+        pushError {
+            type   = 'LUADOC_ERROR_DIAG_MODE',
+            start  = result.start,
+            finish = result.finish,
+        }
+    end
+
+    if checkToken('symbol', ':', 1) then
+        nextToken()
+        result.names = {}
+        while true do
+            local name = parseName('doc.diagnostic.name', result)
+            if not name then
+                pushError {
+                    type   = 'LUADOC_MISS_DIAG_NAME',
+                    start  = getFinish(),
+                    finish = getFinish(),
+                }
+                return result
+            end
+            result.names[#result.names+1] = name
+            if not checkToken('symbol', ',', 1) then
+                break
+            end
+            nextToken()
+        end
+    end
+
+    result.finish = getFinish()
+
+    return result
+end
+
 local function convertTokens()
     local tp, text = nextToken()
     if not tp then
@@ -865,7 +1071,7 @@ local function convertTokens()
     end
     if tp ~= 'name' then
         pushError {
-            type  = 'LUADOC_MISS_CATE_NAME',
+            type   = 'LUADOC_MISS_CATE_NAME',
             start  = getStart(),
             finish = getFinish(),
         }
@@ -897,25 +1103,34 @@ local function convertTokens()
         return parseVersion()
     elseif text == 'see' then
         return parseSee()
+    elseif text == 'diagnostic' then
+        return parseDiagnostic()
     end
 end
 
 local function trimTailComment(text)
+    local comment = text
     if text:sub(1, 1) == '@' then
-        return text:sub(2)
+        comment = text:sub(2)
     end
     if text:sub(1, 1) == '#' then
-        return text:sub(2)
+        comment = text:sub(2)
     end
     if text:sub(1, 2) == '--' then
-        return text:sub(3)
+        comment = text:sub(3)
     end
-    return text
+    if comment:find '^%s*[\'"[]' then
+        local result = grammar(nil, comment:gsub('^%s+', ''), 'string')
+        if result and result[1] then
+            comment = result[1][1]
+        end
+    end
+    return comment
 end
 
 local function buildLuaDoc(comment)
     local text = comment.text
-    local _, startPos = text:find('^%-?%s*@')
+    local _, startPos = text:find('^%-%s*@')
     if not startPos then
         return {
             type    = 'doc.comment',
@@ -932,7 +1147,7 @@ local function buildLuaDoc(comment)
     local result = convertTokens()
     if result then
         result.range = comment.finish
-        local cstart = text:find('%S', result.finish - comment.start + 2)
+        local cstart = text:find('%S', (result.firstFinish or result.finish) - comment.start + 2)
         if cstart and cstart < comment.finish then
             result.comment = {
                 type   = 'doc.tailcomment',
@@ -957,21 +1172,25 @@ local function buildLuaDoc(comment)
 end
 
 ---当前行在注释doc前是否有代码
-local function haveCodeBeforeDocInCurLine(lineData, docStartCol)
-    return docStartCol > lineData.sp + lineData.tab + 3
+local function haveCodeBeforeDocInCurLine(text, lineData, docStart)
+    return text:sub(lineData.start + 1, docStart - 1):find '[%w_]'
 end
 
-local function isNextLine(lns, binded, doc)
+local function isTailComment(lns, text, binded, doc)
+    local lastDoc = binded[#binded]
+    local lastDocStartRow = guide.positionOf(lns, lastDoc.originalComment.start)
+    local lastDocStartLineData = guide.lineData(lns, lastDocStartRow)
+    if haveCodeBeforeDocInCurLine(text, lastDocStartLineData, lastDoc.originalComment.start) then
+        return true
+    end
+    return false
+end
+
+local function isNextLine(lns, text, binded, doc)
     if not binded then
         return false
     end
     local lastDoc = binded[#binded]
-    local lastDocStartRow, lastDocStartCol = guide.positionOf(lns, lastDoc.originalComment.start)
-    local lastDocStartLineData = guide.lineData(lns, lastDocStartRow)
-    if haveCodeBeforeDocInCurLine(lastDocStartLineData, lastDocStartCol) then
-        return false
-    end
-
     local lastRow = guide.positionOf(lns, lastDoc.finish)
     local newRow  = guide.positionOf(lns, doc.start)
     return newRow - lastRow == 1
@@ -986,7 +1205,8 @@ local function bindGeneric(binded)
                 generics[name] = {}
             end
         elseif doc.type == 'doc.param'
-        or     doc.type == 'doc.return' then
+        or     doc.type == 'doc.return'
+        or     doc.type == 'doc.type' then
             guide.eachSourceType(doc, 'doc.type.name', function (src)
                 local name = src[1]
                 if generics[name] then
@@ -1015,20 +1235,84 @@ local function bindDocsBetween(sources, binded, bindSources, start, finish)
         end
         local src = sources[index]
         if src.start < start then
-            left = index
+            left = index + 1
         else
             right = index
         end
     end
-    for i = index - 1, max do
+
+    -- 从前往后进行绑定
+    for i = index, max do
         local src = sources[i]
-        if src then
+        if src and src.start >= start then
             if src.start > finish then
+                break
+            end
+            -- 遇到table后中断，处理以下情况：
+            -- ---@type AAA
+            -- local t = {x = 1, y = 2}
+            if src.type == 'table' then
                 break
             end
             if src.start >= start then
                 src.bindDocs = binded
                 bindSources[#bindSources+1] = src
+            end
+        end
+    end
+end
+
+local function bindParamAndReturnIndex(binded)
+    local func
+    for _, source in ipairs(binded[1].bindSources) do
+        if source.type == 'function' then
+            func = source
+            break
+        end
+    end
+    if not func then
+        return
+    end
+    local paramMap
+    if func.args then
+        local paramIndex = 0
+        paramMap = {}
+        for _, param in ipairs(func.args) do
+            paramIndex = paramIndex + 1
+            if param[1] then
+                paramMap[param[1]] = paramIndex
+            end
+        end
+        func.docParamMap = paramMap
+    end
+    local returnIndex = 0
+    for _, doc in ipairs(binded) do
+        if doc.type == 'doc.param' then
+            if paramMap and doc.extends then
+                doc.extends.paramIndex = paramMap[doc.param[1]]
+            end
+        elseif doc.type == 'doc.return' then
+            for _, rtn in ipairs(doc.returns) do
+                returnIndex = returnIndex + 1
+                rtn.returnIndex = returnIndex
+            end
+        end
+    end
+end
+
+local function bindClassAndFields(binded)
+    local class
+    for _, doc in ipairs(binded) do
+        if doc.type == 'doc.class' then
+            -- 多个class连续写在一起，只有最后一个class可以绑定source
+            if class then
+                class.bindSources = nil
+            end
+            class = doc
+        elseif doc.type == 'doc.field' then
+            if class then
+                class.fields[#class.fields+1] = doc
+                doc.class = class
             end
         end
     end
@@ -1049,44 +1333,46 @@ local function bindDoc(sources, lns, binded)
     end
     bindGeneric(binded)
     local row = guide.positionOf(lns, lastDoc.finish)
-    local cstart, cfinish  = guide.lineRange(lns, row)
+    local cstart, cfinish = guide.lineRange(lns, row)
     local nstart, nfinish = guide.lineRange(lns, row + 1)
     bindDocsBetween(sources, binded, bindSources, cstart, cfinish)
     if #bindSources == 0 then
         bindDocsBetween(sources, binded, bindSources, nstart, nfinish)
     end
+    bindParamAndReturnIndex(binded)
+    bindClassAndFields(binded)
 end
 
+local bindDocAccept = {
+    'local'     , 'setlocal'  , 'setglobal',
+    'setfield'  , 'setmethod' , 'setindex' ,
+    'tablefield', 'tableindex',
+    'function'  , 'table'     , '...'      ,
+}
+
 local function bindDocs(state)
-    local lns = lines(nil, state.lua)
+    local text = state.lua
     local sources = {}
-    guide.eachSource(state.ast, function (src)
-        if src.type == 'local'
-        or src.type == 'setlocal'
-        or src.type == 'setglobal'
-        or src.type == 'setfield'
-        or src.type == 'setmethod'
-        or src.type == 'setindex'
-        or src.type == 'tablefield'
-        or src.type == 'tableindex'
-        or src.type == 'function'
-        or src.type == '...' then
-            sources[#sources+1] = src
-        end
+    guide.eachSourceTypes(state.ast, bindDocAccept, function (src)
+        sources[#sources+1] = src
     end)
     table.sort(sources, function (a, b)
         return a.start < b.start
     end)
     local binded
     for _, doc in ipairs(state.ast.docs) do
-        if not isNextLine(lns, binded, doc) then
-            bindDoc(sources, lns, binded)
+        if not isNextLine(Lines, text, binded, doc) then
+            bindDoc(sources, Lines, binded)
             binded = {}
             state.ast.docs.groups[#state.ast.docs.groups+1] = binded
         end
         binded[#binded+1] = doc
+        if isTailComment(Lines, text, binded, doc) then
+            bindDoc(sources, Lines, binded)
+            binded = nil
+        end
     end
-    bindDoc(sources, lns, binded)
+    bindDoc(sources, Lines, binded)
 end
 
 return function (_, state)
@@ -1103,11 +1389,13 @@ return function (_, state)
 
     pushError = state.pushError
 
+    Lines = lines(nil, state.lua)
+
     local ci = 1
-    NextComment = function (peek)
-        local comment = comments[ci]
+    NextComment = function (offset, peek)
+        local comment = comments[ci + (offset or 0)]
         if not peek then
-            ci = ci + 1
+            ci = ci + 1 + (offset or 0)
         end
         return comment
     end
