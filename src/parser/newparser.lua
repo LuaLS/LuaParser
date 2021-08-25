@@ -1,9 +1,11 @@
-local sbyte   = string.byte
-local sfind   = string.find
-local smatch  = string.match
-local sgsub   = string.gsub
-local ssub    = string.sub
-local tconcat = table.concat
+local sbyte     = string.byte
+local sfind     = string.find
+local smatch    = string.match
+local sgsub     = string.gsub
+local ssub      = string.sub
+local schar     = string.char
+local tconcat   = table.concat
+local tointeger = math.tointeger
 
 ---@alias parser.position integer
 
@@ -29,6 +31,28 @@ local function stringToByteMap(str)
     return map
 end
 
+---@param str string
+---@return table<integer, boolean>
+local function stringToCharMap(str)
+    local map = {}
+    local pos = 1
+    while pos <= #str do
+        local byte = sbyte(str, pos, pos)
+        map[schar(byte)] = true
+        pos = pos + 1
+        if ssub(str, pos, pos) == '-' then
+            pos = pos + 1
+            local byte2 = sbyte(str, pos, pos)
+            assert(byte < byte2)
+            for b = byte + 1, byte2 do
+                map[schar(b)] = true
+            end
+            pos = pos + 1
+        end
+    end
+    return map
+end
+
 local ByteMapSP      = stringToByteMap ' \t'
 local ByteMapNL      = stringToByteMap '\r\n'
 local ByteMapWordH   = stringToByteMap 'a-zA-Z\x80-\xff_'
@@ -37,6 +61,8 @@ local ByteMapStrSH   = stringToByteMap '\'"'
 local ByteMapStrLH   = stringToByteMap '['
 local ByteBLR        = sbyte '\r'
 local ByteBLN        = sbyte '\n'
+
+local CharMapNumber  = stringToCharMap '0-9'
 
 local EscMap = {
     ['a'] = '\a',
@@ -197,32 +223,40 @@ local function parseShotString(parent)
     while true do
         stringPool[stringIndex] = ssub(Lua, LuaOffset, offset - 1)
         stringIndex = stringIndex + 1
-        if char == '\\' then
+        if     char == '\\' then
             local nextChar = getChar(offset + 1)
-            LuaOffset = offset + 2
-            local escChar = EscMap[nextChar]
-            if escChar then
-                stringPool[stringIndex] = escChar
+            if EscMap[nextChar] then
+                LuaOffset = offset + 2
+                stringPool[stringIndex] = EscMap[nextChar]
                 stringIndex = stringIndex + 1
             elseif nextChar == mark then
+                LuaOffset = offset + 2
                 stringPool[stringIndex] = nextChar
                 stringIndex = stringIndex + 1
             elseif nextChar == 'z' then
+                LuaOffset = offset + 2
                 skipSpace()
+            elseif CharMapNumber[nextChar] then
+                local numbers = smatch(Lua, '%d+', offset + 1)
+                if #numbers > 3 then
+                    numbers = ssub(numbers, 1, 3)
+                end
+                LuaOffset = offset + #numbers + 1
+                local byte = tointeger(numbers)
+                stringPool[stringIndex] = schar(byte)
+                stringIndex = stringIndex + 1
+            else
+                LuaOffset = offset + 2
             end
-            goto CONTINUE
-        end
-        if char == mark then
+        elseif char == mark then
             stringResult = tconcat(stringPool, '', 1, stringIndex - 1)
             LuaOffset = offset + 1
             break
         end
-        ::CONTINUE::
         offset, _, char = sfind(Lua, pattern, LuaOffset)
         if not char then
             stringPool[stringIndex] = ssub(Lua, LuaOffset)
             stringResult = tconcat(stringPool, '', 1, stringIndex)
-            offset    = #Lua
             LuaOffset = offset + 1
             break
         end
@@ -230,7 +264,7 @@ local function parseShotString(parent)
     return {
         type   = 'string',
         start  = startPos,
-        finish = getPosition(offset, 'right'),
+        finish = getPosition(LuaOffset - 1, 'right'),
         parent = parent,
         [1]    = stringResult,
         [2]    = mark,
@@ -238,28 +272,49 @@ local function parseShotString(parent)
 end
 
 local function parseLongString(parent)
-    local start, finish, mark = sfind(Lua, '%[%=*%[', LuaOffset)
+    local start, finish, mark = sfind(Lua, '(%[%=*%[)', LuaOffset)
     if not mark then
         return nil
     end
     local startPos = getPosition(start, 'left')
     LuaOffset = finish + 1
     skipNL()
+    local finishMark = sgsub(mark, '%[', ']')
     local stringResult
-    local finishMark = sgsub(mark, '%[', '%]')
-    local finishOffset, markFinishOffset = sfind(Lua, finishMark, LuaOffset, true)
-    if finishOffset then
-        stringResult = ssub(Lua, LuaOffset, finishOffset - 1)
-        LuaOffset = markFinishOffset + 1
-    else
-        stringResult = ssub(Lua, LuaOffset)
-        markFinishOffset = #Lua
-        LuaOffset        = markFinishOffset + 1
+    local stringIndex = 1
+    while true do
+        local offset, _, char = sfind(Lua, '([\r\n%]])', LuaOffset)
+        if not char then
+            stringPool[stringIndex] = ssub(Lua, LuaOffset)
+            stringResult = tconcat(stringPool, '', 1, stringIndex)
+            LuaOffset = #Lua + 1
+            break
+        end
+        stringPool[stringIndex] = ssub(Lua, LuaOffset, offset - 1)
+        stringIndex = stringIndex + 1
+        if char == '\r'
+        or char == '\n' then
+            LuaOffset = offset
+            skipNL()
+            stringPool[stringIndex] = '\n'
+            stringIndex = stringIndex + 1
+        else
+            local markFinishOffset = offset + #finishMark - 1
+            if ssub(Lua, offset, markFinishOffset) == finishMark then
+                stringResult = tconcat(stringPool, '', 1, stringIndex - 1)
+                LuaOffset = markFinishOffset + 1
+                break
+            else
+                stringPool[stringIndex] = ']'
+                stringIndex = stringIndex + 1
+                LuaOffset   = offset + 1
+            end
+        end
     end
     return {
         type   = 'string',
         start  = startPos,
-        finish = getPosition(markFinishOffset, 'right'),
+        finish = getPosition(LuaOffset - 1, 'right'),
         parent = parent,
         [1]    = stringResult,
         [2]    = mark,
