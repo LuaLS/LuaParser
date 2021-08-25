@@ -1,7 +1,7 @@
 CHECK[['123']]
 {
     type   = "string",
-    start  = 1,
+    start  = 0,
     finish = 5,
     [1]    = "123",
     [2]    = "'",
@@ -9,7 +9,7 @@ CHECK[['123']]
 CHECK[['123\'']]
 {
     type   = "string",
-    start  = 1,
+    start  = 0,
     finish = 7,
     [1]    = "123'",
     [2]    = "'",
@@ -18,8 +18,8 @@ CHECK[['123\z
     345']]
 {
     type   = "string",
-    start  = 1,
-    finish = 15,
+    start  = 0,
+    finish = 10008,
     [1]    = "123345",
     [2]    = "'",
 }
