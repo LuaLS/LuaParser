@@ -131,6 +131,30 @@ local function getPosition(offset, leftOrRight)
     end
 end
 
+local function missTL(offset)
+    local pos = getPosition(offset, 'right')
+    pushError {
+        type   = 'MISS_SYMBOL',
+        start  = pos,
+        finish = pos,
+        info = {
+            symbol = '{',
+        }
+    }
+end
+
+local function missTR(offset)
+    local pos = getPosition(offset, 'right')
+    pushError {
+        type   = 'MISS_SYMBOL',
+        start  = pos,
+        finish = pos,
+        info = {
+            symbol = '}',
+        }
+    }
+end
+
 ---@return string          word
 ---@return parser.position startPosition
 ---@return parser.position finishPosition
@@ -217,7 +241,7 @@ local stringPool = {}
 
 local function parseStringUnicode()
     if ssub(Lua, LuaOffset, LuaOffset) ~= '{' then
-        -- TODO pushError
+        missTL(LuaOffset)
         return nil
     end
     local leftPos  = getPosition(LuaOffset, 'right')
@@ -227,11 +251,35 @@ local function parseStringUnicode()
     if ssub(Lua, LuaOffset, LuaOffset) == '}' then
         LuaOffset = LuaOffset + 1
     else
-        -- TODO pushError
+        missTR(LuaOffset)
+    end
+    if  State.version ~= 'Lua 5.3'
+    and State.version ~= 'Lua 5.4'
+    and State.version ~= 'LuaJIT'
+    then
+        pushError {
+            type    = 'ERR_ESC',
+            start   = leftPos - 1,
+            finish  = getPosition(LuaOffset, 'right'),
+            version = {'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+            info = {
+                version = State.version,
+            }
+        }
+        return nil
     end
     local byte = tonumber(x16, 16)
     if not byte then
-
+        for i = 1, #x16 do
+            if not tonumber(ssub(x16, i, i), 16) then
+                pushError {
+                    type   = 'MUST_X16',
+                    start  = leftPos + i - 1,
+                    finish = leftPos + i,
+                }
+            end
+        end
+        return nil
     end
     if State.version == 'Lua 5.4' then
         if byte < 0 or byte > 0x7FFFFFFF then
@@ -260,7 +308,10 @@ local function parseStringUnicode()
             }
         end
     end
-    return uchar(byte)
+    if byte >= 0 and byte <= 0x10FFFF then
+        return uchar(byte)
+    end
+    return nil
 end
 
 local function parseShotString(parent)

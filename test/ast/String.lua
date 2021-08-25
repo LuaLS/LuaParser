@@ -112,7 +112,7 @@ abcdef]]]=]
 {
     type   = "string",
     start  = 0,
-    finish = 11,
+    finish = 10008,
     [1]    = "abcdef",
     [2]    = "[[",
 }
