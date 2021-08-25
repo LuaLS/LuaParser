@@ -4,6 +4,7 @@ local smatch    = string.match
 local sgsub     = string.gsub
 local ssub      = string.sub
 local schar     = string.char
+local uchar     = utf8.char
 local tconcat   = table.concat
 local tointeger = math.tointeger
 
@@ -59,6 +60,7 @@ local ByteMapWordH   = stringToByteMap 'a-zA-Z\x80-\xff_'
 local ByteMapWordT   = stringToByteMap 'a-zA-Z0-9\x80-\xff_'
 local ByteMapStrSH   = stringToByteMap '\'"'
 local ByteMapStrLH   = stringToByteMap '['
+local ByteMapX16     = stringToByteMap '0-9a-fA-F'
 local ByteBLR        = sbyte '\r'
 local ByteBLN        = sbyte '\n'
 
@@ -74,9 +76,26 @@ local EscMap = {
     ['v'] = '\v',
 }
 
-local LineMulti      = 10000
+local LineMulti = 10000
 
 local State, Lua, LuaOffset, Line, LineOffset
+
+
+local function pushError(err)
+    local errs = State.errs
+    if err.finish < err.start then
+        err.finish = err.start
+    end
+    local last = errs[#errs]
+    if last then
+        if last.start <= err.start and last.finish >= err.finish then
+            return
+        end
+    end
+    err.level = err.level or 'error'
+    errs[#errs+1] = err
+    return err
+end
 
 local CachedByte, CachedByteOffset
 local function getByte(offset)
@@ -195,6 +214,55 @@ local function parseBoolean(parent)
 end
 
 local stringPool = {}
+
+local function parseStringUnicode()
+    if ssub(Lua, LuaOffset, LuaOffset) ~= '{' then
+        -- TODO pushError
+        return nil
+    end
+    local leftPos  = getPosition(LuaOffset, 'right')
+    local x16 = smatch(Lua, '^[%da-fA-F]*', LuaOffset + 1)
+    local rightPos = getPosition(LuaOffset + #x16, 'right')
+    LuaOffset = LuaOffset + #x16 + 1
+    if ssub(Lua, LuaOffset, LuaOffset) == '}' then
+        LuaOffset = LuaOffset + 1
+    else
+        -- TODO pushError
+    end
+    local byte = tonumber(x16, 16)
+    if not byte then
+
+    end
+    if State.version == 'Lua 5.4' then
+        if byte < 0 or byte > 0x7FFFFFFF then
+            pushError {
+                type   = 'UTF8_MAX',
+                start  = leftPos,
+                finish = rightPos,
+                info   = {
+                    min = '00000000',
+                    max = '7FFFFFFF',
+                }
+            }
+            return nil
+        end
+    else
+        if byte < 0 or byte > 0x10FFFF then
+            pushError {
+                type    = 'UTF8_MAX',
+                start   = leftPos,
+                finish  = rightPos,
+                version = byte <= 0x7FFFFFFF and 'Lua 5.4' or nil,
+                info = {
+                    min = '000000',
+                    max = '10FFFF',
+                }
+            }
+        end
+    end
+    return uchar(byte)
+end
+
 local function parseShotString(parent)
     local mark = getChar()
     local start = LuaOffset
@@ -243,8 +311,30 @@ local function parseShotString(parent)
                 end
                 LuaOffset = offset + #numbers + 1
                 local byte = tointeger(numbers)
-                stringPool[stringIndex] = schar(byte)
-                stringIndex = stringIndex + 1
+                if byte <= 255 then
+                    stringPool[stringIndex] = schar(byte)
+                    stringIndex = stringIndex + 1
+                else
+                    -- TODO pushError
+                end
+            elseif nextChar == 'x' then
+                local x16 = ssub(Lua, offset + 2, offset + 3)
+                local byte = tonumber(x16, 16)
+                if byte then
+                    stringPool[stringIndex] = schar(byte)
+                    stringIndex = stringIndex + 1
+                    LuaOffset = LuaOffset + 4
+                else
+                    -- TODO pushError
+                    LuaOffset = LuaOffset + 2
+                end
+            elseif nextChar == 'u' then
+                LuaOffset = offset + 2
+                local str = parseStringUnicode()
+                if str then
+                    stringPool[stringIndex] = str
+                    stringIndex = stringIndex + 1
+                end
             else
                 LuaOffset = offset + 2
             end
