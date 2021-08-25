@@ -1,5 +1,6 @@
 local guide       = require 'parser.guide'
 local parse       = require 'parser.parse'
+local newparser   = require 'parser.newparser'
 local type        = type
 local tableInsert = table.insert
 local pairs       = pairs
@@ -568,6 +569,10 @@ local function PostCompile()
 end
 
 return function (lua, mode, version, options)
+    do
+        local state, err = newparser(lua, mode, version, options)
+        return state, err
+    end
     local state, err = parse(lua, mode, version, options)
     if not state then
         return nil, err

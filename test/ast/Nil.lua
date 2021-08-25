@@ -1,12 +1,12 @@
 CHECK [[nil]]
 {
     type   = "nil",
-    start  = 1,
+    start  = 0,
     finish = 3,
 }
 CHECK [[   nil]]
 {
     type   = "nil",
-    start  = 4,
+    start  = 3,
     finish = 6,
 }
