@@ -1,4 +1,5 @@
 local guide       = require 'parser.guide'
+local parse       = require 'parser.parse'
 local type        = type
 local tableInsert = table.insert
 local pairs       = pairs
@@ -566,8 +567,8 @@ local function PostCompile()
     end
 end
 
-return function (self, lua, mode, version, options)
-    local state, err = self:parse(lua, mode, version, options)
+return function (_, lua, mode, version, options)
+    local state, err = parse(nil, lua, mode, version, options)
     if not state then
         return nil, err
     end
