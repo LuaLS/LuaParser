@@ -7,7 +7,7 @@ assert(buf)
 buf = buf:gsub('\r\n', '\n'):gsub('[\r\n]', '\r\n')
 
 do
-    local lines = parser:lines(buf)
+    local lines = parser.lines(buf)
     local row, col = guide.positionOf(lines, 0)
     assert(row == 1)
     assert(col == 0)
@@ -42,7 +42,7 @@ do
 end
 
 do
-    local lines = parser:lines(buf)
+    local lines = parser.lines(buf)
     local offset = guide.offsetOf(lines, 1, 1)
     assert(offset == 1)
 
@@ -78,7 +78,7 @@ do
 end
 
 do
-    local lines = parser:lines 'abc\r\nabc\r\n' -- len = 10
+    local lines = parser.lines 'abc\r\nabc\r\n' -- len = 10
 
     local pos = guide.offsetOf(lines, 9999, 1)
     assert(pos == 10)

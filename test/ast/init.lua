@@ -116,7 +116,7 @@ end
 local function test(type)
     CHECK = function (buf)
         return function (target_ast)
-            local state, err = parser:compile(buf, type, 'Lua 5.4')
+            local state, err = parser.compile(buf, type, 'Lua 5.4')
             if not state then
                 error(('语法树生成失败：%s'):format(err))
             end
@@ -134,7 +134,7 @@ local function test(type)
     end
     LuaDoc = function (buf)
         return function (target_doc)
-            local state, err = parser:compile(buf, 'type', 'Lua 5.4')
+            local state, err = parser.compile(buf, 'type', 'Lua 5.4')
             if not state then
                 error(('语法树生成失败：%s'):format(err))
             end

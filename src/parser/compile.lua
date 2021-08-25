@@ -567,8 +567,8 @@ local function PostCompile()
     end
 end
 
-return function (_, lua, mode, version, options)
-    local state, err = parse(nil, lua, mode, version, options)
+return function (lua, mode, version, options)
+    local state, err = parse(lua, mode, version, options)
     if not state then
         return nil, err
     end
@@ -577,11 +577,7 @@ return function (_, lua, mode, version, options)
     --end
     local clock = os.clock()
     pushError = state.pushError
-    if version == 'Lua 5.1' or version == 'LuaJIT' then
-        ENVMode = '@fenv'
-    else
-        ENVMode = '_ENV'
-    end
+    ENVMode = state.ENVMode
     Compiled = {}
     GoToTag = {}
     LocalCount = 0
@@ -591,7 +587,6 @@ return function (_, lua, mode, version, options)
         Root.state = state
     end
     Options = options
-    state.ENVMode = ENVMode
     if type(state.ast) == 'table' then
         Compile(state.ast)
     end

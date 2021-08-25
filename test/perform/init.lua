@@ -41,11 +41,11 @@ local function performTest()
     end
     local clock = os.clock()
     for path, buf in pairs(files) do
-        local state, err = parser:compile(buf, 'lua', 'Lua 5.4')
+        local state = parser.compile(buf, 'lua', 'Lua 5.4')
         if not state then
             error(('文件解析失败：%s'):format(path:string()))
         end
-        local lines, err = parser:lines(buf)
+        local lines = parser.lines(buf)
         if not lines then
             error(('行号解析失败：%s'):format(path:string()))
         end
@@ -65,10 +65,10 @@ local function test(path)
         return
     end
     local testTimes = 10
-    local state, err
+    local state
     local clock = os.clock()
     for i = 1, testTimes do
-        state, err = parser:compile(buf, 'lua', 'Lua 5.4')
+        state = parser.compile(buf, 'lua', 'Lua 5.4')
         if not state then
             error(('文件解析失败：%s'):format(path:string()))
         end

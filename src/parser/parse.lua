@@ -37,14 +37,19 @@ local function buildState(lua, version, options)
             comms[#comms+1] = comment
         end
     }
+    if version == 'Lua 5.1' or version == 'LuaJIT' then
+        state.ENVMode = '@fenv'
+    else
+        state.ENVMode = '_ENV'
+    end
     return state
 end
 
-return function (_, lua, mode, version, options)
+return function (lua, mode, version, options)
     local state = buildState(lua, version, options)
     local clock = os.clock()
     ast.init(state)
-    local suc, res, err = xpcall(grammar, debug.traceback, nil, lua, mode)
+    local suc, res, err = xpcall(grammar, debug.traceback, lua, mode)
     ast.close()
     if not suc then
         return nil, res
