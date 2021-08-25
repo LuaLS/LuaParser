@@ -2,6 +2,8 @@ local sbyte = string.byte
 local sfind = string.find
 local ssub  = string.sub
 
+---@alias parser.position integer
+
 local function stringToByteMap(str)
     local map = {}
     local pos = 1
@@ -55,19 +57,21 @@ local function getPosition(offset, leftOrRight)
     end
 end
 
-local function getWholeWord(word)
-    local startOffset = LuaOffset
-    local nextOffset  = LuaOffset + #word
-    if ssub(Lua, startOffset, nextOffset - 1) ~= word then
+---@return string          word
+---@return parser.position startPosition
+---@return parser.position finishPosition
+---@return integer         newOffset
+local function peekWord()
+    local start, finish, word = sfind(Lua
+        , '^([%a_\x80-\xff][%w_\x80-\xff]*)'
+        , LuaOffset
+    )
+    if not finish then
         return nil
     end
-    local b = getByte(nextOffset)
-    if ByteMapWordT[b] then
-        return nil
-    end
-    LuaOffset = nextOffset
-    return getPosition(startOffset, 'left')
-         , getPosition(nextOffset, 'left')
+    local startPos  = getPosition(start , 'left')
+    local finishPos = getPosition(finish, 'right')
+    return word, startPos, finishPos, finish + 1
 end
 
 local function skipNL()
@@ -105,15 +109,33 @@ end
 
 local function parseNil(parent)
     skipSpace()
-    local start, finish = getWholeWord 'nil'
-    if not start then
-        return nil
+    local word, start, finish, newOffset = peekWord()
+    if word ~= 'nil' then
+        return
     end
+    LuaOffset = newOffset
     return {
         type   = 'nil',
         start  = start,
         finish = finish,
         parent = parent,
+    }
+end
+
+local function parseBoolean(parent)
+    skipSpace()
+    local word, start, finish, newOffset = peekWord()
+    if  word ~= 'true'
+    and word ~= 'false' then
+        return
+    end
+    LuaOffset = newOffset
+    return {
+        type   = 'boolean',
+        start  = start,
+        finish = finish,
+        parent = parent,
+        [1]    = word == 'true' and true or false,
     }
 end
 
@@ -143,6 +165,8 @@ return function (lua, mode, version, options)
     if     mode == 'Lua' then
     elseif mode == 'Nil' then
         State.ast = parseNil()
+    elseif mode == 'Boolean' then
+        State.ast = parseBoolean()
     end
     return State
 end
