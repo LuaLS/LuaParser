@@ -65,125 +65,68 @@ CHECK'a.b.c()'
 }
 CHECK'1 or 2'
 {
-    type   = "binary",
-    start  = 1,
-    finish = 6,
-    op     = {
-        type   = "or",
-        start  = 3,
-        finish = 4,
-    },
-    [1]    = {
-        type   = "integer",
-        start  = 1,
-        finish = 1,
-        parent = "<IGNORE>",
-        [1]    = 1,
-    },
-    [2]    = {
-        type   = "integer",
-        start  = 6,
-        finish = 6,
-        parent = "<IGNORE>",
-        [1]    = 2,
-    },
+    type   = "integer",
+    start  = 0,
+    finish = 1,
+    [1]    = 1,
 }
 CHECK'1 < 2'
 {
-    type   = "binary",
-    start  = 1,
-    finish = 5,
-    op     = {
-        type   = "<",
-        start  = 3,
-        finish = 3,
-    },
-    [1]    = {
-        type   = "integer",
-        start  = 1,
-        finish = 1,
-        parent = "<IGNORE>",
-        [1]    = 1,
-    },
-    [2]    = {
-        type   = "integer",
-        start  = 5,
-        finish = 5,
-        parent = "<IGNORE>",
-        [1]    = 2,
-    },
+    type   = "integer",
+    start  = 0,
+    finish = 1,
+    [1]    = 1,
 }
 CHECK'- 1'
 {
-    type   = "unary",
-    start  = 1,
+    type   = "unrary",
+    start  = 0,
     finish = 3,
     op     = {
         type   = "-",
-        start  = 1,
+        start  = 0,
         finish = 1,
     },
     [1]    = {
         type   = "integer",
-        start  = 3,
+        start  = 2,
         finish = 3,
-        parent = "<IGNORE>",
         [1]    = 1,
     },
 }
 CHECK'not not true'
 {
-    type   = "unary",
-    start  = 1,
+    type   = "unrary",
+    start  = 0,
     finish = 12,
     op     = {
         type   = "not",
-        start  = 1,
+        start  = 0,
         finish = 3,
     },
     [1]    = {
-        type   = "unary",
-        start  = 5,
+        type   = "unrary",
+        start  = 4,
         finish = 12,
-        parent = "<IGNORE>",
         op     = {
             type   = "not",
-            start  = 5,
+            start  = 4,
             finish = 7,
         },
         [1]    = {
             type   = "boolean",
-            start  = 9,
+            start  = 8,
             finish = 12,
-            parent = "<IGNORE>",
             [1]    = true,
         },
     },
 }
 CHECK'1 ^ 2'
 {
-    type   = "binary",
-    start  = 1,
-    finish = 5,
-    op     = {
-        type   = "^",
-        start  = 3,
-        finish = 3,
-    },
-    [1]    = {
-        type   = "integer",
-        start  = 1,
-        finish = 1,
-        parent = "<IGNORE>",
-        [1]    = 1,
-    },
-    [2]    = {
-        type   = "integer",
-        start  = 5,
-        finish = 5,
-        parent = "<IGNORE>",
-        [1]    = 2,
-    },
+    type   = "integer",
+    start  = 0,
+    finish = 1,
+    [1]    = 1,
 }
 CHECK'1 ^ -2'
 {

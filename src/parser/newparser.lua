@@ -74,7 +74,8 @@ local CharMapN2      = stringToCharMap 'bB'
 local CharMapE10     = stringToCharMap 'eE'
 local CharMapE16     = stringToCharMap 'pP'
 local CharMapSign    = stringToCharMap '+-'
-local CharMapSymbol  = stringToCharMap 'nao|~&=<>.*/%#^!+-'
+local CharMapSB      = stringToCharMap 'ao|~&=<>.*/%^+-'
+local CharMapSU      = stringToCharMap 'n#~-'
 local CharMapSimple  = stringToCharMap '.:(['
 
 local EscMap = {
@@ -88,6 +89,31 @@ local EscMap = {
 }
 
 local LineMulti = 10000
+
+-- goto 单独处理
+local KeyWord = {
+    ['and']      = true,
+    ['break']    = true,
+    ['do']       = true,
+    ['else']     = true,
+    ['elseif']   = true,
+    ['end']      = true,
+    ['false']    = true,
+    ['for']      = true,
+    ['function'] = true,
+    ['if']       = true,
+    ['in']       = true,
+    ['local']    = true,
+    ['nil']      = true,
+    ['not']      = true,
+    ['or']       = true,
+    ['repeat']   = true,
+    ['return']   = true,
+    ['then']     = true,
+    ['true']     = true,
+    ['until']    = true,
+    ['while']    = true,
+}
 
 local UnarySymbol = {
     ['not'] = true,
@@ -636,17 +662,10 @@ local function parseNumber()
     }
 end
 
-local function parseWord()
+local function parseName()
     local word, startPos, finishPos, newOffset = peekWord()
     if not word then
         return nil
-    end
-    if word == 'nil' then
-        return parseNil()
-    end
-    if word == 'true'
-    or word == 'false' then
-        return parseBoolean()
     end
     LuaOffset = newOffset
     return {
@@ -727,7 +746,7 @@ local function parseSimple(node)
             }
             LuaOffset = LuaOffset + 1
             skipSpace()
-            local field = parseWord()
+            local field = parseName()
             local getfield = {
                 type   = 'getfield',
                 start  = node.start,
@@ -778,76 +797,117 @@ local function parseExpUnit()
         return number
     end
 
-    local word = parseWord()
+    local word = peekWord()
     if word then
-        skipSpace()
-        if word.type == 'name' then
-            word.type = 'getglobal'
-            return parseSimple(word)
+        if word == 'nil' then
+            return parseNil()
         end
-        return word
+        if word == 'true'
+        or word == 'false' then
+            return parseBoolean()
+        end
+        local node = parseName()
+        node.type = 'getglobal'
+        return parseSimple(node)
     end
 
     return nil
 end
 
-local function resolveExpUnit(expUnit)
-    local tp = expUnit.type
-    return expUnit
+local function parseUnaryOP()
+    local char = getChar()
+    if not CharMapSU[char] then
+        return nil
+    end
+    if UnarySymbol[char] then
+        local op = {
+            type   = char,
+            start  = getPosition(LuaOffset, 'left'),
+            finish = getPosition(LuaOffset, 'right'),
+        }
+        LuaOffset = LuaOffset + 1
+        return op
+    end
+    local word, start, finish, newOffset = peekWord()
+    if UnarySymbol[word] then
+        local op = {
+            type   = word,
+            start  = start,
+            finish = finish,
+        }
+        LuaOffset = newOffset
+        return op
+    end
+    return nil
 end
 
-local function resolveExpGetUnit(expList, index)
-    local expUnit = expList[index]
-    local tp = expUnit.type
-    if UnarySymbol[tp] then
-        local right, newIndex = resolveExpGetUnit(expList, index + 1)
-        if not right then
-            -- TODO
-            return expUnit, index + 1
+---@param level integer # op level must greater than this level
+local function parseBinaryOP(level)
+    local char = getChar()
+    if not CharMapSB[char] then
+        return nil
+    end
+    local symbol, len
+    if BinarySymbol[char] then
+        symbol = char
+        len    = #char
+    else
+        local char2 = ssub(Lua, LuaOffset, LuaOffset + 1)
+        if BinarySymbol[char2] then
+            symbol = char2
+            len    = #char2
+        else
+            local word = peekWord()
+            if UnarySymbol[word] then
+                symbol = word
+                len    = #word
+            else
+                return nil
+            end
         end
-        expUnit[1] = right
-        return expUnit, newIndex + 1
     end
-    if BinarySymbol[tp] then
-        -- TODO
-        return expUnit, index + 1
-    end
-
-    local nextUnit = expList[index + 1]
-
+    local myLevel = BinarySymbol[char]
+    local op = {
+        type   = symbol,
+        start  = getPosition(LuaOffset, 'left'),
+        finish = getPosition(LuaOffset + len - 1, 'right'),
+    }
+    return op
 end
 
----@param expList parser.guide.object[]
-local function resolveExp(expList, index)
-    local left
-    while true do
-        local exp, newIndex = resolveExpGetUnit(expList, index)
+function parseExp(level)
+    local exp
+    local uop = parseUnaryOP()
+    if uop then
+        skipSpace()
+        local child = parseExp(1000)
+        exp = {
+            type   = 'unrary',
+            op     = uop,
+            start  = uop.start,
+            finish = child and child.finish or uop.finish,
+            [1]    = child,
+        }
+        return exp
     end
-    return left
-end
 
-function parseExp()
-    local firstExpUnit = parseExpUnit()
-    if not firstExpUnit then
+    if not level then
+        level = 0
+    end
+
+    exp = parseExpUnit()
+    if not exp then
         return nil
     end
 
-    local secondExpUnit = parseExpUnit()
-    if not secondExpUnit then
-        return resolveExpUnit(firstExpUnit)
+    if level >= 1000 then
+        return exp
     end
 
-    local expList = {firstExpUnit, secondExpUnit}
-    while true do
-        local expUnit = parseExpUnit()
-        if expUnit then
-            expList[#expList+1] = expUnit
-        else
-            break
-        end
-    end
+    skipSpace()
+    local bop = parseBinaryOP(level)
 
-    return resolveExp(expList, 1)
+    return exp
 end
 
 local function initState(lua, version, options)
