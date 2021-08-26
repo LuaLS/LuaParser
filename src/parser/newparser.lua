@@ -7,6 +7,8 @@ local schar     = string.char
 local uchar     = utf8.char
 local tconcat   = table.concat
 local tointeger = math.tointeger
+local mtype     = math.type
+local tonumber  = tonumber
 
 ---@alias parser.position integer
 
@@ -65,6 +67,15 @@ local ByteBLR        = sbyte '\r'
 local ByteBLN        = sbyte '\n'
 
 local CharMapNumber  = stringToCharMap '0-9'
+local CharMapN16     = stringToCharMap 'xX'
+local CharMapN2      = stringToCharMap 'bB'
+local CharMapE10     = stringToCharMap 'eE'
+local CharMapE16     = stringToCharMap 'pP'
+
+local CharMapPN      = {
+    ['+'] = true,
+    ['-'] = true,
+}
 
 local EscMap = {
     ['a'] = '\a',
@@ -240,7 +251,7 @@ end
 local stringPool = {}
 
 local function parseStringUnicode()
-    if ssub(Lua, LuaOffset, LuaOffset) ~= '{' then
+    if getChar() ~= '{' then
         missTL(LuaOffset)
         return nil
     end
@@ -248,7 +259,7 @@ local function parseStringUnicode()
     local x16 = smatch(Lua, '^[%da-fA-F]*', LuaOffset + 1)
     local rightPos = getPosition(LuaOffset + #x16, 'right')
     LuaOffset = LuaOffset + #x16 + 1
-    if ssub(Lua, LuaOffset, LuaOffset) == '}' then
+    if getChar() == '}' then
         LuaOffset = LuaOffset + 1
     else
         missTR(LuaOffset)
@@ -474,6 +485,97 @@ local function parseString(parent)
     return nil
 end
 
+local function parseNumber10(offset)
+    local integerPart = smatch(Lua, '^%d*', offset)
+    LuaOffset = offset + #integerPart
+    -- float part
+    if getChar(LuaOffset) == '.' then
+        local floatPart = smatch(Lua, '^%d*', LuaOffset + 1)
+        LuaOffset = LuaOffset + #floatPart + 1
+    end
+    -- exp part
+    local echar = getChar(LuaOffset)
+    if CharMapE10[echar] then
+        LuaOffset = LuaOffset + 1
+        local nextChar = getChar(LuaOffset)
+        if CharMapPN[nextChar] then
+            LuaOffset = LuaOffset + 1
+        end
+        local exp = smatch(Lua, '^%d*', LuaOffset)
+        LuaOffset = LuaOffset + #exp
+    end
+    return tonumber(ssub(Lua, offset, LuaOffset - 1))
+end
+
+local function parseNumber16(offset)
+    local integerPart = smatch(Lua, '^[%da-fA-F]*', offset)
+    LuaOffset = offset + #integerPart
+    -- float part
+    if getChar(LuaOffset) == '.' then
+        local floatPart = smatch(Lua, '^[%da-fA-F]*', LuaOffset + 1)
+        LuaOffset = LuaOffset + #floatPart + 1
+    end
+    -- exp part
+    local echar = getChar(LuaOffset)
+    if CharMapE16[echar] then
+        LuaOffset = LuaOffset + 1
+        local nextChar = getChar(LuaOffset)
+        if CharMapPN[nextChar] then
+            LuaOffset = LuaOffset + 1
+        end
+        local exp = smatch(Lua, '^%d*', LuaOffset)
+        LuaOffset = LuaOffset + #exp
+    end
+    return tonumber(ssub(Lua, offset - 2, LuaOffset - 1))
+end
+
+local function parseNumber2(offset)
+    local bins = smatch(Lua, '[01]*', offset)
+    LuaOffset = offset + #bins
+    return tonumber(bins, 2)
+end
+
+local function parseNumber(parent)
+    skipSpace()
+    local offset = LuaOffset
+    local startPos = getPosition(offset, 'left')
+    local neg
+    if getChar(offset) == '-' then
+        neg = true
+        offset = offset + 1
+    end
+    local number
+    local firstChar = getChar(offset)
+    if     firstChar == '.' then
+    elseif firstChar == '0' then
+        local nextChar = getChar(offset + 1)
+        if CharMapN16[nextChar] then
+            number = parseNumber16(offset + 2)
+        elseif CharMapN2[nextChar] then
+            number = parseNumber2(offset + 2)
+        else
+            number = parseNumber10(offset)
+        end
+    elseif CharMapNumber[firstChar] then
+        number = parseNumber10(offset)
+    else
+        return nil
+    end
+    if not number then
+        number = 0
+    end
+    if neg then
+        number = - number
+    end
+    return {
+        type   = mtype(number) == 'integer' and 'integer' or 'number',
+        start  = startPos,
+        finish = getPosition(LuaOffset - 1, 'right'),
+        parent = parent,
+        [1]    = number,
+    }
+end
+
 local function initState(lua, version, options)
     Lua        = lua
     LuaOffset  = 1
@@ -506,6 +608,8 @@ return function (lua, mode, version, options)
         State.ast = parseBoolean()
     elseif mode == 'String' then
         State.ast = parseString()
+    elseif mode == 'Number' then
+        State.ast = parseNumber()
     end
     return State
 end
