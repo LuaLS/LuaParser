@@ -52,14 +52,14 @@ CHECK'a.b.c'
 CHECK'func()'
 {
     type   = "call",
-    start  = 1,
+    start  = 0,
     finish = 6,
     node   = "<IGNORE>",
 }
 CHECK'a.b.c()'
 {
     type   = "call",
-    start  = 1,
+    start  = 0,
     finish = 7,
     node   = "<IGNORE>",
 }

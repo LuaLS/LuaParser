@@ -136,6 +136,7 @@ local SymbolForward = {
 
 local State, Lua, LuaOffset, Line, LineOffset
 
+local parseExp
 
 local function pushError(err)
     local errs = State.errs
@@ -207,6 +208,30 @@ local function missTR(offset)
         finish = pos,
         info = {
             symbol = '}',
+        }
+    }
+end
+
+local function missPL(offset)
+    local pos = getPosition(offset, 'right')
+    pushError {
+        type   = 'MISS_SYMBOL',
+        start  = pos,
+        finish = pos,
+        info = {
+            symbol = '(',
+        }
+    }
+end
+
+local function missPR(offset)
+    local pos = getPosition(offset, 'right')
+    pushError {
+        type   = 'MISS_SYMBOL',
+        start  = pos,
+        finish = pos,
+        info = {
+            symbol = ')',
         }
     }
 end
@@ -632,8 +657,63 @@ local function parseWord()
     }
 end
 
+local function parseExpList()
+    local list
+    local lastSepPos
+    while true do
+        skipSpace()
+        local char = getChar()
+        if not char then
+            break
+        end
+        if char == ',' then
+            local sepPos = getPosition(LuaOffset, 'right')
+            if lastSepPos then
+                pushError {
+                    type   = 'UNEXPECT_SYMBOL',
+                    start  = getPosition(LuaOffset, 'left'),
+                    finish = sepPos,
+                    info = {
+                        symbol = ',',
+                    }
+                }
+            end
+            lastSepPos = sepPos
+            goto CONTINUE
+        else
+            if not lastSepPos then
+                break
+            end
+            local exp = parseExp()
+            if not exp then
+                break
+            end
+            lastSepPos = nil
+            if not list then
+                list = {
+                    start  = exp.start,
+                }
+            end
+            list[#list+1] = exp
+            list.finish   = exp.finish
+            exp.parent    = list
+        end
+        ::CONTINUE::
+    end
+    if not list then
+        return nil
+    end
+    if lastSepPos then
+        pushError {
+            type   = 'MISS_EXP',
+            start  = lastSepPos,
+            finish = lastSepPos,
+        }
+    end
+    return list
+end
+
 local function parseSimple(node)
-    local simple = node
     while true do
         local nextChar = getChar()
         if not CharMapSimple[nextChar] then
@@ -656,13 +736,40 @@ local function parseSimple(node)
                 dot    = dot,
                 field  = field
             }
+            node.parent = getfield
             if field then
-                field.parent = simple
+                field.parent = node
             end
-            simple = getfield
+            node = getfield
+        elseif nextChar == ':' then
+        elseif nextChar == '(' then
+            local startPos = getPosition(LuaOffset, 'left')
+            local call = {
+                type   = 'call',
+                start  = node.start,
+                node   = node,
+            }
+            LuaOffset = LuaOffset + 1
+            skipSpace()
+            local args = parseExpList()
+            if getChar(LuaOffset) == ')' then
+                LuaOffset = LuaOffset + 1
+            else
+                missPR()
+            end
+            if args then
+                args.type   = 'callargs'
+                args.start  = startPos
+                args.finish = getPosition(LuaOffset - 1, 'right')
+                args.parent = call
+                call.args   = args
+            end
+            call.finish = getPosition(LuaOffset - 1, 'right')
+            node = call
         end
+        skipSpace()
     end
-    return simple
+    return node
 end
 
 local function parseExpUnit()
@@ -719,7 +826,7 @@ local function resolveExp(expList, index)
     return left
 end
 
-local function parseExp()
+function parseExp()
     local firstExpUnit = parseExpUnit()
     if not firstExpUnit then
         return nil
