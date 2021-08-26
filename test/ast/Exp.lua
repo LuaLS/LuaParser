@@ -1,34 +1,22 @@
 CHECK'nil'
 {
     type   = "nil",
-    start  = 1,
+    start  = 0,
     finish = 3,
 }
 CHECK'a'
 {
     type   = "getglobal",
-    start  = 1,
+    start  = 0,
     finish = 1,
     [1]    = "a",
 }
 CHECK'a.b'
 {
-    type   = "getfield",
-    start  = 1,
-    finish = 3,
-    node   = "<IGNORE>",
-    dot    = {
-        type   = ".",
-        start  = 2,
-        finish = 2,
-    },
-    field  = {
-        type   = "field",
-        start  = 3,
-        finish = 3,
-        parent = "<IGNORE>",
-        [1]    = "b",
-    },
+    type   = "word",
+    start  = 0,
+    finish = 1,
+    [1]    = "a",
 }
 CHECK'a.b.c'
 {

@@ -21,7 +21,8 @@ local function stringToByteMap(str)
         local byte = sbyte(str, pos, pos)
         map[byte] = true
         pos = pos + 1
-        if ssub(str, pos, pos) == '-' then
+        if  ssub(str, pos, pos) == '-'
+        and pos < #str then
             pos = pos + 1
             local byte2 = sbyte(str, pos, pos)
             assert(byte < byte2)
@@ -43,7 +44,8 @@ local function stringToCharMap(str)
         local byte = sbyte(str, pos, pos)
         map[schar(byte)] = true
         pos = pos + 1
-        if ssub(str, pos, pos) == '-' then
+        if  ssub(str, pos, pos) == '-'
+        and pos < #str then
             pos = pos + 1
             local byte2 = sbyte(str, pos, pos)
             assert(byte < byte2)
@@ -71,11 +73,8 @@ local CharMapN16     = stringToCharMap 'xX'
 local CharMapN2      = stringToCharMap 'bB'
 local CharMapE10     = stringToCharMap 'eE'
 local CharMapE16     = stringToCharMap 'pP'
-
-local CharMapPN      = {
-    ['+'] = true,
-    ['-'] = true,
-}
+local CharMapSign    = stringToCharMap '+-'
+local CharMapSymbol  = stringToCharMap 'nao|~&=<>.*/%#^!+-'
 
 local EscMap = {
     ['a'] = '\a',
@@ -216,8 +215,7 @@ local function skipSpace()
     end
 end
 
-local function parseNil(parent)
-    skipSpace()
+local function parseNil()
     local word, start, finish, newOffset = peekWord()
     if word ~= 'nil' then
         return nil
@@ -227,12 +225,10 @@ local function parseNil(parent)
         type   = 'nil',
         start  = start,
         finish = finish,
-        parent = parent,
     }
 end
 
-local function parseBoolean(parent)
-    skipSpace()
+local function parseBoolean()
     local word, start, finish, newOffset = peekWord()
     if  word ~= 'true'
     and word ~= 'false' then
@@ -243,7 +239,6 @@ local function parseBoolean(parent)
         type   = 'boolean',
         start  = start,
         finish = finish,
-        parent = parent,
         [1]    = word == 'true' and true or false,
     }
 end
@@ -325,7 +320,7 @@ local function parseStringUnicode()
     return nil
 end
 
-local function parseShotString(parent)
+local function parseShotString()
     local mark = getChar()
     local start = LuaOffset
     local pattern
@@ -342,7 +337,6 @@ local function parseShotString(parent)
             type   = 'string',
             start  = getPosition(start , 'left'),
             finish = getPosition(offset, 'right'),
-            parent = parent,
             [1]    = ssub(Lua, start + 1, offset - 1),
             [2]    = mark,
         }
@@ -417,13 +411,12 @@ local function parseShotString(parent)
         type   = 'string',
         start  = startPos,
         finish = getPosition(LuaOffset - 1, 'right'),
-        parent = parent,
         [1]    = stringResult,
         [2]    = mark,
     }
 end
 
-local function parseLongString(parent)
+local function parseLongString()
     local start, finish, mark = sfind(Lua, '(%[%=*%[)', LuaOffset)
     if not mark then
         return nil
@@ -467,20 +460,18 @@ local function parseLongString(parent)
         type   = 'string',
         start  = startPos,
         finish = getPosition(LuaOffset - 1, 'right'),
-        parent = parent,
         [1]    = stringResult,
         [2]    = mark,
     }
 end
 
-local function parseString(parent)
-    skipSpace()
+local function parseString()
     local b = getByte()
     if ByteMapStrSH[b] then
-        return parseShotString(parent)
+        return parseShotString()
     end
     if ByteMapStrLH[b] then
-        return parseLongString(parent)
+        return parseLongString()
     end
     return nil
 end
@@ -498,7 +489,7 @@ local function parseNumber10(offset)
     if CharMapE10[echar] then
         LuaOffset = LuaOffset + 1
         local nextChar = getChar(LuaOffset)
-        if CharMapPN[nextChar] then
+        if CharMapSign[nextChar] then
             LuaOffset = LuaOffset + 1
         end
         local exp = smatch(Lua, '^%d*', LuaOffset)
@@ -520,7 +511,7 @@ local function parseNumber16(offset)
     if CharMapE16[echar] then
         LuaOffset = LuaOffset + 1
         local nextChar = getChar(LuaOffset)
-        if CharMapPN[nextChar] then
+        if CharMapSign[nextChar] then
             LuaOffset = LuaOffset + 1
         end
         local exp = smatch(Lua, '^%d*', LuaOffset)
@@ -535,8 +526,7 @@ local function parseNumber2(offset)
     return tonumber(bins, 2)
 end
 
-local function parseNumber(parent)
-    skipSpace()
+local function parseNumber()
     local offset = LuaOffset
     local startPos = getPosition(offset, 'left')
     local neg
@@ -571,9 +561,79 @@ local function parseNumber(parent)
         type   = mtype(number) == 'integer' and 'integer' or 'number',
         start  = startPos,
         finish = getPosition(LuaOffset - 1, 'right'),
-        parent = parent,
         [1]    = number,
     }
+end
+
+local function parseWord()
+    local word, startPos, finishPos, newOffset = peekWord()
+    if not word then
+        return nil
+    end
+    if word == 'nil' then
+        return parseNil()
+    end
+    if word == 'true'
+    or word == 'false' then
+        return parseBoolean()
+    end
+    LuaOffset = newOffset
+    return {
+        type   = 'name',
+        start  = startPos,
+        finish = finishPos,
+        [1]    = word,
+    }
+end
+
+local function parseExpUnit()
+    local number = parseNumber()
+    if number then
+        return number
+    end
+
+    local word = parseWord()
+    if word then
+        return word
+    end
+
+    return nil
+end
+
+local function resolveExpUnit(expUnit)
+    local tp = expUnit.type
+    if tp == 'name' then
+        expUnit.type = 'getglobal'
+    end
+    return expUnit
+end
+
+local function resolveExp(expList)
+    
+end
+
+local function parseExp()
+    local firstExpUnit = parseExpUnit()
+    if not firstExpUnit then
+        return nil
+    end
+
+    local secondExpUnit = parseExpUnit()
+    if not secondExpUnit then
+        return resolveExpUnit(firstExpUnit)
+    end
+
+    local expList = {firstExpUnit, secondExpUnit}
+    while true do
+        local expUnit = parseExpUnit()
+        if expUnit then
+            expList[#expList+1] = expUnit
+        else
+            break
+        end
+    end
+
+    return resolveExp(expList)
 end
 
 local function initState(lua, version, options)
@@ -601,6 +661,7 @@ end
 
 return function (lua, mode, version, options)
     initState(lua, version, options)
+    skipSpace()
     if     mode == 'Lua' then
     elseif mode == 'Nil' then
         State.ast = parseNil()
@@ -610,6 +671,8 @@ return function (lua, mode, version, options)
         State.ast = parseString()
     elseif mode == 'Number' then
         State.ast = parseNumber()
+    elseif mode == 'Exp' then
+        State.ast = parseExp()
     end
     return State
 end
