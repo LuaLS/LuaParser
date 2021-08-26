@@ -13,25 +13,37 @@ CHECK'a'
 }
 CHECK'a.b'
 {
-    type   = "word",
+    type   = "getfield",
     start  = 0,
-    finish = 1,
-    [1]    = "a",
+    finish = 3,
+    node   = "<IGNORE>",
+    dot    = {
+        type   = ".",
+        start  = 1,
+        finish = 2,
+    },
+    field  = {
+        type   = "name",
+        start  = 2,
+        finish = 3,
+        parent = "<IGNORE>",
+        [1]    = "b",
+    },
 }
 CHECK'a.b.c'
 {
     type   = "getfield",
-    start  = 1,
+    start  = 0,
     finish = 5,
     node   = "<IGNORE>",
     dot    = {
         type   = ".",
-        start  = 4,
+        start  = 3,
         finish = 4,
     },
     field  = {
-        type   = "field",
-        start  = 5,
+        type   = "name",
+        start  = 4,
         finish = 5,
         parent = "<IGNORE>",
         [1]    = "c",

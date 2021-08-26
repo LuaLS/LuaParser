@@ -75,6 +75,7 @@ local CharMapE10     = stringToCharMap 'eE'
 local CharMapE16     = stringToCharMap 'pP'
 local CharMapSign    = stringToCharMap '+-'
 local CharMapSymbol  = stringToCharMap 'nao|~&=<>.*/%#^!+-'
+local CharMapSimple  = stringToCharMap '.:(['
 
 local EscMap = {
     ['a'] = '\a',
@@ -87,6 +88,51 @@ local EscMap = {
 }
 
 local LineMulti = 10000
+
+local UnarySymbol = {
+    ['not'] = true,
+    ['#']   = true,
+    ['~']   = true,
+    ['-']   = true,
+}
+
+local BinarySymbol = {
+    ['or']  = 1,
+    ['and'] = 2,
+    ['<=']  = 3,
+    ['>=']  = 3,
+    ['<']   = 3,
+    ['>']   = 3,
+    ['~=']  = 3,
+    ['==']  = 3,
+    ['|']   = 4,
+    ['~']   = 5,
+    ['&']   = 6,
+    ['<<']  = 7,
+    ['>>']  = 7,
+    ['..']  = 8,
+    ['+']   = 9,
+    ['-']   = 9,
+    ['*']   = 10,
+    ['//']  = 10,
+    ['/']   = 10,
+    ['%']   = 10,
+    ['^']   = 11,
+}
+
+local SymbolForward = {
+    [01]  = true,
+    [02]  = true,
+    [03]  = true,
+    [04]  = true,
+    [05]  = true,
+    [06]  = true,
+    [07]  = true,
+    [08]  = false,
+    [09]  = true,
+    [10]  = true,
+    [11]  = false,
+}
 
 local State, Lua, LuaOffset, Line, LineOffset
 
@@ -586,6 +632,39 @@ local function parseWord()
     }
 end
 
+local function parseSimple(node)
+    local simple = node
+    while true do
+        local nextChar = getChar()
+        if not CharMapSimple[nextChar] then
+            break
+        end
+        if nextChar == '.' then
+            local dot = {
+                type   = nextChar,
+                start  = getPosition(LuaOffset, 'left'),
+                finish = getPosition(LuaOffset, 'right'),
+            }
+            LuaOffset = LuaOffset + 1
+            skipSpace()
+            local field = parseWord()
+            local getfield = {
+                type   = 'getfield',
+                start  = node.start,
+                finish = getPosition(LuaOffset - 1, 'right'),
+                node   = node,
+                dot    = dot,
+                field  = field
+            }
+            if field then
+                field.parent = simple
+            end
+            simple = getfield
+        end
+    end
+    return simple
+end
+
 local function parseExpUnit()
     local number = parseNumber()
     if number then
@@ -594,6 +673,11 @@ local function parseExpUnit()
 
     local word = parseWord()
     if word then
+        skipSpace()
+        if word.type == 'name' then
+            word.type = 'getglobal'
+            return parseSimple(word)
+        end
         return word
     end
 
@@ -602,14 +686,37 @@ end
 
 local function resolveExpUnit(expUnit)
     local tp = expUnit.type
-    if tp == 'name' then
-        expUnit.type = 'getglobal'
-    end
     return expUnit
 end
 
-local function resolveExp(expList)
-    
+local function resolveExpGetUnit(expList, index)
+    local expUnit = expList[index]
+    local tp = expUnit.type
+    if UnarySymbol[tp] then
+        local right, newIndex = resolveExpGetUnit(expList, index + 1)
+        if not right then
+            -- TODO
+            return expUnit, index + 1
+        end
+        expUnit[1] = right
+        return expUnit, newIndex + 1
+    end
+    if BinarySymbol[tp] then
+        -- TODO
+        return expUnit, index + 1
+    end
+
+    local nextUnit = expList[index + 1]
+
+end
+
+---@param expList parser.guide.object[]
+local function resolveExp(expList, index)
+    local left
+    while true do
+        local exp, newIndex = resolveExpGetUnit(expList, index)
+    end
+    return left
 end
 
 local function parseExp()
@@ -633,7 +740,7 @@ local function parseExp()
         end
     end
 
-    return resolveExp(expList)
+    return resolveExp(expList, 1)
 end
 
 local function initState(lua, version, options)
