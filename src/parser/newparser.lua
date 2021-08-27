@@ -819,6 +819,12 @@ local function parseUnaryOP()
     if not CharMapSU[char] then
         return nil
     end
+    if char == '-' then
+        local nextChar = getChar(LuaOffset + 1)
+        if nextChar == '.' or CharMapNumber[nextChar] then
+            return nil
+        end
+    end
     if UnarySymbol[char] then
         local op = {
             type   = char,
@@ -866,12 +872,16 @@ local function parseBinaryOP(level)
             end
         end
     end
-    local myLevel = BinarySymbol[char]
+    local myLevel = BinarySymbol[symbol]
+    if myLevel < level then
+        return nil
+    end
     local op = {
         type   = symbol,
         start  = getPosition(LuaOffset, 'left'),
         finish = getPosition(LuaOffset + len - 1, 'right'),
     }
+    LuaOffset = LuaOffset + len
     return op
 end
 
@@ -888,6 +898,9 @@ function parseExp(level)
             finish = child and child.finish or uop.finish,
             [1]    = child,
         }
+        if child then
+            child.parent = exp
+        end
         return exp
     end
 
@@ -904,8 +917,29 @@ function parseExp(level)
         return exp
     end
 
-    skipSpace()
-    local bop = parseBinaryOP(level)
+    while true do
+        skipSpace()
+        local bop = parseBinaryOP(level)
+        if not bop then
+            break
+        end
+
+        skipSpace()
+        local child = parseExp(level)
+        local bin = {
+            type   = 'binary',
+            start  = exp.start,
+            finish = child and child.finish or bop.finish,
+            op     = bop,
+            [1]    = exp,
+            [2]    = child
+        }
+        exp.parent = bin
+        if child then
+            child.parent = bin
+        end
+        exp = bin
+    end
 
     return exp
 end
