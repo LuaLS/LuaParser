@@ -359,50 +359,50 @@ CHECK'- 1 + 2 * 3'
 CHECK"x and y == 'unary' and z"
 {
     type   = "binary",
-    start  = 1,
+    start  = 0,
     finish = 24,
     op     = {
         type   = "and",
-        start  = 20,
+        start  = 19,
         finish = 22,
     },
     [1]    = {
         type   = "binary",
-        start  = 1,
+        start  = 0,
         finish = 18,
         parent = "<IGNORE>",
         op     = {
             type   = "and",
-            start  = 3,
+            start  = 2,
             finish = 5,
         },
         [1]    = {
             type   = "getglobal",
-            start  = 1,
+            start  = 0,
             finish = 1,
             parent = "<IGNORE>",
             [1]    = "x",
         },
         [2]    = {
             type   = "binary",
-            start  = 7,
+            start  = 6,
             finish = 18,
             parent = "<IGNORE>",
             op     = {
                 type   = "==",
-                start  = 9,
+                start  = 8,
                 finish = 10,
             },
             [1]    = {
                 type   = "getglobal",
-                start  = 7,
+                start  = 6,
                 finish = 7,
                 parent = "<IGNORE>",
                 [1]    = "y",
             },
             [2]    = {
                 type   = "string",
-                start  = 12,
+                start  = 11,
                 finish = 18,
                 parent = "<IGNORE>",
                 [1]    = "unary",
@@ -412,7 +412,7 @@ CHECK"x and y == 'unary' and z"
     },
     [2]    = {
         type   = "getglobal",
-        start  = 24,
+        start  = 23,
         finish = 24,
         parent = "<IGNORE>",
         [1]    = "z",

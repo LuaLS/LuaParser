@@ -430,6 +430,7 @@ local function parseShotString()
     local offset, _, char = sfind(Lua, pattern, LuaOffset)
     -- simple string
     if char == mark then
+        LuaOffset = offset + 1
         return {
             type   = 'string',
             start  = getPosition(start , 'left'),
@@ -802,6 +803,11 @@ local function parseExpUnit()
         return varargs
     end
 
+    local string = parseString()
+    if string then
+        return string
+    end
+
     local number = parseNumber()
     if number then
         return number
@@ -874,7 +880,7 @@ local function parseBinaryOP(level)
             len    = #char2
         else
             local word = peekWord()
-            if UnarySymbol[word] then
+            if BinarySymbol[word] then
                 symbol = word
                 len    = #word
             else
@@ -936,7 +942,7 @@ function parseExp(level)
         level = opLevel
         skipSpace()
         local isForward = SymbolForward[level]
-        local child = parseExp(isForward and (level + 1) or level)
+        local child = parseExp(isForward and (level + 0.5) or level)
         local bin = {
             type   = 'binary',
             start  = exp.start,
