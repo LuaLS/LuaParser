@@ -792,6 +792,16 @@ local function parseSimple(node)
 end
 
 local function parseExpUnit()
+    if ssub(Lua, LuaOffset, LuaOffset + 2) == '...' then
+        local varargs = {
+            type   = 'varargs',
+            start  = getPosition(LuaOffset, 'left'),
+            finish = getPosition(LuaOffset + 2, 'right'),
+        }
+        LuaOffset = LuaOffset + 3
+        return varargs
+    end
+
     local number = parseNumber()
     if number then
         return number
@@ -882,7 +892,7 @@ local function parseBinaryOP(level)
         finish = getPosition(LuaOffset + len - 1, 'right'),
     }
     LuaOffset = LuaOffset + len
-    return op
+    return op, myLevel
 end
 
 function parseExp(level)
@@ -892,7 +902,7 @@ function parseExp(level)
         skipSpace()
         local child = parseExp(1000)
         exp = {
-            type   = 'unrary',
+            type   = 'unary',
             op     = uop,
             start  = uop.start,
             finish = child and child.finish or uop.finish,
@@ -901,16 +911,15 @@ function parseExp(level)
         if child then
             child.parent = exp
         end
-        return exp
+    else
+        exp = parseExpUnit()
+        if not exp then
+            return nil
+        end
     end
 
     if not level then
         level = 0
-    end
-
-    exp = parseExpUnit()
-    if not exp then
-        return nil
     end
 
     if level >= 1000 then
@@ -919,13 +928,15 @@ function parseExp(level)
 
     while true do
         skipSpace()
-        local bop = parseBinaryOP(level)
+        local bop, opLevel = parseBinaryOP(level)
         if not bop then
             break
         end
 
+        level = opLevel
         skipSpace()
-        local child = parseExp(level)
+        local isForward = SymbolForward[level]
+        local child = parseExp(isForward and (level + 1) or level)
         local bin = {
             type   = 'binary',
             start  = exp.start,

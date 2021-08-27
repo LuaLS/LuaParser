@@ -115,7 +115,7 @@ CHECK'1 < 2'
 }
 CHECK'- 1'
 {
-    type   = "unrary",
+    type   = "unary",
     start  = 0,
     finish = 3,
     op     = {
@@ -133,7 +133,7 @@ CHECK'- 1'
 }
 CHECK'not not true'
 {
-    type   = "unrary",
+    type   = "unary",
     start  = 0,
     finish = 12,
     op     = {
@@ -142,7 +142,7 @@ CHECK'not not true'
         finish = 3,
     },
     [1]    = {
-        type   = "unrary",
+        type   = "unary",
         start  = 4,
         finish = 12,
         parent = "<IGNORE>",
@@ -213,39 +213,39 @@ CHECK'1 ^ -2'
 CHECK'...'
 {
     type   = "varargs",
-    start  = 1,
+    start  = 0,
     finish = 3,
 }
 CHECK'1 + 2 + 3'
 {
     type   = "binary",
-    start  = 1,
+    start  = 0,
     finish = 9,
     op     = {
         type   = "+",
-        start  = 7,
+        start  = 6,
         finish = 7,
     },
     [1]    = {
         type   = "binary",
-        start  = 1,
+        start  = 0,
         finish = 5,
         parent = "<IGNORE>",
         op     = {
             type   = "+",
-            start  = 3,
+            start  = 2,
             finish = 3,
         },
         [1]    = {
             type   = "integer",
-            start  = 1,
+            start  = 0,
             finish = 1,
             parent = "<IGNORE>",
             [1]    = 1,
         },
         [2]    = {
             type   = "integer",
-            start  = 5,
+            start  = 4,
             finish = 5,
             parent = "<IGNORE>",
             [1]    = 2,
@@ -253,7 +253,7 @@ CHECK'1 + 2 + 3'
     },
     [2]    = {
         type   = "integer",
-        start  = 9,
+        start  = 8,
         finish = 9,
         parent = "<IGNORE>",
         [1]    = 3,
@@ -262,40 +262,40 @@ CHECK'1 + 2 + 3'
 CHECK'1 + 2 * 3'
 {
     type   = "binary",
-    start  = 1,
+    start  = 0,
     finish = 9,
     op     = {
         type   = "+",
-        start  = 3,
+        start  = 2,
         finish = 3,
     },
     [1]    = {
         type   = "integer",
-        start  = 1,
+        start  = 0,
         finish = 1,
         parent = "<IGNORE>",
         [1]    = 1,
     },
     [2]    = {
         type   = "binary",
-        start  = 5,
+        start  = 4,
         finish = 9,
         parent = "<IGNORE>",
         op     = {
             type   = "*",
-            start  = 7,
+            start  = 6,
             finish = 7,
         },
         [1]    = {
             type   = "integer",
-            start  = 5,
+            start  = 4,
             finish = 5,
             parent = "<IGNORE>",
             [1]    = 2,
         },
         [2]    = {
             type   = "integer",
-            start  = 9,
+            start  = 8,
             finish = 9,
             parent = "<IGNORE>",
             [1]    = 3,
@@ -305,26 +305,26 @@ CHECK'1 + 2 * 3'
 CHECK'- 1 + 2 * 3'
 {
     type   = "binary",
-    start  = 1,
+    start  = 0,
     finish = 11,
     op     = {
         type   = "+",
-        start  = 5,
+        start  = 4,
         finish = 5,
     },
     [1]    = {
         type   = "unary",
-        start  = 1,
+        start  = 0,
         finish = 3,
         parent = "<IGNORE>",
         op     = {
             type   = "-",
-            start  = 1,
+            start  = 0,
             finish = 1,
         },
         [1]    = {
             type   = "integer",
-            start  = 3,
+            start  = 2,
             finish = 3,
             parent = "<IGNORE>",
             [1]    = 1,
@@ -332,24 +332,24 @@ CHECK'- 1 + 2 * 3'
     },
     [2]    = {
         type   = "binary",
-        start  = 7,
+        start  = 6,
         finish = 11,
         parent = "<IGNORE>",
         op     = {
             type   = "*",
-            start  = 9,
+            start  = 8,
             finish = 9,
         },
         [1]    = {
             type   = "integer",
-            start  = 7,
+            start  = 6,
             finish = 7,
             parent = "<IGNORE>",
             [1]    = 2,
         },
         [2]    = {
             type   = "integer",
-            start  = 11,
+            start  = 10,
             finish = 11,
             parent = "<IGNORE>",
             [1]    = 3,
@@ -484,40 +484,40 @@ CHECK"x and y or '' .. z"
 CHECK'1 ^ 2 ^ 3'
 {
     type   = "binary",
-    start  = 1,
+    start  = 0,
     finish = 9,
     op     = {
         type   = "^",
-        start  = 3,
+        start  = 2,
         finish = 3,
     },
     [1]    = {
         type   = "integer",
-        start  = 1,
+        start  = 0,
         finish = 1,
         parent = "<IGNORE>",
         [1]    = 1,
     },
     [2]    = {
         type   = "binary",
-        start  = 5,
+        start  = 4,
         finish = 9,
         parent = "<IGNORE>",
         op     = {
             type   = "^",
-            start  = 7,
+            start  = 6,
             finish = 7,
         },
         [1]    = {
             type   = "integer",
-            start  = 5,
+            start  = 4,
             finish = 5,
             parent = "<IGNORE>",
             [1]    = 2,
         },
         [2]    = {
             type   = "integer",
-            start  = 9,
+            start  = 8,
             finish = 9,
             parent = "<IGNORE>",
             [1]    = 3,
@@ -528,40 +528,40 @@ CHECK'1 ^ 2 ^ 3'
 CHECK'1 .. 2 .. 3'
 {
     type   = "binary",
-    start  = 1,
+    start  = 0,
     finish = 11,
     op     = {
         type   = "..",
-        start  = 3,
+        start  = 2,
         finish = 4,
     },
     [1]    = {
         type   = "integer",
-        start  = 1,
+        start  = 0,
         finish = 1,
         parent = "<IGNORE>",
         [1]    = 1,
     },
     [2]    = {
         type   = "binary",
-        start  = 6,
+        start  = 5,
         finish = 11,
         parent = "<IGNORE>",
         op     = {
             type   = "..",
-            start  = 8,
+            start  = 7,
             finish = 9,
         },
         [1]    = {
             type   = "integer",
-            start  = 6,
+            start  = 5,
             finish = 6,
             parent = "<IGNORE>",
             [1]    = 2,
         },
         [2]    = {
             type   = "integer",
-            start  = 11,
+            start  = 10,
             finish = 11,
             parent = "<IGNORE>",
             [1]    = 3,
@@ -571,93 +571,93 @@ CHECK'1 .. 2 .. 3'
 CHECK'1 + - - - - - - - 1'
 {
     type   = "binary",
-    start  = 1,
+    start  = 0,
     finish = 19,
     op     = {
         type   = "+",
-        start  = 3,
+        start  = 2,
         finish = 3,
     },
     [1]    = {
         type   = "integer",
-        start  = 1,
+        start  = 0,
         finish = 1,
         parent = "<IGNORE>",
         [1]    = 1,
     },
     [2]    = {
         type   = "unary",
-        start  = 5,
+        start  = 4,
         finish = 19,
         parent = "<IGNORE>",
         op     = {
             type   = "-",
-            start  = 5,
+            start  = 4,
             finish = 5,
         },
         [1]    = {
             type   = "unary",
-            start  = 7,
+            start  = 6,
             finish = 19,
             parent = "<IGNORE>",
             op     = {
                 type   = "-",
-                start  = 7,
+                start  = 6,
                 finish = 7,
             },
             [1]    = {
                 type   = "unary",
-                start  = 9,
+                start  = 8,
                 finish = 19,
                 parent = "<IGNORE>",
                 op     = {
                     type   = "-",
-                    start  = 9,
+                    start  = 8,
                     finish = 9,
                 },
                 [1]    = {
                     type   = "unary",
-                    start  = 11,
+                    start  = 10,
                     finish = 19,
                     parent = "<IGNORE>",
                     op     = {
                         type   = "-",
-                        start  = 11,
+                        start  = 10,
                         finish = 11,
                     },
                     [1]    = {
                         type   = "unary",
-                        start  = 13,
+                        start  = 12,
                         finish = 19,
                         parent = "<IGNORE>",
                         op     = {
                             type   = "-",
-                            start  = 13,
+                            start  = 12,
                             finish = 13,
                         },
                         [1]    = {
                             type   = "unary",
-                            start  = 15,
+                            start  = 14,
                             finish = 19,
                             parent = "<IGNORE>",
                             op     = {
                                 type   = "-",
-                                start  = 15,
+                                start  = 14,
                                 finish = 15,
                             },
                             [1]    = {
                                 type   = "unary",
-                                start  = 17,
+                                start  = 16,
                                 finish = 19,
                                 parent = "<IGNORE>",
                                 op     = {
                                     type   = "-",
-                                    start  = 17,
+                                    start  = 16,
                                     finish = 17,
                                 },
                                 [1]    = {
                                     type   = "integer",
-                                    start  = 19,
+                                    start  = 18,
                                     finish = 19,
                                     parent = "<IGNORE>",
                                     [1]    = 1,
