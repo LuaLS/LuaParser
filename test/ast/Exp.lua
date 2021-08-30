@@ -210,6 +210,42 @@ CHECK'1 ^ -2'
         [1]    = -2,
     },
 }
+CHECK'-1 ^ 2'
+{
+    type   = "unary",
+    start  = 0,
+    finish = 6,
+    op     = {
+        type   = "-",
+        start  = 0,
+        finish = 1,
+    },
+    [1]    = {
+        type   = "binary",
+        start  = 1,
+        finish = 6,
+        parent = "<IGNORE>",
+        op     = {
+            type   = "^",
+            start  = 3,
+            finish = 4,
+        },
+        [1]    = {
+            type   = 'integer',
+            start  = 1,
+            finish = 2,
+            parent = "<IGNORE>",
+            [1]    = 1,
+        },
+        [2]    = {
+            type   = 'integer',
+            start  = 5,
+            finish = 6,
+            parent = "<IGNORE>",
+            [1]    = 2,
+        },
+    },
+}
 CHECK'...'
 {
     type   = "varargs",
@@ -351,6 +387,60 @@ CHECK'- 1 + 2 * 3'
             type   = "integer",
             start  = 10,
             finish = 11,
+            parent = "<IGNORE>",
+            [1]    = 3,
+        },
+    },
+}
+CHECK'-1 + 2 * 3'
+{
+    type   = "binary",
+    start  = 0,
+    finish = 10,
+    op     = {
+        type   = "+",
+        start  = 3,
+        finish = 4,
+    },
+    [1]    = {
+        type   = "unary",
+        start  = 0,
+        finish = 2,
+        parent = "<IGNORE>",
+        op     = {
+            type   = "-",
+            start  = 0,
+            finish = 1,
+        },
+        [1]    = {
+            type   = "integer",
+            start  = 1,
+            finish = 2,
+            parent = "<IGNORE>",
+            [1]    = 1,
+        },
+    },
+    [2]    = {
+        type   = "binary",
+        start  = 5,
+        finish = 10,
+        parent = "<IGNORE>",
+        op     = {
+            type   = "*",
+            start  = 7,
+            finish = 8,
+        },
+        [1]    = {
+            type   = "integer",
+            start  = 5,
+            finish = 6,
+            parent = "<IGNORE>",
+            [1]    = 2,
+        },
+        [2]    = {
+            type   = "integer",
+            start  = 9,
+            finish = 10,
             parent = "<IGNORE>",
             [1]    = 3,
         },

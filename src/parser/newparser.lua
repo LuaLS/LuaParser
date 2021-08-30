@@ -88,10 +88,10 @@ local KeyWord = {
 }
 
 local UnarySymbol = {
-    ['not'] = true,
-    ['#']   = true,
-    ['~']   = true,
-    ['-']   = true,
+    ['not'] = 11,
+    ['#']   = 11,
+    ['~']   = 11,
+    ['-']   = 11,
 }
 
 local BinarySymbol = {
@@ -115,7 +115,7 @@ local BinarySymbol = {
     ['//']  = 10,
     ['/']   = 10,
     ['%']   = 10,
-    ['^']   = 11,
+    ['^']   = 12,
 }
 
 local SymbolForward = {
@@ -129,7 +129,8 @@ local SymbolForward = {
     [08]  = false,
     [09]  = true,
     [10]  = true,
-    [11]  = false,
+    [11]  = true,
+    [12]  = false,
 }
 
 local State, Lua, LuaOffset, Line, LineOffset, Chunk
@@ -1152,37 +1153,34 @@ local function parseExpUnit()
     return nil
 end
 
-local function parseUnaryOP()
+local function parseUnaryOP(level)
     local char = getChar()
     if not CharMapSU[char] then
         return nil
     end
-    if char == '-' then
-        local nextChar = getChar(LuaOffset + 1)
-        if nextChar == '.' or CharMapNumber[nextChar] then
-            return nil
+    local symbol
+    if UnarySymbol[char] then
+        symbol = char
+    else
+        local word = peekWord()
+        if UnarySymbol[word] then
+            symbol = word
         end
     end
-    if UnarySymbol[char] then
-        local op = {
-            type   = char,
-            start  = getPosition(LuaOffset, 'left'),
-            finish = getPosition(LuaOffset, 'right'),
-        }
-        LuaOffset = LuaOffset + 1
-        return op
+    if not symbol then
+        return nil
     end
-    local word, start, finish, newOffset = peekWord()
-    if UnarySymbol[word] then
-        local op = {
-            type   = word,
-            start  = start,
-            finish = finish,
-        }
-        LuaOffset = newOffset
-        return op
+    local myLevel = UnarySymbol[symbol]
+    if level and myLevel < level then
+        return nil
     end
-    return nil
+    local op = {
+        type   = symbol,
+        start  = getPosition(LuaOffset, 'left'),
+        finish = getPosition(LuaOffset + #symbol - 1, 'right'),
+    }
+    LuaOffset = LuaOffset + #symbol
+    return op, myLevel
 end
 
 ---@param level integer # op level must greater than this level
@@ -1225,10 +1223,10 @@ end
 
 function parseExp(level)
     local exp
-    local uop = parseUnaryOP()
+    local uop, uopLevel = parseUnaryOP(level)
     if uop then
         skipSpace()
-        local child = parseExp(1000)
+        local child = parseExp(uopLevel)
         exp = {
             type   = 'unary',
             op     = uop,
@@ -1246,20 +1244,16 @@ function parseExp(level)
         end
     end
 
-    if level and level >= 1000 then
-        return exp
-    end
-
     while true do
         skipSpace()
-        local bop, opLevel = parseBinaryOP(level)
+        local bop, bopLevel = parseBinaryOP(level)
         if not bop then
             break
         end
 
         skipSpace()
-        local isForward = SymbolForward[opLevel]
-        local child = parseExp(isForward and (opLevel + 0.5) or opLevel)
+        local isForward = SymbolForward[bopLevel]
+        local child = parseExp(isForward and (bopLevel + 0.5) or bopLevel)
         local bin = {
             type   = 'binary',
             start  = exp.start,
@@ -1276,6 +1270,10 @@ function parseExp(level)
     end
 
     return exp
+end
+
+local function parseAction()
+    
 end
 
 local function initState(lua, version, options)
@@ -1316,6 +1314,8 @@ return function (lua, mode, version, options)
         State.ast = parseNumber()
     elseif mode == 'Exp' then
         State.ast = parseExp()
+    elseif mode == 'Action' then
+        State.ast = parseAction()
     end
     return State
 end
