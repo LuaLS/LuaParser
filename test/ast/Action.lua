@@ -375,35 +375,35 @@ CHECK'("%s"):format(1)'
 CHECK'do end'
 {
     type    = "do",
-    start   = 1,
+    start   = 0,
     finish  = 6,
     keyword = {
-        [1] = 1,
+        [1] = 0,
         [2] = 2,
-        [3] = 4,
+        [3] = 3,
         [4] = 6,
     },
 }
 CHECK'do x = 1 end'
 {
     type    = "do",
-    start   = 1,
+    start   = 0,
     finish  = 12,
     keyword = {
-        [1] = 1,
+        [1] = 0,
         [2] = 2,
-        [3] = 10,
+        [3] = 9,
         [4] = 12,
     },
     [1]     = {
         type   = "setglobal",
-        start  = 4,
+        start  = 3,
         finish = 4,
         range  = 8,
         parent = "<IGNORE>",
         value  = {
             type   = "integer",
-            start  = 8,
+            start  = 7,
             finish = 8,
             parent = "<IGNORE>",
             [1]    = 1,

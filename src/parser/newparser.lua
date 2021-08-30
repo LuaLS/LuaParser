@@ -154,10 +154,16 @@ local GetToSetMap = {
     ['getindex']  = 'setindex',
 }
 
+local ChunkFinishMap = {
+    ['end']    = true,
+    ['else']   = true,
+    ['elseif'] = true,
+}
+
 local State, Lua, LuaOffset, Line, LineOffset, Chunk
 local NonSpacePosition, lastSkipSpaceOffset
 
-local parseExp
+local parseExp, parseAction
 
 local function pushError(err)
     local errs = State.errs
@@ -391,7 +397,7 @@ local stringPool = {}
 
 local function parseStringUnicode()
     if peekChar() ~= '{' then
-        missSymbol()
+        missSymbol '{'
         return nil
     end
     local leftPos  = getPosition(LuaOffset, 'right')
@@ -401,7 +407,7 @@ local function parseStringUnicode()
     if peekChar() == '}' then
         LuaOffset = LuaOffset + 1
     else
-        missSymbol('}')
+        missSymbol '}'
     end
     if  State.version ~= 'Lua 5.3'
     and State.version ~= 'Lua 5.4'
@@ -803,7 +809,7 @@ local function parseIndex()
         index.finish = getPosition(LuaOffset, 'right')
         LuaOffset = LuaOffset + 1
     else
-        missSymbol(']')
+        missSymbol ']'
     end
     return index
 end
@@ -846,7 +852,7 @@ local function parseTable()
                 end
                 tbl[index] = tindex
             else
-                missSymbol(']')
+                missSymbol ']'
             end
             goto CONTINUE
         end
@@ -895,7 +901,7 @@ local function parseTable()
             tbl[index] = texp
             goto CONTINUE
         end
-        missSymbol('}')
+        missSymbol '}'
         break
         ::CONTINUE::
     end
@@ -968,7 +974,7 @@ local function parseSimple(node)
             if peekChar(LuaOffset) == ')' then
                 LuaOffset = LuaOffset + 1
             else
-                missSymbol(')')
+                missSymbol ')'
             end
             if args then
                 args.type   = 'callargs'
@@ -1107,7 +1113,7 @@ local function parseParen()
         paren.finish = getPosition(LuaOffset, 'right')
         LuaOffset = LuaOffset + 1
     else
-        missSymbol(')')
+        missSymbol ')'
     end
     return paren
 end
@@ -1139,7 +1145,7 @@ local function parseFunction()
         func.finish = name.finish
         skipSpace()
         if peekChar() ~= '(' then
-            missSymbol(')')
+            missSymbol ')'
             return func
         end
     end
@@ -1173,12 +1179,12 @@ local function parseFunction()
         LuaOffset = LuaOffset + 1
         skipSpace()
     else
-        missSymbol(')')
+        missSymbol ')'
     end
     -- TODO: actions
     local endWord, endLeft, endRight, endOffset = peekWord()
     if not endWord then
-        missSymbol('end')
+        missSymbol 'end'
         popChunk()
         return func
     end
@@ -1419,7 +1425,49 @@ local function parseLocal()
     return loc
 end
 
-local function parseAction()
+local function parseActions(parent)
+    local index = 0
+    while true do
+        skipSpace()
+        local word, wstart, wfinish, woffset = peekWord()
+        if ChunkFinishMap[word] then
+            return word, wstart, wfinish, woffset
+        end
+        local action = parseAction()
+        if not action then
+            missSymbol 'end'
+            break
+        end
+        index = index + 1
+        parent[index] = action
+        action.parent = parent
+    end
+end
+
+local function parseDo()
+    local doLeft  = getPosition(LuaOffset, 'left')
+    local doRight = getPosition(LuaOffset + 1, 'right')
+    local obj = {
+        type   = 'do',
+        start  = doLeft,
+        finish = doRight,
+        keyword = {
+            [1] = doLeft,
+            [2] = doRight,
+        },
+    }
+    LuaOffset = LuaOffset + 2
+    local word, wstart, wfinish, woffset = parseActions(obj)
+    if word == 'end' then
+        obj.finish     = wfinish
+        obj.keyword[3] = wstart
+        obj.keyword[4] = wfinish
+        LuaOffset = woffset
+    end
+    return obj
+end
+
+function parseAction()
     local char = peekChar()
     if char == ';' then
         return nil
@@ -1430,6 +1478,10 @@ local function parseAction()
         LuaOffset = woffset
         skipSpace()
         return parseLocal()
+    end
+
+    if word == 'do' then
+        return parseDo()
     end
 
     local exp = parseExp()
