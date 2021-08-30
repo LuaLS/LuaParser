@@ -23,7 +23,7 @@ CHECK'a.b'
         finish = 2,
     },
     field  = {
-        type   = "name",
+        type   = "field",
         start  = 2,
         finish = 3,
         parent = "<IGNORE>",
@@ -42,7 +42,7 @@ CHECK'a.b.c'
         finish = 4,
     },
     field  = {
-        type   = "name",
+        type   = "field",
         start  = 4,
         finish = 5,
         parent = "<IGNORE>",

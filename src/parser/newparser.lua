@@ -6,6 +6,7 @@ local ssub      = string.sub
 local schar     = string.char
 local uchar     = utf8.char
 local tconcat   = table.concat
+local tinsert   = table.insert
 local tointeger = math.tointeger
 local mtype     = math.type
 local tonumber  = tonumber
@@ -714,12 +715,35 @@ local function parseSimple(node)
                 dot    = dot,
                 field  = field
             }
-            node.parent = getfield
             if field then
                 field.parent = node
+                field.type   = 'field'
             end
+            node.next = getfield
             node = getfield
         elseif nextChar == ':' then
+            local colon = {
+                type   = nextChar,
+                start  = getPosition(LuaOffset, 'left'),
+                finish = getPosition(LuaOffset, 'right'),
+            }
+            LuaOffset = LuaOffset + 1
+            skipSpace()
+            local method = parseName()
+            local getmethod = {
+                type   = 'getmethod',
+                start  = node.start,
+                finish = getPosition(LuaOffset - 1, 'right'),
+                node   = node,
+                colon   = colon,
+                method = method
+            }
+            if method then
+                method.parent = node
+                method.type   = 'method'
+            end
+            node.next = getmethod
+            node = getmethod
         elseif nextChar == '(' then
             local startPos = getPosition(LuaOffset, 'left')
             local call = {
@@ -742,6 +766,26 @@ local function parseSimple(node)
                 call.args   = args
             end
             call.finish = getPosition(LuaOffset - 1, 'right')
+            if node.type == 'getmethod' then
+                -- dummy param `self`
+                if not call.args then
+                    call.args = {
+                        type   = 'callargs',
+                        start  = call.start,
+                        finish = call.finish,
+                        parent = call,
+                    }
+                end
+                local newNode = {}
+                for k, v in pairs(call.node.node) do
+                    newNode[k] = v
+                end
+                newNode.mirror = call.node.node
+                newNode.dummy  = true
+                newNode.parent = call.args
+                call.node.node.mirror = newNode
+                tinsert(call.args, 1, newNode)
+            end
             node = call
         elseif nextChar == '{' then
             local str = parseTable()
@@ -811,10 +855,10 @@ local function parseSimple(node)
                     node   = node,
                     index  = index
                 }
-                node.parent = getindex
                 if index then
                     index.parent = node
                 end
+                node.next = getindex
                 node = getindex
                 skipSpace()
                 if getChar() == ']' then
