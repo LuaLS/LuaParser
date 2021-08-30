@@ -696,6 +696,33 @@ local function parseExpList()
     return list
 end
 
+local function parseIndex()
+    if getChar() ~= '[' then
+        return nil
+    end
+    local bstart = getPosition(LuaOffset, 'left')
+    LuaOffset = LuaOffset + 1
+    skipSpace()
+    local exp = parseExp()
+    local index = {
+        type   = 'index',
+        start  = bstart,
+        finish = getPosition(LuaOffset - 1, 'right'),
+        index  = exp
+    }
+    if exp then
+        exp.parent = index
+    end
+    skipSpace()
+    if getChar() == ']' then
+        index.finish = getPosition(LuaOffset, 'right')
+        LuaOffset = LuaOffset + 1
+    else
+        missSymbol(LuaOffset, ']')
+    end
+    return index
+end
+
 local function parseTable()
     if getChar() ~= '{' then
         return nil
@@ -715,6 +742,27 @@ local function parseTable()
         end
         if CharMapTSep[nextChar] then
             LuaOffset = LuaOffset + 1
+            goto CONTINUE
+        end
+        if nextChar == '[' then
+            index = index + 1
+            local tindex = parseIndex()
+            skipSpace()
+            if getChar() == '=' then
+                LuaOffset = LuaOffset + 1
+                skipSpace()
+                local ivalue = parseExp()
+                tindex.type   = 'tableindex'
+                tindex.parent = tbl
+                if ivalue then
+                    ivalue.parent = tindex
+                    tindex.finish = ivalue.finish
+                    tindex.value  = ivalue
+                end
+                tbl[index] = tindex
+            else
+                missSymbol(tindex.finish, ']')
+            end
             goto CONTINUE
         end
         local exp = parseExp()
@@ -760,10 +808,10 @@ local function parseTable()
             }
             exp.parent = texp
             tbl[index] = texp
-        else
-            missSymbol(LuaOffset, '}')
-            break
+            goto CONTINUE
         end
+        missSymbol(LuaOffset, '}')
+        break
         ::CONTINUE::
     end
     tbl.finish = getPosition(LuaOffset - 1, 'right')
@@ -922,30 +970,13 @@ local function parseSimple(node)
                 str.parent = args
                 return call
             else
-                local bstart = getPosition(LuaOffset, 'left')
-                LuaOffset = LuaOffset + 1
-                skipSpace()
-                local index = parseExp()
-                local getindex = {
-                    type   = 'getindex',
-                    start  = node.start,
-                    bstart = bstart,
-                    finish = getPosition(LuaOffset - 1, 'right'),
-                    node   = node,
-                    index  = index
-                }
-                if index then
-                    index.parent = node
-                end
-                node.next = getindex
-                node = getindex
-                skipSpace()
-                if getChar() == ']' then
-                    getindex.finish = getPosition(LuaOffset, 'right')
-                    LuaOffset = LuaOffset + 1
-                else
-                    missSymbol(LuaOffset, ']')
-                end
+                local index = parseIndex()
+                index.type   = 'getindex'
+                index.bstart = index.start
+                index.start  = node.start
+                index.node   = node
+                node.next    = index
+                node = index
             end
         end
     end

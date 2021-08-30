@@ -1142,16 +1142,16 @@ CHECK'{x = 1, y = 2}'
 CHECK'{["x"] = 1, ["y"] = 2}'
 {
     type   = "table",
-    start  = 1,
+    start  = 0,
     finish = 22,
     [1]    = {
         type   = "tableindex",
-        start  = 2,
+        start  = 1,
         finish = 10,
         parent = "<IGNORE>",
         index  = {
             type   = "string",
-            start  = 3,
+            start  = 2,
             finish = 5,
             parent = "<IGNORE>",
             [1]    = "x",
@@ -1159,7 +1159,7 @@ CHECK'{["x"] = 1, ["y"] = 2}'
         },
         value  = {
             type   = "integer",
-            start  = 10,
+            start  = 9,
             finish = 10,
             parent = "<IGNORE>",
             [1]    = 1,
@@ -1167,12 +1167,12 @@ CHECK'{["x"] = 1, ["y"] = 2}'
     },
     [2]    = {
         type   = "tableindex",
-        start  = 13,
+        start  = 12,
         finish = 21,
         parent = "<IGNORE>",
         index  = {
             type   = "string",
-            start  = 14,
+            start  = 13,
             finish = 16,
             parent = "<IGNORE>",
             [1]    = "y",
@@ -1180,7 +1180,7 @@ CHECK'{["x"] = 1, ["y"] = 2}'
         },
         value  = {
             type   = "integer",
-            start  = 21,
+            start  = 20,
             finish = 21,
             parent = "<IGNORE>",
             [1]    = 2,
@@ -1190,23 +1190,23 @@ CHECK'{["x"] = 1, ["y"] = 2}'
 CHECK'{[x] = 1, [y] = 2}'
 {
     type   = "table",
-    start  = 1,
+    start  = 0,
     finish = 18,
     [1]    = {
         type   = "tableindex",
-        start  = 2,
+        start  = 1,
         finish = 8,
         parent = "<IGNORE>",
         index  = {
             type   = "getglobal",
-            start  = 3,
+            start  = 2,
             finish = 3,
             parent = "<IGNORE>",
             [1]    = "x",
         },
         value  = {
             type   = "integer",
-            start  = 8,
+            start  = 7,
             finish = 8,
             parent = "<IGNORE>",
             [1]    = 1,
@@ -1214,19 +1214,19 @@ CHECK'{[x] = 1, [y] = 2}'
     },
     [2]    = {
         type   = "tableindex",
-        start  = 11,
+        start  = 10,
         finish = 17,
         parent = "<IGNORE>",
         index  = {
             type   = "getglobal",
-            start  = 12,
+            start  = 11,
             finish = 12,
             parent = "<IGNORE>",
             [1]    = "y",
         },
         value  = {
             type   = "integer",
-            start  = 17,
+            start  = 16,
             finish = 17,
             parent = "<IGNORE>",
             [1]    = 2,
@@ -1236,17 +1236,17 @@ CHECK'{[x] = 1, [y] = 2}'
 CHECK'{{}}'
 {
     type   = "table",
-    start  = 1,
+    start  = 0,
     finish = 4,
     [1]    = {
         type   = "tableexp",
-        start  = 2,
+        start  = 1,
         finish = 3,
         tindex = 1,
         parent = "<IGNORE>",
         value  = {
             type   = "table",
-            start  = 2,
+            start  = 1,
             finish = 3,
             parent = "<IGNORE>",
         },
@@ -1255,57 +1255,57 @@ CHECK'{{}}'
 CHECK'{ a = { b = { c = {} } } }'
 {
     type   = "table",
-    start  = 1,
+    start  = 0,
     finish = 26,
     [1]    = {
         type   = "tablefield",
-        start  = 3,
+        start  = 2,
         finish = 24,
         parent = "<IGNORE>",
         field  = {
             type   = "field",
-            start  = 3,
+            start  = 2,
             finish = 3,
             parent = "<IGNORE>",
             [1]    = "a",
         },
         value  = {
             type   = "table",
-            start  = 7,
+            start  = 6,
             finish = 24,
             parent = "<IGNORE>",
             [1]    = {
                 type   = "tablefield",
-                start  = 9,
+                start  = 8,
                 finish = 22,
                 parent = "<IGNORE>",
                 field  = {
                     type   = "field",
-                    start  = 9,
+                    start  = 8,
                     finish = 9,
                     parent = "<IGNORE>",
                     [1]    = "b",
                 },
                 value  = {
                     type   = "table",
-                    start  = 13,
+                    start  = 12,
                     finish = 22,
                     parent = "<IGNORE>",
                     [1]    = {
                         type   = "tablefield",
-                        start  = 15,
+                        start  = 14,
                         finish = 20,
                         parent = "<IGNORE>",
                         field  = {
                             type   = "field",
-                            start  = 15,
+                            start  = 14,
                             finish = 15,
                             parent = "<IGNORE>",
                             [1]    = "c",
                         },
                         value  = {
                             type   = "table",
-                            start  = 19,
+                            start  = 18,
                             finish = 20,
                             parent = "<IGNORE>",
                         },
@@ -1318,67 +1318,67 @@ CHECK'{ a = { b = { c = {} } } }'
 CHECK'{{}, {}, {{}, {}}}'
 {
     type   = "table",
-    start  = 1,
+    start  = 0,
     finish = 18,
     [1]    = {
         type   = "tableexp",
-        start  = 2,
+        start  = 1,
         finish = 3,
         tindex = 1,
         parent = "<IGNORE>",
         value  = {
             type   = "table",
-            start  = 2,
+            start  = 1,
             finish = 3,
             parent = "<IGNORE>",
         },
     },
     [2]    = {
         type   = "tableexp",
-        start  = 6,
+        start  = 5,
         finish = 7,
         tindex = 2,
         parent = "<IGNORE>",
         value  = {
             type   = "table",
-            start  = 6,
+            start  = 5,
             finish = 7,
             parent = "<IGNORE>",
         },
     },
     [3]    = {
         type   = "tableexp",
-        start  = 10,
+        start  = 9,
         finish = 17,
         tindex = 3,
         parent = "<IGNORE>",
         value  = {
             type   = "table",
-            start  = 10,
+            start  = 9,
             finish = 17,
             parent = "<IGNORE>",
             [1]    = {
                 type   = "tableexp",
-                start  = 11,
+                start  = 10,
                 finish = 12,
                 tindex = 1,
                 parent = "<IGNORE>",
                 value  = {
                     type   = "table",
-                    start  = 11,
+                    start  = 10,
                     finish = 12,
                     parent = "<IGNORE>",
                 },
             },
             [2]    = {
                 type   = "tableexp",
-                start  = 15,
+                start  = 14,
                 finish = 16,
                 tindex = 2,
                 parent = "<IGNORE>",
                 value  = {
                     type   = "table",
-                    start  = 15,
+                    start  = 14,
                     finish = 16,
                     parent = "<IGNORE>",
                 },
@@ -1389,17 +1389,17 @@ CHECK'{{}, {}, {{}, {}}}'
 CHECK'{1, 2, 3,}'
 {
     type   = "table",
-    start  = 1,
+    start  = 0,
     finish = 10,
     [1]    = {
         type   = "tableexp",
-        start  = 2,
+        start  = 1,
         finish = 2,
         tindex = 1,
         parent = "<IGNORE>",
         value  = {
             type   = "integer",
-            start  = 2,
+            start  = 1,
             finish = 2,
             parent = "<IGNORE>",
             [1]    = 1,
@@ -1407,13 +1407,13 @@ CHECK'{1, 2, 3,}'
     },
     [2]    = {
         type   = "tableexp",
-        start  = 5,
+        start  = 4,
         finish = 5,
         tindex = 2,
         parent = "<IGNORE>",
         value  = {
             type   = "integer",
-            start  = 5,
+            start  = 4,
             finish = 5,
             parent = "<IGNORE>",
             [1]    = 2,
@@ -1421,13 +1421,13 @@ CHECK'{1, 2, 3,}'
     },
     [3]    = {
         type   = "tableexp",
-        start  = 8,
+        start  = 7,
         finish = 8,
         tindex = 3,
         parent = "<IGNORE>",
         value  = {
             type   = "integer",
-            start  = 8,
+            start  = 7,
             finish = 8,
             parent = "<IGNORE>",
             [1]    = 3,
@@ -1438,7 +1438,7 @@ CHECK'{1, 2, 3,}'
 CHECK 'notify'
 {
     type   = "getglobal",
-    start  = 1,
+    start  = 0,
     finish = 6,
     [1]    = "notify",
 }
