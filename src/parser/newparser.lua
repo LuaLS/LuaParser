@@ -262,6 +262,15 @@ local function missPR(offset)
     }
 end
 
+local function missExp(offset)
+    local pos = getPosition(offset, 'right')
+    pushError {
+        type   = 'MISS_EXP',
+        start  = pos,
+        finish = pos,
+    }
+end
+
 ---@return string          word
 ---@return parser.position startPosition
 ---@return parser.position finishPosition
@@ -775,7 +784,7 @@ local function parseSimple(node)
             if getChar(LuaOffset) == ')' then
                 LuaOffset = LuaOffset + 1
             else
-                missPR()
+                missPR(LuaOffset)
             end
             if args then
                 args.type   = 'callargs'
@@ -792,7 +801,7 @@ local function parseSimple(node)
     return node
 end
 
-local function parseExpUnit()
+local function parseVarargs()
     if ssub(Lua, LuaOffset, LuaOffset + 2) == '...' then
         local varargs = {
             type   = 'varargs',
@@ -800,6 +809,50 @@ local function parseExpUnit()
             finish = getPosition(LuaOffset + 2, 'right'),
         }
         LuaOffset = LuaOffset + 3
+        return varargs
+    end
+    return nil
+end
+
+local function parseParen()
+    local firstChar = getChar()
+    if firstChar ~= '(' then
+        return
+    end
+    local pl = LuaOffset
+    local paren = {
+        type   = 'paren',
+        start  = getPosition(pl, 'left'),
+        finish = getPosition(pl, 'right')
+    }
+    LuaOffset = LuaOffset + 1
+    skipSpace()
+    local exp = parseExp()
+    if exp then
+        paren.exp    = exp
+        paren.finish = exp.finish
+        exp.parent   = paren
+    else
+        missExp(pl)
+    end
+    skipSpace()
+    if getChar() == ')' then
+        paren.finish = getPosition(LuaOffset, 'right')
+        LuaOffset = LuaOffset + 1
+    else
+        missPR(LuaOffset)
+    end
+    return paren
+end
+
+local function parseExpUnit()
+    local paren = parseParen()
+    if paren then
+        return paren
+    end
+
+    local varargs = parseVarargs()
+    if varargs then
         return varargs
     end
 

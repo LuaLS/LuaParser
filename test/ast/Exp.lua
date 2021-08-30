@@ -673,11 +673,11 @@ CHECK'1 + - - - - - - - 1'
 CHECK'(1)'
 {
     type   = "paren",
-    start  = 1,
+    start  = 0,
     finish = 3,
     exp    = {
         type   = "integer",
-        start  = 2,
+        start  = 1,
         finish = 2,
         parent = "<IGNORE>",
         [1]    = 1,
@@ -686,28 +686,28 @@ CHECK'(1)'
 CHECK'(1 + 2)'
 {
     type   = "paren",
-    start  = 1,
+    start  = 0,
     finish = 7,
     exp    = {
         type   = "binary",
-        start  = 2,
+        start  = 1,
         finish = 6,
         parent = "<IGNORE>",
         op     = {
             type   = "+",
-            start  = 4,
+            start  = 3,
             finish = 4,
         },
         [1]    = {
             type   = "integer",
-            start  = 2,
+            start  = 1,
             finish = 2,
             parent = "<IGNORE>",
             [1]    = 1,
         },
         [2]    = {
             type   = "integer",
-            start  = 6,
+            start  = 5,
             finish = 6,
             parent = "<IGNORE>",
             [1]    = 2,
@@ -717,17 +717,17 @@ CHECK'(1 + 2)'
 CHECK'func(1)'
 {
     type   = "call",
-    start  = 1,
+    start  = 0,
     finish = 7,
     node   = "<IGNORE>",
     args   = {
         type   = "callargs",
-        start  = 5,
+        start  = 4,
         finish = 7,
         parent = "<IGNORE>",
         [1]    = {
             type   = "integer",
-            start  = 6,
+            start  = 5,
             finish = 6,
             parent = "<IGNORE>",
             [1]    = 1,
@@ -737,24 +737,24 @@ CHECK'func(1)'
 CHECK'func(1, 2)'
 {
     type   = "call",
-    start  = 1,
+    start  = 0,
     finish = 10,
     node   = "<IGNORE>",
     args   = {
         type   = "callargs",
-        start  = 5,
+        start  = 4,
         finish = 10,
         parent = "<IGNORE>",
         [1]    = {
             type   = "integer",
-            start  = 6,
+            start  = 5,
             finish = 6,
             parent = "<IGNORE>",
             [1]    = 1,
         },
         [2]    = {
             type   = "integer",
-            start  = 9,
+            start  = 8,
             finish = 9,
             parent = "<IGNORE>",
             [1]    = 2,
@@ -764,17 +764,17 @@ CHECK'func(1, 2)'
 CHECK'func(...)'
 {
     type   = "call",
-    start  = 1,
+    start  = 0,
     finish = 9,
     node   = "<IGNORE>",
     args   = {
         type   = "callargs",
-        start  = 5,
+        start  = 4,
         finish = 9,
         parent = "<IGNORE>",
         [1]    = {
             type   = "varargs",
-            start  = 6,
+            start  = 5,
             finish = 8,
             parent = "<IGNORE>",
         },
@@ -783,24 +783,24 @@ CHECK'func(...)'
 CHECK'func(1, ...)'
 {
     type   = "call",
-    start  = 1,
+    start  = 0,
     finish = 12,
     node   = "<IGNORE>",
     args   = {
         type   = "callargs",
-        start  = 5,
+        start  = 4,
         finish = 12,
         parent = "<IGNORE>",
         [1]    = {
             type   = "integer",
-            start  = 6,
+            start  = 5,
             finish = 6,
             parent = "<IGNORE>",
             [1]    = 1,
         },
         [2]    = {
             type   = "varargs",
-            start  = 9,
+            start  = 8,
             finish = 11,
             parent = "<IGNORE>",
         },
@@ -809,17 +809,17 @@ CHECK'func(1, ...)'
 CHECK'func ""'
 {
     type   = "call",
-    start  = 1,
+    start  = 0,
     finish = 7,
     node   = "<IGNORE>",
     args   = {
         type   = "callargs",
-        start  = 6,
+        start  = 5,
         finish = 7,
         parent = "<IGNORE>",
         [1]    = {
             type   = "string",
-            start  = 6,
+            start  = 5,
             finish = 7,
             parent = "<IGNORE>",
             [1]    = "",
@@ -830,17 +830,17 @@ CHECK'func ""'
 CHECK'func {}'
 {
     type   = "call",
-    start  = 1,
+    start  = 0,
     finish = 7,
     node   = "<IGNORE>",
     args   = {
         type   = "callargs",
-        start  = 6,
+        start  = 5,
         finish = 7,
         parent = "<IGNORE>",
         [1]    = {
             type   = "table",
-            start  = 6,
+            start  = 5,
             finish = 7,
             parent = "<IGNORE>",
         },
@@ -849,13 +849,13 @@ CHECK'func {}'
 CHECK'table[1]'
 {
     type   = "getindex",
-    start  = 1,
-    bstart = 6,
+    start  = 0,
+    bstart = 5,
     finish = 8,
     node   = "<IGNORE>",
     index  = {
         type   = "integer",
-        start  = 7,
+        start  = 6,
         finish = 7,
         parent = "<IGNORE>",
         [1]    = 1,
@@ -864,17 +864,17 @@ CHECK'table[1]'
 CHECK'get_point().x'
 {
     type   = "getfield",
-    start  = 1,
+    start  = 0,
     finish = 13,
     node   = "<IGNORE>",
     dot    = {
         type   = ".",
-        start  = 12,
+        start  = 11,
         finish = 12,
     },
     field  = {
         type   = "field",
-        start  = 13,
+        start  = 12,
         finish = 13,
         parent = "<IGNORE>",
         [1]    = "x",
@@ -883,37 +883,37 @@ CHECK'get_point().x'
 CHECK'obj:remove()'
 {
     type   = "call",
-    start  = 1,
+    start  = 0,
     finish = 12,
     node   = "<IGNORE>",
     args   = {
         type   = "callargs",
-        start  = 1,
+        start  = 0,
         finish = 12,
         parent = "<IGNORE>",
         [1]    = {
             next   = {
                 next   = "<LOOP>",
                 type   = "getmethod",
-                start  = 1,
+                start  = 0,
                 finish = 10,
                 parent = "<IGNORE>",
                 node   = "<IGNORE>",
                 colon  = {
                     type   = ":",
-                    start  = 4,
+                    start  = 3,
                     finish = 4,
                 },
                 method = {
                     type   = "method",
-                    start  = 5,
+                    start  = 4,
                     finish = 10,
                     parent = "<IGNORE>",
                     [1]    = "remove",
                 },
             },
             type   = "getglobal",
-            start  = 1,
+            start  = 0,
             finish = 3,
             parent = "<IGNORE>",
             mirror = "<IGNORE>",
@@ -925,13 +925,13 @@ CHECK'obj:remove()'
 CHECK'(...)[1]'
 {
     type   = "getindex",
-    start  = 1,
-    bstart = 6,
+    start  = 0,
+    bstart = 5,
     finish = 8,
     node   = "<IGNORE>",
     index  = {
         type   = "integer",
-        start  = 7,
+        start  = 6,
         finish = 7,
         parent = "<IGNORE>",
         [1]    = 1,
@@ -940,34 +940,34 @@ CHECK'(...)[1]'
 CHECK'function () end'
 {
     type    = "function",
-    start   = 1,
+    start   = 0,
     finish  = 15,
     keyword = {
-        [1] = 1,
+        [1] = 0,
         [2] = 8,
-        [3] = 13,
+        [3] = 12,
         [4] = 15,
     },
 }
 CHECK'function (...) end'
 {
     type    = "function",
-    start   = 1,
+    start   = 0,
     finish  = 18,
     keyword = {
-        [1] = 1,
+        [1] = 0,
         [2] = 8,
-        [3] = 16,
+        [3] = 15,
         [4] = 18,
     },
     args    = {
         type   = "funcargs",
-        start  = 10,
+        start  = 9,
         finish = 14,
         parent = "<IGNORE>",
         [1]    = {
             type   = "...",
-            start  = 11,
+            start  = 10,
             finish = 13,
             parent = "<IGNORE>",
         },
@@ -976,22 +976,22 @@ CHECK'function (...) end'
 CHECK'function (a, ...) end'
 {
     type    = "function",
-    start   = 1,
+    start   = 0,
     finish  = 21,
     keyword = {
-        [1] = 1,
+        [1] = 0,
         [2] = 8,
-        [3] = 19,
+        [3] = 18,
         [4] = 21,
     },
     args    = {
         type   = "funcargs",
-        start  = 10,
+        start  = 9,
         finish = 17,
         parent = "<IGNORE>",
         [1]    = {
             type   = "local",
-            start  = 11,
+            start  = 10,
             finish = 11,
             effect = 11,
             parent = "<IGNORE>",
@@ -999,7 +999,7 @@ CHECK'function (a, ...) end'
         },
         [2]    = {
             type   = "...",
-            start  = 14,
+            start  = 13,
             finish = 16,
             parent = "<IGNORE>",
         },
@@ -1009,17 +1009,17 @@ CHECK'function (a, ...) end'
 CHECK'{}'
 {
     type   = "table",
-    start  = 1,
+    start  = 0,
     finish = 2,
 }
 CHECK'{...}'
 {
     type   = "table",
-    start  = 1,
+    start  = 0,
     finish = 5,
     [1]    = {
         type   = "varargs",
-        start  = 2,
+        start  = 1,
         finish = 4,
         parent = "<IGNORE>",
     },
