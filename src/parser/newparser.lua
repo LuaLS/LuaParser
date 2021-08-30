@@ -87,6 +87,20 @@ local KeyWord = {
     ['while']    = true,
 }
 
+local Specials = {
+    ['_G']           = true,
+    ['rawset']       = true,
+    ['rawget']       = true,
+    ['setmetatable'] = true,
+    ['require']      = true,
+    ['dofile']       = true,
+    ['loadfile']     = true,
+    ['pcall']        = true,
+    ['xpcall']       = true,
+    ['pairs']        = true,
+    ['ipairs']       = true,
+}
+
 local UnarySymbol = {
     ['not'] = 11,
     ['#']   = 11,
@@ -159,6 +173,18 @@ local function pushError(err)
     err.level = err.level or 'error'
     errs[#errs+1] = err
     return err
+end
+
+local function addSpecial(name, obj)
+    local root = State.ast
+    if not root.specials then
+        root.specials = {}
+    end
+    if not root.specials[name] then
+        root.specials[name] = {}
+    end
+    root.specials[name][#root.specials[name]+1] = obj
+    obj.special = name
 end
 
 local CachedChar, CachedCharOffset
@@ -280,7 +306,6 @@ local function parseLocalAttrs(loc)
             parent = loc,
         }
         LuaOffset = LuaOffset + 1
-        local charOffset = LuaOffset
         skipSpace()
         local word, wstart, wfinish, woffset = peekWord()
         if word then
@@ -1206,6 +1231,15 @@ local function parseExpUnit()
         end
         local node = parseName()
         node.type = 'getglobal'
+        local name = node[1]
+        if Specials[name] then
+            addSpecial(name, node)
+        else
+            local ospeicals = State.options.special
+            if ospeicals and ospeicals[name] then
+                addSpecial(name, node)
+            end
+        end
         return parseSimple(node)
     end
 
@@ -1355,6 +1389,10 @@ local function compileExpAsAction(exp)
             value.parent = exp
             return exp
         end
+    end
+
+    if exp.type == 'call' then
+        return exp
     end
 end
 
