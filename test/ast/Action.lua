@@ -16,21 +16,21 @@ CHECK'x = 1'
 CHECK'local x'
 {
     type   = "local",
-    start  = 7,
+    start  = 6,
     finish = 7,
-    effect = 8,
+    effect = 7,
     [1]    = "x",
 }
 CHECK'local x = 1'
 {
     type   = "local",
-    start  = 7,
+    start  = 6,
     finish = 7,
-    effect = 12,
+    effect = 11,
     range  = 11,
     value  = {
         type   = "integer",
-        start  = 11,
+        start  = 10,
         finish = 11,
         parent = "<IGNORE>",
         [1]    = 1,
@@ -40,13 +40,13 @@ CHECK'local x = 1'
 CHECK'local x = x'
 {
     type   = "local",
-    start  = 7,
+    start  = 6,
     finish = 7,
-    effect = 12,
+    effect = 11,
     range  = 11,
     value  = {
         type   = "getglobal",
-        start  = 11,
+        start  = 10,
         finish = 11,
         parent = "<IGNORE>",
         [1]    = "x",
@@ -56,31 +56,29 @@ CHECK'local x = x'
 CHECK'local x <close> <const> = 1'
 {
     type   = "local",
-    start  = 7,
+    start  = 6,
     finish = 7,
-    effect = 28,
+    effect = 27,
     range  = 27,
     value  = {
         type   = "integer",
-        start  = 27,
+        start  = 26,
         finish = 27,
         parent = "<IGNORE>",
         [1]    = 1,
     },
     attrs  = {
-        start  = 10,
-        finish = 22,
         [1]    = {
             type   = "localattr",
-            start  = 10,
-            finish = 14,
+            start  = 8,
+            finish = 15,
             parent = "<IGNORE>",
             [1]    = "close",
         },
         [2]    = {
             type   = "localattr",
-            start  = 18,
-            finish = 22,
+            start  = 16,
+            finish = 23,
             parent = "<IGNORE>",
             [1]    = "const",
         },
@@ -90,24 +88,22 @@ CHECK'local x <close> <const> = 1'
 CHECK'local x < const > = 1'
 {
     type   = "local",
-    start  = 7,
+    start  = 6,
     finish = 7,
-    effect = 22,
+    effect = 21,
     range  = 21,
     value  = {
         type   = "integer",
-        start  = 21,
+        start  = 20,
         finish = 21,
         parent = "<IGNORE>",
         [1]    = 1,
     },
     attrs  = {
-        start  = 11,
-        finish = 15,
         [1]    = {
             type   = "localattr",
-            start  = 11,
-            finish = 15,
+            start  = 8,
+            finish = 17,
             parent = "<IGNORE>",
             [1]    = "const",
         },

@@ -141,6 +141,7 @@ local GetToSetMap = {
 }
 
 local State, Lua, LuaOffset, Line, LineOffset, Chunk
+local NonSpacePosition, lastSkipSpaceOffset
 
 local parseExp
 
@@ -182,24 +183,30 @@ local function getPosition(offset, leftOrRight)
     end
 end
 
-local function missSymbol(offset, symbol)
-    local pos = getPosition(offset, 'right')
+local function missSymbol(symbol)
     pushError {
         type   = 'MISS_SYMBOL',
-        start  = pos,
-        finish = pos,
+        start  = NonSpacePosition,
+        finish = NonSpacePosition,
         info = {
             symbol = symbol,
         }
     }
 end
 
-local function missExp(offset)
-    local pos = getPosition(offset, 'right')
+local function missExp()
     pushError {
         type   = 'MISS_EXP',
-        start  = pos,
-        finish = pos,
+        start  = NonSpacePosition,
+        finish = NonSpacePosition,
+    }
+end
+
+local function missName()
+    pushError {
+        type   = 'MISS_NAME',
+        start  = NonSpacePosition,
+        finish = NonSpacePosition,
     }
 end
 
@@ -239,37 +246,82 @@ local function skipNL()
 end
 
 local function skipSpace()
+    if LuaOffset == lastSkipSpaceOffset then
+        return
+    end
+    NonSpacePosition = getPosition(LuaOffset, 'right')
     ::AGAIN::
     if skipNL() then
         goto AGAIN
     end
     local offset = sfind(Lua, '[^ \t]', LuaOffset)
     if not offset then
+        lastSkipSpaceOffset = LuaOffset
         return
     end
     if offset > LuaOffset then
         LuaOffset = offset
         goto AGAIN
     end
+    lastSkipSpaceOffset = LuaOffset
 end
 
-local function createLocal(obj, effect, value, attrs)
+local function parseLocalAttrs(loc)
+    while true do
+        skipSpace()
+        local char = peekChar()
+        if char ~= '<' then
+            break
+        end
+        local attr = {
+            type   = 'localattr',
+            start  = getPosition(LuaOffset, 'left'),
+            finish = getPosition(LuaOffset, 'right'),
+            parent = loc,
+        }
+        LuaOffset = LuaOffset + 1
+        local charOffset = LuaOffset
+        skipSpace()
+        local word, wstart, wfinish, woffset = peekWord()
+        if word then
+            attr[1] = word
+            LuaOffset = woffset
+            attr.finish = wfinish
+        else
+            missName()
+        end
+        attr.finish = getPosition(LuaOffset, 'right')
+        skipSpace()
+        if peekChar() == '>' then
+            attr.finish = getPosition(LuaOffset, 'right')
+            LuaOffset = LuaOffset + 1
+        else
+            missSymbol '>'
+        end
+        if not loc.attrs then
+            loc.attrs = {}
+        end
+        loc.attrs[#loc.attrs+1] = attr
+    end
+end
+
+local function createLocal(obj)
     if not obj then
         return nil
     end
     obj.type   = 'local'
-    obj.effect = effect or obj.finish
-    obj.value  = value
-    obj.attrs  = attrs
-    if value then
-        obj.range = value.finish
-    end
+    obj.effect = obj.finish
+
+    parseLocalAttrs(obj)
+
     local chunk = Chunk[#Chunk]
-    local locals = chunk.locals
-    if not locals then
-        locals = {}
-        chunk.locals = {}
-        locals[#locals+1] = obj
+    if chunk then
+        local locals = chunk.locals
+        if not locals then
+            locals = {}
+            chunk.locals = {}
+            locals[#locals+1] = obj
+        end
     end
     return obj
 end
@@ -314,7 +366,7 @@ local stringPool = {}
 
 local function parseStringUnicode()
     if peekChar() ~= '{' then
-        missSymbol(LuaOffset)
+        missSymbol()
         return nil
     end
     local leftPos  = getPosition(LuaOffset, 'right')
@@ -324,7 +376,7 @@ local function parseStringUnicode()
     if peekChar() == '}' then
         LuaOffset = LuaOffset + 1
     else
-        missSymbol(LuaOffset, '}')
+        missSymbol('}')
     end
     if  State.version ~= 'Lua 5.3'
     and State.version ~= 'Lua 5.4'
@@ -726,7 +778,7 @@ local function parseIndex()
         index.finish = getPosition(LuaOffset, 'right')
         LuaOffset = LuaOffset + 1
     else
-        missSymbol(LuaOffset, ']')
+        missSymbol(']')
     end
     return index
 end
@@ -769,7 +821,7 @@ local function parseTable()
                 end
                 tbl[index] = tindex
             else
-                missSymbol(tindex.finish, ']')
+                missSymbol(']')
             end
             goto CONTINUE
         end
@@ -818,7 +870,7 @@ local function parseTable()
             tbl[index] = texp
             goto CONTINUE
         end
-        missSymbol(LuaOffset, '}')
+        missSymbol('}')
         break
         ::CONTINUE::
     end
@@ -891,7 +943,7 @@ local function parseSimple(node)
             if peekChar(LuaOffset) == ')' then
                 LuaOffset = LuaOffset + 1
             else
-                missSymbol(LuaOffset, ')')
+                missSymbol(')')
             end
             if args then
                 args.type   = 'callargs'
@@ -1023,14 +1075,14 @@ local function parseParen()
         paren.finish = exp.finish
         exp.parent   = paren
     else
-        missExp(pl)
+        missExp()
     end
     skipSpace()
     if peekChar() == ')' then
         paren.finish = getPosition(LuaOffset, 'right')
         LuaOffset = LuaOffset + 1
     else
-        missSymbol(LuaOffset, ')')
+        missSymbol(')')
     end
     return paren
 end
@@ -1062,7 +1114,7 @@ local function parseFunction()
         func.finish = name.finish
         skipSpace()
         if peekChar() ~= '(' then
-            missSymbol(name.finish, ')')
+            missSymbol(')')
             return func
         end
     end
@@ -1096,12 +1148,12 @@ local function parseFunction()
         LuaOffset = LuaOffset + 1
         skipSpace()
     else
-        missSymbol(func.finish, ')')
+        missSymbol(')')
     end
     -- TODO: actions
     local endWord, endLeft, endRight, endOffset = peekWord()
     if not endWord then
-        missSymbol(LuaOffset, 'end')
+        missSymbol('end')
         popChunk()
         return func
     end
@@ -1306,6 +1358,29 @@ local function compileExpAsAction(exp)
     end
 end
 
+local function parseLocal()
+    local word, wstart, wfinish, woffset = peekWord()
+    if not word then
+        missExp()
+        return nil
+    end
+
+    if word == 'function' then
+        
+    end
+
+    local loc = createLocal(parseName())
+    skipSpace()
+    local value = parseSetValue()
+    if value then
+        loc.value  = value
+        loc.range  = value.finish
+        loc.effect = value.finish
+        value.parent = loc
+    end
+    return loc
+end
+
 local function parseAction()
     local char = peekChar()
     if char == ';' then
@@ -1313,6 +1388,11 @@ local function parseAction()
     end
 
     local word, wstart, wfinish, woffset = peekWord()
+    if word == 'local' then
+        LuaOffset = woffset
+        skipSpace()
+        return parseLocal()
+    end
 
     local exp = parseExp()
     if exp then
@@ -1324,13 +1404,14 @@ local function parseAction()
 end
 
 local function initState(lua, version, options)
-    Lua        = lua
-    LuaOffset  = 1
-    Line       = 0
-    LineOffset = 1
-    Chunk      = {}
-    CachedByteOffset = nil
-    CachedCharOffset = nil
+    Lua                 = lua
+    LuaOffset           = 1
+    Line                = 0
+    LineOffset          = 1
+    NonSpacePosition    = 0
+    lastSkipSpaceOffset = 0
+    Chunk               = {}
+    CachedCharOffset    = nil
     State = {
         version = version,
         lua     = lua,
