@@ -14,29 +14,6 @@ local tonumber  = tonumber
 
 ---@param str string
 ---@return table<integer, boolean>
-local function stringToByteMap(str)
-    local map = {}
-    local pos = 1
-    while pos <= #str do
-        local byte = sbyte(str, pos, pos)
-        map[byte] = true
-        pos = pos + 1
-        if  ssub(str, pos, pos) == '-'
-        and pos < #str then
-            pos = pos + 1
-            local byte2 = sbyte(str, pos, pos)
-            assert(byte < byte2)
-            for b = byte + 1, byte2 do
-                map[b] = true
-            end
-            pos = pos + 1
-        end
-    end
-    return map
-end
-
----@param str string
----@return table<integer, boolean>
 local function stringToCharMap(str)
     local map = {}
     local pos = 1
@@ -58,16 +35,7 @@ local function stringToCharMap(str)
     return map
 end
 
-local ByteMapSP      = stringToByteMap ' \t'
-local ByteMapNL      = stringToByteMap '\r\n'
-local ByteMapWordH   = stringToByteMap 'a-zA-Z\x80-\xff_'
-local ByteMapWordT   = stringToByteMap 'a-zA-Z0-9\x80-\xff_'
-local ByteMapStrSH   = stringToByteMap '\'"'
-local ByteMapStrLH   = stringToByteMap '['
-local ByteMapX16     = stringToByteMap '0-9a-fA-F'
-local ByteBLR        = sbyte '\r'
-local ByteBLN        = sbyte '\n'
-
+local CharMapNL      = stringToCharMap '\r\n'
 local CharMapNumber  = stringToCharMap '0-9'
 local CharMapN16     = stringToCharMap 'xX'
 local CharMapN2      = stringToCharMap 'bB'
@@ -76,7 +44,9 @@ local CharMapE16     = stringToCharMap 'pP'
 local CharMapSign    = stringToCharMap '+-'
 local CharMapSB      = stringToCharMap 'ao|~&=<>.*/%^+-'
 local CharMapSU      = stringToCharMap 'n#~-'
-local CharMapSimple  = stringToCharMap '.:(['
+local CharMapSimple  = stringToCharMap '.:([\'"{'
+local CharMapStrSH   = stringToCharMap '\'"'
+local CharMapStrLH   = stringToCharMap '['
 
 local EscMap = {
     ['a'] = '\a',
@@ -180,18 +150,6 @@ local function pushError(err)
     return err
 end
 
-local CachedByte, CachedByteOffset
-local function getByte(offset)
-    if not offset then
-        offset = LuaOffset
-    end
-    if CachedByteOffset ~= offset then
-        CachedByteOffset = offset
-        CachedByte = sbyte(Lua, offset, offset)
-    end
-    return CachedByte
-end
-
 local CachedChar, CachedCharOffset
 local function getChar(offset)
     if not offset then
@@ -214,50 +172,14 @@ local function getPosition(offset, leftOrRight)
     end
 end
 
-local function missTL(offset)
+local function missSymbol(offset, symbol)
     local pos = getPosition(offset, 'right')
     pushError {
         type   = 'MISS_SYMBOL',
         start  = pos,
         finish = pos,
         info = {
-            symbol = '{',
-        }
-    }
-end
-
-local function missTR(offset)
-    local pos = getPosition(offset, 'right')
-    pushError {
-        type   = 'MISS_SYMBOL',
-        start  = pos,
-        finish = pos,
-        info = {
-            symbol = '}',
-        }
-    }
-end
-
-local function missPL(offset)
-    local pos = getPosition(offset, 'right')
-    pushError {
-        type   = 'MISS_SYMBOL',
-        start  = pos,
-        finish = pos,
-        info = {
-            symbol = '(',
-        }
-    }
-end
-
-local function missPR(offset)
-    local pos = getPosition(offset, 'right')
-    pushError {
-        type   = 'MISS_SYMBOL',
-        start  = pos,
-        finish = pos,
-        info = {
-            symbol = ')',
+            symbol = symbol,
         }
     }
 end
@@ -289,15 +211,15 @@ local function peekWord()
 end
 
 local function skipNL()
-    local b = getByte()
-    if not ByteMapNL[b] then
+    local b = getChar()
+    if not CharMapNL[b] then
         return false
     end
     LuaOffset = LuaOffset + 1
     -- \r\n ?
-    if b == ByteBLR then
-        local nb = getByte()
-        if nb == ByteBLN then
+    if b == '\r' then
+        local nb = getChar()
+        if nb == '\n' then
             LuaOffset = LuaOffset + 1
         end
     end
@@ -353,7 +275,7 @@ local stringPool = {}
 
 local function parseStringUnicode()
     if getChar() ~= '{' then
-        missTL(LuaOffset)
+        missSymbol(LuaOffset)
         return nil
     end
     local leftPos  = getPosition(LuaOffset, 'right')
@@ -363,7 +285,7 @@ local function parseStringUnicode()
     if getChar() == '}' then
         LuaOffset = LuaOffset + 1
     else
-        missTR(LuaOffset)
+        missSymbol(LuaOffset, '}')
     end
     if  State.version ~= 'Lua 5.3'
     and State.version ~= 'Lua 5.4'
@@ -573,11 +495,11 @@ local function parseLongString()
 end
 
 local function parseString()
-    local b = getByte()
-    if ByteMapStrSH[b] then
+    local b = getChar()
+    if CharMapStrSH[b] then
         return parseShotString()
     end
-    if ByteMapStrLH[b] then
+    if CharMapStrLH[b] then
         return parseLongString()
     end
     return nil
@@ -688,7 +610,7 @@ end
 
 local function parseExpList()
     local list
-    local lastSepPos
+    local lastSepPos = LuaOffset
     while true do
         skipSpace()
         local char = getChar()
@@ -708,6 +630,7 @@ local function parseExpList()
                 }
             end
             lastSepPos = sepPos
+            LuaOffset = LuaOffset + 1
             goto CONTINUE
         else
             if not lastSepPos then
@@ -742,8 +665,34 @@ local function parseExpList()
     return list
 end
 
+local function parseTable()
+    if getChar() ~= '{' then
+        return nil
+    end
+    local tbl = {
+        type   = 'table',
+        start  = getPosition(LuaOffset, 'left'),
+    }
+    LuaOffset = LuaOffset + 1
+    while true do
+        skipSpace()
+        local nextChar = getChar()
+        if not nextChar then
+            missSymbol(LuaOffset, '}')
+            break
+        end
+        if nextChar == '}' then
+            LuaOffset = LuaOffset + 1
+            break
+        end
+    end
+    tbl.finish = getPosition(LuaOffset - 1, 'right')
+    return tbl
+end
+
 local function parseSimple(node)
     while true do
+        skipSpace()
         local nextChar = getChar()
         if not CharMapSimple[nextChar] then
             break
@@ -779,12 +728,11 @@ local function parseSimple(node)
                 node   = node,
             }
             LuaOffset = LuaOffset + 1
-            skipSpace()
             local args = parseExpList()
             if getChar(LuaOffset) == ')' then
                 LuaOffset = LuaOffset + 1
             else
-                missPR(LuaOffset)
+                missSymbol(LuaOffset, ')')
             end
             if args then
                 args.type   = 'callargs'
@@ -795,8 +743,88 @@ local function parseSimple(node)
             end
             call.finish = getPosition(LuaOffset - 1, 'right')
             node = call
+        elseif nextChar == '{' then
+            local str = parseTable()
+            local call = {
+                type   = 'call',
+                start  = node.start,
+                finish = str.finish,
+                node   = node,
+            }
+            local args = {
+                type   = 'callargs',
+                start  = str.start,
+                finish = str.finish,
+                parent = call,
+                [1]    = str,
+            }
+            call.args  = args
+            str.parent = args
+            return call
+        elseif CharMapStrSH[nextChar] then
+            local str = parseShotString()
+            local call = {
+                type   = 'call',
+                start  = node.start,
+                finish = str.finish,
+                node   = node,
+            }
+            local args = {
+                type   = 'callargs',
+                start  = str.start,
+                finish = str.finish,
+                parent = call,
+                [1]    = str,
+            }
+            call.args  = args
+            str.parent = args
+            return call
+        elseif CharMapStrLH[nextChar] then
+            local str = parseLongString()
+            if str then
+                local call = {
+                    type   = 'call',
+                    start  = node.start,
+                    finish = str.finish,
+                    node   = node,
+                }
+                local args = {
+                    type   = 'callargs',
+                    start  = str.start,
+                    finish = str.finish,
+                    parent = call,
+                    [1]    = str,
+                }
+                call.args  = args
+                str.parent = args
+                return call
+            else
+                local bstart = getPosition(LuaOffset, 'left')
+                LuaOffset = LuaOffset + 1
+                skipSpace()
+                local index = parseExp()
+                local getindex = {
+                    type   = 'getindex',
+                    start  = node.start,
+                    bstart = bstart,
+                    finish = getPosition(LuaOffset - 1, 'right'),
+                    node   = node,
+                    index  = index
+                }
+                node.parent = getindex
+                if index then
+                    index.parent = node
+                end
+                node = getindex
+                skipSpace()
+                if getChar() == ']' then
+                    getindex.finish = getPosition(LuaOffset, 'right')
+                    LuaOffset = LuaOffset + 1
+                else
+                    missSymbol(LuaOffset, ']')
+                end
+            end
         end
-        skipSpace()
     end
     return node
 end
@@ -840,7 +868,7 @@ local function parseParen()
         paren.finish = getPosition(LuaOffset, 'right')
         LuaOffset = LuaOffset + 1
     else
-        missPR(LuaOffset)
+        missSymbol(LuaOffset, ')')
     end
     return paren
 end

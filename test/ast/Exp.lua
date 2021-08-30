@@ -861,6 +861,27 @@ CHECK'table[1]'
         [1]    = 1,
     },
 }
+CHECK'table[[1]]'
+{
+    type   = "call",
+    start  = 0,
+    finish = 10,
+    node   = "<IGNORE>",
+    args   = {
+        type   = "callargs",
+        start  = 5,
+        finish = 10,
+        parent = "<IGNORE>",
+        [1]    = {
+            type   = "string",
+            start  = 5,
+            finish = 10,
+            parent = "<IGNORE>",
+            [1]    = '1',
+            [2]    = '[['
+        },
+    },
+}
 CHECK'get_point().x'
 {
     type   = "getfield",
