@@ -889,7 +889,7 @@ local function parseBinaryOP(level)
         end
     end
     local myLevel = BinarySymbol[symbol]
-    if myLevel < level then
+    if level and myLevel < level then
         return nil
     end
     local op = {
@@ -924,11 +924,7 @@ function parseExp(level)
         end
     end
 
-    if not level then
-        level = 0
-    end
-
-    if level >= 1000 then
+    if level and level >= 1000 then
         return exp
     end
 
@@ -939,10 +935,9 @@ function parseExp(level)
             break
         end
 
-        level = opLevel
         skipSpace()
-        local isForward = SymbolForward[level]
-        local child = parseExp(isForward and (level + 0.5) or level)
+        local isForward = SymbolForward[opLevel]
+        local child = parseExp(isForward and (opLevel + 0.5) or opLevel)
         local bin = {
             type   = 'binary',
             start  = exp.start,
