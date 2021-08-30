@@ -131,7 +131,7 @@ local SymbolForward = {
     [11]  = false,
 }
 
-local State, Lua, LuaOffset, Line, LineOffset
+local State, Lua, LuaOffset, Line, LineOffset, Chunk
 
 local parseExp
 
@@ -242,6 +242,35 @@ local function skipSpace()
         LuaOffset = offset
         goto AGAIN
     end
+end
+
+local function createLocal(obj, effect, value, attrs)
+    if not obj then
+        return nil
+    end
+    obj.type   = 'local'
+    obj.effect = effect or obj.finish
+    obj.value  = value
+    obj.attrs  = attrs
+    if value then
+        obj.range = value.finish
+    end
+    local chunk = Chunk[#Chunk]
+    local locals = chunk.locals
+    if not locals then
+        locals = {}
+        chunk.locals = {}
+        locals[#locals+1] = obj
+    end
+    return obj
+end
+
+local function pushChunk(chunk)
+    Chunk[#Chunk+1] = chunk
+end
+
+local function popChunk()
+    Chunk[#Chunk] = nil
 end
 
 local function parseNil()
@@ -917,10 +946,89 @@ local function parseParen()
     return paren
 end
 
+local function parseFunction()
+    local word, funcLeft, funcRight, newOffset = peekWord()
+    if word ~= 'function' then
+        return nil
+    end
+    local func = {
+        type    = 'function',
+        start   = funcLeft,
+        finish  = funcRight,
+        keyword = {
+            [1] = funcLeft,
+            [2] = funcRight,
+        },
+    }
+    pushChunk(func)
+    LuaOffset = newOffset
+    skipSpace()
+    local name
+    if getChar() ~= '(' then
+        name = parseExp()
+        if not name then
+            return func
+        end
+        func.name   = name
+        func.finish = name.finish
+        skipSpace()
+        if getChar() ~= '(' then
+            missSymbol(name.finish, ')')
+            return func
+        end
+    end
+    local parenLeft = getPosition(LuaOffset, 'left')
+    LuaOffset = LuaOffset + 1
+    skipSpace()
+    local args = parseExpList()
+    if args then
+        args.type   = 'funcargs'
+        args.start  = parenLeft
+        args.parent = func
+        func.args   = args
+        func.finish = args.finish
+        for i = 1, #args do
+            local arg = args[i]
+            if arg.type == 'varargs' then
+                arg.type = '...'
+            elseif arg.type == 'getglobal'
+            or     arg.type == 'getlocal' then
+                createLocal(arg)
+            end
+        end
+    end
+    skipSpace()
+    if getChar() == ')' then
+        local parenRight = getPosition(LuaOffset, 'right')
+        func.finish = parenRight
+        if args then
+            args.finish = parenRight
+        end
+        LuaOffset = LuaOffset + 1
+        skipSpace()
+    else
+        missSymbol(func.finish, ')')
+    end
+    -- TODO: actions
+    local endWord, endLeft, endRight, endOffset = peekWord()
+    if not endWord then
+        missSymbol(LuaOffset, 'end')
+        popChunk()
+        return func
+    end
+    if endWord == 'end' then
+        func.keyword[3] = endLeft
+        func.keyword[4] = endRight
+        func.finish     = endRight
+        popChunk()
+        return func
+    end
+end
+
 local function parseExpUnit()
     local paren = parseParen()
     if paren then
-        return paren
+        return parseSimple(paren)
     end
 
     local varargs = parseVarargs()
@@ -946,6 +1054,9 @@ local function parseExpUnit()
         if word == 'true'
         or word == 'false' then
             return parseBoolean()
+        end
+        if word == 'function' then
+            return parseFunction()
         end
         local node = parseName()
         node.type = 'getglobal'
@@ -1086,6 +1197,7 @@ local function initState(lua, version, options)
     LuaOffset  = 1
     Line       = 0
     LineOffset = 1
+    Chunk      = {}
     CachedByteOffset = nil
     CachedCharOffset = nil
     State = {
