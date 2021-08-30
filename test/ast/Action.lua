@@ -1,12 +1,12 @@
 CHECK'x = 1'
 {
     type   = "setglobal",
-    start  = 1,
+    start  = 0,
     finish = 1,
     range  = 5,
     value  = {
         type   = "integer",
-        start  = 5,
+        start  = 4,
         finish = 5,
         parent = "<IGNORE>",
         [1]    = 1,

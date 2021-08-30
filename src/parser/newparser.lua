@@ -133,6 +133,13 @@ local SymbolForward = {
     [12]  = false,
 }
 
+local GetToSetMap = {
+    ['getglobal'] = 'setglobal',
+    ['getlocal']  = 'setlocal',
+    ['getfield']  = 'setfield',
+    ['getindex']  = 'setindex',
+}
+
 local State, Lua, LuaOffset, Line, LineOffset, Chunk
 
 local parseExp
@@ -154,7 +161,7 @@ local function pushError(err)
 end
 
 local CachedChar, CachedCharOffset
-local function getChar(offset)
+local function peekChar(offset)
     if not offset then
         offset = LuaOffset
     end
@@ -214,14 +221,14 @@ local function peekWord()
 end
 
 local function skipNL()
-    local b = getChar()
+    local b = peekChar()
     if not CharMapNL[b] then
         return false
     end
     LuaOffset = LuaOffset + 1
     -- \r\n ?
     if b == '\r' then
-        local nb = getChar()
+        local nb = peekChar()
         if nb == '\n' then
             LuaOffset = LuaOffset + 1
         end
@@ -306,7 +313,7 @@ end
 local stringPool = {}
 
 local function parseStringUnicode()
-    if getChar() ~= '{' then
+    if peekChar() ~= '{' then
         missSymbol(LuaOffset)
         return nil
     end
@@ -314,7 +321,7 @@ local function parseStringUnicode()
     local x16 = smatch(Lua, '^[%da-fA-F]*', LuaOffset + 1)
     local rightPos = getPosition(LuaOffset + #x16, 'right')
     LuaOffset = LuaOffset + #x16 + 1
-    if getChar() == '}' then
+    if peekChar() == '}' then
         LuaOffset = LuaOffset + 1
     else
         missSymbol(LuaOffset, '}')
@@ -381,7 +388,7 @@ local function parseStringUnicode()
 end
 
 local function parseShotString()
-    local mark = getChar()
+    local mark = peekChar()
     local start = LuaOffset
     local pattern
     if mark == '"' then
@@ -409,7 +416,7 @@ local function parseShotString()
         stringPool[stringIndex] = ssub(Lua, LuaOffset, offset - 1)
         stringIndex = stringIndex + 1
         if     char == '\\' then
-            local nextChar = getChar(offset + 1)
+            local nextChar = peekChar(offset + 1)
             if EscMap[nextChar] then
                 LuaOffset = offset + 2
                 stringPool[stringIndex] = EscMap[nextChar]
@@ -527,7 +534,7 @@ local function parseLongString()
 end
 
 local function parseString()
-    local b = getChar()
+    local b = peekChar()
     if CharMapStrSH[b] then
         return parseShotString()
     end
@@ -541,15 +548,15 @@ local function parseNumber10(offset)
     local integerPart = smatch(Lua, '^%d*', offset)
     LuaOffset = offset + #integerPart
     -- float part
-    if getChar(LuaOffset) == '.' then
+    if peekChar(LuaOffset) == '.' then
         local floatPart = smatch(Lua, '^%d*', LuaOffset + 1)
         LuaOffset = LuaOffset + #floatPart + 1
     end
     -- exp part
-    local echar = getChar(LuaOffset)
+    local echar = peekChar(LuaOffset)
     if CharMapE10[echar] then
         LuaOffset = LuaOffset + 1
-        local nextChar = getChar(LuaOffset)
+        local nextChar = peekChar(LuaOffset)
         if CharMapSign[nextChar] then
             LuaOffset = LuaOffset + 1
         end
@@ -563,15 +570,15 @@ local function parseNumber16(offset)
     local integerPart = smatch(Lua, '^[%da-fA-F]*', offset)
     LuaOffset = offset + #integerPart
     -- float part
-    if getChar(LuaOffset) == '.' then
+    if peekChar(LuaOffset) == '.' then
         local floatPart = smatch(Lua, '^[%da-fA-F]*', LuaOffset + 1)
         LuaOffset = LuaOffset + #floatPart + 1
     end
     -- exp part
-    local echar = getChar(LuaOffset)
+    local echar = peekChar(LuaOffset)
     if CharMapE16[echar] then
         LuaOffset = LuaOffset + 1
-        local nextChar = getChar(LuaOffset)
+        local nextChar = peekChar(LuaOffset)
         if CharMapSign[nextChar] then
             LuaOffset = LuaOffset + 1
         end
@@ -591,15 +598,15 @@ local function parseNumber()
     local offset = LuaOffset
     local startPos = getPosition(offset, 'left')
     local neg
-    if getChar(offset) == '-' then
+    if peekChar(offset) == '-' then
         neg = true
         offset = offset + 1
     end
     local number
-    local firstChar = getChar(offset)
+    local firstChar = peekChar(offset)
     if     firstChar == '.' then
     elseif firstChar == '0' then
-        local nextChar = getChar(offset + 1)
+        local nextChar = peekChar(offset + 1)
         if CharMapN16[nextChar] then
             number = parseNumber16(offset + 2)
         elseif CharMapN2[nextChar] then
@@ -645,7 +652,7 @@ local function parseExpList()
     local lastSepPos = LuaOffset
     while true do
         skipSpace()
-        local char = getChar()
+        local char = peekChar()
         if not char then
             break
         end
@@ -698,7 +705,7 @@ local function parseExpList()
 end
 
 local function parseIndex()
-    if getChar() ~= '[' then
+    if peekChar() ~= '[' then
         return nil
     end
     local bstart = getPosition(LuaOffset, 'left')
@@ -715,7 +722,7 @@ local function parseIndex()
         exp.parent = index
     end
     skipSpace()
-    if getChar() == ']' then
+    if peekChar() == ']' then
         index.finish = getPosition(LuaOffset, 'right')
         LuaOffset = LuaOffset + 1
     else
@@ -725,7 +732,7 @@ local function parseIndex()
 end
 
 local function parseTable()
-    if getChar() ~= '{' then
+    if peekChar() ~= '{' then
         return nil
     end
     local tbl = {
@@ -736,7 +743,7 @@ local function parseTable()
     local index = 0
     while true do
         skipSpace()
-        local nextChar = getChar()
+        local nextChar = peekChar()
         if nextChar == '}' then
             LuaOffset = LuaOffset + 1
             break
@@ -749,7 +756,7 @@ local function parseTable()
             index = index + 1
             local tindex = parseIndex()
             skipSpace()
-            if getChar() == '=' then
+            if peekChar() == '=' then
                 LuaOffset = LuaOffset + 1
                 skipSpace()
                 local ivalue = parseExp()
@@ -777,7 +784,7 @@ local function parseTable()
             if exp.type == 'getlocal'
             or exp.type == 'getglobal' then
                 skipSpace()
-                if getChar() == '=' then
+                if peekChar() == '=' then
                     local eqRight = getPosition(LuaOffset, 'right')
                     LuaOffset = LuaOffset + 1
                     skipSpace()
@@ -822,7 +829,7 @@ end
 local function parseSimple(node)
     while true do
         skipSpace()
-        local nextChar = getChar()
+        local nextChar = peekChar()
         if not CharMapSimple[nextChar] then
             break
         end
@@ -881,7 +888,7 @@ local function parseSimple(node)
             }
             LuaOffset = LuaOffset + 1
             local args = parseExpList()
-            if getChar(LuaOffset) == ')' then
+            if peekChar(LuaOffset) == ')' then
                 LuaOffset = LuaOffset + 1
             else
                 missSymbol(LuaOffset, ')')
@@ -998,7 +1005,7 @@ local function parseVarargs()
 end
 
 local function parseParen()
-    local firstChar = getChar()
+    local firstChar = peekChar()
     if firstChar ~= '(' then
         return
     end
@@ -1019,7 +1026,7 @@ local function parseParen()
         missExp(pl)
     end
     skipSpace()
-    if getChar() == ')' then
+    if peekChar() == ')' then
         paren.finish = getPosition(LuaOffset, 'right')
         LuaOffset = LuaOffset + 1
     else
@@ -1046,7 +1053,7 @@ local function parseFunction()
     LuaOffset = newOffset
     skipSpace()
     local name
-    if getChar() ~= '(' then
+    if peekChar() ~= '(' then
         name = parseExp()
         if not name then
             return func
@@ -1054,7 +1061,7 @@ local function parseFunction()
         func.name   = name
         func.finish = name.finish
         skipSpace()
-        if getChar() ~= '(' then
+        if peekChar() ~= '(' then
             missSymbol(name.finish, ')')
             return func
         end
@@ -1080,7 +1087,7 @@ local function parseFunction()
         end
     end
     skipSpace()
-    if getChar() == ')' then
+    if peekChar() == ')' then
         local parenRight = getPosition(LuaOffset, 'right')
         func.finish = parenRight
         if args then
@@ -1154,7 +1161,7 @@ local function parseExpUnit()
 end
 
 local function parseUnaryOP(level)
-    local char = getChar()
+    local char = peekChar()
     if not CharMapSU[char] then
         return nil
     end
@@ -1185,7 +1192,7 @@ end
 
 ---@param level integer # op level must greater than this level
 local function parseBinaryOP(level)
-    local char = getChar()
+    local char = peekChar()
     if not CharMapSB[char] then
         return nil
     end
@@ -1272,8 +1279,48 @@ function parseExp(level)
     return exp
 end
 
+local function parseSetValue()
+    if peekChar() ~= '=' then
+        return nil
+    end
+    LuaOffset = LuaOffset + 1
+    if peekChar() == '=' then
+        -- TODO
+        LuaOffset = LuaOffset + 1
+    end
+    skipSpace()
+    return parseExp()
+end
+
+local function compileExpAsAction(exp)
+    if GetToSetMap[exp.type] then
+        skipSpace()
+        local value = parseSetValue()
+        if value then
+            exp.type   = GetToSetMap[exp.type]
+            exp.value  = value
+            exp.range  = value.finish
+            value.parent = exp
+            return exp
+        end
+    end
+end
+
 local function parseAction()
-    
+    local char = peekChar()
+    if char == ';' then
+        return nil
+    end
+
+    local word, wstart, wfinish, woffset = peekWord()
+
+    local exp = parseExp()
+    if exp then
+        local action = compileExpAsAction(exp)
+        if action then
+            return action
+        end
+    end
 end
 
 local function initState(lua, version, options)
