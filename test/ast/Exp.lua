@@ -1048,17 +1048,17 @@ CHECK'{...}'
 CHECK'{1, 2, 3}'
 {
     type   = "table",
-    start  = 1,
+    start  = 0,
     finish = 9,
     [1]    = {
         type   = "tableexp",
-        start  = 2,
+        start  = 1,
         finish = 2,
         tindex = 1,
         parent = "<IGNORE>",
         value  = {
             type   = "integer",
-            start  = 2,
+            start  = 1,
             finish = 2,
             parent = "<IGNORE>",
             [1]    = 1,
@@ -1066,13 +1066,13 @@ CHECK'{1, 2, 3}'
     },
     [2]    = {
         type   = "tableexp",
-        start  = 5,
+        start  = 4,
         finish = 5,
         tindex = 2,
         parent = "<IGNORE>",
         value  = {
             type   = "integer",
-            start  = 5,
+            start  = 4,
             finish = 5,
             parent = "<IGNORE>",
             [1]    = 2,
@@ -1080,13 +1080,13 @@ CHECK'{1, 2, 3}'
     },
     [3]    = {
         type   = "tableexp",
-        start  = 8,
+        start  = 7,
         finish = 8,
         tindex = 3,
         parent = "<IGNORE>",
         value  = {
             type   = "integer",
-            start  = 8,
+            start  = 7,
             finish = 8,
             parent = "<IGNORE>",
             [1]    = 3,
@@ -1096,23 +1096,23 @@ CHECK'{1, 2, 3}'
 CHECK'{x = 1, y = 2}'
 {
     type   = "table",
-    start  = 1,
+    start  = 0,
     finish = 14,
     [1]    = {
         type   = "tablefield",
-        start  = 2,
+        start  = 1,
         finish = 6,
         parent = "<IGNORE>",
         field  = {
             type   = "field",
-            start  = 2,
+            start  = 1,
             finish = 2,
             parent = "<IGNORE>",
             [1]    = "x",
         },
         value  = {
             type   = "integer",
-            start  = 6,
+            start  = 5,
             finish = 6,
             parent = "<IGNORE>",
             [1]    = 1,
@@ -1120,19 +1120,19 @@ CHECK'{x = 1, y = 2}'
     },
     [2]    = {
         type   = "tablefield",
-        start  = 9,
+        start  = 8,
         finish = 13,
         parent = "<IGNORE>",
         field  = {
             type   = "field",
-            start  = 9,
+            start  = 8,
             finish = 9,
             parent = "<IGNORE>",
             [1]    = "y",
         },
         value  = {
             type   = "integer",
-            start  = 13,
+            start  = 12,
             finish = 13,
             parent = "<IGNORE>",
             [1]    = 2,

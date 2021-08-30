@@ -48,6 +48,7 @@ local CharMapSU      = stringToCharMap 'n#~-'
 local CharMapSimple  = stringToCharMap '.:([\'"{'
 local CharMapStrSH   = stringToCharMap '\'"'
 local CharMapStrLH   = stringToCharMap '['
+local CharMapTSep    = stringToCharMap ',;'
 
 local EscMap = {
     ['a'] = '\a',
@@ -704,17 +705,66 @@ local function parseTable()
         start  = getPosition(LuaOffset, 'left'),
     }
     LuaOffset = LuaOffset + 1
+    local index = 0
     while true do
         skipSpace()
         local nextChar = getChar()
-        if not nextChar then
-            missSymbol(LuaOffset, '}')
-            break
-        end
         if nextChar == '}' then
             LuaOffset = LuaOffset + 1
             break
         end
+        if CharMapTSep[nextChar] then
+            LuaOffset = LuaOffset + 1
+            goto CONTINUE
+        end
+        local exp = parseExp()
+        if exp then
+            index = index + 1
+            if exp.type == 'varargs' then
+                tbl[index] = exp
+                exp.parent = tbl
+                goto CONTINUE
+            end
+            if exp.type == 'getlocal'
+            or exp.type == 'getglobal' then
+                skipSpace()
+                if getChar() == '=' then
+                    local eqRight = getPosition(LuaOffset, 'right')
+                    LuaOffset = LuaOffset + 1
+                    skipSpace()
+                    local fvalue = parseExp()
+                    local tfield = {
+                        type   = 'tablefield',
+                        start  = exp.start,
+                        finish = fvalue and fvalue.finish or eqRight,
+                        parent = tbl,
+                        field  = exp,
+                        value  = fvalue,
+                    }
+                    exp.type   = 'field'
+                    exp.parent = tfield
+                    if fvalue then
+                        fvalue.parent = tfield
+                    end
+                    tbl[index] = tfield
+                    goto CONTINUE
+                end
+            end
+            local texp = {
+                type   = 'tableexp',
+                start  = exp.start,
+                finish = exp.finish,
+                tindex = index,
+                parent = tbl,
+                value  = exp,
+            }
+            exp.parent = texp
+            tbl[index] = texp
+        else
+            missSymbol(LuaOffset, '}')
+            break
+        end
+        ::CONTINUE::
     end
     tbl.finish = getPosition(LuaOffset - 1, 'right')
     return tbl
@@ -1034,6 +1084,11 @@ local function parseExpUnit()
     local varargs = parseVarargs()
     if varargs then
         return varargs
+    end
+
+    local table = parseTable()
+    if table then
+        return table
     end
 
     local string = parseString()
