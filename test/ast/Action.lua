@@ -414,17 +414,17 @@ CHECK'do x = 1 end'
 CHECK'return'
 {
     type   = "return",
-    start  = 1,
+    start  = 0,
     finish = 6,
 }
 CHECK'return 1'
 {
     type   = "return",
-    start  = 1,
+    start  = 0,
     finish = 8,
     [1]    = {
         type   = "integer",
-        start  = 8,
+        start  = 7,
         finish = 8,
         parent = "<IGNORE>",
         [1]    = 1,
@@ -433,18 +433,18 @@ CHECK'return 1'
 CHECK'return 1, 2'
 {
     type   = "return",
-    start  = 1,
+    start  = 0,
     finish = 11,
     [1]    = {
         type   = "integer",
-        start  = 8,
+        start  = 7,
         finish = 8,
         parent = "<IGNORE>",
         [1]    = 1,
     },
     [2]    = {
         type   = "integer",
-        start  = 11,
+        start  = 10,
         finish = 11,
         parent = "<IGNORE>",
         [1]    = 2,
@@ -453,14 +453,14 @@ CHECK'return 1, 2'
 CHECK'::CONTINUE::'
 {
     type   = "label",
-    start  = 3,
+    start  = 2,
     finish = 10,
     [1]    = "CONTINUE",
 }
 CHECK'goto CONTINUE'
 {
     type   = "goto",
-    start  = 6,
+    start  = 5,
     finish = 13,
     [1]    = "CONTINUE",
 }
@@ -468,22 +468,22 @@ CHECK[[if 1 then
 end]]
 {
     type   = "if",
-    start  = 1,
+    start  = 0,
     finish = 13,
     [1]    = {
         type    = "ifblock",
-        start   = 1,
+        start   = 0,
         finish  = 9,
         keyword = {
-            [1] = 1,
+            [1] = 0,
             [2] = 2,
-            [3] = 6,
+            [3] = 5,
             [4] = 9,
         },
         parent  = "<IGNORE>",
         filter  = {
             type   = "integer",
-            start  = 4,
+            start  = 3,
             finish = 4,
             parent = "<IGNORE>",
             [1]    = 1,
@@ -495,16 +495,16 @@ CHECK[[if 1 then
 end]]
 {
     type   = "if",
-    start  = 1,
+    start  = 0,
     finish = 24,
     [1]    = {
         type    = "ifblock",
-        start   = 1,
+        start   = 0,
         finish  = 21,
         keyword = {
-            [1] = 1,
+            [1] = 0,
             [2] = 2,
-            [3] = 6,
+            [3] = 5,
             [4] = 9,
         },
         parent  = "<IGNORE>",
@@ -530,45 +530,45 @@ else
 end]]
 {
     type   = "if",
-    start  = 1,
+    start  = 0,
     finish = 40,
     [1]    = {
         type    = "ifblock",
-        start   = 1,
+        start   = 0,
         finish  = 21,
         keyword = {
-            [1] = 1,
+            [1] = 0,
             [2] = 2,
-            [3] = 6,
+            [3] = 5,
             [4] = 9,
         },
         parent  = "<IGNORE>",
         filter  = {
             type   = "integer",
-            start  = 4,
+            start  = 3,
             finish = 4,
             parent = "<IGNORE>",
             [1]    = 1,
         },
         [1]     = {
             type   = "return",
-            start  = 15,
+            start  = 14,
             finish = 21,
             parent = "<IGNORE>",
         },
     },
     [2]    = {
         type    = "elseblock",
-        start   = 22,
+        start   = 21,
         finish  = 37,
         keyword = {
-            [1] = 22,
+            [1] = 21,
             [2] = 25,
         },
         parent  = "<IGNORE>",
         [1]     = {
             type   = "return",
-            start  = 31,
+            start  = 30,
             finish = 37,
             parent = "<IGNORE>",
         },
@@ -581,54 +581,54 @@ elseif 1 then
 end]]
 {
     type   = "if",
-    start  = 1,
+    start  = 0,
     finish = 49,
     [1]    = {
         type    = "ifblock",
-        start   = 1,
+        start   = 0,
         finish  = 21,
         keyword = {
-            [1] = 1,
+            [1] = 0,
             [2] = 2,
-            [3] = 6,
+            [3] = 5,
             [4] = 9,
         },
         parent  = "<IGNORE>",
         filter  = {
             type   = "integer",
-            start  = 4,
+            start  = 3,
             finish = 4,
             parent = "<IGNORE>",
             [1]    = 1,
         },
         [1]     = {
             type   = "return",
-            start  = 15,
+            start  = 14,
             finish = 21,
             parent = "<IGNORE>",
         },
     },
     [2]    = {
         type    = "elseifblock",
-        start   = 22,
+        start   = 21,
         finish  = 46,
         keyword = {
-            [1] = 22,
+            [1] = 21,
             [2] = 27,
-            [3] = 31,
+            [3] = 30,
             [4] = 34,
         },
         parent  = "<IGNORE>",
         filter  = {
             type   = "integer",
-            start  = 29,
+            start  = 28,
             finish = 29,
             parent = "<IGNORE>",
             [1]    = 1,
         },
         [1]     = {
             type   = "return",
-            start  = 40,
+            start  = 39,
             finish = 46,
             parent = "<IGNORE>",
         },
@@ -643,70 +643,70 @@ else
 end]]
 {
     type   = "if",
-    start  = 1,
+    start  = 0,
     finish = 65,
     [1]    = {
         type    = "ifblock",
-        start   = 1,
+        start   = 0,
         finish  = 21,
         keyword = {
-            [1] = 1,
+            [1] = 0,
             [2] = 2,
-            [3] = 6,
+            [3] = 5,
             [4] = 9,
         },
         parent  = "<IGNORE>",
         filter  = {
             type   = "integer",
-            start  = 4,
+            start  = 3,
             finish = 4,
             parent = "<IGNORE>",
             [1]    = 1,
         },
         [1]     = {
             type   = "return",
-            start  = 15,
+            start  = 14,
             finish = 21,
             parent = "<IGNORE>",
         },
     },
     [2]    = {
         type    = "elseifblock",
-        start   = 22,
+        start   = 21,
         finish  = 46,
         keyword = {
-            [1] = 22,
+            [1] = 21,
             [2] = 27,
-            [3] = 31,
+            [3] = 30,
             [4] = 34,
         },
         parent  = "<IGNORE>",
         filter  = {
             type   = "integer",
-            start  = 29,
+            start  = 28,
             finish = 29,
             parent = "<IGNORE>",
             [1]    = 1,
         },
         [1]     = {
             type   = "return",
-            start  = 40,
+            start  = 39,
             finish = 46,
             parent = "<IGNORE>",
         },
     },
     [3]    = {
         type    = "elseblock",
-        start   = 47,
+        start   = 46,
         finish  = 62,
         keyword = {
-            [1] = 47,
+            [1] = 46,
             [2] = 50,
         },
         parent  = "<IGNORE>",
         [1]     = {
             type   = "return",
-            start  = 56,
+            start  = 55,
             finish = 62,
             parent = "<IGNORE>",
         },
@@ -720,22 +720,22 @@ elseif 1 then
 end]]
 {
     type   = "if",
-    start  = 1,
+    start  = 0,
     finish = 55,
     [1]    = {
         type    = "ifblock",
-        start   = 1,
+        start   = 0,
         finish  = 9,
         keyword = {
-            [1] = 1,
+            [1] = 0,
             [2] = 2,
-            [3] = 6,
+            [3] = 5,
             [4] = 9,
         },
         parent  = "<IGNORE>",
         filter  = {
             type   = "integer",
-            start  = 4,
+            start  = 3,
             finish = 4,
             parent = "<IGNORE>",
             [1]    = 1,
@@ -743,18 +743,18 @@ end]]
     },
     [2]    = {
         type    = "elseifblock",
-        start   = 11,
+        start   = 10,
         finish  = 23,
         keyword = {
-            [1] = 11,
+            [1] = 10,
             [2] = 16,
-            [3] = 20,
+            [3] = 19,
             [4] = 23,
         },
         parent  = "<IGNORE>",
         filter  = {
             type   = "integer",
-            start  = 18,
+            start  = 17,
             finish = 18,
             parent = "<IGNORE>",
             [1]    = 1,
@@ -762,18 +762,18 @@ end]]
     },
     [3]    = {
         type    = "elseifblock",
-        start   = 25,
+        start   = 24,
         finish  = 37,
         keyword = {
-            [1] = 25,
+            [1] = 24,
             [2] = 30,
-            [3] = 34,
+            [3] = 33,
             [4] = 37,
         },
         parent  = "<IGNORE>",
         filter  = {
             type   = "integer",
-            start  = 32,
+            start  = 31,
             finish = 32,
             parent = "<IGNORE>",
             [1]    = 1,
@@ -781,18 +781,18 @@ end]]
     },
     [4]    = {
         type    = "elseifblock",
-        start   = 39,
+        start   = 38,
         finish  = 51,
         keyword = {
-            [1] = 39,
+            [1] = 38,
             [2] = 44,
-            [3] = 48,
+            [3] = 47,
             [4] = 51,
         },
         parent  = "<IGNORE>",
         filter  = {
             type   = "integer",
-            start  = 46,
+            start  = 45,
             finish = 46,
             parent = "<IGNORE>",
             [1]    = 1,
@@ -806,45 +806,45 @@ if 1 then
 end]]
 {
     type   = "if",
-    start  = 1,
+    start  = 0,
     finish = 35,
     [1]    = {
         type    = "ifblock",
-        start   = 1,
+        start   = 0,
         finish  = 31,
         keyword = {
-            [1] = 1,
+            [1] = 0,
             [2] = 2,
-            [3] = 6,
+            [3] = 5,
             [4] = 9,
         },
         parent  = "<IGNORE>",
         filter  = {
             type   = "integer",
-            start  = 4,
+            start  = 3,
             finish = 4,
             parent = "<IGNORE>",
             [1]    = 1,
         },
         [1]     = {
             type   = "if",
-            start  = 15,
+            start  = 14,
             finish = 31,
             parent = "<IGNORE>",
             [1]    = {
                 type    = "ifblock",
-                start   = 15,
+                start   = 14,
                 finish  = 23,
                 keyword = {
-                    [1] = 15,
+                    [1] = 14,
                     [2] = 16,
-                    [3] = 20,
+                    [3] = 19,
                     [4] = 23,
                 },
                 parent  = "<IGNORE>",
                 filter  = {
                     type   = "integer",
-                    start  = 18,
+                    start  = 17,
                     finish = 18,
                     parent = "<IGNORE>",
                     [1]    = 2,
@@ -860,22 +860,22 @@ else
 end]]
 {
     type   = "if",
-    start  = 1,
+    start  = 0,
     finish = 32,
     [1]    = {
         type    = "ifblock",
-        start   = 1,
+        start   = 0,
         finish  = 9,
         keyword = {
-            [1] = 1,
+            [1] = 0,
             [2] = 2,
-            [3] = 6,
+            [3] = 5,
             [4] = 9,
         },
         parent  = "<IGNORE>",
         filter  = {
             type   = "integer",
-            start  = 4,
+            start  = 3,
             finish = 4,
             parent = "<IGNORE>",
             [1]    = 1,
@@ -883,18 +883,18 @@ end]]
     },
     [2]    = {
         type    = "elseifblock",
-        start   = 11,
+        start   = 10,
         finish  = 23,
         keyword = {
-            [1] = 11,
+            [1] = 10,
             [2] = 16,
-            [3] = 20,
+            [3] = 19,
             [4] = 23,
         },
         parent  = "<IGNORE>",
         filter  = {
             type   = "integer",
-            start  = 18,
+            start  = 17,
             finish = 18,
             parent = "<IGNORE>",
             [1]    = 1,
@@ -902,10 +902,10 @@ end]]
     },
     [3]    = {
         type    = "elseblock",
-        start   = 25,
+        start   = 24,
         finish  = 28,
         keyword = {
-            [1] = 25,
+            [1] = 24,
             [2] = 28,
         },
         parent  = "<IGNORE>",
@@ -917,26 +917,26 @@ for i = 1, i do
 end]]
 {
     type    = "loop",
-    start   = 1,
+    start   = 0,
     finish  = 30,
     keyword = {
-        [1] = 1,
+        [1] = 0,
         [2] = 3,
-        [3] = 14,
+        [3] = 13,
         [4] = 15,
-        [5] = 28,
+        [5] = 27,
         [6] = 30,
     },
     loc     = {
         type   = "local",
-        start  = 5,
+        start  = 4,
         finish = 5,
         effect = 16,
         range  = 9,
         parent = "<IGNORE>",
         value  = {
             type   = "integer",
-            start  = 9,
+            start  = 8,
             finish = 9,
             parent = "<IGNORE>",
             [1]    = 1,
@@ -945,7 +945,7 @@ end]]
     },
     max     = {
         type   = "getglobal",
-        start  = 12,
+        start  = 11,
         finish = 12,
         parent = "<IGNORE>",
         [1]    = "i",
@@ -953,7 +953,7 @@ end]]
     locals  = "<IGNORE>",
     [1]     = {
         type   = "return",
-        start  = 21,
+        start  = 20,
         finish = 27,
         parent = "<IGNORE>",
     },

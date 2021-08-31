@@ -158,6 +158,8 @@ local ChunkFinishMap = {
     ['end']    = true,
     ['else']   = true,
     ['elseif'] = true,
+    ['in']     = true,
+    ['do']     = true,
 }
 
 local State, Lua, LuaOffset, Line, LineOffset, Chunk
@@ -239,6 +241,17 @@ local function missName()
         type   = 'MISS_NAME',
         start  = NonSpacePosition,
         finish = NonSpacePosition,
+    }
+end
+
+local function unknownSymbol(symbol)
+    pushError {
+        type   = 'UNKNOWN_SYMBOL',
+        start  = getPosition(LuaOffset, 'left'),
+        finish = getPosition(LuaOffset, 'right'),
+        info   = {
+            symbol = symbol,
+        }
     }
 end
 
@@ -1225,6 +1238,9 @@ local function parseExpUnit()
 
     local word = peekWord()
     if word then
+        if ChunkFinishMap[word] then
+            return nil
+        end
         if word == 'nil' then
             return parseNil()
         end
@@ -1481,10 +1497,73 @@ local function parseDo()
     return obj
 end
 
+local function parseReturn()
+    local returnLeft  = getPosition(LuaOffset, 'left')
+    local returnRight = getPosition(LuaOffset + 5, 'right')
+    LuaOffset = LuaOffset + 6
+    skipSpace()
+    local rtn = parseExpList()
+    if rtn then
+        rtn.type  = 'return'
+        rtn.start = returnLeft
+    else
+        rtn = {
+            type   = 'return',
+            start  = returnLeft,
+            finish = returnRight,
+        }
+    end
+    pushActionIntoCurrentChunk(rtn)
+    return rtn
+end
+
+local function parseLabel()
+    if ssub(Lua, LuaOffset, LuaOffset + 1) ~= '::' then
+        unknownSymbol ':'
+        return nil
+    end
+    LuaOffset = LuaOffset + 2
+    skipSpace()
+    local label = parseName()
+    skipSpace()
+
+    if ssub(Lua, LuaOffset, LuaOffset + 1) == '::' then
+        LuaOffset = LuaOffset + 2
+    else
+        missSymbol '::'
+    end
+
+    if not label then
+        return nil
+    end
+
+    label.type = 'label'
+    pushActionIntoCurrentChunk(label)
+    return label
+end
+
+local function parseGoTo()
+    LuaOffset = LuaOffset + 4
+    skipSpace()
+
+    local name = parseName()
+    if not name then
+        missName()
+        return nil
+    end
+
+    name.type = 'goto'
+    return name
+end
+
 function parseAction()
     local char = peekChar()
     if char == ';' then
         return nil
+    end
+
+    if char == ':' then
+        return parseLabel()
     end
 
     local word, wstart, wfinish, woffset = peekWord()
@@ -1496,6 +1575,14 @@ function parseAction()
 
     if word == 'do' then
         return parseDo()
+    end
+
+    if word == 'return' then
+        return parseReturn()
+    end
+
+    if word == 'goto' then
+        return parseGoTo()
     end
 
     local exp = parseExp()
