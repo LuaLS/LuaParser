@@ -1150,27 +1150,27 @@ while true do
 end]]
 {
     type    = "while",
-    start   = 1,
-    finish  = 28,
+    start   = 0,
+    finish  = 20003,
     keyword = {
-        [1] = 1,
+        [1] = 0,
         [2] = 5,
-        [3] = 12,
+        [3] = 11,
         [4] = 13,
-        [5] = 26,
-        [6] = 28,
+        [5] = 20000,
+        [6] = 20003,
     },
     filter  = {
         type   = "boolean",
-        start  = 7,
+        start  = 6,
         finish = 10,
         parent = "<IGNORE>",
         [1]    = true,
     },
     [1]     = {
         type   = "return",
-        start  = 19,
-        finish = 25,
+        start  = 10004,
+        finish = 10010,
         parent = "<IGNORE>",
     },
 }

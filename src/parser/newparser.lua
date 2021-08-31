@@ -1873,6 +1873,55 @@ local function parseFor()
     return action
 end
 
+local function parseWhile()
+    local action = {
+        type    = 'while',
+        start   = getPosition(LuaOffset, 'left'),
+        finish  = getPosition(LuaOffset + 4, 'right'),
+        keyword = {},
+    }
+    action.keyword[1] = action.start
+    action.keyword[2] = action.finish
+    LuaOffset = LuaOffset + 5
+
+    skipSpace()
+    local filter = parseExp()
+    if filter then
+        action.filter = filter
+        action.finish = filter.finish
+        filter.parent = action
+    end
+
+    skipSpace()
+    local word, wleft, wright, newOffset = peekWord()
+    if word == 'do' then
+        action.finish     = wright
+        action.keyword[#action.keyword+1] = wleft
+        action.keyword[#action.keyword+1] = wright
+        LuaOffset         = newOffset
+    else
+        missSymbol 'do'
+    end
+
+    pushChunk(action)
+    skipSpace()
+    parseActions()
+    popChunk()
+
+    skipSpace()
+    word, wleft, wright, newOffset = peekWord()
+    if word == 'end' then
+        action.keyword[#action.keyword+1] = wleft
+        action.keyword[#action.keyword+1] = wright
+        action.finish     = wright
+        LuaOffset         = newOffset
+    else
+        missSymbol 'end'
+    end
+
+    return action
+end
+
 function parseAction()
     local char = peekChar()
     if char == ';' then
@@ -1904,6 +1953,10 @@ function parseAction()
 
     if word == 'return' then
         return parseReturn()
+    end
+
+    if word == 'while' then
+        return parseWhile()
     end
 
     if word == 'goto' then
