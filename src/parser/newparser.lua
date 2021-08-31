@@ -161,6 +161,7 @@ local ChunkFinishMap = {
     ['in']     = true,
     ['do']     = true,
     ['then']   = true,
+    ['until']  = true,
 }
 
 local State, Lua, LuaOffset, Line, LineOffset, Chunk
@@ -1591,14 +1592,16 @@ local function parseGoTo()
     LuaOffset = LuaOffset + 4
     skipSpace()
 
-    local name = parseName()
-    if not name then
+    local action = parseName()
+    if not action then
         missName()
         return nil
     end
 
-    name.type = 'goto'
-    return name
+    action.type = 'goto'
+
+    pushActionIntoCurrentChunk(action)
+    return action
 end
 
 local function parseIfBlock()
@@ -1870,6 +1873,8 @@ local function parseFor()
 
     popChunk()
 
+    pushActionIntoCurrentChunk(action)
+
     return action
 end
 
@@ -1919,6 +1924,73 @@ local function parseWhile()
         missSymbol 'end'
     end
 
+    pushActionIntoCurrentChunk(action)
+
+    return action
+end
+
+local function parseRepeat()
+    local action = {
+        type    = 'repeat',
+        start   = getPosition(LuaOffset, 'left'),
+        finish  = getPosition(LuaOffset + 5, 'right'),
+        keyword = {},
+    }
+    action.keyword[1] = action.start
+    action.keyword[2] = action.finish
+    LuaOffset = LuaOffset + 6
+
+    pushChunk(action)
+    skipSpace()
+    parseActions()
+
+    skipSpace()
+    local word, wleft, wright, newOffset = peekWord()
+    if word == 'until' then
+        action.keyword[#action.keyword+1] = wleft
+        action.keyword[#action.keyword+1] = wright
+        action.finish     = wright
+        LuaOffset         = newOffset
+
+        skipSpace()
+        local filter = parseExp()
+        if filter then
+            action.filter = filter
+            action.finish = filter.finish
+            filter.parent = action
+        end
+
+    else
+        missSymbol 'until'
+    end
+
+    popChunk()
+
+    pushActionIntoCurrentChunk(action)
+
+    return action
+end
+
+local function parseBreak()
+    local returnLeft  = getPosition(LuaOffset, 'left')
+    local returnRight = getPosition(LuaOffset + 4, 'right')
+    LuaOffset = LuaOffset + 5
+    skipSpace()
+    local action = {
+        type   = 'break',
+        start  = returnLeft,
+        finish = returnRight,
+    }
+
+    local chunk = Chunk[#Chunk]
+    if chunk then
+        if not chunk.breaks then
+            chunk.breaks = {}
+        end
+        chunk.breaks[#chunk.breaks+1] = action
+    end
+
+    pushActionIntoCurrentChunk(action)
     return action
 end
 
@@ -1955,8 +2027,16 @@ function parseAction()
         return parseReturn()
     end
 
+    if word == 'break' then
+        return parseBreak()
+    end
+
     if word == 'while' then
         return parseWhile()
+    end
+
+    if word == 'repeat' then
+        return parseRepeat()
     end
 
     if word == 'goto' then

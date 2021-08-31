@@ -1180,33 +1180,33 @@ repeat
 until 1]]
 {
     type    = "repeat",
-    start   = 1,
-    finish  = 25,
+    start   = 0,
+    finish  = 20007,
     keyword = {
-        [1] = 1,
+        [1] = 0,
         [2] = 6,
-        [3] = 18,
-        [4] = 22,
+        [3] = 20000,
+        [4] = 20005,
     },
     filter  = {
         type   = "integer",
-        start  = 24,
-        finish = 24,
+        start  = 20006,
+        finish = 20007,
         parent = "<IGNORE>",
         [1]    = 1,
     },
     breaks  = {
         [1] = {
             type   = "break",
-            start  = 12,
-            finish = 16,
+            start  = 10004,
+            finish = 10009,
             parent = "<IGNORE>",
         },
     },
     [1]     = {
         type   = "break",
-        start  = 12,
-        finish = 16,
+        start  = 10004,
+        finish = 10009,
         parent = "<IGNORE>",
     },
 }
