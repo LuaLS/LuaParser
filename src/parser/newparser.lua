@@ -160,6 +160,7 @@ local ChunkFinishMap = {
     ['elseif'] = true,
     ['in']     = true,
     ['do']     = true,
+    ['then']   = true,
 }
 
 local State, Lua, LuaOffset, Line, LineOffset, Chunk
@@ -309,6 +310,18 @@ local function skipSpace()
         goto AGAIN
     end
     lastSkipSpaceOffset = LuaOffset
+end
+
+local function expectAssign()
+    if peekChar() ~= '=' then
+        return false
+    end
+    LuaOffset = LuaOffset + 1
+    if peekChar() == '=' then
+        -- TODO
+        LuaOffset = LuaOffset + 1
+    end
+    return true
 end
 
 local function parseLocalAttrs(loc)
@@ -743,6 +756,32 @@ local function parseName()
     }
 end
 
+local function parseNameOrList()
+    local first = parseName()
+    if not first then
+        return nil
+    end
+    skipSpace()
+    local list
+    while true do
+        local sep = peekChar()
+        if sep ~= ',' then
+            break
+        end
+        skipSpace()
+        local name = parseName()
+        if not name then
+            missName()
+            break
+        end
+        if not list then
+            list = {}
+        end
+        list[#list+1] = name
+    end
+    return list or first
+end
+
 local function parseExpList()
     local list
     local lastSepPos = LuaOffset
@@ -852,7 +891,7 @@ local function parseTable()
             index = index + 1
             local tindex = parseIndex()
             skipSpace()
-            if peekChar() == '=' then
+            if expectAssign() then
                 LuaOffset = LuaOffset + 1
                 skipSpace()
                 local ivalue = parseExp()
@@ -880,7 +919,7 @@ local function parseTable()
             if exp.type == 'getlocal'
             or exp.type == 'getglobal' then
                 skipSpace()
-                if peekChar() == '=' then
+                if expectAssign() then
                     local eqRight = getPosition(LuaOffset, 'right')
                     LuaOffset = LuaOffset + 1
                     skipSpace()
@@ -1388,13 +1427,8 @@ function parseExp(level)
 end
 
 local function parseSetValue()
-    if peekChar() ~= '=' then
-        return nil
-    end
-    LuaOffset = LuaOffset + 1
-    if peekChar() == '=' then
-        -- TODO
-        LuaOffset = LuaOffset + 1
+    if not expectAssign() then
+        return
     end
     skipSpace()
     return parseExp()
@@ -1656,10 +1690,11 @@ local function parseElseBlock()
 end
 
 local function parseIf()
+    local firstword = peekWord()
     local action  = {
         type   = 'if',
         start  = getPosition(LuaOffset, 'left'),
-        finish = getPosition(LuaOffset + 1, 'right'),
+        finish = getPosition(LuaOffset + #firstword - 1, 'right'),
     }
     while true do
         local word = peekWord()
@@ -1692,6 +1727,96 @@ local function parseIf()
     return action
 end
 
+local function parseFor()
+    local action = {
+        type    = 'for',
+        start   = getPosition(LuaOffset, 'left'),
+        finish  = getPosition(LuaOffset + 2, 'right'),
+        keyword = {},
+    }
+    action.keyword[1] = action.start
+    action.keyword[2] = action.finish
+    LuaOffset = LuaOffset + 3
+    pushChunk(action)
+    skipSpace()
+    local nameOrList = parseNameOrList()
+    if not nameOrList then
+        missName()
+    end
+    skipSpace()
+    -- for i =
+    if expectAssign() then
+        action.type = 'loop'
+
+        skipSpace()
+        local expList = parseExpList()
+        local name
+        if nameOrList and nameOrList.type == 'name' then
+            name = nameOrList
+        else
+            name = nameOrList[1]
+            -- TODO
+        end
+        if name then
+            action.finish = name.finish
+        end
+        local value = expList[1]
+        if name and value then
+            local loc = createLocal(name)
+            loc.value     = value
+            loc.range     = value.finish
+            loc.effect    = expList[#expList].finish
+            loc.parent    = action
+            value.parent  = loc
+            action.loc    = loc
+            action.finish = expList[#expList].finish
+        end
+        local max = expList[2]
+        if max then
+            max.parent    = action
+            action.max    = max
+            action.finish = max.finish
+        else
+            -- TODO
+        end
+        local step = expList[3]
+        if step then
+            step.parent   = action
+            action.step   = step
+            action.finish = step.finish
+        end
+
+        skipSpace()
+        local word, wleft, wright, newOffset = peekWord()
+        if word == 'do' then
+            action.finish     = wright
+            action.keyword[3] = wleft
+            action.keyword[4] = wright
+            LuaOffset         = newOffset
+        else
+            missSymbol 'do'
+        end
+    end
+
+    skipSpace()
+    parseActions()
+
+    skipSpace()
+    local word, wleft, wright, newOffset = peekWord()
+    if word == 'end' then
+        action.keyword[5] = wleft
+        action.keyword[6] = wright
+        action.finish     = wright
+        LuaOffset         = newOffset
+    else
+        missSymbol 'end'
+    end
+
+    popChunk()
+
+    return action
+end
+
 function parseAction()
     local char = peekChar()
     if char == ';' then
@@ -1707,8 +1832,14 @@ function parseAction()
         return parseLocal()
     end
 
-    if word == 'if' then
+    if word == 'if'
+    or word == 'elseif'
+    or word == 'else' then
         return parseIf()
+    end
+
+    if word == 'for' then
+        return parseFor()
     end
 
     if word == 'do' then

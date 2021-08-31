@@ -918,20 +918,20 @@ end]]
 {
     type    = "loop",
     start   = 0,
-    finish  = 30,
+    finish  = 20003,
     keyword = {
         [1] = 0,
         [2] = 3,
         [3] = 13,
         [4] = 15,
-        [5] = 27,
-        [6] = 30,
+        [5] = 20000,
+        [6] = 20003,
     },
     loc     = {
         type   = "local",
         start  = 4,
         finish = 5,
-        effect = 16,
+        effect = 12,
         range  = 9,
         parent = "<IGNORE>",
         value  = {
@@ -953,8 +953,8 @@ end]]
     locals  = "<IGNORE>",
     [1]     = {
         type   = "return",
-        start  = 20,
-        finish = 27,
+        start  = 10004,
+        finish = 10010,
         parent = "<IGNORE>",
     },
 }
@@ -964,26 +964,26 @@ for i = 1, 10, i do
 end]]
 {
     type    = "loop",
-    start   = 1,
-    finish  = 34,
+    start   = 0,
+    finish  = 20003,
     keyword = {
-        [1] = 1,
+        [1] = 0,
         [2] = 3,
-        [3] = 18,
+        [3] = 17,
         [4] = 19,
-        [5] = 32,
-        [6] = 34,
+        [5] = 20000,
+        [6] = 20003,
     },
     loc     = {
         type   = "local",
-        start  = 5,
+        start  = 4,
         finish = 5,
-        effect = 20,
+        effect = 16,
         range  = 9,
         parent = "<IGNORE>",
         value  = {
             type   = "integer",
-            start  = 9,
+            start  = 8,
             finish = 9,
             parent = "<IGNORE>",
             [1]    = 1,
@@ -992,14 +992,14 @@ end]]
     },
     max     = {
         type   = "integer",
-        start  = 12,
+        start  = 11,
         finish = 13,
         parent = "<IGNORE>",
         [1]    = 10,
     },
     step    = {
         type   = "getglobal",
-        start  = 16,
+        start  = 15,
         finish = 16,
         parent = "<IGNORE>",
         [1]    = "i",
@@ -1007,8 +1007,8 @@ end]]
     locals  = "<IGNORE>",
     [1]     = {
         type   = "return",
-        start  = 25,
-        finish = 31,
+        start  = 10004,
+        finish = 10010,
         parent = "<IGNORE>",
     },
 }
