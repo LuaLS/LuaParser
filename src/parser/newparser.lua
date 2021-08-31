@@ -1404,7 +1404,8 @@ local function pushActionIntoCurrentChunk(action)
     local chunk = Chunk[#Chunk]
     if chunk then
         chunk[#chunk+1] = action
-        action.parent = chunk
+        action.parent   = chunk
+        chunk.finish    = action.finish
     end
 end
 
@@ -1429,6 +1430,8 @@ local function compileExpAsAction(exp)
 end
 
 local function parseLocal()
+    LuaOffset = LuaOffset + 5
+    skipSpace()
     local word, wstart, wfinish, woffset = peekWord()
     if not word then
         missExp()
@@ -1556,6 +1559,139 @@ local function parseGoTo()
     return name
 end
 
+local function parseIfBlock()
+    local ifLeft  = getPosition(LuaOffset, 'left')
+    local ifRight = getPosition(LuaOffset + 1, 'right')
+    local ifblock = {
+        type    = 'ifblock',
+        start   = ifLeft,
+        finish  = ifRight,
+        keyword = {
+            [1] = ifLeft,
+            [2] = ifRight,
+        }
+    }
+    LuaOffset = LuaOffset + 2
+    skipSpace()
+    local filter = parseExp()
+    if filter then
+        ifblock.filter = filter
+        ifblock.finish = filter.finish
+        filter.parent = ifblock
+    else
+        missExp()
+    end
+    skipSpace()
+    local endWord, endLeft, endRight, newOffset = peekWord()
+    if endWord == 'then' then
+        LuaOffset = newOffset
+        ifblock.finish     = endRight
+        ifblock.keyword[3] = endLeft
+        ifblock.keyword[4] = endRight
+    else
+        missSymbol 'then'
+    end
+    pushChunk(ifblock)
+    parseActions()
+    popChunk()
+    return ifblock
+end
+
+local function parseElseIfBlock()
+    local ifLeft  = getPosition(LuaOffset, 'left')
+    local ifRight = getPosition(LuaOffset + 5, 'right')
+    local elseifblock = {
+        type    = 'elseifblock',
+        start   = ifLeft,
+        finish  = ifRight,
+        keyword = {
+            [1] = ifLeft,
+            [2] = ifRight,
+        }
+    }
+    LuaOffset = LuaOffset + 6
+    skipSpace()
+    local filter = parseExp()
+    if filter then
+        elseifblock.filter = filter
+        elseifblock.finish = filter.finish
+        filter.parent = elseifblock
+    else
+        missExp()
+    end
+    skipSpace()
+    local endWord, endLeft, endRight, newOffset = peekWord()
+    if endWord == 'then' then
+        LuaOffset = newOffset
+        elseifblock.finish     = endRight
+        elseifblock.keyword[3] = endLeft
+        elseifblock.keyword[4] = endRight
+    else
+        missSymbol 'then'
+    end
+    pushChunk(elseifblock)
+    parseActions()
+    popChunk()
+    return elseifblock
+end
+
+local function parseElseBlock()
+    local ifLeft  = getPosition(LuaOffset, 'left')
+    local ifRight = getPosition(LuaOffset + 3, 'right')
+    local elseblock = {
+        type    = 'elseblock',
+        start   = ifLeft,
+        finish  = ifRight,
+        keyword = {
+            [1] = ifLeft,
+            [2] = ifRight,
+        }
+    }
+    LuaOffset = LuaOffset + 4
+    skipSpace()
+    pushChunk(elseblock)
+    parseActions()
+    popChunk()
+    return elseblock
+end
+
+local function parseIf()
+    local action  = {
+        type   = 'if',
+        start  = getPosition(LuaOffset, 'left'),
+        finish = getPosition(LuaOffset + 1, 'right'),
+    }
+    while true do
+        local word = peekWord()
+        local child
+        if     word == 'if' then
+            child = parseIfBlock()
+        elseif word == 'elseif' then
+            child = parseElseIfBlock()
+        elseif word == 'else' then
+            child = parseElseBlock()
+        end
+        if not child then
+            break
+        end
+        action[#action+1] = child
+        child.parent = action
+        action.finish = child.finish
+        skipSpace()
+    end
+
+    local word, wleft, wright, newOffset = peekWord()
+    if word == 'end' then
+        action.finish = wright
+        LuaOffset = newOffset
+    else
+        missSymbol 'end'
+    end
+
+    pushActionIntoCurrentChunk(action)
+    return action
+end
+
 function parseAction()
     local char = peekChar()
     if char == ';' then
@@ -1566,11 +1702,13 @@ function parseAction()
         return parseLabel()
     end
 
-    local word, wstart, wfinish, woffset = peekWord()
+    local word = peekWord()
     if word == 'local' then
-        LuaOffset = woffset
-        skipSpace()
         return parseLocal()
+    end
+
+    if word == 'if' then
+        return parseIf()
     end
 
     if word == 'do' then
