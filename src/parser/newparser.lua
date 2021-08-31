@@ -768,6 +768,7 @@ local function parseNameOrList()
         if sep ~= ',' then
             break
         end
+        LuaOffset = LuaOffset + 1
         skipSpace()
         local name = parseName()
         if not name then
@@ -775,9 +776,15 @@ local function parseNameOrList()
             break
         end
         if not list then
-            list = {}
+            list = {
+                type   = 'list',
+                start  = first.start,
+                finish = first.finish,
+                [1]    = first
+            }
         end
         list[#list+1] = name
+        list.finish = name.finish
     end
     return list or first
 end
@@ -817,6 +824,7 @@ local function parseExpList()
             lastSepPos = nil
             if not list then
                 list = {
+                    type   = 'list',
                     start  = exp.start,
                 }
             end
@@ -1758,17 +1766,15 @@ local function parseFor()
             -- TODO
         end
         if name then
+            local loc = createLocal(name)
+            loc.parent    = action
             action.finish = name.finish
+            action.loc    = loc
         end
         local value = expList[1]
-        if name and value then
-            local loc = createLocal(name)
-            loc.value     = value
-            loc.range     = value.finish
-            loc.effect    = expList[#expList].finish
-            loc.parent    = action
-            value.parent  = loc
-            action.loc    = loc
+        if value then
+            value.parent  = action
+            action.init   = value
             action.finish = expList[#expList].finish
         end
         local max = expList[2]
@@ -1786,26 +1792,76 @@ local function parseFor()
             action.finish = step.finish
         end
 
-        skipSpace()
-        local word, wleft, wright, newOffset = peekWord()
-        if word == 'do' then
-            action.finish     = wright
-            action.keyword[3] = wleft
-            action.keyword[4] = wright
-            LuaOffset         = newOffset
-        else
-            missSymbol 'do'
+        if action.loc then
+            action.loc.effect = action.finish
         end
+    elseif peekWord() == 'in' then
+        action.type = 'in'
+        local inLeft  = getPosition(LuaOffset, 'left')
+        local inRight = getPosition(LuaOffset + 1, 'right')
+        LuaOffset = LuaOffset + 2
+        skipSpace()
+
+        local exps = parseExpList()
+
+        action.finish = inRight
+        action.keyword[3] = inLeft
+        action.keyword[4] = inRight
+
+        local list
+        if nameOrList and nameOrList.type == 'name' then
+            list = {
+                type   = 'list',
+                start  = nameOrList.start,
+                finish = nameOrList.finish,
+                [1]    = nameOrList,
+            }
+        else
+            list = nameOrList
+        end
+
+        local lastName  = list[#list]
+
+        list.range  = lastName and lastName.range or inRight
+
+        local lastExp = exps[#exps]
+        if lastExp then
+            action.finish = lastExp.finish
+        end
+
+        action.keys = list
+        for i = 1, #list do
+            local loc = createLocal(list[i])
+            loc.parent = action
+            loc.effect = action.finish
+        end
+
+        action.exps = exps
+        for i = 1, #exps do
+            local exp = exps[i]
+            exp.parent = action
+        end
+    end
+
+    skipSpace()
+    local word, wleft, wright, newOffset = peekWord()
+    if word == 'do' then
+        action.finish     = wright
+        action.keyword[#action.keyword+1] = wleft
+        action.keyword[#action.keyword+1] = wright
+        LuaOffset         = newOffset
+    else
+        missSymbol 'do'
     end
 
     skipSpace()
     parseActions()
 
     skipSpace()
-    local word, wleft, wright, newOffset = peekWord()
+    word, wleft, wright, newOffset = peekWord()
     if word == 'end' then
-        action.keyword[5] = wleft
-        action.keyword[6] = wright
+        action.keyword[#action.keyword+1] = wleft
+        action.keyword[#action.keyword+1] = wright
         action.finish     = wright
         LuaOffset         = newOffset
     else
