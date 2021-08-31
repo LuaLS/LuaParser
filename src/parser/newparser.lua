@@ -1384,7 +1384,17 @@ local function parseSetValue()
     return parseExp()
 end
 
+local function pushActionIntoCurrentChunk(action)
+    local chunk = Chunk[#Chunk]
+    if chunk then
+        chunk[#chunk+1] = action
+        action.parent = chunk
+    end
+end
+
 local function compileExpAsAction(exp)
+    pushActionIntoCurrentChunk(exp)
+
     if GetToSetMap[exp.type] then
         skipSpace()
         local value = parseSetValue()
@@ -1422,11 +1432,13 @@ local function parseLocal()
         loc.effect = value.finish
         value.parent = loc
     end
+
+    pushActionIntoCurrentChunk(loc)
+
     return loc
 end
 
-local function parseActions(parent)
-    local index = 0
+local function parseActions()
     while true do
         skipSpace()
         local word, wstart, wfinish, woffset = peekWord()
@@ -1438,9 +1450,6 @@ local function parseActions(parent)
             missSymbol 'end'
             break
         end
-        index = index + 1
-        parent[index] = action
-        action.parent = parent
     end
 end
 
@@ -1457,13 +1466,18 @@ local function parseDo()
         },
     }
     LuaOffset = LuaOffset + 2
-    local word, wstart, wfinish, woffset = parseActions(obj)
+    pushChunk(obj)
+    local word, wstart, wfinish, woffset = parseActions()
     if word == 'end' then
         obj.finish     = wfinish
         obj.keyword[3] = wstart
         obj.keyword[4] = wfinish
         LuaOffset = woffset
     end
+    popChunk()
+
+    pushActionIntoCurrentChunk(obj)
+
     return obj
 end
 
