@@ -238,11 +238,11 @@ local function missExp()
     }
 end
 
-local function missName()
+local function missName(pos)
     pushError {
         type   = 'MISS_NAME',
-        start  = NonSpacePosition,
-        finish = NonSpacePosition,
+        start  = pos or NonSpacePosition,
+        finish = pos or NonSpacePosition,
     }
 end
 
@@ -970,7 +970,7 @@ local function parseTable()
     return tbl
 end
 
-local function parseSimple(node)
+local function parseSimple(node, enableCall)
     while true do
         skipSpace()
         local nextChar = peekChar()
@@ -1024,6 +1024,9 @@ local function parseSimple(node)
             node.next = getmethod
             node = getmethod
         elseif nextChar == '(' then
+            if not enableCall then
+                break
+            end
             local startPos = getPosition(LuaOffset, 'left')
             local call = {
                 type   = 'call',
@@ -1067,6 +1070,9 @@ local function parseSimple(node)
             end
             node = call
         elseif nextChar == '{' then
+            if not enableCall then
+                break
+            end
             local str = parseTable()
             local call = {
                 type   = 'call',
@@ -1085,6 +1091,9 @@ local function parseSimple(node)
             str.parent = args
             return call
         elseif CharMapStrSH[nextChar] then
+            if not enableCall then
+                break
+            end
             local str = parseShotString()
             local call = {
                 type   = 'call',
@@ -1105,6 +1114,9 @@ local function parseSimple(node)
         elseif CharMapStrLH[nextChar] then
             local str = parseLongString()
             if str then
+                if not enableCall then
+                    break
+                end
                 local call = {
                     type   = 'call',
                     start  = node.start,
@@ -1130,6 +1142,8 @@ local function parseSimple(node)
                 node.next    = index
                 node = index
             end
+        else
+            break
         end
     end
     return node
@@ -1179,6 +1193,36 @@ local function parseParen()
     return paren
 end
 
+local function parseExpName(enableCall)
+    local node = parseName()
+    node.type = 'getglobal'
+    local name = node[1]
+    if Specials[name] then
+        addSpecial(name, node)
+    else
+        local ospeicals = State.options.special
+        if ospeicals and ospeicals[name] then
+            addSpecial(name, node)
+        end
+    end
+    return parseSimple(node, enableCall)
+end
+
+local function parseActions()
+    while true do
+        skipSpace()
+        local word, wstart, wfinish, woffset = peekWord()
+        if ChunkFinishMap[word] then
+            return word, wstart, wfinish, woffset
+        end
+        local action = parseAction()
+        if not action then
+            missSymbol 'end'
+            break
+        end
+    end
+end
+
 local function parseFunction()
     local word, funcLeft, funcRight, newOffset = peekWord()
     if word ~= 'function' then
@@ -1198,7 +1242,7 @@ local function parseFunction()
     skipSpace()
     local name
     if peekChar() ~= '(' then
-        name = parseExp()
+        name = parseExpName()
         if not name then
             return func
         end
@@ -1243,25 +1287,23 @@ local function parseFunction()
         missSymbol ')'
     end
     -- TODO: actions
+    parseActions()
     local endWord, endLeft, endRight, endOffset = peekWord()
-    if not endWord then
-        missSymbol 'end'
-        popChunk()
-        return func
-    end
     if endWord == 'end' then
         func.keyword[3] = endLeft
         func.keyword[4] = endRight
         func.finish     = endRight
-        popChunk()
-        return func
+    else
+        missSymbol 'end'
     end
+    popChunk()
+    return func
 end
 
 local function parseExpUnit()
     local paren = parseParen()
     if paren then
-        return parseSimple(paren)
+        return parseSimple(paren, true)
     end
 
     local varargs = parseVarargs()
@@ -1299,18 +1341,7 @@ local function parseExpUnit()
         if word == 'function' then
             return parseFunction()
         end
-        local node = parseName()
-        node.type = 'getglobal'
-        local name = node[1]
-        if Specials[name] then
-            addSpecial(name, node)
-        else
-            local ospeicals = State.options.special
-            if ospeicals and ospeicals[name] then
-                addSpecial(name, node)
-            end
-        end
-        return parseSimple(node)
+        return parseExpName(true)
     end
 
     return nil
@@ -1459,9 +1490,9 @@ local function compileExpAsAction(exp)
         skipSpace()
         local value = parseSetValue()
         if value then
-            exp.type   = GetToSetMap[exp.type]
-            exp.value  = value
-            exp.range  = value.finish
+            exp.type     = GetToSetMap[exp.type]
+            exp.value    = value
+            exp.range    = value.finish
             value.parent = exp
             return exp
         end
@@ -1469,6 +1500,22 @@ local function compileExpAsAction(exp)
 
     if exp.type == 'call' then
         return exp
+    end
+
+    if exp.type == 'function' then
+        local name = exp.name
+        if name then
+            exp.name    = nil
+            name.type   = GetToSetMap[name.type]
+            name.value  = exp
+            name.vstart = exp.start
+            name.range  = exp.finish
+            exp.parent  = name
+            return name
+        else
+            missName(exp.keyword[2])
+            return exp
+        end
     end
 end
 
@@ -1498,21 +1545,6 @@ local function parseLocal()
     pushActionIntoCurrentChunk(loc)
 
     return loc
-end
-
-local function parseActions()
-    while true do
-        skipSpace()
-        local word, wstart, wfinish, woffset = peekWord()
-        if ChunkFinishMap[word] then
-            return word, wstart, wfinish, woffset
-        end
-        local action = parseAction()
-        if not action then
-            missSymbol 'end'
-            break
-        end
-    end
 end
 
 local function parseDo()
@@ -1560,6 +1592,18 @@ local function parseReturn()
         }
     end
     pushActionIntoCurrentChunk(rtn)
+    for i = #Chunk, 1, -1 do
+        local func = Chunk[i]
+        if func.type == 'function'
+        or func.type == 'main' then
+            if not func.returns then
+                func.returns = {}
+            end
+            func.returns[#func.returns+1] = rtn
+            break
+        end
+    end
+
     return rtn
 end
 
