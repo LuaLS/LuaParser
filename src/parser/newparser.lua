@@ -1,3 +1,5 @@
+
+local guide = require "parser.guide"
 local sbyte     = string.byte
 local sfind     = string.find
 local smatch    = string.match
@@ -152,6 +154,7 @@ local GetToSetMap = {
     ['getlocal']  = 'setlocal',
     ['getfield']  = 'setfield',
     ['getindex']  = 'setindex',
+    ['getmethod'] = 'setmethod',
 }
 
 local ChunkFinishMap = {
@@ -377,7 +380,7 @@ local function createLocal(obj)
         local locals = chunk.locals
         if not locals then
             locals = {}
-            chunk.locals = {}
+            chunk.locals = locals
             locals[#locals+1] = obj
         end
     end
@@ -1193,9 +1196,43 @@ local function parseParen()
     return paren
 end
 
+local function getLocal(name, pos)
+    for i = #Chunk, 1, -1 do
+        local chunk  = Chunk[i]
+        local locals = chunk.locals
+        if locals then
+            local res
+            for n = 1, #locals do
+                local loc = locals[n]
+                if loc.effect > pos then
+                    break
+                end
+                if loc[1] == name then
+                    if not res or res.effect < loc.effect then
+                        res = loc
+                    end
+                end
+            end
+            if res then
+                return res
+            end
+        end
+    end
+end
+
 local function parseExpName(enableCall)
     local node = parseName()
-    node.type = 'getglobal'
+    local loc  = getLocal(node[1], node.start)
+    if loc then
+        node.type = 'getlocal'
+        node.node = loc
+        if not loc.ref then
+            loc.ref = {}
+            loc.ref[#loc.ref+1] = node
+        end
+    else
+        node.type = 'getglobal'
+    end
     local name = node[1]
     if Specials[name] then
         addSpecial(name, node)
@@ -1258,6 +1295,23 @@ local function parseFunction()
     LuaOffset = LuaOffset + 1
     skipSpace()
     local args = parseExpList()
+    if func.name and func.name.type == 'getmethod' then
+        if name.type == 'getmethod' then
+            if not args then
+                args = {}
+            end
+            local localself = createLocal {
+                start  = func.start,
+                finish = func.start,
+                method = name,
+                parent = args,
+                tag    = 'self',
+                dummy  = true,
+                [1]    = 'self',
+            }
+            tinsert(args, 1, localself)
+        end
+    end
     if args then
         args.type   = 'funcargs'
         args.start  = parenLeft
