@@ -1235,10 +1235,17 @@ local function parseExpName(enableCall)
         node.node = loc
         if not loc.ref then
             loc.ref = {}
-            loc.ref[#loc.ref+1] = node
         end
+        loc.ref[#loc.ref+1] = node
     else
         node.type = 'getglobal'
+        local env = getLocal(State.ENVMode, node.start)
+        if env then
+            if not env.ref then
+                env.ref = {}
+            end
+            env.ref[#env.ref+1] = node
+        end
     end
     local name = node[1]
     if Specials[name] then
@@ -2166,6 +2173,15 @@ local function parseLua()
         finish = #Lua
     }
     pushChunk(main)
+    createLocal{
+        type   = 'local',
+        start  = 0,
+        finish = 0,
+        effect = 0,
+        tag    = '_ENV',
+        special= '_G',
+        [1]    = State.ENVMode,
+    }
     parseActions()
     popChunk()
 

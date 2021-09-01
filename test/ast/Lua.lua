@@ -3,6 +3,7 @@ CHECK''
     type   = "main",
     start  = 0,
     finish = 0,
+    locals = "<IGNORE>",
 }
 
 CHECK';;;'
@@ -10,6 +11,7 @@ CHECK';;;'
     type   = "main",
     start  = 0,
     finish = 3,
+    locals = "<IGNORE>",
 }
 
 CHECK';;;x = 1'
@@ -17,6 +19,7 @@ CHECK';;;x = 1'
     type   = "main",
     start  = 0,
     finish = 4,
+    locals = "<IGNORE>",
     [1]    = {
         type   = "setglobal",
         start  = 3,
