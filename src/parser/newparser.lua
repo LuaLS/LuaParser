@@ -1544,7 +1544,7 @@ end
 ---@return parser.guide.object   first
 ---@return parser.guide.object   second
 ---@return parser.guide.object[] rest
-local function parseSetValue()
+local function parseSetValues()
     if not expectAssign() then
         return
     end
@@ -1604,27 +1604,33 @@ end
 
 ---@return parser.guide.object   second
 ---@return parser.guide.object[] rest
-local function parseSetTails()
+local function parseSetTails(parser, isLocal)
     if peekChar() ~= ',' then
         return
     end
     LuaOffset = LuaOffset + 1
     skipSpace()
-    local second = parseExp()
+    local second = parser()
     if not second then
         missName()
         return
     end
+    if isLocal then
+        createLocal(second, parseLocalAttrs())
+    end
     skipSpace()
     if peekChar() ~= ',' then
         return second
     end
     LuaOffset = LuaOffset + 1
     skipSpace()
-    local third = parseExp()
+    local third = parser()
     if not third then
         missName()
         return second
+    end
+    if isLocal then
+        createLocal(third, parseLocalAttrs())
     end
     local rest = { third }
     while true do
@@ -1634,38 +1640,48 @@ local function parseSetTails()
         end
         LuaOffset = LuaOffset + 1
         skipSpace()
-        local exp = parseExp()
-        if not exp then
+        local name = parser()
+        if not name then
             missName()
             return second, rest
         end
-        rest[#rest+1] = exp
+        if isLocal then
+            createLocal(name, parseLocalAttrs())
+        end
+        rest[#rest+1] = name
     end
 end
 
-local function bindValue(n, v)
-    n.type   = GetToSetMap[n.type]
+local function bindValue(n, v, isLocal)
+    if isLocal then
+        createLocal(n)
+    else
+        n.type = GetToSetMap[n.type] or n.type
+    end
     if v then
         n.value  = v
         n.range  = v.finish
         v.parent = n
+        if isLocal then
+            n.effect = NonSpacePosition
+        end
     end
 end
 
-local function parseSet(n1)
-    local n2, nrest     = parseSetTails()
+local function parseSet(n1, parser, isLocal)
+    local n2, nrest     = parseSetTails(parser, isLocal)
     skipSpace()
-    local v1, v2, vrest = parseSetValue()
-    bindValue(n1, v1)
+    local v1, v2, vrest = parseSetValues()
+    bindValue(n1, v1, isLocal)
     if n2 then
-        bindValue(n2, v2)
+        bindValue(n2, v2, isLocal)
         pushActionIntoCurrentChunk(n2)
     end
     if nrest then
         for i = 1, #nrest do
             local n = nrest[i]
             local v = vrest and vrest[i]
-            bindValue(n, v)
+            bindValue(n, v, isLocal)
             pushActionIntoCurrentChunk(n)
         end
     end
@@ -1692,7 +1708,7 @@ local function compileExpAsAction(exp)
 
     if GetToSetMap[exp.type] then
         skipSpace()
-        local action = parseSet(exp)
+        local action = parseSet(exp, parseExp)
         if action then
             return action
         end
@@ -1733,18 +1749,14 @@ local function parseLocal()
     end
 
     local name  = parseName()
-    local attrs = parseLocalAttrs()
-    local loc = createLocal(name, attrs)
-    skipSpace()
-    local value = parseSetValue()
-    if value then
-        loc.value  = value
-        loc.range  = value.finish
-        loc.effect = value.finish
-        value.parent = loc
+    if not name then
+        missName()
+        return nil
     end
-
+    local loc = createLocal(name, parseLocalAttrs())
     pushActionIntoCurrentChunk(loc)
+    skipSpace()
+    parseSet(loc, parseName, true)
 
     return loc
 end
