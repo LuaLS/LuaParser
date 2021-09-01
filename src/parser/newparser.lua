@@ -1255,15 +1255,19 @@ end
 local function parseActions()
     while true do
         skipSpace()
+        if peekChar() == ';' then
+            LuaOffset = LuaOffset + 1
+            goto CONTINUE
+        end
         local word, wstart, wfinish, woffset = peekWord()
         if ChunkFinishMap[word] then
             return word, wstart, wfinish, woffset
         end
         local action = parseAction()
         if not action then
-            missSymbol 'end'
             break
         end
+        ::CONTINUE::
     end
 end
 
@@ -1308,8 +1312,8 @@ local function parseFunction()
                 args = {}
             end
             local localself = createLocal {
-                start  = func.start,
-                finish = func.start,
+                start  = funcRight,
+                finish = funcRight,
                 method = name,
                 parent = args,
                 tag    = 'self',
@@ -2102,9 +2106,6 @@ end
 
 function parseAction()
     local char = peekChar()
-    if char == ';' then
-        return nil
-    end
 
     if char == ':' then
         return parseLabel()
@@ -2158,6 +2159,19 @@ function parseAction()
     end
 end
 
+local function parseLua()
+    local main = {
+        type   = 'main',
+        start  = 0,
+        finish = #Lua
+    }
+    pushChunk(main)
+    parseActions()
+    popChunk()
+
+    return main
+end
+
 local function initState(lua, version, options)
     Lua                 = lua
     LuaOffset           = 1
@@ -2187,6 +2201,7 @@ return function (lua, mode, version, options)
     initState(lua, version, options)
     skipSpace()
     if     mode == 'Lua' then
+        State.ast = parseLua()
     elseif mode == 'Nil' then
         State.ast = parseNil()
     elseif mode == 'Boolean' then

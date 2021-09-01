@@ -1,35 +1,31 @@
 CHECK''
 {
     type   = "main",
-    start  = 1,
+    start  = 0,
     finish = 0,
-    locals = "<IGNORE>",
 }
 
 CHECK';;;'
 {
     type   = "main",
-    start  = 1,
+    start  = 0,
     finish = 3,
-    locals = "<IGNORE>",
 }
 
 CHECK';;;x = 1'
 {
     type   = "main",
-    start  = 1,
-    finish = 8,
-    locals = "<IGNORE>",
+    start  = 0,
+    finish = 4,
     [1]    = {
         type   = "setglobal",
-        start  = 4,
+        start  = 3,
         finish = 4,
         range  = 8,
         parent = "<IGNORE>",
-        node   = "<IGNORE>",
         value  = {
             type   = "integer",
-            start  = 8,
+            start  = 7,
             finish = 8,
             parent = "<IGNORE>",
             [1]    = 1,
