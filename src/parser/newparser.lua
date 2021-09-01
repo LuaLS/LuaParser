@@ -299,7 +299,7 @@ local function skipSpace()
     if LuaOffset == lastSkipSpaceOffset then
         return
     end
-    NonSpacePosition = getPosition(LuaOffset, 'right')
+    NonSpacePosition = getPosition(LuaOffset - 1, 'right')
     ::AGAIN::
     if skipNL() then
         goto AGAIN
