@@ -328,19 +328,23 @@ local function expectAssign()
     return true
 end
 
-local function parseLocalAttrs(loc)
+local function parseLocalAttrs()
+    local attrs
     while true do
         skipSpace()
         local char = peekChar()
         if char ~= '<' then
             break
         end
+        if not attrs then
+            attrs = {}
+        end
         local attr = {
             type   = 'localattr',
             start  = getPosition(LuaOffset, 'left'),
             finish = getPosition(LuaOffset, 'right'),
-            parent = loc,
         }
+        attrs[#attrs+1] = attr
         LuaOffset = LuaOffset + 1
         skipSpace()
         local word, wstart, wfinish, woffset = peekWord()
@@ -359,21 +363,24 @@ local function parseLocalAttrs(loc)
         else
             missSymbol '>'
         end
-        if not loc.attrs then
-            loc.attrs = {}
-        end
-        loc.attrs[#loc.attrs+1] = attr
     end
+    return attrs
 end
 
-local function createLocal(obj)
+local function createLocal(obj, attrs)
     if not obj then
         return nil
     end
     obj.type   = 'local'
     obj.effect = obj.finish
 
-    parseLocalAttrs(obj)
+    if attrs then
+        obj.attrs = attrs
+        for i = 1, #attrs do
+            local attr = attrs[i]
+            attr.parent = obj
+        end
+    end
 
     local chunk = Chunk[#Chunk]
     if chunk then
@@ -1340,7 +1347,6 @@ local function parseFunction()
     else
         missSymbol ')'
     end
-    -- TODO: actions
     parseActions()
     local endWord, endLeft, endRight, endOffset = peekWord()
     if endWord == 'end' then
@@ -1586,7 +1592,9 @@ local function parseLocal()
         
     end
 
-    local loc = createLocal(parseName())
+    local name  = parseName()
+    local attrs = parseLocalAttrs()
+    local loc = createLocal(name, attrs)
     skipSpace()
     local value = parseSetValue()
     if value then
