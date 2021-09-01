@@ -1229,6 +1229,9 @@ end
 
 local function parseExpName(enableCall)
     local node = parseName()
+    if not node then
+        return
+    end
     local loc  = getLocal(node[1], node.start)
     if loc then
         node.type = 'getlocal'
@@ -1241,6 +1244,7 @@ local function parseExpName(enableCall)
         node.type = 'getglobal'
         local env = getLocal(State.ENVMode, node.start)
         if env then
+            node.node = env
             if not env.ref then
                 env.ref = {}
             end
@@ -1537,12 +1541,56 @@ function parseExp(level)
     return exp
 end
 
+---@return parser.guide.object   first
+---@return parser.guide.object   second
+---@return parser.guide.object[] rest
 local function parseSetValue()
     if not expectAssign() then
         return
     end
     skipSpace()
-    return parseExp()
+    local first = parseExp()
+    if not first then
+        return nil
+    end
+    skipSpace()
+    if peekChar() ~= ',' then
+        return first
+    end
+    LuaOffset = LuaOffset + 1
+    skipSpace()
+    local second = parseExp()
+    if not second then
+        missExp()
+        return first
+    end
+    skipSpace()
+    if peekChar() ~= ',' then
+        return first, second
+    end
+    LuaOffset = LuaOffset + 1
+    skipSpace()
+    local third = parseExp()
+    if not third then
+        missExp()
+        return first, second
+    end
+
+    local rest = { third }
+    while true do
+        skipSpace()
+        if peekChar() ~= ',' then
+            return first, second, rest
+        end
+        LuaOffset = LuaOffset + 1
+        skipSpace()
+        local exp = parseExp()
+        if not exp then
+            missExp()
+            return first, second, rest
+        end
+        rest[#rest+1] = exp
+    end
 end
 
 local function pushActionIntoCurrentChunk(action)
@@ -1554,18 +1602,99 @@ local function pushActionIntoCurrentChunk(action)
     end
 end
 
+---@return parser.guide.object   second
+---@return parser.guide.object[] rest
+local function parseSetTails()
+    if peekChar() ~= ',' then
+        return
+    end
+    LuaOffset = LuaOffset + 1
+    skipSpace()
+    local second = parseExp()
+    if not second then
+        missName()
+        return
+    end
+    skipSpace()
+    if peekChar() ~= ',' then
+        return second
+    end
+    LuaOffset = LuaOffset + 1
+    skipSpace()
+    local third = parseExp()
+    if not third then
+        missName()
+        return second
+    end
+    local rest = { third }
+    while true do
+        skipSpace()
+        if peekChar() ~= ',' then
+            return second, rest
+        end
+        LuaOffset = LuaOffset + 1
+        skipSpace()
+        local exp = parseExp()
+        if not exp then
+            missName()
+            return second, rest
+        end
+        rest[#rest+1] = exp
+    end
+end
+
+local function bindValue(n, v)
+    n.type   = GetToSetMap[n.type]
+    if v then
+        n.value  = v
+        n.range  = v.finish
+        v.parent = n
+    end
+end
+
+local function parseSet(n1)
+    local n2, nrest     = parseSetTails()
+    skipSpace()
+    local v1, v2, vrest = parseSetValue()
+    bindValue(n1, v1)
+    if n2 then
+        bindValue(n2, v2)
+        pushActionIntoCurrentChunk(n2)
+    end
+    if nrest then
+        for i = 1, #nrest do
+            local n = nrest[i]
+            local v = vrest and vrest[i]
+            bindValue(n, v)
+            pushActionIntoCurrentChunk(n)
+        end
+    end
+
+    if v2 and not n2 then
+        v2.redundant = true
+        pushActionIntoCurrentChunk(v2)
+    end
+    if vrest then
+        for i = 1, #vrest do
+            local v = vrest[i]
+            if not nrest or not nrest[i] then
+                v.redundant = true
+                pushActionIntoCurrentChunk(v)
+            end
+        end
+    end
+
+    return n1
+end
+
 local function compileExpAsAction(exp)
     pushActionIntoCurrentChunk(exp)
 
     if GetToSetMap[exp.type] then
         skipSpace()
-        local value = parseSetValue()
-        if value then
-            exp.type     = GetToSetMap[exp.type]
-            exp.value    = value
-            exp.range    = value.finish
-            value.parent = exp
-            return exp
+        local action = parseSet(exp)
+        if action then
+            return action
         end
     end
 
@@ -2170,7 +2299,7 @@ local function parseLua()
     local main = {
         type   = 'main',
         start  = 0,
-        finish = #Lua
+        finish = 0,
     }
     pushChunk(main)
     createLocal{
@@ -2184,6 +2313,7 @@ local function parseLua()
     }
     parseActions()
     popChunk()
+    main.finish = getPosition(#Lua, 'right')
 
     return main
 end
