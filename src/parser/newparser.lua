@@ -1652,13 +1652,38 @@ local function parseSetTails(parser, isLocal)
     end
 end
 
-local function bindValue(n, v, isLocal)
+local function bindValue(n, v, index, lastValue, isLocal)
     if isLocal then
         createLocal(n)
     else
         n.type = GetToSetMap[n.type] or n.type
     end
+    if not v and lastValue then
+        if lastValue.type == 'call'
+        or lastValue.type == 'varargs' then
+            v = lastValue
+            if not v.extParent then
+                v.extParent = {}
+            end
+        end
+    end
     if v then
+        if v.type == 'call'
+        or v.type == 'varargs' then
+            local select = {
+                type   = 'select',
+                sindex = index,
+                start  = v.start,
+                finish = v.finish,
+                vararg = v
+            }
+            if v.parent then
+                v.extParent[#v.extParent+1] = select
+            else
+                v.parent = select
+            end
+            v = select
+        end
         n.value  = v
         n.range  = v.finish
         v.parent = n
@@ -1672,16 +1697,19 @@ local function parseSet(n1, parser, isLocal)
     local n2, nrest     = parseSetTails(parser, isLocal)
     skipSpace()
     local v1, v2, vrest = parseSetValues()
-    bindValue(n1, v1, isLocal)
+    bindValue(n1, v1, 1, nil, isLocal)
+    local lastValue = v1
     if n2 then
-        bindValue(n2, v2, isLocal)
+        bindValue(n2, v2, 2, lastValue, isLocal)
+        lastValue = v2 or lastValue
         pushActionIntoCurrentChunk(n2)
     end
     if nrest then
         for i = 1, #nrest do
             local n = nrest[i]
             local v = vrest and vrest[i]
-            bindValue(n, v, isLocal)
+            bindValue(n, v, i + 2, lastValue, isLocal)
+            lastValue = v or lastValue
             pushActionIntoCurrentChunk(n)
         end
     end
