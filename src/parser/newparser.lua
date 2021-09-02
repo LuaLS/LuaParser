@@ -222,6 +222,23 @@ local function getPosition(offset, leftOrRight)
     end
 end
 
+---@return string          word
+---@return parser.position startPosition
+---@return parser.position finishPosition
+---@return integer         newOffset
+local function peekWord()
+    local start, finish, word = sfind(Lua
+        , '^([%a_\x80-\xff][%w_\x80-\xff]*)'
+        , LuaOffset
+    )
+    if not finish then
+        return nil
+    end
+    local startPos  = getPosition(start , 'left')
+    local finishPos = getPosition(finish, 'right')
+    return word, startPos, finishPos, finish + 1
+end
+
 local function missSymbol(symbol)
     pushError {
         type   = 'MISS_SYMBOL',
@@ -249,32 +266,24 @@ local function missName(pos)
     }
 end
 
-local function unknownSymbol(symbol)
+local function skipUnknownSymbol(stopSymbol)
+    local symbol, sstart, sfinish, newOffset = peekWord()
+    if not newOffset then
+        local pattern = '([^ \t\r\n' .. (stopSymbol or '') .. ']*)'
+        sstart, newOffset, symbol = sfind(Lua, pattern, LuaOffset)
+        sstart  = getPosition(sstart, 'left')
+        sfinish = getPosition(newOffset, 'right')
+        newOffset = newOffset + 1
+    end
+    LuaOffset = newOffset
     pushError {
         type   = 'UNKNOWN_SYMBOL',
-        start  = getPosition(LuaOffset, 'left'),
-        finish = getPosition(LuaOffset, 'right'),
+        start  = sstart,
+        finish = sfinish,
         info   = {
             symbol = symbol,
         }
     }
-end
-
----@return string          word
----@return parser.position startPosition
----@return parser.position finishPosition
----@return integer         newOffset
-local function peekWord()
-    local start, finish, word = sfind(Lua
-        , '^([%a_\x80-\xff][%w_\x80-\xff]*)'
-        , LuaOffset
-    )
-    if not finish then
-        return nil
-    end
-    local startPos  = getPosition(start , 'left')
-    local finishPos = getPosition(finish, 'right')
-    return word, startPos, finishPos, finish + 1
 end
 
 local function skipNL()
@@ -1281,6 +1290,74 @@ local function parseActions()
     end
 end
 
+local function parseParams(params)
+    local wantSep = false
+    while true do
+        skipSpace()
+        local char = peekChar()
+        if not char or char == ')' then
+            if not wantSep then
+                missName()
+            end
+            break
+        end
+        if char == ',' then
+            if wantSep then
+                wantSep = false
+            else
+                missName()
+            end
+            LuaOffset = LuaOffset + 1
+            goto CONTINUE
+        end
+        if char == '.' then
+            if ssub(Lua, LuaOffset, LuaOffset + 2) == '...' then
+                if wantSep then
+                    missSymbol ','
+                end
+                wantSep = true
+                if not params then
+                    params = {}
+                end
+                params[#params+1] = {
+                    type   = '...',
+                    start  = getPosition(LuaOffset, 'left'),
+                    finish = getPosition(LuaOffset + 2, 'right'),
+                    parent = params,
+                }
+                LuaOffset = LuaOffset + 3
+                goto CONTINUE
+            else
+                skipUnknownSymbol '%,%)%.'
+                goto CONTINUE
+            end
+        end
+        local word, wstart, wfinish, woffset = peekWord()
+        if word then
+            if wantSep then
+                missSymbol ','
+            end
+            wantSep = true
+            if not params then
+                params = {}
+            end
+            params[#params+1] = createLocal {
+                start  = wstart,
+                finish = wfinish,
+                parent = params,
+                [1]    = word,
+            }
+            LuaOffset = woffset
+            goto CONTINUE
+        else
+            skipUnknownSymbol '%,%)%.'
+            goto CONTINUE
+        end
+        ::CONTINUE::
+    end
+    return params
+end
+
 local function parseFunction(isLocal)
     local word, funcLeft, funcRight, newOffset = peekWord()
     if word ~= 'function' then
@@ -1318,48 +1395,36 @@ local function parseFunction(isLocal)
     end
     local parenLeft = getPosition(LuaOffset, 'left')
     LuaOffset = LuaOffset + 1
-    skipSpace()
     pushChunk(func)
-    local args = parseExpList()
+    local params
     if func.name and func.name.type == 'getmethod' then
         if name.type == 'getmethod' then
-            if not args then
-                args = {}
-            end
-            local localself = createLocal {
+            params = {}
+            params[1] = createLocal {
                 start  = funcRight,
                 finish = funcRight,
                 method = name,
-                parent = args,
+                parent = params,
                 tag    = 'self',
                 dummy  = true,
                 [1]    = 'self',
             }
-            tinsert(args, 1, localself)
         end
     end
-    if args then
-        args.type   = 'funcargs'
-        args.start  = parenLeft
-        args.parent = func
-        func.args   = args
-        func.finish = args.finish
-        for i = 1, #args do
-            local arg = args[i]
-            if arg.type == 'varargs' then
-                arg.type = '...'
-            elseif arg.type == 'getglobal'
-            or     arg.type == 'getlocal' then
-                createLocal(arg)
-            end
-        end
+    params = parseParams(params)
+    if params then
+        params.type   = 'funcargs'
+        params.start  = parenLeft
+        params.parent = func
+        func.args     = params
+        func.finish   = params.finish
     end
     skipSpace()
     if peekChar() == ')' then
         local parenRight = getPosition(LuaOffset, 'right')
         func.finish = parenRight
-        if args then
-            args.finish = parenRight
+        if params then
+            params.finish = parenRight
         end
         LuaOffset = LuaOffset + 1
         skipSpace()
@@ -1875,7 +1940,7 @@ end
 
 local function parseLabel()
     if ssub(Lua, LuaOffset, LuaOffset + 1) ~= '::' then
-        unknownSymbol ':'
+        skipUnknownSymbol()
         return nil
     end
     LuaOffset = LuaOffset + 2
