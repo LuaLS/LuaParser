@@ -1370,8 +1370,8 @@ local function parseActions()
         and Chunk[#Chunk].type ~= 'main' then
             return word, wstart, wfinish, woffset
         end
-        local action = parseAction()
-        if not action then
+        local _, failed = parseAction()
+        if failed then
             break
         end
         ::CONTINUE::
@@ -1713,6 +1713,18 @@ function parseExp(level)
     return exp
 end
 
+local function skipSeps()
+    while true do
+        skipSpace()
+        if peekChar() == ',' then
+            missExp()
+            LuaOffset = LuaOffset + 1
+        else
+            break
+        end
+    end
+end
+
 ---@return parser.guide.object   first
 ---@return parser.guide.object   second
 ---@return parser.guide.object[] rest
@@ -1727,7 +1739,7 @@ local function parseSetValues()
         return first
     end
     LuaOffset = LuaOffset + 1
-    skipSpace()
+    skipSeps()
     local second = parseExp()
     if not second then
         missExp()
@@ -1738,7 +1750,7 @@ local function parseSetValues()
         return first, second
     end
     LuaOffset = LuaOffset + 1
-    skipSpace()
+    skipSeps()
     local third = parseExp()
     if not third then
         missExp()
@@ -1752,7 +1764,7 @@ local function parseSetValues()
             return first, second, rest
         end
         LuaOffset = LuaOffset + 1
-        skipSpace()
+        skipSeps()
         local exp = parseExp()
         if not exp then
             missExp()
@@ -1793,7 +1805,7 @@ local function parseSetTails(parser, isLocal)
         return second
     end
     LuaOffset = LuaOffset + 1
-    skipSpace()
+    skipSeps()
     local third = parser()
     if not third then
         missName()
@@ -1810,7 +1822,7 @@ local function parseSetTails(parser, isLocal)
             return second, rest
         end
         LuaOffset = LuaOffset + 1
-        skipSpace()
+        skipSeps()
         local name = parser()
         if not name then
             missName()
@@ -2531,6 +2543,7 @@ function parseAction()
             return action
         end
     end
+    return nil, true
 end
 
 local function parseLua()
