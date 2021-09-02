@@ -1,17 +1,17 @@
 
-local guide = require "parser.guide"
-local sbyte     = string.byte
-local sfind     = string.find
-local smatch    = string.match
-local sgsub     = string.gsub
-local ssub      = string.sub
-local schar     = string.char
-local uchar     = utf8.char
-local tconcat   = table.concat
-local tinsert   = table.insert
-local tointeger = math.tointeger
-local mtype     = math.type
-local tonumber  = tonumber
+local sbyte      = string.byte
+local sfind      = string.find
+local smatch     = string.match
+local sgsub      = string.gsub
+local ssub       = string.sub
+local schar      = string.char
+local uchar      = utf8.char
+local tconcat    = table.concat
+local tinsert    = table.insert
+local tointeger  = math.tointeger
+local mtype      = math.type
+local tonumber   = tonumber
+local maxinteger = math.maxinteger
 
 ---@alias parser.position integer
 
@@ -388,8 +388,8 @@ local function createLocal(obj, attrs)
         if not locals then
             locals = {}
             chunk.locals = locals
-            locals[#locals+1] = obj
         end
+        locals[#locals+1] = obj
     end
     return obj
 end
@@ -1305,7 +1305,6 @@ local function parseFunction(isLocal)
         end
         if isLocal then
             createLocal(name)
-            name.effect = name.finish
         else
             name = parseSimple(resolveName(name), false)
         end
@@ -1623,6 +1622,7 @@ local function parseSetTails(parser, isLocal)
     end
     if isLocal then
         createLocal(second, parseLocalAttrs())
+        second.effect = maxinteger
     end
     skipSpace()
     if peekChar() ~= ',' then
@@ -1637,6 +1637,7 @@ local function parseSetTails(parser, isLocal)
     end
     if isLocal then
         createLocal(third, parseLocalAttrs())
+        third.effect = maxinteger
     end
     local rest = { third }
     while true do
@@ -1653,6 +1654,7 @@ local function parseSetTails(parser, isLocal)
         end
         if isLocal then
             createLocal(name, parseLocalAttrs())
+            name.effect = maxinteger
         end
         rest[#rest+1] = name
     end
@@ -1660,7 +1662,7 @@ end
 
 local function bindValue(n, v, index, lastValue, isLocal)
     if isLocal then
-        createLocal(n)
+        n.effect = getPosition(LuaOffset, 'left')
     else
         n.type = GetToSetMap[n.type] or n.type
     end
@@ -1802,9 +1804,11 @@ local function parseLocal()
         return nil
     end
     local loc = createLocal(name, parseLocalAttrs())
+    loc.effect = maxinteger
     pushActionIntoCurrentChunk(loc)
     skipSpace()
     parseSet(loc, parseName, true)
+    loc.effect = getPosition(LuaOffset, 'left')
 
     return loc
 end
