@@ -208,6 +208,9 @@ local function peekChar(offset)
     if CachedCharOffset ~= offset then
         CachedCharOffset = offset
         CachedChar = ssub(Lua, offset, offset)
+        if CachedChar == '' then
+            CachedChar = nil
+        end
     end
     return CachedChar
 end
@@ -1501,6 +1504,9 @@ local function parseFunction(isLocal)
         LuaOffset = LuaOffset + 1
         skipSpace()
     else
+        if params then
+            params.finish = NonSpacePosition
+        end
         missSymbol ')'
     end
     parseActions()
@@ -1688,9 +1694,6 @@ end
 ---@return parser.guide.object   second
 ---@return parser.guide.object[] rest
 local function parseSetValues()
-    if not expectAssign() then
-        return
-    end
     skipSpace()
     local first = parseExp()
     if not first then
@@ -1798,10 +1801,10 @@ local function parseSetTails(parser, isLocal)
     end
 end
 
-local function bindValue(n, v, index, lastValue, isLocal)
+local function bindValue(n, v, index, lastValue, isLocal, isSet)
     if isLocal then
         n.effect = getPosition(LuaOffset, 'left')
-    else
+    elseif isSet then
         n.type = GetToSetMap[n.type] or n.type
     end
     if not v and lastValue then
@@ -1842,11 +1845,16 @@ end
 local function parseSet(n1, parser, isLocal)
     local n2, nrest     = parseSetTails(parser, isLocal)
     skipSpace()
-    local v1, v2, vrest = parseSetValues()
-    bindValue(n1, v1, 1, nil, isLocal)
+    local v1, v2, vrest
+    local isSet
+    if expectAssign() then
+        v1, v2, vrest = parseSetValues()
+        isSet = true
+    end
+    bindValue(n1, v1, 1, nil, isLocal, isSet)
     local lastValue = v1
     if n2 then
-        bindValue(n2, v2, 2, lastValue, isLocal)
+        bindValue(n2, v2, 2, lastValue, isLocal, isSet)
         lastValue = v2 or lastValue
         pushActionIntoCurrentChunk(n2)
     end
@@ -1854,7 +1862,7 @@ local function parseSet(n1, parser, isLocal)
         for i = 1, #nrest do
             local n = nrest[i]
             local v = vrest and vrest[i]
-            bindValue(n, v, i + 2, lastValue, isLocal)
+            bindValue(n, v, i + 2, lastValue, isLocal, isSet)
             lastValue = v or lastValue
             pushActionIntoCurrentChunk(n)
         end
