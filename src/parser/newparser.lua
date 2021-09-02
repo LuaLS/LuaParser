@@ -809,13 +809,82 @@ local function parseNameOrList()
     return list or first
 end
 
-local function parseExpList()
+local function dropTail()
+    local pl, pt, pp = 0, 0, 0
+    while true do
+        local char, offset = smatch(Lua, '([\r\n%,%<%>%{%}%(%)])()', LuaOffset)
+        if not char then
+            return
+        end
+        if char == '\r'
+        or char == '\n' then
+            LuaOffset = offset - 1
+            return
+        end
+        if char == ',' then
+            if pl > 0
+            or pt > 0
+            or pp > 0 then
+                LuaOffset = offset
+                goto CONTINUE
+            else
+                LuaOffset = offset - 1
+                break
+            end
+        end
+        if char == '<' then
+            pl = pl + 1
+            LuaOffset = offset
+            goto CONTINUE
+        end
+        if char == '{' then
+            pt = pt + 1
+            LuaOffset = offset
+            goto CONTINUE
+        end
+        if char == '(' then
+            pp = pp + 1
+            LuaOffset = offset
+            goto CONTINUE
+        end
+        if char == '>' then
+            if pl <= 0 then
+                break
+            end
+            pl = pl - 1
+            LuaOffset = offset
+            goto CONTINUE
+        end
+        if char == '}' then
+            if pt <= 0 then
+                break
+            end
+            pt = pt - 1
+            LuaOffset = offset
+            goto CONTINUE
+        end
+        if char == ')' then
+            if pp <= 0 then
+                break
+            end
+            pp = pp - 1
+            LuaOffset = offset
+            goto CONTINUE
+        end
+        ::CONTINUE::
+    end
+end
+
+local function parseExpList(stop)
     local list
     local lastSepPos = LuaOffset
     while true do
         skipSpace()
         local char = peekChar()
         if not char then
+            break
+        end
+        if char == stop then
             break
         end
         if char == ',' then
@@ -840,6 +909,9 @@ local function parseExpList()
             local exp = parseExp()
             if not exp then
                 break
+            end
+            if stop then
+                dropTail()
             end
             lastSepPos = nil
             if not list then
@@ -1053,7 +1125,7 @@ local function parseSimple(node, enableCall)
                 node   = node,
             }
             LuaOffset = LuaOffset + 1
-            local args = parseExpList()
+            local args = parseExpList(')')
             if peekChar(LuaOffset) == ')' then
                 LuaOffset = LuaOffset + 1
             else
