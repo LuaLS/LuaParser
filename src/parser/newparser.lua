@@ -1504,6 +1504,7 @@ local function parseFunction(isLocal)
         LuaOffset = LuaOffset + 1
         skipSpace()
     else
+        func.finish = NonSpacePosition
         if params then
             params.finish = NonSpacePosition
         end
@@ -1886,10 +1887,10 @@ local function parseSet(n1, parser, isLocal)
 end
 
 local function compileExpAsAction(exp)
-    pushActionIntoCurrentChunk(exp)
 
     if GetToSetMap[exp.type] then
         skipSpace()
+        pushActionIntoCurrentChunk(exp)
         local action = parseSet(exp, parseExp)
         if action then
             return action
@@ -1897,6 +1898,7 @@ local function compileExpAsAction(exp)
     end
 
     if exp.type == 'call' then
+        pushActionIntoCurrentChunk(exp)
         return exp
     end
 
@@ -1909,12 +1911,16 @@ local function compileExpAsAction(exp)
             name.vstart = exp.start
             name.range  = exp.finish
             exp.parent  = name
+            pushActionIntoCurrentChunk(name)
             return name
         else
+            pushActionIntoCurrentChunk(exp)
             missName(exp.keyword[2])
             return exp
         end
     end
+
+    pushActionIntoCurrentChunk(exp)
 end
 
 local function parseLocal()
