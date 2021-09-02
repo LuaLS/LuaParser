@@ -1227,10 +1227,9 @@ local function getLocal(name, pos)
     end
 end
 
-local function parseExpName(enableCall)
-    local node = parseName()
+local function resolveName(node)
     if not node then
-        return
+        return nil
     end
     local loc  = getLocal(node[1], node.start)
     if loc then
@@ -1260,7 +1259,7 @@ local function parseExpName(enableCall)
             addSpecial(name, node)
         end
     end
-    return parseSimple(node, enableCall)
+    return node
 end
 
 local function parseActions()
@@ -1282,7 +1281,7 @@ local function parseActions()
     end
 end
 
-local function parseFunction()
+local function parseFunction(isLocal)
     local word, funcLeft, funcRight, newOffset = peekWord()
     if word ~= 'function' then
         return nil
@@ -1296,14 +1295,19 @@ local function parseFunction()
             [2] = funcRight,
         },
     }
-    pushChunk(func)
     LuaOffset = newOffset
     skipSpace()
     local name
     if peekChar() ~= '(' then
-        name = parseExpName()
+        name = parseName()
         if not name then
             return func
+        end
+        if isLocal then
+            createLocal(name)
+            name.effect = name.finish
+        else
+            name = parseSimple(resolveName(name), false)
         end
         func.name   = name
         func.finish = name.finish
@@ -1316,6 +1320,7 @@ local function parseFunction()
     local parenLeft = getPosition(LuaOffset, 'left')
     LuaOffset = LuaOffset + 1
     skipSpace()
+    pushChunk(func)
     local args = parseExpList()
     if func.name and func.name.type == 'getmethod' then
         if name.type == 'getmethod' then
@@ -1416,7 +1421,8 @@ local function parseExpUnit()
         if word == 'function' then
             return parseFunction()
         end
-        return parseExpName(true)
+        local node = parseName()
+        return parseSimple(resolveName(node), true)
     end
 
     return nil
@@ -1773,7 +1779,21 @@ local function parseLocal()
     end
 
     if word == 'function' then
-        
+        local func = parseFunction(true)
+        local name = func.name
+        if name then
+            func.name    = nil
+            name.value  = func
+            name.vstart = func.start
+            name.range  = func.finish
+            func.parent  = name
+            pushActionIntoCurrentChunk(name)
+            return name
+        else
+            missName(func.keyword[2])
+            pushActionIntoCurrentChunk(func)
+            return func
+        end
     end
 
     local name  = parseName()
