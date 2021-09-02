@@ -1687,9 +1687,14 @@ function parseExp(level)
             break
         end
 
+        ::AGAIN::
         skipSpace()
         local isForward = SymbolForward[bopLevel]
         local child = parseExp(isForward and (bopLevel + 0.5) or bopLevel)
+        if not child then
+            skipUnknownSymbol()
+            goto AGAIN
+        end
         local bin = {
             type   = 'binary',
             start  = exp.start,
