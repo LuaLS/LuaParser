@@ -426,14 +426,6 @@ CHECK 'end'
     start  = 0,
     finish = 3,
     locals = "<IGNORE>",
-    [1]    = {
-        type   = "getglobal",
-        start  = 0,
-        finish = 3,
-        parent = "<IGNORE>",
-        node   = "<IGNORE>",
-        [1]    = "end",
-    },
 }
 
 CHECK 'local x = ,'
@@ -906,22 +898,22 @@ end
 ]]
 {
     type   = "main",
-    start  = 1,
-    finish = 16,
+    start  = 0,
+    finish = 20000,
     locals = "<IGNORE>",
     [1]    = {
         type   = "if",
-        start  = 1,
-        finish = 16,
+        start  = 0,
+        finish = 10003,
         parent = "<IGNORE>",
         [1]    = {
             type    = "ifblock",
-            start   = 1,
+            start   = 0,
             finish  = 12,
             keyword = {
-                [1] = 1,
+                [1] = 0,
                 [2] = 2,
-                [3] = 9,
+                [3] = 8,
                 [4] = 12,
             },
             parent  = "<IGNORE>",
@@ -934,23 +926,23 @@ f(if)
 ]]
 {
     type   = "main",
-    start  = 1,
-    finish = 5,
+    start  = 0,
+    finish = 10000,
     locals = "<IGNORE>",
     [1]    = {
         type   = "call",
-        start  = 1,
+        start  = 0,
         finish = 5,
         parent = "<IGNORE>",
         node   = "<IGNORE>",
         args   = {
             type   = "callargs",
-            start  = 2,
+            start  = 1,
             finish = 5,
             parent = "<IGNORE>",
             [1]    = {
                 type   = "getglobal",
-                start  = 3,
+                start  = 2,
                 finish = 4,
                 parent = "<IGNORE>",
                 node   = "<IGNORE>",

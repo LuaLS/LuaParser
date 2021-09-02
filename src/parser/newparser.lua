@@ -319,6 +319,67 @@ local function skipNL()
     return true
 end
 
+local function resolveLongString(finishMark)
+    skipNL()
+    local start        = LuaOffset
+    local finishOffset = sfind(Lua, finishMark, LuaOffset, true) or (#Lua + 1)
+    local stringResult = ssub(Lua, LuaOffset, finishOffset - 1)
+    local lastLN = stringResult:find '[\r\n][^\r\n]*$'
+    if not lastLN then
+        LuaOffset  = finishOffset + #finishMark
+        return stringResult
+    end
+    local result, count = stringResult
+        : gsub('\r\n', '\n')
+        : gsub('[\r\n]', '\n')
+    Line       = Line + count
+    LineOffset = lastLN + start
+    LuaOffset  = finishOffset + #finishMark
+    return result
+end
+
+local function parseLongString()
+    local start, finish, mark = sfind(Lua, '(%[%=*%[)', LuaOffset)
+    if not mark then
+        return nil
+    end
+    LuaOffset = finish + 1
+    local startPos     = getPosition(start, 'left')
+    local finishMark   = sgsub(mark, '%[', ']')
+    local stringResult = resolveLongString(finishMark)
+    return {
+        type   = 'string',
+        start  = startPos,
+        finish = getPosition(LuaOffset - 1, 'right'),
+        [1]    = stringResult,
+        [2]    = mark,
+    }
+end
+
+local function skipComment()
+    local head = ssub(Lua, LuaOffset, LuaOffset + 1)
+    if head == '--'
+    or head == '//' then
+        LuaOffset = LuaOffset + 2
+        local longComment = parseLongString()
+        if longComment then
+            return true
+        end
+        local offset = sfind(Lua, '[\r\n]', LuaOffset)
+        if offset then
+            LuaOffset = offset
+        else
+            LuaOffset = #Lua + 1
+        end
+        return true
+    end
+    if head == '/*' then
+        LuaOffset = LuaOffset + 2
+        resolveLongString '*/'
+    end
+    return false
+end
+
 local function skipSpace()
     if LuaOffset == lastSkipSpaceOffset then
         return
@@ -326,6 +387,9 @@ local function skipSpace()
     NonSpacePosition = getPosition(LuaOffset - 1, 'right')
     ::AGAIN::
     if skipNL() then
+        goto AGAIN
+    end
+    if skipComment() then
         goto AGAIN
     end
     local offset = sfind(Lua, '[^ \t]', LuaOffset)
@@ -454,8 +518,6 @@ local function parseBoolean()
     }
 end
 
-local stringPool = {}
-
 local function parseStringUnicode()
     if peekChar() ~= '{' then
         missSymbol '{'
@@ -531,6 +593,7 @@ local function parseStringUnicode()
     return nil
 end
 
+local stringPool = {}
 local function parseShotString()
     local mark = peekChar()
     local start = LuaOffset
@@ -617,55 +680,6 @@ local function parseShotString()
             stringResult = tconcat(stringPool, '', 1, stringIndex)
             LuaOffset = offset + 1
             break
-        end
-    end
-    return {
-        type   = 'string',
-        start  = startPos,
-        finish = getPosition(LuaOffset - 1, 'right'),
-        [1]    = stringResult,
-        [2]    = mark,
-    }
-end
-
-local function parseLongString()
-    local start, finish, mark = sfind(Lua, '(%[%=*%[)', LuaOffset)
-    if not mark then
-        return nil
-    end
-    local startPos = getPosition(start, 'left')
-    LuaOffset = finish + 1
-    skipNL()
-    local finishMark = sgsub(mark, '%[', ']')
-    local stringResult
-    local stringIndex = 1
-    while true do
-        local offset, _, char = sfind(Lua, '([\r\n%]])', LuaOffset)
-        if not char then
-            stringPool[stringIndex] = ssub(Lua, LuaOffset)
-            stringResult = tconcat(stringPool, '', 1, stringIndex)
-            LuaOffset = #Lua + 1
-            break
-        end
-        stringPool[stringIndex] = ssub(Lua, LuaOffset, offset - 1)
-        stringIndex = stringIndex + 1
-        if char == '\r'
-        or char == '\n' then
-            LuaOffset = offset
-            skipNL()
-            stringPool[stringIndex] = '\n'
-            stringIndex = stringIndex + 1
-        else
-            local markFinishOffset = offset + #finishMark - 1
-            if ssub(Lua, offset, markFinishOffset) == finishMark then
-                stringResult = tconcat(stringPool, '', 1, stringIndex - 1)
-                LuaOffset = markFinishOffset + 1
-                break
-            else
-                stringPool[stringIndex] = ']'
-                stringIndex = stringIndex + 1
-                LuaOffset   = offset + 1
-            end
         end
     end
     return {
@@ -1366,8 +1380,7 @@ local function parseActions()
             goto CONTINUE
         end
         local word, wstart, wfinish, woffset = peekWord()
-        if  ChunkFinishMap[word]
-        and Chunk[#Chunk].type ~= 'main' then
+        if  ChunkFinishMap[word] then
             return word, wstart, wfinish, woffset
         end
         local _, failed = parseAction()
@@ -1565,8 +1578,7 @@ local function parseExpUnit()
 
     local word = peekWord()
     if word then
-        if  ChunkFinishMap[word]
-        and Chunk[#Chunk].type ~= 'main' then
+        if ChunkFinishMap[word] then
             return nil
         end
         if word == 'nil' then
