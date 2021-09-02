@@ -1437,6 +1437,7 @@ local function parseFunction(isLocal)
         func.keyword[3] = endLeft
         func.keyword[4] = endRight
         func.finish     = endRight
+        LuaOffset       = endOffset
     else
         missSymbol 'end'
     end
