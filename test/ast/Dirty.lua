@@ -423,12 +423,12 @@ CHECK 'return local a'
 CHECK 'end'
 {
     type   = "main",
-    start  = 1,
+    start  = 0,
     finish = 3,
     locals = "<IGNORE>",
     [1]    = {
         type   = "getglobal",
-        start  = 1,
+        start  = 0,
         finish = 3,
         parent = "<IGNORE>",
         node   = "<IGNORE>",
@@ -439,14 +439,14 @@ CHECK 'end'
 CHECK 'local x = ,'
 {
     type   = "main",
-    start  = 1,
+    start  = 0,
     finish = 11,
     locals = "<IGNORE>",
     [1]    = {
         type   = "local",
-        start  = 7,
+        start  = 6,
         finish = 7,
-        effect = 12,
+        effect = 10,
         parent = "<IGNORE>",
         [1]    = "x",
     },
@@ -455,34 +455,34 @@ CHECK 'local x = ,'
 CHECK 'local x = (a && b)'
 {
     type   = "main",
-    start  = 1,
+    start  = 0,
     finish = 18,
     locals = "<IGNORE>",
     [1]    = {
         type   = "local",
-        start  = 7,
+        start  = 6,
         finish = 7,
-        effect = 19,
+        effect = 18,
         range  = 18,
         parent = "<IGNORE>",
         value  = {
             type   = "paren",
-            start  = 11,
+            start  = 10,
             finish = 18,
             parent = "<IGNORE>",
             exp    = {
                 type   = "binary",
-                start  = 12,
+                start  = 11,
                 finish = 17,
                 parent = "<IGNORE>",
                 op     = {
                     type   = "and",
-                    start  = 14,
+                    start  = 13,
                     finish = 16,
                 },
                 [1]    = {
                     type   = "getglobal",
-                    start  = 12,
+                    start  = 11,
                     finish = 12,
                     parent = "<IGNORE>",
                     node   = "<IGNORE>",
@@ -490,7 +490,7 @@ CHECK 'local x = (a && b)'
                 },
                 [2]    = {
                     type   = "getglobal",
-                    start  = 17,
+                    start  = 16,
                     finish = 17,
                     parent = "<IGNORE>",
                     node   = "<IGNORE>",

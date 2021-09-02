@@ -46,7 +46,7 @@ local CharMapE10     = stringToCharMap 'eE'
 local CharMapE16     = stringToCharMap 'pP'
 local CharMapSign    = stringToCharMap '+-'
 local CharMapSB      = stringToCharMap 'ao|~&=<>.*/%^+-'
-local CharMapSU      = stringToCharMap 'n#~-'
+local CharMapSU      = stringToCharMap 'n#~!-'
 local CharMapSimple  = stringToCharMap '.:([\'"{'
 local CharMapStrSH   = stringToCharMap '\'"'
 local CharMapStrLH   = stringToCharMap '['
@@ -108,11 +108,14 @@ local UnarySymbol = {
     ['#']   = 11,
     ['~']   = 11,
     ['-']   = 11,
+    ['!']   = 11,
 }
 
 local BinarySymbol = {
     ['or']  = 1,
+    ['||']  = 1,
     ['and'] = 2,
+    ['&&']  = 2,
     ['<=']  = 3,
     ['>=']  = 3,
     ['<']   = 3,
@@ -132,6 +135,15 @@ local BinarySymbol = {
     ['/']   = 10,
     ['%']   = 10,
     ['^']   = 12,
+}
+
+local BinaryAlias = {
+    ['&&'] = 'and',
+    ['||'] = 'or',
+}
+
+local UnaryAlias = {
+    ['!'] = 'not',
 }
 
 local SymbolForward = {
@@ -1354,7 +1366,8 @@ local function parseActions()
             goto CONTINUE
         end
         local word, wstart, wfinish, woffset = peekWord()
-        if ChunkFinishMap[word] then
+        if  ChunkFinishMap[word]
+        and Chunk[#Chunk].type ~= 'main' then
             return word, wstart, wfinish, woffset
         end
         local action = parseAction()
@@ -1552,7 +1565,8 @@ local function parseExpUnit()
 
     local word = peekWord()
     if word then
-        if ChunkFinishMap[word] then
+        if  ChunkFinishMap[word]
+        and Chunk[#Chunk].type ~= 'main' then
             return nil
         end
         if word == 'nil' then
@@ -1572,20 +1586,23 @@ local function parseExpUnit()
     return nil
 end
 
+local function getUnaryOP(char)
+    if UnarySymbol[char] then
+        return UnaryAlias[char] or char
+    end
+    local word = peekWord()
+    if UnarySymbol[word] then
+        return word
+    end
+    return nil
+end
+
 local function parseUnaryOP(level)
     local char = peekChar()
     if not CharMapSU[char] then
         return nil
     end
-    local symbol
-    if UnarySymbol[char] then
-        symbol = char
-    else
-        local word = peekWord()
-        if UnarySymbol[word] then
-            symbol = word
-        end
-    end
+    local symbol = getUnaryOP(char)
     if not symbol then
         return nil
     end
@@ -1602,30 +1619,30 @@ local function parseUnaryOP(level)
     return op, myLevel
 end
 
+local function getBinaryOP(char)
+    local char2 = ssub(Lua, LuaOffset, LuaOffset + 1)
+    if BinarySymbol[char2] then
+        return BinaryAlias[char2] or char2
+    end
+    if BinarySymbol[char] then
+        return char
+    end
+    local word = peekWord()
+    if BinarySymbol[word] then
+        return word
+    end
+    return nil
+end
+
 ---@param level integer # op level must greater than this level
 local function parseBinaryOP(level)
     local char = peekChar()
     if not CharMapSB[char] then
         return nil
     end
-    local symbol, len
-    if BinarySymbol[char] then
-        symbol = char
-        len    = #char
-    else
-        local char2 = ssub(Lua, LuaOffset, LuaOffset + 1)
-        if BinarySymbol[char2] then
-            symbol = char2
-            len    = #char2
-        else
-            local word = peekWord()
-            if BinarySymbol[word] then
-                symbol = word
-                len    = #word
-            else
-                return nil
-            end
-        end
+    local symbol = getBinaryOP(char)
+    if not symbol then
+        return nil
     end
     local myLevel = BinarySymbol[symbol]
     if level and myLevel < level then
@@ -1634,9 +1651,9 @@ local function parseBinaryOP(level)
     local op = {
         type   = symbol,
         start  = getPosition(LuaOffset, 'left'),
-        finish = getPosition(LuaOffset + len - 1, 'right'),
+        finish = getPosition(LuaOffset + #symbol - 1, 'right'),
     }
-    LuaOffset = LuaOffset + len
+    LuaOffset = LuaOffset + #symbol
     return op, myLevel
 end
 
