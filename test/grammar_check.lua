@@ -33,11 +33,11 @@ local function catchTarget(script, sep)
     local cur = 1
     local cut = 0
     while true do
-        local start, finish  = script:find(('<%%%s.-%%%s>'):format(sep, sep), cur)
+        local start, finish = script:find(('<%%%s.-%%%s>'):format(sep, sep), cur)
         if not start then
             break
         end
-        list[#list+1] = { start - cut, math.max(start - cut, finish - 4 - cut) }
+        list[#list+1] = { start - cut - 1, math.max(start - cut - 1, finish - 4 - cut) }
         cur = finish + 1
         cut = cut + 4
     end
@@ -50,7 +50,7 @@ local Version
 local function TEST(script)
     return function (expect)
         local newScript, list = catchTarget(script, '!')
-        local ast = parser.compile(newScript, 'lua', Version)
+        local ast = parser.compile(newScript, 'Lua', Version)
         assert(ast)
         local errs = ast.errs
         local first = errs[1]
@@ -77,7 +77,7 @@ end
 Version = 'Lua 5.3'
 
 TEST[[
-local<! !>
+local<!!>
 ]]
 {
     type = 'MISS_NAME',

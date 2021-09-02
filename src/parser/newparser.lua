@@ -797,6 +797,13 @@ local function parseName()
         return nil
     end
     LuaOffset = newOffset
+    if not State.options.unicodeName and word:find '[\x80-\xff]' then
+        pushError {
+            type   = 'UNICODE_NAME',
+            start  = startPos,
+            finish = finishPos,
+        }
+    end
     return {
         type   = 'name',
         start  = startPos,
@@ -1392,31 +1399,31 @@ local function parseActions()
 end
 
 local function parseParams(params)
-    local wantSep = false
+    local lastSep
     while true do
         skipSpace()
         local char = peekChar()
         if not char or char == ')' then
-            if not wantSep then
+            if lastSep then
                 missName()
             end
             break
         end
         if char == ',' then
-            if wantSep then
-                wantSep = false
-            else
+            if lastSep then
                 missName()
+            else
+                lastSep = true
             end
             LuaOffset = LuaOffset + 1
             goto CONTINUE
         end
         if char == '.' then
             if ssub(Lua, LuaOffset, LuaOffset + 2) == '...' then
-                if wantSep then
+                if lastSep == false then
                     missSymbol ','
                 end
-                wantSep = true
+                lastSep = false
                 if not params then
                     params = {}
                 end
@@ -1435,10 +1442,10 @@ local function parseParams(params)
         end
         local word, wstart, wfinish, woffset = peekWord()
         if word then
-            if wantSep then
+            if lastSep == false then
                 missSymbol ','
             end
-            wantSep = true
+            lastSep = false
             if not params then
                 params = {}
             end
@@ -1972,9 +1979,9 @@ end
 local function parseLocal()
     LuaOffset = LuaOffset + 5
     skipSpace()
-    local word, wstart, wfinish, woffset = peekWord()
+    local word = peekWord()
     if not word then
-        missExp()
+        missName()
         return nil
     end
 
@@ -1996,7 +2003,7 @@ local function parseLocal()
         end
     end
 
-    local name  = parseName()
+    local name = parseName()
     if not name then
         missName()
         return nil
