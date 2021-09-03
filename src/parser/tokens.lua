@@ -1,7 +1,5 @@
 local m = require 'lpeglabel'
 
-local Index, Tokens, Offsets
-
 local Sp     = m.S' \t'
 local Nl     = m.P'\r\n' + m.S'\r\n'
 local Number = m.R'09'^1

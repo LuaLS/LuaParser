@@ -1,3 +1,4 @@
+local tokens     = require 'parser.tokens'
 
 local sbyte      = string.byte
 local sfind      = string.find
@@ -179,8 +180,7 @@ local ChunkFinishMap = {
     ['until']  = true,
 }
 
-local State, Lua, LuaOffset, Line, LineOffset, Chunk
-local NonSpacePosition, lastSkipSpaceOffset
+local State, Lua, Line, LineOffset, Chunk, Tokens, Index
 
 local parseExp, parseAction
 
@@ -306,21 +306,16 @@ local function skipUnknownSymbol(stopSymbol)
 end
 
 local function skipNL()
-    local b = peekChar()
-    if not CharMapNL[b] then
-        return false
+    local token = Tokens[Index + 1]
+    if token == '\r'
+    or token == '\n'
+    or token == '\r\n' then
+        Line       = Line + 1
+        LineOffset = Tokens[Index] + #token
+        Index = Index + 2
+        return true
     end
-    LuaOffset = LuaOffset + 1
-    -- \r\n ?
-    if b == '\r' then
-        local nb = peekChar()
-        if nb == '\n' then
-            LuaOffset = LuaOffset + 1
-        end
-    end
-    Line       = Line + 1
-    LineOffset = LuaOffset
-    return true
+    return false
 end
 
 local function resolveLongString(finishMark)
@@ -555,12 +550,14 @@ local function parseNil()
 end
 
 local function parseBoolean()
-    local word, start, finish, newOffset = peekWord()
+    local word = Tokens[Index+1]
     if  word ~= 'true'
     and word ~= 'false' then
         return nil
     end
-    LuaOffset = newOffset
+    local start  = getPosition(Tokens[Index], 'left')
+    local finish = getPosition(Tokens[Index] + #word - 1, 'right')
+    Index = Index + 2
     return {
         type   = 'boolean',
         start  = start,
@@ -656,33 +653,64 @@ end
 
 local stringPool = {}
 local function parseShotString()
-    local mark = peekChar()
-    local start = LuaOffset
-    local pattern
-    if mark == '"' then
-        pattern = '(["\r\n\\])'
-    else
-        pattern = "(['\r\n\\])"
-    end
-    LuaOffset = LuaOffset + 1
-    local offset, _, char = sfind(Lua, pattern, LuaOffset)
-    -- simple string
-    if char == mark then
-        LuaOffset = offset + 1
+    local mark        = Tokens[Index+1]
+    local startOffset = Tokens[Index]
+    local startPos    = getPosition(startOffset, 'left')
+    Index             = Index + 2
+    -- empty string
+    if Tokens[Index+1] == mark then
+        local finishPos = getPosition(Tokens[Index], 'right')
+        Index = Index + 2
         return {
             type   = 'string',
-            start  = getPosition(start , 'left'),
-            finish = getPosition(offset, 'right'),
-            [1]    = ssub(Lua, start + 1, offset - 1),
+            start  = startPos,
+            finish = finishPos,
+            [1]    = '',
             [2]    = mark,
         }
     end
-    local startPos = getPosition(start , 'left')
-    local stringResult
-    local stringIndex = 1
+    local stringIndex = 0
+    local finishPos
+    local currentOffset = startOffset + 1
     while true do
-        stringPool[stringIndex] = ssub(Lua, LuaOffset, offset - 1)
-        stringIndex = stringIndex + 1
+        local token = Tokens[Index + 1]
+        if token == mark then
+            finishPos   = getPosition(Tokens[Index], 'right')
+            stringIndex = stringIndex + 1
+            stringPool[stringIndex] = ssub(Lua, currentOffset, Tokens[Index] - 1)
+            break
+        end
+        if token == '\\' then
+            stringIndex = stringIndex + 1
+            stringPool[stringIndex] = ssub(Lua, currentOffset, Tokens[Index] - 1)
+            currentOffset = Tokens[Index]
+            if Tokens[Index + 2] - currentOffset > 1 then
+                Index = Index + 2
+                goto CONTINUE
+            end
+            local nextChar = Tokens[Index + 3]
+            if EscMap[nextChar] then
+                stringIndex = stringIndex + 1
+                stringPool[stringIndex] = EscMap[nextChar]
+                currentOffset = Tokens[Index + 2] + #nextChar
+                Index = Index + 4
+                goto CONTINUE
+            end
+            if nextChar == mark then
+                stringIndex = stringIndex + 1
+                stringPool[stringIndex] = mark
+                currentOffset = Tokens[Index + 2] + #nextChar
+                Index = Index + 4
+                goto CONTINUE
+            end
+            if nextChar == 'z' then
+                Index = Index + 4
+                repeat until not skipNL()
+                currentOffset = Tokens[Index]
+                goto CONTINUE
+            end
+        end
+        --[[
         if     char == '\\' then
             local nextChar = peekChar(offset + 1)
             if EscMap[nextChar] then
@@ -748,22 +776,26 @@ local function parseShotString()
             missSymbol(mark, getPosition(offset - 1, 'right'))
             break
         end
+        ]]
+        Index = Index + 2
+        ::CONTINUE::
     end
+    local stringResult = tconcat(stringPool, '', 1, stringIndex)
     return {
         type   = 'string',
         start  = startPos,
-        finish = getPosition(LuaOffset - 1, 'right'),
+        finish = finishPos,
         [1]    = stringResult,
         [2]    = mark,
     }
 end
 
 local function parseString()
-    local b = peekChar()
-    if CharMapStrSH[b] then
+    local c = Tokens[Index+1]
+    if CharMapStrSH[c] then
         return parseShotString()
     end
-    if CharMapStrLH[b] then
+    if CharMapStrLH[c] then
         return parseLongString()
     end
     return nil
@@ -2673,12 +2705,11 @@ end
 
 local function initState(lua, version, options)
     Lua                 = lua
-    LuaOffset           = 1
     Line                = 0
     LineOffset          = 1
-    NonSpacePosition    = 0
-    lastSkipSpaceOffset = 0
     Chunk               = {}
+    Tokens              = tokens(lua)
+    Index               = 1
     CachedCharOffset    = nil
     State = {
         version = version,
