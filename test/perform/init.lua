@@ -45,10 +45,6 @@ local function performTest()
         if not state then
             error(('文件解析失败：%s'):format(path:string()))
         end
-        local lines = parser.lines(buf)
-        if not lines then
-            error(('行号解析失败：%s'):format(path:string()))
-        end
         --local dump = utility.unpack(state.root)
         --utility.pack(dump)
 
