@@ -661,7 +661,7 @@ local function parseStringUnicode()
 end
 
 local stringPool = {}
-local function parseShotString()
+local function parseShortString()
     local mark        = Tokens[Index+1]
     local startOffset = Tokens[Index]
     local startPos    = getPosition(startOffset, 'left')
@@ -693,29 +693,46 @@ local function parseShotString()
             stringIndex = stringIndex + 1
             stringPool[stringIndex] = ssub(Lua, currentOffset, Tokens[Index] - 1)
             currentOffset = Tokens[Index]
-            if Tokens[Index + 2] - currentOffset > 1 then
-                Index = Index + 2
+            -- has space?
+            Index = Index + 2
+            if Tokens[Index] - currentOffset > 1 then
                 goto CONTINUE
             end
-            local nextChar = Tokens[Index + 3]
+            local nextChar = ssub(Tokens[Index + 1], 1, 1)
             if EscMap[nextChar] then
                 stringIndex = stringIndex + 1
                 stringPool[stringIndex] = EscMap[nextChar]
-                currentOffset = Tokens[Index + 2] + #nextChar
-                Index = Index + 4
+                currentOffset = Tokens[Index] + #nextChar
+                Index = Index + 2
                 goto CONTINUE
             end
             if nextChar == mark then
                 stringIndex = stringIndex + 1
                 stringPool[stringIndex] = mark
-                currentOffset = Tokens[Index + 2] + #nextChar
-                Index = Index + 4
+                currentOffset = Tokens[Index] + #nextChar
+                Index = Index + 2
                 goto CONTINUE
             end
             if nextChar == 'z' then
-                Index = Index + 4
+                Index = Index + 2
                 repeat until not skipNL()
                 currentOffset = Tokens[Index]
+                goto CONTINUE
+            end
+            if CharMapNumber[nextChar] then
+                local numbers = smatch(Tokens[Index + 1], '^%d+')
+                if #numbers > 3 then
+                    numbers = ssub(numbers, 1, 3)
+                end
+                currentOffset = Tokens[Index] + #numbers
+                fastwardToken(currentOffset)
+                local byte = tointeger(numbers)
+                if byte <= 255 then
+                    stringIndex = stringIndex + 1
+                    stringPool[stringIndex] = schar(byte)
+                else
+                    -- TODO pushError
+                end
                 goto CONTINUE
             end
         end
@@ -802,7 +819,7 @@ end
 local function parseString()
     local c = Tokens[Index+1]
     if CharMapStrSH[c] then
-        return parseShotString()
+        return parseShortString()
     end
     if CharMapStrLH[c] then
         return parseLongString()
@@ -1345,7 +1362,7 @@ local function parseSimple(node, enableCall)
             if not enableCall then
                 break
             end
-            local str = parseShotString()
+            local str = parseShortString()
             local call = {
                 type   = 'call',
                 start  = node.start,
