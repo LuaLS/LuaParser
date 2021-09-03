@@ -295,7 +295,7 @@ end
 local function skipUnknownSymbol(stopSymbol)
     local symbol, sstart, sfinish, newOffset = peekWord()
     if not newOffset then
-        local pattern = '([^ \t\r\n' .. (stopSymbol or '') .. ']*)'
+        local pattern = '^([^ \t\r\n' .. (stopSymbol or '') .. ']*)'
         sstart, newOffset, symbol = sfind(Lua, pattern, LuaOffset)
         sstart  = getPosition(sstart, 'left')
         sfinish = getPosition(newOffset, 'right')
@@ -346,7 +346,7 @@ local function resolveLongString(finishMark)
         LuaOffset  = finishOffset + #finishMark
     end
     if miss then
-        local estart, ew, efinish = smatch(Lua, '()(%]%=*%])()[%c%s]*$')
+        local estart, _, efinish = smatch(Lua, '()(%]%=*%])()[%c%s]*$')
         if estart then
             local left  = getPosition(estart, 'left')
             local right = getPosition(efinish - 1, 'right')
@@ -390,7 +390,7 @@ local function resolveLongString(finishMark)
 end
 
 local function parseLongString()
-    local start, finish, mark = sfind(Lua, '(%[%=*%[)', LuaOffset)
+    local start, finish, mark = sfind(Lua, '^(%[%=*%[)', LuaOffset)
     if not mark then
         return nil
     end
@@ -697,7 +697,7 @@ local function parseShotString()
                 LuaOffset = offset + 2
                 skipSpace()
             elseif CharMapNumber[nextChar] then
-                local numbers = smatch(Lua, '%d+', offset + 1)
+                local numbers = smatch(Lua, '^%d+', offset + 1)
                 if #numbers > 3 then
                     numbers = ssub(numbers, 1, 3)
                 end
@@ -814,7 +814,7 @@ local function parseNumber16(offset)
 end
 
 local function parseNumber2(offset)
-    local bins = smatch(Lua, '[01]*', offset)
+    local bins = smatch(Lua, '^[01]*', offset)
     LuaOffset = offset + #bins
     return tonumber(bins, 2)
 end
