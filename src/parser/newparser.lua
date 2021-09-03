@@ -318,16 +318,27 @@ local function skipNL()
     return false
 end
 
+local function fastwardToken(offset)
+    while true do
+        local myOffset = Tokens[Index]
+        if not myOffset
+        or myOffset >= offset then
+            break
+        end
+        Index = Index + 2
+    end
+end
+
 local function resolveLongString(finishMark)
     skipNL()
     local miss
-    local start        = LuaOffset
-    local finishOffset = sfind(Lua, finishMark, LuaOffset, true)
+    local start        = Tokens[Index]
+    local finishOffset = sfind(Lua, finishMark, start, true)
     if not finishOffset then
         finishOffset = #Lua + 1
         miss = true
     end
-    local stringResult = ssub(Lua, LuaOffset, finishOffset - 1)
+    local stringResult = ssub(Lua, start, finishOffset - 1)
     local lastLN = stringResult:find '[\r\n][^\r\n]*$'
     if lastLN then
         local result, count = stringResult
@@ -335,11 +346,9 @@ local function resolveLongString(finishMark)
             : gsub('[\r\n]', '\n')
         Line       = Line + count
         LineOffset = lastLN + start
-        LuaOffset  = finishOffset + #finishMark
         stringResult = result
-    else
-        LuaOffset  = finishOffset + #finishMark
     end
+    fastwardToken(finishOffset + #finishMark)
     if miss then
         local estart, _, efinish = smatch(Lua, '()(%]%=*%])()[%c%s]*$')
         if estart then
@@ -381,22 +390,22 @@ local function resolveLongString(finishMark)
             }
         end
     end
-    return stringResult
+    return stringResult, finishOffset + #finishMark - 1
 end
 
 local function parseLongString()
-    local start, finish, mark = sfind(Lua, '^(%[%=*%[)', LuaOffset)
+    local start, finish, mark = sfind(Lua, '^(%[%=*%[)', Tokens[Index])
     if not mark then
         return nil
     end
-    LuaOffset = finish + 1
+    fastwardToken(finish + 1)
     local startPos     = getPosition(start, 'left')
     local finishMark   = sgsub(mark, '%[', ']')
-    local stringResult = resolveLongString(finishMark)
+    local stringResult, finishOffset = resolveLongString(finishMark)
     return {
         type   = 'string',
         start  = startPos,
-        finish = getPosition(LuaOffset - 1, 'right'),
+        finish = getPosition(finishOffset, 'right'),
         [1]    = stringResult,
         [2]    = mark,
     }
