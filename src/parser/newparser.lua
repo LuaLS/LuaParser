@@ -571,17 +571,27 @@ end
 
 local function parseStringUnicode()
     if peekChar() ~= '{' then
-        missSymbol '{'
+        local pos  = getPosition(LuaOffset, 'left')
+        missSymbol('{', pos)
         return nil
     end
-    local leftPos  = getPosition(LuaOffset, 'right')
-    local x16 = smatch(Lua, '^[%da-fA-F]*', LuaOffset + 1)
+    local leftPos  = getPosition(LuaOffset - 1, 'right')
+    local x16 = smatch(Lua, '^%w*', LuaOffset + 1)
     local rightPos = getPosition(LuaOffset + #x16, 'right')
     LuaOffset = LuaOffset + #x16 + 1
     if peekChar() == '}' then
         LuaOffset = LuaOffset + 1
+        rightPos  = rightPos + 1
     else
-        missSymbol '}'
+        missSymbol('}', rightPos)
+    end
+    if #x16 == 0 then
+        pushError {
+            type   = 'UTF8_SMALL',
+            start  = leftPos,
+            finish = rightPos,
+        }
+        return ''
     end
     if  State.version ~= 'Lua 5.3'
     and State.version ~= 'Lua 5.4'
@@ -604,8 +614,8 @@ local function parseStringUnicode()
             if not tonumber(ssub(x16, i, i), 16) then
                 pushError {
                     type   = 'MUST_X16',
-                    start  = leftPos + i - 1,
-                    finish = leftPos + i,
+                    start  = leftPos + i,
+                    finish = leftPos + i + 1,
                 }
             end
         end
@@ -641,7 +651,7 @@ local function parseStringUnicode()
     if byte >= 0 and byte <= 0x10FFFF then
         return uchar(byte)
     end
-    return nil
+    return ''
 end
 
 local stringPool = {}
@@ -707,7 +717,11 @@ local function parseShotString()
                     stringIndex = stringIndex + 1
                     LuaOffset = LuaOffset + 4
                 else
-                    -- TODO pushError
+                    pushError {
+                        type   = 'MISS_ESC_X',
+                        start  = getPosition(LuaOffset, 'left'),
+                        finish = getPosition(LuaOffset + 1, 'right'),
+                    }
                     LuaOffset = LuaOffset + 2
                 end
             elseif nextChar == 'u' then

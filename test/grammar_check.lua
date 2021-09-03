@@ -189,7 +189,7 @@ s = [===[a<!]=]!>]======]
 }
 
 TEST[[
-s = '<!\xzz!>zzz'
+s = '<!\x!>zzzzz'
 ]]
 {
     type = 'MISS_ESC_X',
@@ -206,14 +206,14 @@ s = '\u<!!>'
 }
 
 TEST[[
-s = '<!\u{}!>'
+s = '\u<!{}!>'
 ]]
 {
     type = 'UTF8_SMALL',
 }
 
 TEST[[
-s = '<!\u{111111111}!>'
+s = '\u<!{111111111}!>'
 ]]
 {
     type = 'UTF8_MAX',
@@ -224,7 +224,7 @@ s = '<!\u{111111111}!>'
 }
 
 TEST[[
-s = '<!\u{ffffff}!>'
+s = '\u<!{ffffff}!>'
 ]]
 {
     type = 'UTF8_MAX',
@@ -236,7 +236,7 @@ s = '<!\u{ffffff}!>'
 }
 
 TEST[[
-s = '\u{aaa<!'!>
+s = '\u{aaa<!!>'
 ]]
 {
     type = 'MISS_SYMBOL',
