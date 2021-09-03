@@ -346,7 +346,45 @@ local function resolveLongString(finishMark)
         LuaOffset  = finishOffset + #finishMark
     end
     if miss then
-        missSymbol(finishMark, getPosition(finishOffset - 1, 'right'))
+        local estart, ew, efinish = smatch(Lua, '()(%]%=*%])()[%c%s]*$')
+        if estart then
+            local left  = getPosition(estart, 'left')
+            local right = getPosition(efinish - 1, 'right')
+            pushError {
+                type   = 'ERR_LSTRING_END',
+                start  = left,
+                finish = right,
+                info   = {
+                    symbol = finishMark,
+                },
+                fix    = {
+                    title = 'FIX_LSTRING_END',
+                    {
+                        start  = estart,
+                        finish = efinish,
+                        text   = finishMark,
+                    }
+                },
+            }
+        else
+            local pos = getPosition(finishOffset - 1, 'right')
+            pushError {
+                type   = 'MISS_SYMBOL',
+                start  = pos,
+                finish = pos,
+                info   = {
+                    symbol = finishMark,
+                },
+                fix    = {
+                    title = 'ADD_LSTRING_END',
+                    {
+                        start  = pos,
+                        finish = pos,
+                        text   = finishMark,
+                    }
+                },
+            }
+        end
     end
     return stringResult
 end
