@@ -254,11 +254,11 @@ local function peekWord()
     return word, startPos, finishPos, finish + 1
 end
 
-local function missSymbol(symbol)
+local function missSymbol(symbol, pos)
     pushError {
         type   = 'MISS_SYMBOL',
-        start  = NonSpacePosition,
-        finish = NonSpacePosition,
+        start  = pos or NonSpacePosition,
+        finish = pos or NonSpacePosition,
         info = {
             symbol = symbol,
         }
@@ -281,6 +281,17 @@ local function missName(pos)
     }
 end
 
+local function unknownSymbol(start, finish, symbol)
+    pushError {
+        type   = 'UNKNOWN_SYMBOL',
+        start  = start,
+        finish = finish,
+        info   = {
+            symbol = symbol,
+        }
+    }
+end
+
 local function skipUnknownSymbol(stopSymbol)
     local symbol, sstart, sfinish, newOffset = peekWord()
     if not newOffset then
@@ -291,14 +302,7 @@ local function skipUnknownSymbol(stopSymbol)
         newOffset = newOffset + 1
     end
     LuaOffset = newOffset
-    pushError {
-        type   = 'UNKNOWN_SYMBOL',
-        start  = sstart,
-        finish = sfinish,
-        info   = {
-            symbol = symbol,
-        }
-    }
+    unknownSymbol(sstart, sfinish, symbol)
 end
 
 local function skipNL()
@@ -321,21 +325,30 @@ end
 
 local function resolveLongString(finishMark)
     skipNL()
+    local miss
     local start        = LuaOffset
-    local finishOffset = sfind(Lua, finishMark, LuaOffset, true) or (#Lua + 1)
+    local finishOffset = sfind(Lua, finishMark, LuaOffset, true)
+    if not finishOffset then
+        finishOffset = #Lua + 1
+        miss = true
+    end
     local stringResult = ssub(Lua, LuaOffset, finishOffset - 1)
     local lastLN = stringResult:find '[\r\n][^\r\n]*$'
-    if not lastLN then
+    if lastLN then
+        local result, count = stringResult
+            : gsub('\r\n', '\n')
+            : gsub('[\r\n]', '\n')
+        Line       = Line + count
+        LineOffset = lastLN + start
         LuaOffset  = finishOffset + #finishMark
-        return stringResult
+        stringResult = result
+    else
+        LuaOffset  = finishOffset + #finishMark
     end
-    local result, count = stringResult
-        : gsub('\r\n', '\n')
-        : gsub('[\r\n]', '\n')
-    Line       = Line + count
-    LineOffset = lastLN + start
-    LuaOffset  = finishOffset + #finishMark
-    return result
+    if miss then
+        missSymbol(finishMark, getPosition(finishOffset - 1, 'right'))
+    end
+    return stringResult
 end
 
 local function parseLongString()
@@ -675,10 +688,12 @@ local function parseShotString()
             break
         end
         offset, _, char = sfind(Lua, pattern, LuaOffset)
-        if not char then
+        if not char
+        or CharMapNL[char] then
             stringPool[stringIndex] = ssub(Lua, LuaOffset)
             stringResult = tconcat(stringPool, '', 1, stringIndex)
             LuaOffset = offset + 1
+            missSymbol(mark, getPosition(offset - 1, 'right'))
             break
         end
     end
@@ -752,6 +767,19 @@ local function parseNumber2(offset)
     return tonumber(bins, 2)
 end
 
+local function dropNumberTail()
+    local _, finish, word = sfind(Lua, '^([%.%w_\x80-\xff]+)', LuaOffset)
+    if not finish then
+        return
+    end
+    unknownSymbol(
+        getPosition(LuaOffset, 'left'),
+        getPosition(LuaOffset, 'right'),
+        word
+    )
+    LuaOffset = finish + 1
+end
+
 local function parseNumber()
     local offset = LuaOffset
     local startPos = getPosition(offset, 'left')
@@ -763,6 +791,7 @@ local function parseNumber()
     local number
     local firstChar = peekChar(offset)
     if     firstChar == '.' then
+        number = parseNumber10(offset)
     elseif firstChar == '0' then
         local nextChar = peekChar(offset + 1)
         if CharMapN16[nextChar] then
@@ -783,12 +812,14 @@ local function parseNumber()
     if neg then
         number = - number
     end
-    return {
+    local result = {
         type   = mtype(number) == 'integer' and 'integer' or 'number',
         start  = startPos,
         finish = getPosition(LuaOffset - 1, 'right'),
         [1]    = number,
     }
+    dropNumberTail()
+    return result
 end
 
 local function parseName()

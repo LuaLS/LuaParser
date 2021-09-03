@@ -33,6 +33,13 @@ CHECK'0.31416E1'
     finish = 9,
     [1]    = 0x1.921ff2e48e8a7p+1,
 }
+CHECK'.31416E1'
+{
+    type   = "number",
+    start  = 0,
+    finish = 8,
+    [1]    = 0x1.921ff2e48e8a7p+1,
+}
 CHECK'34e1'
 {
     type   = "number",
