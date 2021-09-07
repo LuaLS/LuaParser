@@ -1474,13 +1474,13 @@ end
 local function parseActions()
     while true do
         skipSpace()
-        if peekChar() == ';' then
-            LuaOffset = LuaOffset + 1
+        local token = Tokens[Index + 1]
+        if token == ';' then
+            Index = Index + 2
             goto CONTINUE
         end
-        local word, wstart, wfinish, woffset = peekWord()
-        if  ChunkFinishMap[word] then
-            return word, wstart, wfinish, woffset
+        if  ChunkFinishMap[token] then
+            return
         end
         local _, failed = parseAction()
         if failed then
@@ -1494,46 +1494,40 @@ local function parseParams(params)
     local lastSep
     while true do
         skipSpace()
-        local char = peekChar()
-        if not char or char == ')' then
+        local token = Tokens[Index + 1]
+        if not token or token == ')' then
             if lastSep then
                 missName()
             end
             break
         end
-        if char == ',' then
+        if token == ',' then
             if lastSep then
                 missName()
             else
                 lastSep = true
             end
-            LuaOffset = LuaOffset + 1
+            Index = Index + 2
             goto CONTINUE
         end
-        if char == '.' then
-            if ssub(Lua, LuaOffset, LuaOffset + 2) == '...' then
-                if lastSep == false then
-                    missSymbol ','
-                end
-                lastSep = false
-                if not params then
-                    params = {}
-                end
-                params[#params+1] = {
-                    type   = '...',
-                    start  = getPosition(LuaOffset, 'left'),
-                    finish = getPosition(LuaOffset + 2, 'right'),
-                    parent = params,
-                }
-                LuaOffset = LuaOffset + 3
-                goto CONTINUE
-            else
-                skipUnknownSymbol '%,%)%.'
-                goto CONTINUE
+        if token == '...' then
+            if lastSep == false then
+                missSymbol ','
             end
+            lastSep = false
+            if not params then
+                params = {}
+            end
+            params[#params+1] = {
+                type   = '...',
+                start  = getPosition(Tokens[Index], 'left'),
+                finish = getPosition(Tokens[Index] + 2, 'right'),
+                parent = params,
+            }
+            Index = Index + 2
+            goto CONTINUE
         end
-        local word, wstart, wfinish, woffset = peekWord()
-        if word then
+        do
             if lastSep == false then
                 missSymbol ','
             end
@@ -1542,27 +1536,23 @@ local function parseParams(params)
                 params = {}
             end
             params[#params+1] = createLocal {
-                start  = wstart,
-                finish = wfinish,
+                start  = getPosition(Tokens[Index], 'left'),
+                finish = getPosition(Tokens[Index] + #token - 1, 'right'),
                 parent = params,
-                [1]    = word,
+                [1]    = token,
             }
-            LuaOffset = woffset
-            goto CONTINUE
-        else
-            skipUnknownSymbol '%,%)%.'
+            Index = Index + 2
             goto CONTINUE
         end
+        skipUnknownSymbol '%,%)%.'
         ::CONTINUE::
     end
     return params
 end
 
 local function parseFunction(isLocal)
-    local word, funcLeft, funcRight, newOffset = peekWord()
-    if word ~= 'function' then
-        return nil
-    end
+    local funcLeft  = getPosition(Tokens[Index], 'left')
+    local funcRight = getPosition(Tokens[Index] + 7, 'right')
     local func = {
         type    = 'function',
         start   = funcLeft,
@@ -1572,10 +1562,10 @@ local function parseFunction(isLocal)
             [2] = funcRight,
         },
     }
-    LuaOffset = newOffset
+    Index = Index + 2
     skipSpace()
     local name
-    if peekChar() ~= '(' then
+    if Tokens[Index + 1] ~= '(' then
         name = parseName()
         if not name then
             return func
@@ -1588,13 +1578,13 @@ local function parseFunction(isLocal)
         func.name   = name
         func.finish = name.finish
         skipSpace()
-        if peekChar() ~= '(' then
+        if Tokens[Index + 1] ~= '(' then
             missSymbol ')'
             return func
         end
     end
-    local parenLeft = getPosition(LuaOffset, 'left')
-    LuaOffset = LuaOffset + 1
+    local parenLeft = getPosition(Tokens[Index], 'left')
+    Index = Index + 2
     pushChunk(func)
     local params
     if func.name and func.name.type == 'getmethod' then
@@ -1620,28 +1610,27 @@ local function parseFunction(isLocal)
         func.finish   = params.finish
     end
     skipSpace()
-    if peekChar() == ')' then
-        local parenRight = getPosition(LuaOffset, 'right')
+    if Tokens[Index + 1] == ')' then
+        local parenRight = getPosition(Tokens[Index], 'right')
         func.finish = parenRight
         if params then
             params.finish = parenRight
         end
-        LuaOffset = LuaOffset + 1
+        Index = Index + 2
         skipSpace()
     else
-        func.finish = NonSpacePosition
         if params then
-            params.finish = NonSpacePosition
+            params.finish = func.finish
         end
         missSymbol ')'
     end
     parseActions()
-    local endWord, endLeft, endRight, endOffset = peekWord()
-    if endWord == 'end' then
+    if Tokens[Index + 1] == 'end' then
+        local endLeft   = getPosition(Tokens[Index], 'left')
+        local endRight  = getPosition(Tokens[Index] + 2, 'right')
         func.keyword[3] = endLeft
         func.keyword[4] = endRight
         func.finish     = endRight
-        LuaOffset       = endOffset
     else
         missSymbol 'end'
     end
@@ -2579,48 +2568,47 @@ local function parseBreak()
 end
 
 function parseAction()
-    local char = peekChar()
+    local token = Tokens[Index + 1]
 
-    if char == ':' then
+    if token == ':' then
         return parseLabel()
     end
 
-    local word = peekWord()
-    if word == 'local' then
+    if token == 'local' then
         return parseLocal()
     end
 
-    if word == 'if'
-    or word == 'elseif'
-    or word == 'else' then
+    if token == 'if'
+    or token == 'elseif'
+    or token == 'else' then
         return parseIf()
     end
 
-    if word == 'for' then
+    if token == 'for' then
         return parseFor()
     end
 
-    if word == 'do' then
+    if token == 'do' then
         return parseDo()
     end
 
-    if word == 'return' then
+    if token == 'return' then
         return parseReturn()
     end
 
-    if word == 'break' then
+    if token == 'break' then
         return parseBreak()
     end
 
-    if word == 'while' then
+    if token == 'while' then
         return parseWhile()
     end
 
-    if word == 'repeat' then
+    if token == 'repeat' then
         return parseRepeat()
     end
 
-    if word == 'goto' then
+    if token == 'goto' then
         return parseGoTo()
     end
 
