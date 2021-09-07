@@ -290,6 +290,7 @@ local function unknownSymbol(start, finish, symbol)
 end
 
 local function skipUnknownSymbol(stopSymbol)
+    do return end
     local symbol, sstart, sfinish, newOffset = peekWord()
     if not newOffset then
         local pattern = '^([^ \t\r\n' .. (stopSymbol or '') .. ']*)'
@@ -687,6 +688,7 @@ local function parseShortString()
             finishPos   = getPosition(Tokens[Index], 'right')
             stringIndex = stringIndex + 1
             stringPool[stringIndex] = ssub(Lua, currentOffset, Tokens[Index] - 1)
+            Index = Index + 2
             break
         end
         if not token then
@@ -781,7 +783,7 @@ local function parseShortString()
 end
 
 local function parseString()
-    local c = Tokens[Index+1]
+    local c = Tokens[Index + 1]
     if CharMapStrSH[c] then
         return parseShortString()
     end
@@ -1081,26 +1083,23 @@ local function parseExpList(stop)
 end
 
 local function parseIndex()
-    if peekChar() ~= '[' then
-        return nil
-    end
-    local bstart = getPosition(LuaOffset, 'left')
-    LuaOffset = LuaOffset + 1
+    local bstart = getPosition(Tokens[Index], 'left')
+    Index = Index + 2
     skipSpace()
     local exp = parseExp()
     local index = {
         type   = 'index',
         start  = bstart,
-        finish = getPosition(LuaOffset - 1, 'right'),
+        finish = exp and exp.finish or (bstart + 1),
         index  = exp
     }
     if exp then
         exp.parent = index
     end
     skipSpace()
-    if peekChar() == ']' then
-        index.finish = getPosition(LuaOffset, 'right')
-        LuaOffset = LuaOffset + 1
+    if Tokens[Index + 1] == ']' then
+        index.finish = getPosition(Tokens[Index], 'right')
+        Index = Index + 2
     else
         missSymbol ']'
     end
@@ -1108,27 +1107,25 @@ local function parseIndex()
 end
 
 local function parseTable()
-    if peekChar() ~= '{' then
-        return nil
-    end
     local tbl = {
         type   = 'table',
-        start  = getPosition(LuaOffset, 'left'),
+        start  = getPosition(Tokens[Index], 'left'),
+        finish = getPosition(Tokens[Index], 'right'),
     }
-    LuaOffset = LuaOffset + 1
+    Index = Index + 2
     local index = 0
     while true do
         skipSpace()
-        local nextChar = peekChar()
-        if nextChar == '}' then
-            LuaOffset = LuaOffset + 1
+        local token = Tokens[Index + 1]
+        if token == '}' then
+            Index = Index + 2
             break
         end
-        if CharMapTSep[nextChar] then
-            LuaOffset = LuaOffset + 1
+        if CharMapTSep[token] then
+            Index = Index + 2
             goto CONTINUE
         end
-        if nextChar == '[' then
+        if token == '[' then
             index = index + 1
             local tindex = parseIndex()
             skipSpace()
@@ -1198,7 +1195,7 @@ local function parseTable()
         break
         ::CONTINUE::
     end
-    tbl.finish = getPosition(LuaOffset - 1, 'right')
+    tbl.finish = getPosition(Tokens[Index - 2], 'right')
     return tbl
 end
 
@@ -1379,16 +1376,13 @@ local function parseSimple(node, enableCall)
 end
 
 local function parseVarargs()
-    if ssub(Lua, LuaOffset, LuaOffset + 2) == '...' then
-        local varargs = {
-            type   = 'varargs',
-            start  = getPosition(LuaOffset, 'left'),
-            finish = getPosition(LuaOffset + 2, 'right'),
-        }
-        LuaOffset = LuaOffset + 3
-        return varargs
-    end
-    return nil
+    local varargs = {
+        type   = 'varargs',
+        start  = getPosition(Tokens[Index], 'left'),
+        finish = getPosition(Tokens[Index] + 2, 'right'),
+    }
+    Index = Index + 2
+    return varargs
 end
 
 local function parseParen()
@@ -1662,6 +1656,31 @@ local function parseExpUnit()
         return parseSimple(paren, true)
     end
 
+    if token == '...' then
+        local varargs = parseVarargs()
+        return varargs
+    end
+
+    if token == '{' then
+        local table = parseTable()
+        return table
+    end
+
+    if CharMapStrSH[token] then
+        local string = parseShortString()
+        return string
+    end
+
+    if CharMapStrLH[token] then
+        local string = parseLongString()
+        return string
+    end
+
+    local number = parseNumber()
+    if number then
+        return number
+    end
+
     if ChunkFinishMap[token] then
         return nil
     end
@@ -1684,32 +1703,12 @@ local function parseExpUnit()
         return parseSimple(resolveName(node), true)
     end
 
-    --local varargs = parseVarargs()
-    --if varargs then
-    --    return varargs
-    --end
---
-    --local table = parseTable()
-    --if table then
-    --    return table
-    --end
---
-    --local string = parseString()
-    --if string then
-    --    return string
-    --end
---
-    --local number = parseNumber()
-    --if number then
-    --    return number
-    --end
-
     return nil
 end
 
 local function parseUnaryOP(level)
-    local token = Tokens[Index + 1]
-    local symbol = UnaryAlias[token] or UnarySymbol[token]
+    local token  = Tokens[Index + 1]
+    local symbol = UnarySymbol[token] and token or UnaryAlias[token]
     if not symbol then
         return nil
     end
@@ -1726,28 +1725,10 @@ local function parseUnaryOP(level)
     return op, myLevel
 end
 
-local function getBinaryOP(char)
-    local char2 = ssub(Lua, LuaOffset, LuaOffset + 1)
-    if BinarySymbol[char2] then
-        return BinaryAlias[char2] or char2
-    end
-    if BinarySymbol[char] then
-        return char
-    end
-    local word = peekWord()
-    if BinarySymbol[word] then
-        return word
-    end
-    return nil
-end
-
 ---@param level integer # op level must greater than this level
 local function parseBinaryOP(level)
-    local char = peekChar()
-    if not CharMapSB[char] then
-        return nil
-    end
-    local symbol = getBinaryOP(char)
+    local token  = Tokens[Index + 1]
+    local symbol = BinarySymbol[token] and token or BinaryAlias[token]
     if not symbol then
         return nil
     end
@@ -1757,10 +1738,10 @@ local function parseBinaryOP(level)
     end
     local op = {
         type   = symbol,
-        start  = getPosition(LuaOffset, 'left'),
-        finish = getPosition(LuaOffset + #symbol - 1, 'right'),
+        start  = getPosition(Tokens[Index], 'left'),
+        finish = getPosition(Tokens[Index] + #symbol - 1, 'right'),
     }
-    LuaOffset = LuaOffset + #symbol
+    Index = Index + 2
     return op, myLevel
 end
 
