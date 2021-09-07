@@ -214,9 +214,6 @@ end
 
 local CachedChar, CachedCharOffset
 local function peekChar(offset)
-    if not offset then
-        offset = LuaOffset
-    end
     if CachedCharOffset ~= offset then
         CachedCharOffset = offset
         CachedChar = ssub(Lua, offset, offset)
@@ -698,8 +695,8 @@ local function parseShortString()
             stringIndex = stringIndex + 1
             stringPool[stringIndex] = ssub(Lua, currentOffset, Tokens[Index] - 1)
             currentOffset = Tokens[Index]
-            -- has space?
             Index = Index + 2
+            -- has space?
             if Tokens[Index] - currentOffset > 1 then
                 goto CONTINUE
             end
@@ -769,73 +766,6 @@ local function parseShortString()
                 goto CONTINUE
             end
         end
-        --[[
-        if     char == '\\' then
-            local nextChar = peekChar(offset + 1)
-            if EscMap[nextChar] then
-                LuaOffset = offset + 2
-                stringPool[stringIndex] = EscMap[nextChar]
-                stringIndex = stringIndex + 1
-            elseif nextChar == mark then
-                LuaOffset = offset + 2
-                stringPool[stringIndex] = nextChar
-                stringIndex = stringIndex + 1
-            elseif nextChar == 'z' then
-                LuaOffset = offset + 2
-                skipSpace()
-            elseif CharMapNumber[nextChar] then
-                local numbers = smatch(Lua, '^%d+', offset + 1)
-                if #numbers > 3 then
-                    numbers = ssub(numbers, 1, 3)
-                end
-                LuaOffset = offset + #numbers + 1
-                local byte = tointeger(numbers)
-                if byte <= 255 then
-                    stringPool[stringIndex] = schar(byte)
-                    stringIndex = stringIndex + 1
-                else
-                    -- TODO pushError
-                end
-            elseif nextChar == 'x' then
-                local x16 = ssub(Lua, offset + 2, offset + 3)
-                local byte = tonumber(x16, 16)
-                if byte then
-                    stringPool[stringIndex] = schar(byte)
-                    stringIndex = stringIndex + 1
-                    LuaOffset = LuaOffset + 4
-                else
-                    pushError {
-                        type   = 'MISS_ESC_X',
-                        start  = getPosition(LuaOffset, 'left'),
-                        finish = getPosition(LuaOffset + 1, 'right'),
-                    }
-                    LuaOffset = LuaOffset + 2
-                end
-            elseif nextChar == 'u' then
-                LuaOffset = offset + 2
-                local str = parseStringUnicode()
-                if str then
-                    stringPool[stringIndex] = str
-                    stringIndex = stringIndex + 1
-                end
-            else
-                LuaOffset = offset + 2
-            end
-        elseif char == mark then
-            stringResult = tconcat(stringPool, '', 1, stringIndex - 1)
-            LuaOffset = offset + 1
-            break
-        end
-        offset, _, char = sfind(Lua, pattern, LuaOffset)
-        if not char
-        or CharMapNL[char] then
-            stringPool[stringIndex] = ssub(Lua, LuaOffset)
-            stringResult = tconcat(stringPool, '', 1, stringIndex)
-            LuaOffset = offset + 1
-            missSymbol(mark, getPosition(offset - 1, 'right'))
-            break
-        end
-        ]]
         Index = Index + 2
         ::CONTINUE::
     end
@@ -860,71 +790,71 @@ local function parseString()
     return nil
 end
 
-local function parseNumber10(offset)
-    local integerPart = smatch(Lua, '^%d*', offset)
-    LuaOffset = offset + #integerPart
+local function parseNumber10(start)
+    local integerPart = smatch(Lua, '^%d*', start)
+    local offset = start + #integerPart
     -- float part
-    if peekChar(LuaOffset) == '.' then
-        local floatPart = smatch(Lua, '^%d*', LuaOffset + 1)
-        LuaOffset = LuaOffset + #floatPart + 1
+    if peekChar(offset) == '.' then
+        local floatPart = smatch(Lua, '^%d*', offset + 1)
+        offset = offset + #floatPart + 1
     end
     -- exp part
-    local echar = peekChar(LuaOffset)
+    local echar = peekChar(offset)
     if CharMapE10[echar] then
-        LuaOffset = LuaOffset + 1
-        local nextChar = peekChar(LuaOffset)
+        offset = offset + 1
+        local nextChar = peekChar(offset)
         if CharMapSign[nextChar] then
-            LuaOffset = LuaOffset + 1
+            offset = offset + 1
         end
-        local exp = smatch(Lua, '^%d*', LuaOffset)
-        LuaOffset = LuaOffset + #exp
+        local exp = smatch(Lua, '^%d*', offset)
+        offset = offset + #exp
     end
-    return tonumber(ssub(Lua, offset, LuaOffset - 1))
+    return tonumber(ssub(Lua, start, offset - 1)), offset
 end
 
-local function parseNumber16(offset)
-    local integerPart = smatch(Lua, '^[%da-fA-F]*', offset)
-    LuaOffset = offset + #integerPart
+local function parseNumber16(start)
+    local integerPart = smatch(Lua, '^[%da-fA-F]*', start)
+    local offset = start + #integerPart
     -- float part
-    if peekChar(LuaOffset) == '.' then
-        local floatPart = smatch(Lua, '^[%da-fA-F]*', LuaOffset + 1)
-        LuaOffset = LuaOffset + #floatPart + 1
+    if peekChar(offset) == '.' then
+        local floatPart = smatch(Lua, '^[%da-fA-F]*', offset + 1)
+        offset = offset + #floatPart + 1
     end
     -- exp part
-    local echar = peekChar(LuaOffset)
+    local echar = peekChar(offset)
     if CharMapE16[echar] then
-        LuaOffset = LuaOffset + 1
-        local nextChar = peekChar(LuaOffset)
+        offset = offset + 1
+        local nextChar = peekChar(offset)
         if CharMapSign[nextChar] then
-            LuaOffset = LuaOffset + 1
+            offset = offset + 1
         end
-        local exp = smatch(Lua, '^%d*', LuaOffset)
-        LuaOffset = LuaOffset + #exp
+        local exp = smatch(Lua, '^%d*', offset)
+        offset = offset + #exp
     end
-    return tonumber(ssub(Lua, offset - 2, LuaOffset - 1))
+    return tonumber(ssub(Lua, start - 2, offset - 1)), offset
 end
 
-local function parseNumber2(offset)
-    local bins = smatch(Lua, '^[01]*', offset)
-    LuaOffset = offset + #bins
-    return tonumber(bins, 2)
+local function parseNumber2(start)
+    local bins = smatch(Lua, '^[01]*', start)
+    local offset = start + #bins
+    return tonumber(bins, 2), offset
 end
 
-local function dropNumberTail()
-    local _, finish, word = sfind(Lua, '^([%.%w_\x80-\xff]+)', LuaOffset)
+local function dropNumberTail(offset)
+    local _, finish, word = sfind(Lua, '^([%.%w_\x80-\xff]+)', offset)
     if not finish then
-        return
+        return offset
     end
     unknownSymbol(
-        getPosition(LuaOffset, 'left'),
-        getPosition(LuaOffset, 'right'),
+        getPosition(offset, 'left'),
+        getPosition(offset, 'right'),
         word
     )
-    LuaOffset = finish + 1
+    return finish + 1
 end
 
 local function parseNumber()
-    local offset = LuaOffset
+    local offset = Tokens[Index]
     local startPos = getPosition(offset, 'left')
     local neg
     if peekChar(offset) == '-' then
@@ -934,18 +864,18 @@ local function parseNumber()
     local number
     local firstChar = peekChar(offset)
     if     firstChar == '.' then
-        number = parseNumber10(offset)
+        number, offset = parseNumber10(offset)
     elseif firstChar == '0' then
         local nextChar = peekChar(offset + 1)
         if CharMapN16[nextChar] then
-            number = parseNumber16(offset + 2)
+            number, offset = parseNumber16(offset + 2)
         elseif CharMapN2[nextChar] then
-            number = parseNumber2(offset + 2)
+            number, offset = parseNumber2(offset + 2)
         else
-            number = parseNumber10(offset)
+            number, offset = parseNumber10(offset)
         end
     elseif CharMapNumber[firstChar] then
-        number = parseNumber10(offset)
+        number, offset = parseNumber10(offset)
     else
         return nil
     end
@@ -958,10 +888,11 @@ local function parseNumber()
     local result = {
         type   = mtype(number) == 'integer' and 'integer' or 'number',
         start  = startPos,
-        finish = getPosition(LuaOffset - 1, 'right'),
+        finish = getPosition(offset - 1, 'right'),
         [1]    = number,
     }
-    dropNumberTail()
+    offset = dropNumberTail(offset)
+    fastwardToken(offset)
     return result
 end
 
