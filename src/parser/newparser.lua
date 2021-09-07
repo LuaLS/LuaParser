@@ -433,6 +433,7 @@ local function skipComment()
 end
 
 local function skipSpace()
+    do return end
     if LuaOffset == lastSkipSpaceOffset then
         return
     end
@@ -543,15 +544,15 @@ local function popChunk()
 end
 
 local function parseNil()
-    local word, start, finish, newOffset = peekWord()
-    if word ~= 'nil' then
+    if Tokens[Index + 1] ~= 'nil' then
         return nil
     end
-    LuaOffset = newOffset
+    local offset = Tokens[Index]
+    Index = Index + 2
     return {
         type   = 'nil',
-        start  = start,
-        finish = finish,
+        start  = getPosition(offset, 'left'),
+        finish = getPosition(offset + 2, 'right'),
     }
 end
 
@@ -897,11 +898,10 @@ local function parseNumber()
 end
 
 local function parseName()
-    local word, startPos, finishPos, newOffset = peekWord()
-    if not word then
-        return nil
-    end
-    LuaOffset = newOffset
+    local word      = Tokens[Index + 1]
+    local startPos  = getPosition(Tokens[Index], 'left')
+    local finishPos = getPosition(Tokens[Index] + #word - 1, 'right')
+    Index = Index + 2
     if not State.options.unicodeName and word:find '[\x80-\xff]' then
         pushError {
             type   = 'UNICODE_NAME',
@@ -1018,22 +1018,22 @@ end
 
 local function parseExpList(stop)
     local list
-    local lastSepPos = LuaOffset
+    local lastSepPos = Tokens[Index]
     while true do
         skipSpace()
-        local char = peekChar()
-        if not char then
+        local token = Tokens[Index + 1]
+        if not token then
             break
         end
-        if char == stop then
+        if token == stop then
             break
         end
-        if char == ',' then
-            local sepPos = getPosition(LuaOffset, 'right')
+        if token == ',' then
+            local sepPos = getPosition(Tokens[Index], 'right')
             if lastSepPos then
                 pushError {
                     type   = 'UNEXPECT_SYMBOL',
-                    start  = getPosition(LuaOffset, 'left'),
+                    start  = getPosition(Tokens[Index], 'left'),
                     finish = sepPos,
                     info = {
                         symbol = ',',
@@ -1041,7 +1041,7 @@ local function parseExpList(stop)
                 }
             end
             lastSepPos = sepPos
-            LuaOffset = LuaOffset + 1
+            Index = Index + 2
             goto CONTINUE
         else
             if not lastSepPos then
@@ -1052,7 +1052,7 @@ local function parseExpList(stop)
                 break
             end
             if stop then
-                dropTail()
+                --dropTail()
             end
             lastSepPos = nil
             if not list then
@@ -1205,23 +1205,20 @@ end
 local function parseSimple(node, enableCall)
     while true do
         skipSpace()
-        local nextChar = peekChar()
-        if not CharMapSimple[nextChar] then
-            break
-        end
-        if nextChar == '.' then
+        local token = Tokens[Index + 1]
+        if token == '.' then
             local dot = {
-                type   = nextChar,
-                start  = getPosition(LuaOffset, 'left'),
-                finish = getPosition(LuaOffset, 'right'),
+                type   = token,
+                start  = getPosition(Tokens[Index], 'left'),
+                finish = getPosition(Tokens[Index], 'right'),
             }
-            LuaOffset = LuaOffset + 1
+            Index = Index + 2
             skipSpace()
             local field = parseName()
             local getfield = {
                 type   = 'getfield',
                 start  = node.start,
-                finish = getPosition(LuaOffset - 1, 'right'),
+                finish = field.finish,
                 node   = node,
                 dot    = dot,
                 field  = field
@@ -1232,21 +1229,21 @@ local function parseSimple(node, enableCall)
             end
             node.next = getfield
             node = getfield
-        elseif nextChar == ':' then
+        elseif token == ':' then
             local colon = {
-                type   = nextChar,
-                start  = getPosition(LuaOffset, 'left'),
-                finish = getPosition(LuaOffset, 'right'),
+                type   = token,
+                start  = getPosition(Tokens[Index], 'left'),
+                finish = getPosition(Tokens[Index], 'right'),
             }
-            LuaOffset = LuaOffset + 1
+            Index = Index + 2
             skipSpace()
             local method = parseName()
             local getmethod = {
                 type   = 'getmethod',
                 start  = node.start,
-                finish = getPosition(LuaOffset - 1, 'right'),
+                finish = method.finish,
                 node   = node,
-                colon   = colon,
+                colon  = colon,
                 method = method
             }
             if method then
@@ -1255,31 +1252,31 @@ local function parseSimple(node, enableCall)
             end
             node.next = getmethod
             node = getmethod
-        elseif nextChar == '(' then
+        elseif token == '(' then
             if not enableCall then
                 break
             end
-            local startPos = getPosition(LuaOffset, 'left')
+            local startPos = getPosition(Tokens[Index], 'left')
             local call = {
                 type   = 'call',
                 start  = node.start,
                 node   = node,
             }
-            LuaOffset = LuaOffset + 1
+            Index = Index + 2
             local args = parseExpList(')')
-            if peekChar(LuaOffset) == ')' then
-                LuaOffset = LuaOffset + 1
+            if Tokens[Index + 1] == ')' then
+                call.finish = getPosition(Tokens[Index], 'right')
+                Index = Index + 2
             else
                 missSymbol ')'
             end
             if args then
                 args.type   = 'callargs'
                 args.start  = startPos
-                args.finish = getPosition(LuaOffset - 1, 'right')
+                args.finish = call.finish
                 args.parent = call
                 call.args   = args
             end
-            call.finish = getPosition(LuaOffset - 1, 'right')
             if node.type == 'getmethod' then
                 -- dummy param `self`
                 if not call.args then
@@ -1301,7 +1298,7 @@ local function parseSimple(node, enableCall)
                 tinsert(call.args, 1, newNode)
             end
             node = call
-        elseif nextChar == '{' then
+        elseif token == '{' then
             if not enableCall then
                 break
             end
@@ -1322,7 +1319,7 @@ local function parseSimple(node, enableCall)
             call.args  = args
             str.parent = args
             return call
-        elseif CharMapStrSH[nextChar] then
+        elseif CharMapStrSH[token] then
             if not enableCall then
                 break
             end
@@ -1343,7 +1340,7 @@ local function parseSimple(node, enableCall)
             call.args  = args
             str.parent = args
             return call
-        elseif CharMapStrLH[nextChar] then
+        elseif CharMapStrLH[token] then
             local str = parseLongString()
             if str then
                 if not enableCall then
@@ -1395,17 +1392,13 @@ local function parseVarargs()
 end
 
 local function parseParen()
-    local firstChar = peekChar()
-    if firstChar ~= '(' then
-        return
-    end
-    local pl = LuaOffset
+    local pl = Tokens[Index]
     local paren = {
         type   = 'paren',
         start  = getPosition(pl, 'left'),
         finish = getPosition(pl, 'right')
     }
-    LuaOffset = LuaOffset + 1
+    Index = Index + 2
     skipSpace()
     local exp = parseExp()
     if exp then
@@ -1416,9 +1409,9 @@ local function parseParen()
         missExp()
     end
     skipSpace()
-    if peekChar() == ')' then
-        paren.finish = getPosition(LuaOffset, 'right')
-        LuaOffset = LuaOffset + 1
+    if Tokens[Index + 1] == ')' then
+        paren.finish = getPosition(Tokens[Index], 'right')
+        Index = Index + 2
     else
         missSymbol ')'
     end
@@ -1663,70 +1656,60 @@ local function parseFunction(isLocal)
 end
 
 local function parseExpUnit()
-    local paren = parseParen()
-    if paren then
+    local token = Tokens[Index + 1]
+    if token == '(' then
+        local paren = parseParen()
         return parseSimple(paren, true)
     end
 
-    local varargs = parseVarargs()
-    if varargs then
-        return varargs
+    if ChunkFinishMap[token] then
+        return nil
     end
 
-    local table = parseTable()
-    if table then
-        return table
+    if token == 'nil' then
+        return parseNil()
     end
 
-    local string = parseString()
-    if string then
-        return string
+    if token == 'true'
+    or token == 'false' then
+        return parseBoolean()
     end
 
-    local number = parseNumber()
-    if number then
-        return number
+    if token == 'function' then
+        return parseFunction()
     end
 
-    local word = peekWord()
-    if word then
-        if ChunkFinishMap[word] then
-            return nil
-        end
-        if word == 'nil' then
-            return parseNil()
-        end
-        if word == 'true'
-        or word == 'false' then
-            return parseBoolean()
-        end
-        if word == 'function' then
-            return parseFunction()
-        end
-        local node = parseName()
+    local node = parseName()
+    if node then
         return parseSimple(resolveName(node), true)
     end
 
-    return nil
-end
+    --local varargs = parseVarargs()
+    --if varargs then
+    --    return varargs
+    --end
+--
+    --local table = parseTable()
+    --if table then
+    --    return table
+    --end
+--
+    --local string = parseString()
+    --if string then
+    --    return string
+    --end
+--
+    --local number = parseNumber()
+    --if number then
+    --    return number
+    --end
 
-local function getUnaryOP(char)
-    if UnarySymbol[char] then
-        return UnaryAlias[char] or char
-    end
-    local word = peekWord()
-    if UnarySymbol[word] then
-        return word
-    end
     return nil
 end
 
 local function parseUnaryOP(level)
-    local char = peekChar()
-    if not CharMapSU[char] then
-        return nil
-    end
-    local symbol = getUnaryOP(char)
+    local token = Tokens[Index + 1]
+    local symbol = UnaryAlias[token] or UnarySymbol[token]
     if not symbol then
         return nil
     end
@@ -1736,10 +1719,10 @@ local function parseUnaryOP(level)
     end
     local op = {
         type   = symbol,
-        start  = getPosition(LuaOffset, 'left'),
-        finish = getPosition(LuaOffset + #symbol - 1, 'right'),
+        start  = getPosition(Tokens[Index], 'left'),
+        finish = getPosition(Tokens[Index] + #symbol - 1, 'right'),
     }
-    LuaOffset = LuaOffset + #symbol
+    Index = Index + 2
     return op, myLevel
 end
 
