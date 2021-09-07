@@ -576,28 +576,30 @@ local function parseBoolean()
 end
 
 local function parseStringUnicode()
-    if peekChar() ~= '{' then
-        local pos  = getPosition(LuaOffset, 'left')
+    local offset = Tokens[Index] + 1
+    if ssub(Lua, offset, offset) ~= '{' then
+        local pos  = getPosition(offset, 'left')
         missSymbol('{', pos)
-        return nil
+        return nil, offset
     end
-    local leftPos  = getPosition(LuaOffset - 1, 'right')
-    local x16 = smatch(Lua, '^%w*', LuaOffset + 1)
-    local rightPos = getPosition(LuaOffset + #x16, 'right')
-    LuaOffset = LuaOffset + #x16 + 1
+    local leftPos  = getPosition(offset, 'left')
+    local x16      = smatch(Lua, '^%w*', offset + 1)
+    local rightPos = getPosition(offset + #x16, 'right')
+    offset = offset + #x16 + 1
     if peekChar() == '}' then
-        LuaOffset = LuaOffset + 1
-        rightPos  = rightPos + 1
+        offset   = offset + 1
+        rightPos = rightPos + 1
     else
         missSymbol('}', rightPos)
     end
+    offset = offset + 1
     if #x16 == 0 then
         pushError {
             type   = 'UTF8_SMALL',
             start  = leftPos,
             finish = rightPos,
         }
-        return ''
+        return '', offset
     end
     if  State.version ~= 'Lua 5.3'
     and State.version ~= 'Lua 5.4'
@@ -612,7 +614,7 @@ local function parseStringUnicode()
                 version = State.version,
             }
         }
-        return nil
+        return nil, offset
     end
     local byte = tonumber(x16, 16)
     if not byte then
@@ -625,7 +627,7 @@ local function parseStringUnicode()
                 }
             end
         end
-        return nil
+        return nil, offset
     end
     if State.version == 'Lua 5.4' then
         if byte < 0 or byte > 0x7FFFFFFF then
@@ -638,7 +640,7 @@ local function parseStringUnicode()
                     max = '7FFFFFFF',
                 }
             }
-            return nil
+            return nil, offset
         end
     else
         if byte < 0 or byte > 0x10FFFF then
@@ -655,9 +657,9 @@ local function parseStringUnicode()
         end
     end
     if byte >= 0 and byte <= 0x10FFFF then
-        return uchar(byte)
+        return uchar(byte), offset
     end
-    return ''
+    return '', offset
 end
 
 local stringPool = {}
@@ -687,6 +689,9 @@ local function parseShortString()
             finishPos   = getPosition(Tokens[Index], 'right')
             stringIndex = stringIndex + 1
             stringPool[stringIndex] = ssub(Lua, currentOffset, Tokens[Index] - 1)
+            break
+        end
+        if not token then
             break
         end
         if token == '\\' then
@@ -733,6 +738,34 @@ local function parseShortString()
                 else
                     -- TODO pushError
                 end
+                goto CONTINUE
+            end
+            if nextChar == 'x' then
+                local x16 = ssub(Tokens[Index + 1], 2, 3)
+                local byte = tonumber(x16, 16)
+                if byte then
+                    currentOffset = Tokens[Index] + 3
+                    stringIndex = stringIndex + 1
+                    stringPool[stringIndex] = schar(byte)
+                else
+                    currentOffset = Tokens[Index] + 1
+                    pushError {
+                        type   = 'MISS_ESC_X',
+                        start  = getPosition(currentOffset + 1, 'left'),
+                        finish = getPosition(currentOffset + 2, 'right'),
+                    }
+                end
+                Index = Index + 2
+                goto CONTINUE
+            end
+            if nextChar == 'u' then
+                local str, newOffset = parseStringUnicode()
+                if str then
+                    stringIndex = stringIndex + 1
+                    stringPool[stringIndex] = str
+                end
+                currentOffset = newOffset
+                fastwardToken(currentOffset)
                 goto CONTINUE
             end
         end
