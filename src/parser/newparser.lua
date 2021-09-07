@@ -251,11 +251,15 @@ local function peekWord()
     return word, startPos, finishPos, finish + 1
 end
 
+local function lastRightPosition()
+    return getPosition(Tokens[Index - 2] + #Tokens[Index - 1] - 1, 'right')
+end
+
 local function missSymbol(symbol, pos)
     pushError {
         type   = 'MISS_SYMBOL',
-        start  = pos or NonSpacePosition,
-        finish = pos or NonSpacePosition,
+        start  = pos or lastRightPosition(),
+        finish = pos or lastRightPosition(),
         info = {
             symbol = symbol,
         }
@@ -265,16 +269,16 @@ end
 local function missExp()
     pushError {
         type   = 'MISS_EXP',
-        start  = NonSpacePosition,
-        finish = NonSpacePosition,
+        start  = lastRightPosition(),
+        finish = lastRightPosition(),
     }
 end
 
 local function missName(pos)
     pushError {
         type   = 'MISS_NAME',
-        start  = pos or NonSpacePosition,
-        finish = pos or NonSpacePosition,
+        start  = pos or lastRightPosition(),
+        finish = pos or lastRightPosition(),
     }
 end
 
@@ -459,15 +463,12 @@ local function skipSpace()
 end
 
 local function expectAssign()
-    if peekChar() ~= '=' then
-        return false
+    local token = Tokens[Index + 1]
+    if token == '=' then
+        Index = Index + 2
+        return true
     end
-    LuaOffset = LuaOffset + 1
-    if peekChar() == '=' then
-        -- TODO
-        LuaOffset = LuaOffset + 1
-    end
-    return true
+    return false
 end
 
 local function parseLocalAttrs()
@@ -1130,7 +1131,6 @@ local function parseTable()
             local tindex = parseIndex()
             skipSpace()
             if expectAssign() then
-                LuaOffset = LuaOffset + 1
                 skipSpace()
                 local ivalue = parseExp()
                 tindex.type   = 'tableindex'
@@ -1158,8 +1158,7 @@ local function parseTable()
             or exp.type == 'getglobal' then
                 skipSpace()
                 if expectAssign() then
-                    local eqRight = getPosition(LuaOffset, 'right')
-                    LuaOffset = LuaOffset + 1
+                    local eqRight = lastRightPosition()
                     skipSpace()
                     local fvalue = parseExp()
                     local tfield = {
