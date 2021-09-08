@@ -227,6 +227,9 @@ end
 ---@param offset integer
 ---@param leftOrRight '"left"'|'"right"'
 local function getPosition(offset, leftOrRight)
+    if not offset or offset > #Lua then
+        return LineMulti * Line + #Lua - LineOffset + 1
+    end
     if leftOrRight == 'left' then
         return LineMulti * Line + offset - LineOffset
     else
@@ -239,16 +242,16 @@ end
 ---@return parser.position finishPosition
 ---@return integer         newOffset
 local function peekWord()
-    local start, finish, word = sfind(Lua
-        , '^([%a_\x80-\xff][%w_\x80-\xff]*)'
-        , LuaOffset
-    )
-    if not finish then
+    local word = Tokens[Index + 1]
+    if not word then
         return nil
     end
-    local startPos  = getPosition(start , 'left')
-    local finishPos = getPosition(finish, 'right')
-    return word, startPos, finishPos, finish + 1
+    if not smatch(word, '^([%a_\x80-\xff][%w_\x80-\xff]*)') then
+        return nil
+    end
+    local startPos  = getPosition(Tokens[Index] , 'left')
+    local finishPos = getPosition(Tokens[Index] + #word - 1, 'right')
+    return word, startPos, finishPos
 end
 
 local function lastRightPosition()
@@ -438,6 +441,8 @@ local function skipComment()
 end
 
 local function skipSpace()
+    while skipNL() do
+    end
     do return end
     if LuaOffset == lastSkipSpaceOffset then
         return
@@ -475,8 +480,8 @@ local function parseLocalAttrs()
     local attrs
     while true do
         skipSpace()
-        local char = peekChar()
-        if char ~= '<' then
+        local token = Tokens[Index + 1]
+        if token ~= '<' then
             break
         end
         if not attrs then
@@ -484,25 +489,25 @@ local function parseLocalAttrs()
         end
         local attr = {
             type   = 'localattr',
-            start  = getPosition(LuaOffset, 'left'),
-            finish = getPosition(LuaOffset, 'right'),
+            start  = getPosition(Tokens[Index], 'left'),
+            finish = getPosition(Tokens[Index], 'right'),
         }
         attrs[#attrs+1] = attr
-        LuaOffset = LuaOffset + 1
+        Index = Index + 2
         skipSpace()
-        local word, wstart, wfinish, woffset = peekWord()
+        local word, wstart, wfinish = peekWord()
         if word then
             attr[1] = word
-            LuaOffset = woffset
             attr.finish = wfinish
+            Index = Index + 2
         else
             missName()
         end
-        attr.finish = getPosition(LuaOffset, 'right')
+        attr.finish = lastRightPosition()
         skipSpace()
-        if peekChar() == '>' then
-            attr.finish = getPosition(LuaOffset, 'right')
-            LuaOffset = LuaOffset + 1
+        if Tokens[Index + 1] == '>' then
+            attr.finish = getPosition(Tokens[Index], 'right')
+            Index = Index + 2
         else
             missSymbol '>'
         end
@@ -1792,9 +1797,9 @@ end
 local function skipSeps()
     while true do
         skipSpace()
-        if peekChar() == ',' then
+        if Tokens[Index + 1] == ',' then
             missExp()
-            LuaOffset = LuaOffset + 1
+            Index = Index + 2
         else
             break
         end
@@ -1811,10 +1816,10 @@ local function parseSetValues()
         return nil
     end
     skipSpace()
-    if peekChar() ~= ',' then
+    if Tokens[Index + 1] ~= ',' then
         return first
     end
-    LuaOffset = LuaOffset + 1
+    Index = Index + 2
     skipSeps()
     local second = parseExp()
     if not second then
@@ -1862,10 +1867,10 @@ end
 ---@return parser.guide.object   second
 ---@return parser.guide.object[] rest
 local function parseSetTails(parser, isLocal)
-    if peekChar() ~= ',' then
+    if Tokens[Index + 1] ~= ',' then
         return
     end
-    LuaOffset = LuaOffset + 1
+    Index = Index + 2
     skipSpace()
     local second = parser()
     if not second then
@@ -1877,10 +1882,10 @@ local function parseSetTails(parser, isLocal)
         second.effect = maxinteger
     end
     skipSpace()
-    if peekChar() ~= ',' then
+    if Tokens[Index + 1] ~= ',' then
         return second
     end
-    LuaOffset = LuaOffset + 1
+    Index = Index + 2
     skipSeps()
     local third = parser()
     if not third then
@@ -1894,10 +1899,10 @@ local function parseSetTails(parser, isLocal)
     local rest = { third }
     while true do
         skipSpace()
-        if peekChar() ~= ',' then
+        if Tokens[Index + 1] ~= ',' then
             return second, rest
         end
-        LuaOffset = LuaOffset + 1
+        Index = Index + 2
         skipSeps()
         local name = parser()
         if not name then
@@ -1914,7 +1919,7 @@ end
 
 local function bindValue(n, v, index, lastValue, isLocal, isSet)
     if isLocal then
-        n.effect = getPosition(LuaOffset, 'left')
+        n.effect = getPosition(Tokens[Index], 'left')
     elseif isSet then
         n.type = GetToSetMap[n.type] or n.type
     end
@@ -1948,13 +1953,13 @@ local function bindValue(n, v, index, lastValue, isLocal, isSet)
         n.range  = v.finish
         v.parent = n
         if isLocal then
-            n.effect = NonSpacePosition
+            n.effect = lastRightPosition()
         end
     end
 end
 
 local function parseSet(n1, parser, isLocal)
-    local n2, nrest     = parseSetTails(parser, isLocal)
+    local n2, nrest   = parseSetTails(parser, isLocal)
     skipSpace()
     local v1, v2, vrest
     local isSet
@@ -1997,7 +2002,6 @@ local function parseSet(n1, parser, isLocal)
 end
 
 local function compileExpAsAction(exp)
-
     if GetToSetMap[exp.type] then
         skipSpace()
         pushActionIntoCurrentChunk(exp)
@@ -2034,7 +2038,7 @@ local function compileExpAsAction(exp)
 end
 
 local function parseLocal()
-    LuaOffset = LuaOffset + 5
+    Index = Index + 2
     skipSpace()
     local word = peekWord()
     if not word then
@@ -2070,14 +2074,14 @@ local function parseLocal()
     pushActionIntoCurrentChunk(loc)
     skipSpace()
     parseSet(loc, parseName, true)
-    loc.effect = getPosition(LuaOffset, 'left')
+    loc.effect = getPosition(Tokens[Index], 'left')
 
     return loc
 end
 
 local function parseDo()
-    local doLeft  = getPosition(LuaOffset, 'left')
-    local doRight = getPosition(LuaOffset + 1, 'right')
+    local doLeft  = getPosition(Tokens[Index], 'left')
+    local doRight = getPosition(Tokens[Index] + 1, 'right')
     local obj = {
         type   = 'do',
         start  = doLeft,
@@ -2087,14 +2091,14 @@ local function parseDo()
             [2] = doRight,
         },
     }
-    LuaOffset = LuaOffset + 2
+    Index = Index + 2
     pushChunk(obj)
-    local word, wstart, wfinish, woffset = parseActions()
-    if word == 'end' then
-        obj.finish     = wfinish
-        obj.keyword[3] = wstart
-        obj.keyword[4] = wfinish
-        LuaOffset = woffset
+    parseActions()
+    if Tokens[Index + 1] == 'end' then
+        obj.finish     = getPosition(Tokens[Index] + 2, 'right')
+        obj.keyword[3] = getPosition(Tokens[Index], 'left')
+        obj.keyword[4] = getPosition(Tokens[Index] + 2, 'right')
+        Index = Index + 2
     end
     popChunk()
 
@@ -2104,9 +2108,9 @@ local function parseDo()
 end
 
 local function parseReturn()
-    local returnLeft  = getPosition(LuaOffset, 'left')
-    local returnRight = getPosition(LuaOffset + 5, 'right')
-    LuaOffset = LuaOffset + 6
+    local returnLeft  = getPosition(Tokens[Index], 'left')
+    local returnRight = getPosition(Tokens[Index] + 5, 'right')
+    Index = Index + 2
     skipSpace()
     local rtn = parseExpList()
     if rtn then
