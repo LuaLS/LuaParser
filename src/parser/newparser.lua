@@ -52,6 +52,7 @@ local CharMapSimple  = stringToCharMap '.:([\'"{'
 local CharMapStrSH   = stringToCharMap '\'"'
 local CharMapStrLH   = stringToCharMap '['
 local CharMapTSep    = stringToCharMap ',;'
+local CharMapWord    = stringToCharMap 'a-zA-Z\x80-\xff'
 
 local EscMap = {
     ['a'] = '\a',
@@ -115,14 +116,11 @@ local UnarySymbol = {
     ['#']   = 11,
     ['~']   = 11,
     ['-']   = 11,
-    ['!']   = 11,
 }
 
 local BinarySymbol = {
     ['or']  = 1,
-    ['||']  = 1,
     ['and'] = 2,
-    ['&&']  = 2,
     ['<=']  = 3,
     ['>=']  = 3,
     ['<']   = 3,
@@ -299,29 +297,21 @@ local function missName(pos)
     }
 end
 
-local function unknownSymbol(start, finish, symbol)
+local function unknownSymbol()
+    local token = Tokens[Index + 1]
     pushError {
         type   = 'UNKNOWN_SYMBOL',
-        start  = start,
-        finish = finish,
+        start  = getPosition(Tokens[Index], 'left'),
+        finish = getPosition(Tokens[Index] + #token - 1, 'right'),
         info   = {
-            symbol = symbol,
+            symbol = token,
         }
     }
 end
 
 local function skipUnknownSymbol(stopSymbol)
-    do return end
-    local symbol, sstart, sfinish, newOffset = peekWord()
-    if not newOffset then
-        local pattern = '^([^ \t\r\n' .. (stopSymbol or '') .. ']*)'
-        sstart, newOffset, symbol = sfind(Lua, pattern, LuaOffset)
-        sstart  = getPosition(sstart, 'left')
-        sfinish = getPosition(newOffset, 'right')
-        newOffset = newOffset + 1
-    end
-    LuaOffset = newOffset
-    unknownSymbol(sstart, sfinish, symbol)
+    unknownSymbol()
+    Index = Index + 2
 end
 
 local function skipNL()
@@ -904,7 +894,7 @@ local function parseNumber()
 end
 
 local function parseName()
-    local word      = Tokens[Index + 1]
+    local word = peekWord()
     if not word then
         return nil
     end
@@ -1600,6 +1590,7 @@ local function parseFunction(isLocal)
     if params then
         params.type   = 'funcargs'
         params.start  = parenLeft
+        params.finish = lastRightPosition()
         params.parent = func
         func.args     = params
         func.finish   = params.finish
@@ -1724,7 +1715,7 @@ local function parseBinaryOP(level)
     local op = {
         type   = symbol,
         start  = getPosition(Tokens[Index], 'left'),
-        finish = getPosition(Tokens[Index] + #symbol - 1, 'right'),
+        finish = getPosition(Tokens[Index] + #token - 1, 'right'),
     }
     Index = Index + 2
     return op, myLevel
