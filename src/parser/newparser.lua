@@ -13,6 +13,10 @@ local tointeger  = math.tointeger
 local mtype      = math.type
 local tonumber   = tonumber
 local maxinteger = math.maxinteger
+local assert     = assert
+local next       = next
+
+_ENV = nil
 
 ---@alias parser.position integer
 
@@ -216,18 +220,6 @@ local function addSpecial(name, obj)
     obj.special = name
 end
 
-local CachedChar, CachedCharOffset
-local function peekChar(offset)
-    if CachedCharOffset ~= offset then
-        CachedCharOffset = offset
-        CachedChar = ssub(Lua, offset, offset)
-        if CachedChar == '' then
-            CachedChar = nil
-        end
-    end
-    return CachedChar
-end
-
 ---@param offset integer
 ---@param leftOrRight '"left"'|'"right"'
 local function getPosition(offset, leftOrRight)
@@ -262,8 +254,7 @@ local function lastRightPosition()
     if Index < 2 then
         return 0
     end
-    if NLMap[Tokens[Index + 1]]
-    or NLMap[Tokens[Index - 1]] then
+    if NLMap[Tokens[Index - 1]] then
         return LastTokenFinish
     else
         return getPosition(Tokens[Index - 2] + #Tokens[Index - 1] - 1, 'right')
@@ -297,12 +288,12 @@ local function missName(pos)
     }
 end
 
-local function unknownSymbol()
-    local token = Tokens[Index + 1]
+local function unknownSymbol(start, finish, word)
+    local token = word or Tokens[Index + 1]
     pushError {
         type   = 'UNKNOWN_SYMBOL',
-        start  = getPosition(Tokens[Index], 'left'),
-        finish = getPosition(Tokens[Index] + #token - 1, 'right'),
+        start  = start  or getPosition(Tokens[Index], 'left'),
+        finish = finish or getPosition(Tokens[Index] + #token - 1, 'right'),
         info   = {
             symbol = token,
         }
@@ -328,7 +319,7 @@ local function skipNL()
     return false
 end
 
-local function fastwardToken(offset)
+local function fastForwardToken(offset)
     while true do
         local myOffset = Tokens[Index]
         if not myOffset
@@ -358,7 +349,7 @@ local function resolveLongString(finishMark)
         LineOffset = lastLN + start
         stringResult = result
     end
-    fastwardToken(finishOffset + #finishMark)
+    fastForwardToken(finishOffset + #finishMark)
     if miss then
         local estart, _, efinish = smatch(Lua, '()(%]%=*%])()[%c%s]*$')
         if estart then
@@ -408,7 +399,7 @@ local function parseLongString()
     if not mark then
         return nil
     end
-    fastwardToken(finish + 1)
+    fastForwardToken(finish + 1)
     local startPos     = getPosition(start, 'left')
     local finishMark   = sgsub(mark, '%[', ']')
     local stringResult, finishOffset = resolveLongString(finishMark)
@@ -429,6 +420,13 @@ local function skipComment()
         local longComment = parseLongString()
         if longComment then
             return true
+        end
+        while true do
+            Index = Index + 2
+            local nl = Tokens[Index + 1]
+            if not nl or NLMap[nl] then
+                break
+            end
         end
         return true
     end
@@ -568,7 +566,7 @@ local function parseStringUnicode()
     local x16      = smatch(Lua, '^%w*', offset + 1)
     local rightPos = getPosition(offset + #x16, 'right')
     offset = offset + #x16 + 1
-    if peekChar() == '}' then
+    if ssub(Lua, offset, offset) == '}' then
         offset   = offset + 1
         rightPos = rightPos + 1
     else
@@ -590,7 +588,7 @@ local function parseStringUnicode()
         pushError {
             type    = 'ERR_ESC',
             start   = leftPos - 1,
-            finish  = getPosition(LuaOffset, 'right'),
+            finish  = getPosition(offset, 'right'),
             version = {'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
             info = {
                 version = State.version,
@@ -663,12 +661,10 @@ local function parseShortString()
         }
     end
     local stringIndex = 0
-    local finishPos
     local currentOffset = startOffset + 1
     while true do
         local token = Tokens[Index + 1]
         if token == mark then
-            finishPos   = getPosition(Tokens[Index], 'right')
             stringIndex = stringIndex + 1
             stringPool[stringIndex] = ssub(Lua, currentOffset, Tokens[Index] - 1)
             Index = Index + 2
@@ -713,7 +709,7 @@ local function parseShortString()
                     numbers = ssub(numbers, 1, 3)
                 end
                 currentOffset = Tokens[Index] + #numbers
-                fastwardToken(currentOffset)
+                fastForwardToken(currentOffset)
                 local byte = tointeger(numbers)
                 if byte <= 255 then
                     stringIndex = stringIndex + 1
@@ -748,7 +744,7 @@ local function parseShortString()
                     stringPool[stringIndex] = str
                 end
                 currentOffset = newOffset
-                fastwardToken(currentOffset)
+                fastForwardToken(currentOffset)
                 goto CONTINUE
             end
         end
@@ -759,7 +755,7 @@ local function parseShortString()
     return {
         type   = 'string',
         start  = startPos,
-        finish = finishPos,
+        finish = lastRightPosition(),
         [1]    = stringResult,
         [2]    = mark,
     }
@@ -780,15 +776,15 @@ local function parseNumber10(start)
     local integerPart = smatch(Lua, '^%d*', start)
     local offset = start + #integerPart
     -- float part
-    if peekChar(offset) == '.' then
+    if ssub(Lua, offset, offset) == '.' then
         local floatPart = smatch(Lua, '^%d*', offset + 1)
         offset = offset + #floatPart + 1
     end
     -- exp part
-    local echar = peekChar(offset)
+    local echar = ssub(Lua, offset, offset)
     if CharMapE10[echar] then
         offset = offset + 1
-        local nextChar = peekChar(offset)
+        local nextChar = ssub(Lua, offset, offset)
         if CharMapSign[nextChar] then
             offset = offset + 1
         end
@@ -802,15 +798,15 @@ local function parseNumber16(start)
     local integerPart = smatch(Lua, '^[%da-fA-F]*', start)
     local offset = start + #integerPart
     -- float part
-    if peekChar(offset) == '.' then
+    if ssub(Lua, offset, offset) == '.' then
         local floatPart = smatch(Lua, '^[%da-fA-F]*', offset + 1)
         offset = offset + #floatPart + 1
     end
     -- exp part
-    local echar = peekChar(offset)
+    local echar = ssub(Lua, offset, offset)
     if CharMapE16[echar] then
         offset = offset + 1
-        local nextChar = peekChar(offset)
+        local nextChar = ssub(Lua, offset, offset)
         if CharMapSign[nextChar] then
             offset = offset + 1
         end
@@ -846,16 +842,16 @@ local function parseNumber()
     end
     local startPos = getPosition(offset, 'left')
     local neg
-    if peekChar(offset) == '-' then
+    if ssub(Lua, offset, offset) == '-' then
         neg = true
         offset = offset + 1
     end
     local number
-    local firstChar = peekChar(offset)
+    local firstChar = ssub(Lua, offset, offset)
     if     firstChar == '.' then
         number, offset = parseNumber10(offset)
     elseif firstChar == '0' then
-        local nextChar = peekChar(offset + 1)
+        local nextChar = ssub(Lua, offset + 1, offset + 1)
         if CharMapN16[nextChar] then
             number, offset = parseNumber16(offset + 2)
         elseif CharMapN2[nextChar] then
@@ -881,7 +877,7 @@ local function parseNumber()
         [1]    = number,
     }
     offset = dropNumberTail(offset)
-    fastwardToken(offset)
+    fastForwardToken(offset)
     return result
 end
 
@@ -1262,7 +1258,7 @@ local function parseSimple(node, enableCall)
                     }
                 end
                 local newNode = {}
-                for k, v in pairs(call.node.node) do
+                for k, v in next, call.node.node do
                     newNode[k] = v
                 end
                 newNode.mirror = call.node.node
@@ -2618,7 +2614,6 @@ local function initState(lua, version, options)
     Chunk               = {}
     Tokens              = tokens(lua)
     Index               = 1
-    CachedCharOffset    = nil
     State = {
         version = version,
         lua     = lua,
