@@ -933,11 +933,10 @@ local function parseNameOrList()
     skipSpace()
     local list
     while true do
-        local sep = peekChar()
-        if sep ~= ',' then
+        if Tokens[Index + 1] ~= ',' then
             break
         end
-        LuaOffset = LuaOffset + 1
+        Index = Index + 2
         skipSpace()
         local name = parseName()
         if not name then
@@ -2140,17 +2139,13 @@ local function parseReturn()
 end
 
 local function parseLabel()
-    if ssub(Lua, LuaOffset, LuaOffset + 1) ~= '::' then
-        skipUnknownSymbol()
-        return nil
-    end
-    LuaOffset = LuaOffset + 2
+    Index = Index + 2
     skipSpace()
     local label = parseName()
     skipSpace()
 
-    if ssub(Lua, LuaOffset, LuaOffset + 1) == '::' then
-        LuaOffset = LuaOffset + 2
+    if Tokens[Index + 1] == '::' then
+        Index = Index + 2
     else
         missSymbol '::'
     end
@@ -2165,7 +2160,7 @@ local function parseLabel()
 end
 
 local function parseGoTo()
-    LuaOffset = LuaOffset + 4
+    Index = Index + 2
     skipSpace()
 
     local action = parseName()
@@ -2181,8 +2176,9 @@ local function parseGoTo()
 end
 
 local function parseIfBlock()
-    local ifLeft  = getPosition(LuaOffset, 'left')
-    local ifRight = getPosition(LuaOffset + 1, 'right')
+    local ifLeft  = getPosition(Tokens[Index], 'left')
+    local ifRight = getPosition(Tokens[Index] + 1, 'right')
+    Index = Index + 2
     local ifblock = {
         type    = 'ifblock',
         start   = ifLeft,
@@ -2192,7 +2188,6 @@ local function parseIfBlock()
             [2] = ifRight,
         }
     }
-    LuaOffset = LuaOffset + 2
     skipSpace()
     local filter = parseExp()
     if filter then
@@ -2203,12 +2198,11 @@ local function parseIfBlock()
         missExp()
     end
     skipSpace()
-    local endWord, endLeft, endRight, newOffset = peekWord()
-    if endWord == 'then' then
-        LuaOffset = newOffset
-        ifblock.finish     = endRight
-        ifblock.keyword[3] = endLeft
-        ifblock.keyword[4] = endRight
+    if Tokens[Index + 1] == 'then' then
+        ifblock.finish     = getPosition(Tokens[Index] + 3, 'right')
+        ifblock.keyword[3] = getPosition(Tokens[Index], 'left')
+        ifblock.keyword[4] = ifblock.finish
+        Index = Index + 2
     else
         missSymbol 'then'
     end
@@ -2219,8 +2213,8 @@ local function parseIfBlock()
 end
 
 local function parseElseIfBlock()
-    local ifLeft  = getPosition(LuaOffset, 'left')
-    local ifRight = getPosition(LuaOffset + 5, 'right')
+    local ifLeft  = getPosition(Tokens[Index], 'left')
+    local ifRight = getPosition(Tokens[Index] + 5, 'right')
     local elseifblock = {
         type    = 'elseifblock',
         start   = ifLeft,
@@ -2230,7 +2224,7 @@ local function parseElseIfBlock()
             [2] = ifRight,
         }
     }
-    LuaOffset = LuaOffset + 6
+    Index = Index + 2
     skipSpace()
     local filter = parseExp()
     if filter then
@@ -2241,12 +2235,11 @@ local function parseElseIfBlock()
         missExp()
     end
     skipSpace()
-    local endWord, endLeft, endRight, newOffset = peekWord()
-    if endWord == 'then' then
-        LuaOffset = newOffset
-        elseifblock.finish     = endRight
-        elseifblock.keyword[3] = endLeft
-        elseifblock.keyword[4] = endRight
+    if Tokens[Index + 1] == 'then' then
+        elseifblock.finish     = getPosition(Tokens[Index] + 3, 'right')
+        elseifblock.keyword[3] = getPosition(Tokens[Index], 'left')
+        elseifblock.keyword[4] = elseifblock.finish
+        Index = Index + 2
     else
         missSymbol 'then'
     end
@@ -2257,8 +2250,8 @@ local function parseElseIfBlock()
 end
 
 local function parseElseBlock()
-    local ifLeft  = getPosition(LuaOffset, 'left')
-    local ifRight = getPosition(LuaOffset + 3, 'right')
+    local ifLeft  = getPosition(Tokens[Index], 'left')
+    local ifRight = getPosition(Tokens[Index] + 3, 'right')
     local elseblock = {
         type    = 'elseblock',
         start   = ifLeft,
@@ -2268,7 +2261,7 @@ local function parseElseBlock()
             [2] = ifRight,
         }
     }
-    LuaOffset = LuaOffset + 4
+    Index = Index + 2
     skipSpace()
     pushChunk(elseblock)
     parseActions()
@@ -2277,14 +2270,13 @@ local function parseElseBlock()
 end
 
 local function parseIf()
-    local firstword = peekWord()
     local action  = {
         type   = 'if',
-        start  = getPosition(LuaOffset, 'left'),
-        finish = getPosition(LuaOffset + #firstword - 1, 'right'),
+        start  = getPosition(Tokens[Index], 'left'),
+        finish = getPosition(Tokens[Index] + #Tokens[Index + 1] - 1, 'right'),
     }
     while true do
-        local word = peekWord()
+        local word = Tokens[Index + 1]
         local child
         if     word == 'if' then
             child = parseIfBlock()
@@ -2302,10 +2294,9 @@ local function parseIf()
         skipSpace()
     end
 
-    local word, wleft, wright, newOffset = peekWord()
-    if word == 'end' then
-        action.finish = wright
-        LuaOffset = newOffset
+    if Tokens[Index + 1] == 'end' then
+        action.finish = getPosition(Tokens[Index] + 2, 'right')
+        Index = Index + 2
     else
         missSymbol 'end'
     end
@@ -2317,13 +2308,13 @@ end
 local function parseFor()
     local action = {
         type    = 'for',
-        start   = getPosition(LuaOffset, 'left'),
-        finish  = getPosition(LuaOffset + 2, 'right'),
+        start   = getPosition(Tokens[Index], 'left'),
+        finish  = getPosition(Tokens[Index] + 2, 'right'),
         keyword = {},
     }
     action.keyword[1] = action.start
     action.keyword[2] = action.finish
-    LuaOffset = LuaOffset + 3
+    Index = Index + 2
     pushChunk(action)
     skipSpace()
     local nameOrList = parseNameOrList()
@@ -2374,11 +2365,11 @@ local function parseFor()
         if action.loc then
             action.loc.effect = action.finish
         end
-    elseif peekWord() == 'in' then
+    elseif Tokens[Index + 1] == 'in' then
         action.type = 'in'
-        local inLeft  = getPosition(LuaOffset, 'left')
-        local inRight = getPosition(LuaOffset + 1, 'right')
-        LuaOffset = LuaOffset + 2
+        local inLeft  = getPosition(Tokens[Index], 'left')
+        local inRight = getPosition(Tokens[Index] + 1, 'right')
+        Index = Index + 2
         skipSpace()
 
         local exps = parseExpList()
@@ -2423,12 +2414,11 @@ local function parseFor()
     end
 
     skipSpace()
-    local word, wleft, wright, newOffset = peekWord()
-    if word == 'do' then
-        action.finish     = wright
-        action.keyword[#action.keyword+1] = wleft
-        action.keyword[#action.keyword+1] = wright
-        LuaOffset         = newOffset
+    if Tokens[Index + 1] == 'do' then
+        action.finish                     = getPosition(Tokens[Index] + 1, 'right')
+        action.keyword[#action.keyword+1] = getPosition(Tokens[Index], 'left')
+        action.keyword[#action.keyword+1] = action.finish
+        Index = Index + 2
     else
         missSymbol 'do'
     end
@@ -2437,12 +2427,11 @@ local function parseFor()
     parseActions()
 
     skipSpace()
-    word, wleft, wright, newOffset = peekWord()
-    if word == 'end' then
-        action.keyword[#action.keyword+1] = wleft
-        action.keyword[#action.keyword+1] = wright
-        action.finish     = wright
-        LuaOffset         = newOffset
+    if Tokens[Index + 1] == 'end' then
+        action.finish                     = getPosition(Tokens[Index] + 2, 'right')
+        action.keyword[#action.keyword+1] = getPosition(Tokens[Index], 'left')
+        action.keyword[#action.keyword+1] = action.finish
+        Index = Index + 2
     else
         missSymbol 'end'
     end
@@ -2457,13 +2446,13 @@ end
 local function parseWhile()
     local action = {
         type    = 'while',
-        start   = getPosition(LuaOffset, 'left'),
-        finish  = getPosition(LuaOffset + 4, 'right'),
+        start   = getPosition(Tokens[Index], 'left'),
+        finish  = getPosition(Tokens[Index] + 4, 'right'),
         keyword = {},
     }
     action.keyword[1] = action.start
     action.keyword[2] = action.finish
-    LuaOffset = LuaOffset + 5
+    Index = Index + 2
 
     skipSpace()
     local filter = parseExp()
@@ -2474,12 +2463,11 @@ local function parseWhile()
     end
 
     skipSpace()
-    local word, wleft, wright, newOffset = peekWord()
-    if word == 'do' then
-        action.finish     = wright
-        action.keyword[#action.keyword+1] = wleft
-        action.keyword[#action.keyword+1] = wright
-        LuaOffset         = newOffset
+    if Tokens[Index + 1] == 'do' then
+        action.finish                     = getPosition(Tokens[Index] + 1, 'right')
+        action.keyword[#action.keyword+1] = getPosition(Tokens[Index], 'left')
+        action.keyword[#action.keyword+1] = action.finish
+        Index = Index + 2
     else
         missSymbol 'do'
     end
@@ -2490,12 +2478,11 @@ local function parseWhile()
     popChunk()
 
     skipSpace()
-    word, wleft, wright, newOffset = peekWord()
-    if word == 'end' then
-        action.keyword[#action.keyword+1] = wleft
-        action.keyword[#action.keyword+1] = wright
-        action.finish     = wright
-        LuaOffset         = newOffset
+    if Tokens[Index + 1] == 'end' then
+        action.finish                     = getPosition(Tokens[Index] + 2, 'right')
+        action.keyword[#action.keyword+1] = getPosition(Tokens[Index], 'left')
+        action.keyword[#action.keyword+1] = action.finish
+        Index = Index + 2
     else
         missSymbol 'end'
     end
@@ -2508,25 +2495,24 @@ end
 local function parseRepeat()
     local action = {
         type    = 'repeat',
-        start   = getPosition(LuaOffset, 'left'),
-        finish  = getPosition(LuaOffset + 5, 'right'),
+        start   = getPosition(Tokens[Index], 'left'),
+        finish  = getPosition(Tokens[Index] + 5, 'right'),
         keyword = {},
     }
     action.keyword[1] = action.start
     action.keyword[2] = action.finish
-    LuaOffset = LuaOffset + 6
+    Index = Index + 2
 
     pushChunk(action)
     skipSpace()
     parseActions()
 
     skipSpace()
-    local word, wleft, wright, newOffset = peekWord()
-    if word == 'until' then
-        action.keyword[#action.keyword+1] = wleft
-        action.keyword[#action.keyword+1] = wright
-        action.finish     = wright
-        LuaOffset         = newOffset
+    if Tokens[Index + 1] == 'until' then
+        action.finish                     = getPosition(Tokens[Index] + 4, 'right')
+        action.keyword[#action.keyword+1] = getPosition(Tokens[Index], 'left')
+        action.keyword[#action.keyword+1] = action.finish
+        Index = Index + 2
 
         skipSpace()
         local filter = parseExp()
@@ -2548,9 +2534,9 @@ local function parseRepeat()
 end
 
 local function parseBreak()
-    local returnLeft  = getPosition(LuaOffset, 'left')
-    local returnRight = getPosition(LuaOffset + 4, 'right')
-    LuaOffset = LuaOffset + 5
+    local returnLeft  = getPosition(Tokens[Index], 'left')
+    local returnRight = getPosition(Tokens[Index] + 4, 'right')
+    Index = Index + 2
     skipSpace()
     local action = {
         type   = 'break',
@@ -2573,7 +2559,7 @@ end
 function parseAction()
     local token = Tokens[Index + 1]
 
-    if token == ':' then
+    if token == '::' then
         return parseLabel()
     end
 

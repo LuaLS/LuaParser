@@ -30,7 +30,7 @@ local Symbol = m.P'=='
 local Unknown = (1 - Number - Word - Symbol - Sp - Nl)^1
 local Token   = m.Cp() * m.C(Nl + Number + Word + Symbol + Unknown)
 
-local Parser  = m.Ct((Sp^1 + Token)^1)
+local Parser  = m.Ct((Sp^1 + Token)^0)
 
 return function (lua)
     local results = Parser:match(lua)
