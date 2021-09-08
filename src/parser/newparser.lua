@@ -58,13 +58,16 @@ local CharMapTSep    = stringToCharMap ',;'
 local CharMapWord    = stringToCharMap '_a-zA-Z\x80-\xff'
 
 local EscMap = {
-    ['a'] = '\a',
-    ['b'] = '\b',
-    ['f'] = '\f',
-    ['n'] = '\n',
-    ['r'] = '\r',
-    ['t'] = '\t',
-    ['v'] = '\v',
+    ['a']  = '\a',
+    ['b']  = '\b',
+    ['f']  = '\f',
+    ['n']  = '\n',
+    ['r']  = '\r',
+    ['t']  = '\t',
+    ['v']  = '\v',
+    ['\\'] = '\\',
+    ['\''] = '\'',
+    ['\"'] = '\"',
 }
 
 local NLMap = {
@@ -670,7 +673,9 @@ local function parseShortString()
             Index = Index + 2
             break
         end
-        if not token then
+        if not token
+        or NLMap[token] then
+            missSymbol(mark)
             break
         end
         if token == '\\' then
@@ -680,30 +685,35 @@ local function parseShortString()
             Index = Index + 2
             -- has space?
             if Tokens[Index] - currentOffset > 1 then
+                pushError {
+                    type   = 'ERR_ESC',
+                    start  = getPosition(currentOffset, 'left'),
+                    finish = getPosition(currentOffset + 1, 'right'),
+                }
                 goto CONTINUE
             end
-            local nextChar = ssub(Tokens[Index + 1], 1, 1)
-            if EscMap[nextChar] then
+            local nextToken = ssub(Tokens[Index + 1], 1, 1)
+            if EscMap[nextToken] then
                 stringIndex = stringIndex + 1
-                stringPool[stringIndex] = EscMap[nextChar]
-                currentOffset = Tokens[Index] + #nextChar
+                stringPool[stringIndex] = EscMap[nextToken]
+                currentOffset = Tokens[Index] + #nextToken
                 Index = Index + 2
                 goto CONTINUE
             end
-            if nextChar == mark then
+            if nextToken == mark then
                 stringIndex = stringIndex + 1
                 stringPool[stringIndex] = mark
-                currentOffset = Tokens[Index] + #nextChar
+                currentOffset = Tokens[Index] + #nextToken
                 Index = Index + 2
                 goto CONTINUE
             end
-            if nextChar == 'z' then
+            if nextToken == 'z' then
                 Index = Index + 2
                 repeat until not skipNL()
                 currentOffset = Tokens[Index]
                 goto CONTINUE
             end
-            if CharMapNumber[nextChar] then
+            if CharMapNumber[nextToken] then
                 local numbers = smatch(Tokens[Index + 1], '^%d+')
                 if #numbers > 3 then
                     numbers = ssub(numbers, 1, 3)
@@ -719,7 +729,7 @@ local function parseShortString()
                 end
                 goto CONTINUE
             end
-            if nextChar == 'x' then
+            if nextToken == 'x' then
                 local x16 = ssub(Tokens[Index + 1], 2, 3)
                 local byte = tonumber(x16, 16)
                 if byte then
@@ -730,23 +740,34 @@ local function parseShortString()
                     currentOffset = Tokens[Index] + 1
                     pushError {
                         type   = 'MISS_ESC_X',
-                        start  = getPosition(currentOffset + 1, 'left'),
-                        finish = getPosition(currentOffset + 2, 'right'),
+                        start  = getPosition(currentOffset, 'left'),
+                        finish = getPosition(currentOffset + 1, 'right'),
                     }
                 end
                 Index = Index + 2
                 goto CONTINUE
             end
-            if nextChar == 'u' then
+            if nextToken == 'u' then
                 local str, newOffset = parseStringUnicode()
                 if str then
                     stringIndex = stringIndex + 1
                     stringPool[stringIndex] = str
                 end
                 currentOffset = newOffset
-                fastForwardToken(currentOffset)
+                fastForwardToken(currentOffset - 1)
                 goto CONTINUE
             end
+            if NLMap[nextToken] then
+                stringPool[stringIndex] = '\n'
+                currentOffset = Tokens[Index] + #nextToken
+                Index = Index + 2
+                goto CONTINUE
+            end
+            pushError {
+                type   = 'ERR_ESC',
+                start  = getPosition(currentOffset, 'left'),
+                finish = getPosition(currentOffset + 1, 'right'),
+            }
         end
         Index = Index + 2
         ::CONTINUE::

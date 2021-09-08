@@ -189,7 +189,7 @@ s = [===[a<!]=]!>]======]
 }
 
 TEST[[
-s = '<!\x!>zzzzz'
+s = '\x<!zz!>zzz'
 ]]
 {
     type = 'MISS_ESC_X',
@@ -254,6 +254,13 @@ s = '\u{abc<!z!>}'
 
 TEST[[
 s = '<!\c!>'
+]]
+{
+    type = 'ERR_ESC',
+}
+
+TEST[[
+s = '<!\ !>'
 ]]
 {
     type = 'ERR_ESC',
