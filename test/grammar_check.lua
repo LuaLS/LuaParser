@@ -386,13 +386,10 @@ f(<!,!>1)
 }
 
 TEST[[
-f(1<!,!>)
+f(1,<!!>)
 ]]
 {
-    type = 'UNEXPECT_SYMBOL',
-    info = {
-        symbol = ',',
-    }
+    type = 'MISS_EXP',
 }
 
 TEST[[

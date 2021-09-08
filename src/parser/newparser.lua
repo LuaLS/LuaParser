@@ -263,11 +263,11 @@ local function lastRightPosition()
     end
 end
 
-local function missSymbol(symbol, pos)
+local function missSymbol(symbol, start, finish)
     pushError {
         type   = 'MISS_SYMBOL',
-        start  = pos or lastRightPosition(),
-        finish = pos or lastRightPosition(),
+        start  = start or lastRightPosition(),
+        finish = finish or start or lastRightPosition(),
         info = {
             symbol = symbol,
         }
@@ -1033,7 +1033,7 @@ end
 
 local function parseExpList(stop)
     local list
-    local lastSepPos = Tokens[Index]
+    local wantSep = false
     while true do
         skipSpace()
         local token = Tokens[Index + 1]
@@ -1045,7 +1045,7 @@ local function parseExpList(stop)
         end
         if token == ',' then
             local sepPos = getPosition(Tokens[Index], 'right')
-            if lastSepPos then
+            if not wantSep then
                 pushError {
                     type   = 'UNEXPECT_SYMBOL',
                     start  = getPosition(Tokens[Index], 'left'),
@@ -1055,12 +1055,14 @@ local function parseExpList(stop)
                     }
                 }
             end
-            lastSepPos = sepPos
+            wantSep = false
             Index = Index + 2
             goto CONTINUE
         else
-            if not lastSepPos then
-                break
+            if wantSep then
+                if not stop then
+                    break
+                end
             end
             local exp = parseExp()
             if not exp then
@@ -1068,8 +1070,11 @@ local function parseExpList(stop)
             end
             if stop then
                 dropTail()
+                if wantSep then
+                    missSymbol(',', list[#list].finish, exp.start)
+                end
             end
-            lastSepPos = nil
+            wantSep = true
             if not list then
                 list = {
                     type   = 'list',
@@ -1085,12 +1090,8 @@ local function parseExpList(stop)
     if not list then
         return nil
     end
-    if lastSepPos then
-        pushError {
-            type   = 'MISS_EXP',
-            start  = lastSepPos,
-            finish = lastSepPos,
-        }
+    if not wantSep then
+        missExp()
     end
     return list
 end
