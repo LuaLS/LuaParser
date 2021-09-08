@@ -63,6 +63,12 @@ local EscMap = {
     ['v'] = '\v',
 }
 
+local NLMap = {
+    ['\n']   = true,
+    ['\r']   = true,
+    ['\r\n'] = true,
+}
+
 local LineMulti = 10000
 
 -- goto 单独处理
@@ -180,7 +186,7 @@ local ChunkFinishMap = {
     ['until']  = true,
 }
 
-local State, Lua, Line, LineOffset, Chunk, Tokens, Index
+local State, Lua, Line, LineOffset, Chunk, Tokens, Index, LastTokenFinish
 
 local parseExp, parseAction
 
@@ -255,7 +261,15 @@ local function peekWord()
 end
 
 local function lastRightPosition()
-    return getPosition(Tokens[Index - 2] + #Tokens[Index - 1] - 1, 'right')
+    if Index < 2 then
+        return 0
+    end
+    if NLMap[Tokens[Index + 1]]
+    or NLMap[Tokens[Index - 1]] then
+        return LastTokenFinish
+    else
+        return getPosition(Tokens[Index - 2] + #Tokens[Index - 1] - 1, 'right')
+    end
 end
 
 local function missSymbol(symbol, pos)
@@ -312,9 +326,10 @@ end
 
 local function skipNL()
     local token = Tokens[Index + 1]
-    if token == '\r'
-    or token == '\n'
-    or token == '\r\n' then
+    if NLMap[token] then
+        if Index >= 2 and not NLMap[Tokens[Index - 1]] then
+            LastTokenFinish = getPosition(Tokens[Index - 2], 'right')
+        end
         Line       = Line + 1
         LineOffset = Tokens[Index] + #token
         Index = Index + 2
@@ -864,6 +879,9 @@ end
 
 local function parseNumber()
     local offset = Tokens[Index]
+    if not offset then
+        return nil
+    end
     local startPos = getPosition(offset, 'left')
     local neg
     if peekChar(offset) == '-' then
@@ -907,6 +925,9 @@ end
 
 local function parseName()
     local word      = Tokens[Index + 1]
+    if not word then
+        return nil
+    end
     local startPos  = getPosition(Tokens[Index], 'left')
     local finishPos = getPosition(Tokens[Index] + #word - 1, 'right')
     Index = Index + 2
@@ -1826,10 +1847,10 @@ local function parseSetValues()
         return first
     end
     skipSpace()
-    if peekChar() ~= ',' then
+    if Tokens[Index + 1] ~= ',' then
         return first, second
     end
-    LuaOffset = LuaOffset + 1
+    Index = Index + 2
     skipSeps()
     local third = parseExp()
     if not third then
@@ -1840,10 +1861,10 @@ local function parseSetValues()
     local rest = { third }
     while true do
         skipSpace()
-        if peekChar() ~= ',' then
+        if Tokens[Index + 1] ~= ',' then
             return first, second, rest
         end
-        LuaOffset = LuaOffset + 1
+        Index = Index + 2
         skipSeps()
         local exp = parseExp()
         if not exp then
@@ -1918,7 +1939,7 @@ end
 
 local function bindValue(n, v, index, lastValue, isLocal, isSet)
     if isLocal then
-        n.effect = getPosition(Tokens[Index], 'left')
+        n.effect = lastRightPosition()
     elseif isSet then
         n.type = GetToSetMap[n.type] or n.type
     end
@@ -2073,7 +2094,7 @@ local function parseLocal()
     pushActionIntoCurrentChunk(loc)
     skipSpace()
     parseSet(loc, parseName, true)
-    loc.effect = getPosition(Tokens[Index], 'left')
+    loc.effect = lastRightPosition()
 
     return loc
 end
@@ -2638,6 +2659,7 @@ local function initState(lua, version, options)
     Lua                 = lua
     Line                = 0
     LineOffset          = 1
+    LastTokenFinish     = 0
     Chunk               = {}
     Tokens              = tokens(lua)
     Index               = 1
