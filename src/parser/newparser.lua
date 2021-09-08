@@ -422,34 +422,26 @@ local function parseLongString()
 end
 
 local function skipComment()
-    local head = ssub(Lua, LuaOffset, LuaOffset + 1)
-    if head == '--'
-    or head == '//' then
-        LuaOffset = LuaOffset + 2
+    local token = Tokens[Index + 1]
+    if token == '--'
+    or token == '//' then
+        Index = Index + 2
         local longComment = parseLongString()
         if longComment then
             return true
         end
-        local offset = sfind(Lua, '[\r\n]', LuaOffset)
-        if offset then
-            LuaOffset = offset
-        else
-            LuaOffset = #Lua + 1
-        end
         return true
     end
-    if head == '/*' then
-        LuaOffset = LuaOffset + 2
+    if token == '/*' then
+        Index = Index + 2
         resolveLongString '*/'
     end
     return false
 end
 
 local function skipSpace()
-    while skipNL() do
-    end
-    --if skipComment() then
-    --end
+    repeat until not skipNL()
+            and  not skipComment()
 end
 
 local function expectAssign()
