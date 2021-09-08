@@ -17,11 +17,11 @@ end
 
 local function main()
     --collectgarbage 'stop'
-    unitTest 'ast'
-    unitTest 'grammar'
-    unitTest 'lines'
-    unitTest 'grammar_check'
-    unitTest 'syntax_check'
+    --unitTest 'ast'
+    --unitTest 'grammar'
+    --unitTest 'lines'
+    --unitTest 'grammar_check'
+    --unitTest 'syntax_check'
     --unitTest 'guide'
     unitTest 'perform'
 

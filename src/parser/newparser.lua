@@ -43,7 +43,6 @@ local function stringToCharMap(str)
     return map
 end
 
-local CharMapNL      = stringToCharMap '\r\n'
 local CharMapNumber  = stringToCharMap '0-9'
 local CharMapN16     = stringToCharMap 'xX'
 local CharMapN2      = stringToCharMap 'bB'
@@ -56,7 +55,7 @@ local CharMapSimple  = stringToCharMap '.:([\'"{'
 local CharMapStrSH   = stringToCharMap '\'"'
 local CharMapStrLH   = stringToCharMap '['
 local CharMapTSep    = stringToCharMap ',;'
-local CharMapWord    = stringToCharMap 'a-zA-Z\x80-\xff'
+local CharMapWord    = stringToCharMap '_a-zA-Z\x80-\xff'
 
 local EscMap = {
     ['a'] = '\a',
@@ -422,17 +421,18 @@ local function skipComment()
             return true
         end
         while true do
-            Index = Index + 2
             local nl = Tokens[Index + 1]
             if not nl or NLMap[nl] then
                 break
             end
+            Index = Index + 2
         end
         return true
     end
     if token == '/*' then
         Index = Index + 2
         resolveLongString '*/'
+        return true
     end
     return false
 end
