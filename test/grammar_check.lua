@@ -271,11 +271,10 @@ n = 0x<!!>
 ]]
 {
     type = 'MUST_X16',
-    multi = 1,
 }
 
 TEST[[
-n = 0x<!zzzz!>
+n = 0x<!!>zzzz
 ]]
 {
     type = 'MUST_X16',
@@ -284,7 +283,7 @@ n = 0x<!zzzz!>
 
 
 TEST[[
-n = 0x.<!zzzz!>
+n = 0x.<!!>zzzz
 ]]
 {
     type = 'MUST_X16',

@@ -822,6 +822,22 @@ local function parseNumber16(start)
     if ssub(Lua, offset, offset) == '.' then
         local floatPart = smatch(Lua, '^[%da-fA-F]*', offset + 1)
         offset = offset + #floatPart + 1
+        if #integerPart == 0 and #floatPart == 0 then
+            pushError {
+                type   = 'MUST_X16',
+                start  = getPosition(offset - 1, 'right'),
+                finish = getPosition(offset - 1, 'right'),
+            }
+        end
+    else
+        if #integerPart == 0 then
+            pushError {
+                type   = 'MUST_X16',
+                start  = getPosition(offset - 1, 'right'),
+                finish = getPosition(offset - 1, 'right'),
+            }
+            return 0, offset
+        end
     end
     -- exp part
     local echar = ssub(Lua, offset, offset)
@@ -834,7 +850,8 @@ local function parseNumber16(start)
         local exp = smatch(Lua, '^%d*', offset)
         offset = offset + #exp
     end
-    return tonumber(ssub(Lua, start - 2, offset - 1)), offset
+    local n = tonumber(ssub(Lua, start - 2, offset - 1))
+    return n, offset
 end
 
 local function parseNumber2(start)
@@ -1091,6 +1108,8 @@ local function parseIndex()
     }
     if exp then
         exp.parent = index
+    else
+        missExp()
     end
     skipSpace()
     if Tokens[Index + 1] == ']' then
@@ -1110,6 +1129,7 @@ local function parseTable()
     }
     Index = Index + 2
     local index = 0
+    local wantSep = false
     while true do
         skipSpace()
         local token = Tokens[Index + 1]
@@ -1118,10 +1138,23 @@ local function parseTable()
             break
         end
         if CharMapTSep[token] then
+            if not wantSep then
+                missExp()
+            end
+            wantSep = false
             Index = Index + 2
             goto CONTINUE
         end
+        local lastRight = lastRightPosition()
         if token == '[' then
+            if wantSep then
+                pushError {
+                    type   = 'MISS_SEP_IN_TABLE',
+                    start  = lastRight,
+                    finish = getPosition(Tokens[Index], 'left'),
+                }
+            end
+            wantSep = true
             index = index + 1
             local tindex = parseIndex()
             skipSpace()
@@ -1134,15 +1167,25 @@ local function parseTable()
                     ivalue.parent = tindex
                     tindex.finish = ivalue.finish
                     tindex.value  = ivalue
+                else
+                    missExp()
                 end
                 tbl[index] = tindex
             else
-                missSymbol ']'
+                missSymbol '='
             end
             goto CONTINUE
         end
         local exp = parseExp()
         if exp then
+            if wantSep then
+                pushError {
+                    type   = 'MISS_SEP_IN_TABLE',
+                    start  = lastRight,
+                    finish = exp.start,
+                }
+            end
+            wantSep = true
             index = index + 1
             if exp.type == 'varargs' then
                 tbl[index] = exp
@@ -1168,6 +1211,8 @@ local function parseTable()
                     exp.parent = tfield
                     if fvalue then
                         fvalue.parent = tfield
+                    else
+                        missExp()
                     end
                     tbl[index] = tfield
                     goto CONTINUE
