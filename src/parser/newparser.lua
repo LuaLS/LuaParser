@@ -328,7 +328,7 @@ local function skipNL()
     local token = Tokens[Index + 1]
     if NLMap[token] then
         if Index >= 2 and not NLMap[Tokens[Index - 1]] then
-            LastTokenFinish = getPosition(Tokens[Index - 2], 'right')
+            LastTokenFinish = getPosition(Tokens[Index - 2] + #Tokens[Index - 1] - 1, 'right')
         end
         Line       = Line + 1
         LineOffset = Tokens[Index] + #token
@@ -458,28 +458,8 @@ end
 local function skipSpace()
     while skipNL() do
     end
-    do return end
-    if LuaOffset == lastSkipSpaceOffset then
-        return
-    end
-    NonSpacePosition = getPosition(LuaOffset - 1, 'right')
-    ::AGAIN::
-    if skipNL() then
-        goto AGAIN
-    end
-    if skipComment() then
-        goto AGAIN
-    end
-    local offset = sfind(Lua, '[^ \t]', LuaOffset)
-    if not offset then
-        lastSkipSpaceOffset = LuaOffset
-        return
-    end
-    if offset > LuaOffset then
-        LuaOffset = offset
-        goto AGAIN
-    end
-    lastSkipSpaceOffset = LuaOffset
+    --if skipComment() then
+    --end
 end
 
 local function expectAssign()
@@ -981,66 +961,57 @@ end
 local function dropTail()
     local pl, pt, pp = 0, 0, 0
     while true do
-        local char, offset = smatch(Lua, '([\r\n%,%<%>%{%}%(%)])()', LuaOffset)
-        if not char then
-            return
+        local token = Tokens[Index + 1]
+        if not token then
+            break
         end
-        if char == '\r'
-        or char == '\n' then
-            LuaOffset = offset - 1
-            return
+        if NLMap[token] then
+            break
         end
-        if char == ',' then
+        if token == ',' then
             if pl > 0
             or pt > 0
             or pp > 0 then
-                LuaOffset = offset
                 goto CONTINUE
             else
-                LuaOffset = offset - 1
                 break
             end
         end
-        if char == '<' then
+        if token == '<' then
             pl = pl + 1
-            LuaOffset = offset
             goto CONTINUE
         end
-        if char == '{' then
+        if token == '{' then
             pt = pt + 1
-            LuaOffset = offset
             goto CONTINUE
         end
-        if char == '(' then
+        if token == '(' then
             pp = pp + 1
-            LuaOffset = offset
             goto CONTINUE
         end
-        if char == '>' then
+        if token == '>' then
             if pl <= 0 then
                 break
             end
             pl = pl - 1
-            LuaOffset = offset
             goto CONTINUE
         end
-        if char == '}' then
+        if token == '}' then
             if pt <= 0 then
                 break
             end
             pt = pt - 1
-            LuaOffset = offset
             goto CONTINUE
         end
-        if char == ')' then
+        if token == ')' then
             if pp <= 0 then
                 break
             end
             pp = pp - 1
-            LuaOffset = offset
             goto CONTINUE
         end
         ::CONTINUE::
+        Index = Index + 2
     end
 end
 
@@ -1080,7 +1051,7 @@ local function parseExpList(stop)
                 break
             end
             if stop then
-                --dropTail()
+                dropTail()
             end
             lastSepPos = nil
             if not list then
@@ -1239,7 +1210,7 @@ local function parseSimple(node, enableCall)
             local getfield = {
                 type   = 'getfield',
                 start  = node.start,
-                finish = field.finish,
+                finish = lastRightPosition(),
                 node   = node,
                 dot    = dot,
                 field  = field
@@ -1262,7 +1233,7 @@ local function parseSimple(node, enableCall)
             local getmethod = {
                 type   = 'getmethod',
                 start  = node.start,
-                finish = method.finish,
+                finish = lastRightPosition(),
                 node   = node,
                 colon  = colon,
                 method = method
@@ -1655,6 +1626,7 @@ local function parseFunction(isLocal)
         func.keyword[3] = endLeft
         func.keyword[4] = endRight
         func.finish     = endRight
+        Index = Index + 2
     else
         missSymbol 'end'
     end
