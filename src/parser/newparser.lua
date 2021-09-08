@@ -242,7 +242,7 @@ local function peekWord()
     if not word then
         return nil
     end
-    if not smatch(word, '^([%a_\x80-\xff][%w_\x80-\xff]*)') then
+    if not CharMapWord[ssub(word, 1, 1)] then
         return nil
     end
     local startPos  = getPosition(Tokens[Index] , 'left')
@@ -1452,7 +1452,7 @@ local function parseActions()
             Index = Index + 2
             goto CONTINUE
         end
-        if  ChunkFinishMap[token] then
+        if ChunkFinishMap[token] then
             return
         end
         local _, failed = parseAction()
@@ -2599,7 +2599,15 @@ local function parseLua()
         special= '_G',
         [1]    = State.ENVMode,
     }
-    parseActions()
+    while true do
+        parseActions()
+        if Index <= #Tokens then
+            unknownSymbol()
+            Index = Index + 2
+        else
+            break
+        end
+    end
     popChunk()
     main.finish = getPosition(#Lua, 'right')
 
@@ -2648,5 +2656,6 @@ return function (lua, mode, version, options)
     elseif mode == 'Action' then
         State.ast = parseAction()
     end
+
     return State
 end
