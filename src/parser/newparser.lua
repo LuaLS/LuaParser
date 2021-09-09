@@ -1638,7 +1638,7 @@ local function parseParams(params)
     return params
 end
 
-local function parseFunction(isLocal)
+local function parseFunction(isLocal, isAction)
     local funcLeft  = getPosition(Tokens[Index], 'left')
     local funcRight = getPosition(Tokens[Index] + 7, 'right')
     local func = {
@@ -1656,18 +1656,24 @@ local function parseFunction(isLocal)
     local hasLeftParen = Tokens[Index + 1] == '('
     if not hasLeftParen then
         name = parseName()
-        if not name then
-            return func
+        if name then
+            if isLocal then
+                createLocal(name)
+            else
+                name = parseSimple(resolveName(name), false)
+            end
+            func.name   = name
+            func.finish = name.finish
+            if not isAction then
+                pushError {
+                    type   = 'UNEXPECT_EFUNC_NAME',
+                    start  = name.start,
+                    finish = name.finish,
+                }
+            end
+            skipSpace()
+            hasLeftParen = Tokens[Index + 1] == '('
         end
-        if isLocal then
-            createLocal(name)
-        else
-            name = parseSimple(resolveName(name), false)
-        end
-        func.name   = name
-        func.finish = name.finish
-        skipSpace()
-        hasLeftParen = Tokens[Index + 1] == '('
     end
     pushChunk(func)
     local params
@@ -2109,24 +2115,6 @@ local function compileExpAsAction(exp)
         return exp
     end
 
-    if exp.type == 'function' then
-        local name = exp.name
-        if name then
-            exp.name    = nil
-            name.type   = GetToSetMap[name.type]
-            name.value  = exp
-            name.vstart = exp.start
-            name.range  = exp.finish
-            exp.parent  = name
-            pushActionIntoCurrentChunk(name)
-            return name
-        else
-            pushActionIntoCurrentChunk(exp)
-            missName(exp.keyword[2])
-            return exp
-        end
-    end
-
     pushActionIntoCurrentChunk(exp)
 end
 
@@ -2140,7 +2128,7 @@ local function parseLocal()
     end
 
     if word == 'function' then
-        local func = parseFunction(true)
+        local func = parseFunction(true, true)
         local name = func.name
         if name then
             func.name    = nil
@@ -2699,6 +2687,25 @@ function parseAction()
 
     if token == 'goto' then
         return parseGoTo()
+    end
+
+    if token == 'function' then
+        local exp = parseFunction(false, true)
+        local name = exp.name
+        if name then
+            exp.name    = nil
+            name.type   = GetToSetMap[name.type]
+            name.value  = exp
+            name.vstart = exp.start
+            name.range  = exp.finish
+            exp.parent  = name
+            pushActionIntoCurrentChunk(name)
+            return name
+        else
+            pushActionIntoCurrentChunk(exp)
+            missName(exp.keyword[2])
+            return exp
+        end
     end
 
     local exp = parseExp()

@@ -574,10 +574,9 @@ f = function<!!> end
 }
 
 TEST[[
-f = function <!f!>()
+f = function <!f!>() end
 ]]
 {
-    multi = 3,
     type = 'UNEXPECT_EFUNC_NAME',
 }
 
@@ -585,7 +584,6 @@ TEST[[
 function f()<!!>
 ]]
 {
-    multi = 1,
     type = 'MISS_SYMBOL',
     info = {
         symbol = 'end',
