@@ -639,20 +639,20 @@ function f(<!!>,a) end
 }
 
 TEST[[
-function f(...<!, a!>) end
+function f(..., <!a!>) end
 ]]
 {
     type = 'ARGS_AFTER_DOTS',
 }
 
 TEST[[
-local x = <!!>]]
+local x =<!!> ]]
 {
     type = 'MISS_EXP',
 }
 
 TEST[[
-x = <!!>]]
+x =<!!> ]]
 {
     type = 'MISS_EXP',
 }
@@ -705,7 +705,7 @@ for k, v in next do<!!>
         symbol = 'end',
         related = {
             {
-                start  = 1,
+                start  = 0,
                 finish = 3,
             },
         }
@@ -753,8 +753,8 @@ for i = 1,<!!> do
 end
 ]]
 {
-    multi = 2,
-    type = 'MISS_LOOP_MAX'
+    --multi = 2,
+    type = 'MISS_EXP'
 }
 
 TEST[[
@@ -766,26 +766,20 @@ end
 }
 
 TEST[[
-for i = 1<!,!> do
+for i = 1,<!!> do
 end
 ]]
 {
-    multi = 1,
-    type = 'UNEXPECT_SYMBOL',
-    info = {
-        symbol = ',',
-    }
+    --multi = 1,
+    type = 'MISS_EXP',
 }
 
 TEST[[
-for i = 1, 2<!,!> do
+for i = 1, 2,<!!> do
 end
 ]]
 {
-    type = 'UNEXPECT_SYMBOL',
-    info = {
-        symbol = ',',
-    }
+    type = 'MISS_EXP',
 }
 
 TEST[[

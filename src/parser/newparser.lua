@@ -1602,6 +1602,7 @@ end
 
 local function parseParams(params)
     local lastSep
+    local hasDots
     while true do
         skipSpace()
         local token = Tokens[Index + 1]
@@ -1612,7 +1613,7 @@ local function parseParams(params)
             break
         end
         if token == ',' then
-            if lastSep then
+            if lastSep or lastSep == nil then
                 missName()
             else
                 lastSep = true
@@ -1634,6 +1635,14 @@ local function parseParams(params)
                 finish = getPosition(Tokens[Index] + 2, 'right'),
                 parent = params,
             }
+            if hasDots then
+                pushError {
+                    type   = 'ARGS_AFTER_DOTS',
+                    start  = getPosition(Tokens[Index], 'left'),
+                    finish = getPosition(Tokens[Index] + 2, 'right'),
+                }
+            end
+            hasDots = true
             Index = Index + 2
             goto CONTINUE
         end
@@ -1651,6 +1660,13 @@ local function parseParams(params)
                 parent = params,
                 [1]    = token,
             }
+            if hasDots then
+                pushError {
+                    type   = 'ARGS_AFTER_DOTS',
+                    start  = getPosition(Tokens[Index], 'left'),
+                    finish = getPosition(Tokens[Index] + #token - 1, 'right'),
+                }
+            end
             Index = Index + 2
             goto CONTINUE
         end
@@ -2087,6 +2103,9 @@ local function parseSet(n1, parser, isLocal)
     if expectAssign() then
         v1, v2, vrest = parseSetValues()
         isSet = true
+        if not v1 then
+            missExp()
+        end
     end
     bindValue(n1, v1, 1, nil, isLocal, isSet)
     local lastValue = v1
@@ -2439,11 +2458,12 @@ local function parseFor()
         skipSpace()
         local expList = parseExpList()
         local name
-        if nameOrList and nameOrList.type == 'name' then
-            name = nameOrList
-        else
-            name = nameOrList[1]
-            -- TODO
+        if nameOrList then
+            if nameOrList.type == 'name' then
+                name = nameOrList
+            else
+                name = nameOrList[1]
+            end
         end
         if name then
             local loc = createLocal(name)
@@ -2451,25 +2471,37 @@ local function parseFor()
             action.finish = name.finish
             action.loc    = loc
         end
-        local value = expList[1]
-        if value then
-            value.parent  = action
-            action.init   = value
-            action.finish = expList[#expList].finish
-        end
-        local max = expList[2]
-        if max then
-            max.parent    = action
-            action.max    = max
-            action.finish = max.finish
+        if expList then
+            local value = expList[1]
+            if value then
+                value.parent  = action
+                action.init   = value
+                action.finish = expList[#expList].finish
+            end
+            local max = expList[2]
+            if max then
+                max.parent    = action
+                action.max    = max
+                action.finish = max.finish
+            else
+                pushError {
+                    type   = 'MISS_LOOP_MAX',
+                    start  = lastRightPosition(),
+                    finish = lastRightPosition(),
+                }
+            end
+            local step = expList[3]
+            if step then
+                step.parent   = action
+                action.step   = step
+                action.finish = step.finish
+            end
         else
-            -- TODO
-        end
-        local step = expList[3]
-        if step then
-            step.parent   = action
-            action.step   = step
-            action.finish = step.finish
+            pushError {
+                type   = 'MISS_LOOP_MIN',
+                start  = lastRightPosition(),
+                finish = lastRightPosition(),
+            }
         end
 
         if action.loc then
@@ -2500,27 +2532,33 @@ local function parseFor()
             list = nameOrList
         end
 
-        local lastName  = list[#list]
+        if exps then
+            local lastExp = exps[#exps]
+            if lastExp then
+                action.finish = lastExp.finish
+            end
 
-        list.range  = lastName and lastName.range or inRight
-
-        local lastExp = exps[#exps]
-        if lastExp then
-            action.finish = lastExp.finish
+            action.exps = exps
+            for i = 1, #exps do
+                local exp = exps[i]
+                exp.parent = action
+            end
+        else
+            missExp()
         end
 
-        action.keys = list
-        for i = 1, #list do
-            local loc = createLocal(list[i])
-            loc.parent = action
-            loc.effect = action.finish
+        if list then
+            local lastName  = list[#list]
+            list.range  = lastName and lastName.range or inRight
+            action.keys = list
+            for i = 1, #list do
+                local loc = createLocal(list[i])
+                loc.parent = action
+                loc.effect = action.finish
+            end
         end
-
-        action.exps = exps
-        for i = 1, #exps do
-            local exp = exps[i]
-            exp.parent = action
-        end
+    else
+        missSymbol 'in'
     end
 
     skipSpace()
@@ -2543,7 +2581,7 @@ local function parseFor()
         action.keyword[#action.keyword+1] = action.finish
         Index = Index + 2
     else
-        missSymbol 'end'
+        missEnd(action.keyword[1], action.keyword[2])
     end
 
     popChunk()
