@@ -293,6 +293,28 @@ local function missName(pos)
     }
 end
 
+local function missEnd(relatedStart, relatedFinish)
+    pushError {
+        type   = 'MISS_SYMBOL',
+        start  = lastRightPosition(),
+        finish = lastRightPosition(),
+        info = {
+            symbol  = 'end',
+            related = {
+                {
+                    start  = relatedStart,
+                    finish = relatedFinish,
+                }
+            }
+        }
+    }
+    pushError {
+        type   = 'MISS_END',
+        start  = relatedStart,
+        finish = relatedFinish,
+    }
+end
+
 local function unknownSymbol(start, finish, word)
     local token = word or Tokens[Index + 1]
     if not token then
@@ -1730,7 +1752,7 @@ local function parseFunction(isLocal, isAction)
         func.finish     = endRight
         Index = Index + 2
     else
-        missSymbol 'end'
+        missEnd(funcLeft, funcRight)
     end
     popChunk()
     return func

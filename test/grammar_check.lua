@@ -537,6 +537,7 @@ TEST[[
 function f(<!!>
 ]]
 {
+    multi = 1,
     type = 'MISS_SYMBOL',
     info = {
         symbol = ')',
@@ -557,6 +558,7 @@ TEST[[
 f = function (<!!>
 ]]
 {
+    multi = 1,
     type = 'MISS_SYMBOL',
     info = {
         symbol = ')',
@@ -584,12 +586,13 @@ TEST[[
 function f()<!!>
 ]]
 {
+    multi = 1,
     type = 'MISS_SYMBOL',
     info = {
         symbol = 'end',
         related = {
             {
-                start  = 1,
+                start  = 0,
                 finish = 8,
             }
         },
@@ -612,7 +615,7 @@ function f:<!!>() end
 }
 
 TEST[[
-function f:x<!.!>y() end
+function f:x<!!>.y() end
 ]]
 {
     type = 'MISS_SYMBOL',
