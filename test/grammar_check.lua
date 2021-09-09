@@ -858,7 +858,7 @@ while true do<!!>
         symbol = 'end',
         related = {
             {
-                start  = 1,
+                start  = 0,
                 finish = 5,
             },
         }
@@ -920,7 +920,7 @@ if true then<!!>
         symbol = 'end',
         related = {
             {
-                start  = 1,
+                start  = 0,
                 finish = 2,
             },
         }
@@ -946,7 +946,7 @@ else<!!>
         symbol = 'end',
         related = {
             {
-                start  = 1,
+                start  = 0,
                 finish = 2,
             },
         }
@@ -1271,7 +1271,7 @@ local test = function ( a , b , c , ... )<!!>
         symbol = 'end',
         related = {
             {
-                start  = 14,
+                start  = 13,
                 finish = 21,
             },
         }
@@ -1399,7 +1399,7 @@ if a then<!!>
         symbol = 'end',
         related = {
             {
-                start  = 1,
+                start  = 0,
                 finish = 2,
             },
         }
@@ -1424,7 +1424,7 @@ if a then else<!!>
         symbol = 'end',
         related = {
             {
-                start  = 1,
+                start  = 0,
                 finish = 2,
             },
         }

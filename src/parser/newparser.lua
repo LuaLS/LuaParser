@@ -2000,7 +2000,7 @@ end
 
 ---@return parser.guide.object   second
 ---@return parser.guide.object[] rest
-local function parseSetTails(parser, isLocal)
+local function parseVarTails(parser, isLocal)
     if Tokens[Index + 1] ~= ',' then
         return
     end
@@ -2092,8 +2092,8 @@ local function bindValue(n, v, index, lastValue, isLocal, isSet)
     end
 end
 
-local function parseSet(n1, parser, isLocal)
-    local n2, nrest   = parseSetTails(parser, isLocal)
+local function parseMultiVars(n1, parser, isLocal)
+    local n2, nrest = parseVarTails(parser, isLocal)
     skipSpace()
     local v1, v2, vrest
     local isSet
@@ -2135,25 +2135,28 @@ local function parseSet(n1, parser, isLocal)
         end
     end
 
-    return n1
+    return n1, isSet
 end
 
 local function compileExpAsAction(exp)
+    pushActionIntoCurrentChunk(exp)
     if GetToSetMap[exp.type] then
         skipSpace()
-        pushActionIntoCurrentChunk(exp)
-        local action = parseSet(exp, parseExp)
-        if action then
+        local action, isSet = parseMultiVars(exp, parseExp)
+        if isSet then
             return action
         end
     end
 
     if exp.type == 'call' then
-        pushActionIntoCurrentChunk(exp)
         return exp
     end
 
-    pushActionIntoCurrentChunk(exp)
+    pushError {
+        type   = 'EXP_IN_ACTION',
+        start  = exp.start,
+        finish = exp.finish,
+    }
 end
 
 local function parseLocal()
@@ -2192,7 +2195,7 @@ local function parseLocal()
     loc.effect = maxinteger
     pushActionIntoCurrentChunk(loc)
     skipSpace()
-    parseSet(loc, parseName, true)
+    parseMultiVars(loc, parseName, true)
     loc.effect = lastRightPosition()
 
     return loc
@@ -2218,6 +2221,8 @@ local function parseDo()
         obj.keyword[3] = getPosition(Tokens[Index], 'left')
         obj.keyword[4] = getPosition(Tokens[Index] + 2, 'right')
         Index = Index + 2
+    else
+        missEnd(doLeft, doRight)
     end
     popChunk()
 
@@ -2424,7 +2429,7 @@ local function parseIf()
         action.finish = getPosition(Tokens[Index] + 2, 'right')
         Index = Index + 2
     else
-        missSymbol 'end'
+        missEnd(action[1].keyword[1], action[1].keyword[2])
     end
 
     pushActionIntoCurrentChunk(action)
@@ -2605,6 +2610,8 @@ local function parseWhile()
         action.filter = filter
         action.finish = filter.finish
         filter.parent = action
+    else
+        missExp()
     end
 
     skipSpace()
@@ -2629,7 +2636,7 @@ local function parseWhile()
         action.keyword[#action.keyword+1] = action.finish
         Index = Index + 2
     else
-        missSymbol 'end'
+        missEnd(action.keyword[1], action.keyword[2])
     end
 
     pushActionIntoCurrentChunk(action)
@@ -2665,6 +2672,8 @@ local function parseRepeat()
             action.filter = filter
             action.finish = filter.finish
             filter.parent = action
+        else
+            missExp()
         end
 
     else
