@@ -400,7 +400,7 @@ CHECK 'return local a'
     [1]     = {
         type   = "return",
         start  = 0,
-        finish = 12,
+        finish = 14,
         parent = "<IGNORE>",
         [1]    = {
             type   = "getglobal",
@@ -410,14 +410,14 @@ CHECK 'return local a'
             node   = "<IGNORE>",
             [1]    = "local",
         },
-    },
-    [2]     = {
-        type   = "getglobal",
-        start  = 13,
-        finish = 14,
-        parent = "<IGNORE>",
-        node   = "<IGNORE>",
-        [1]    = "a",
+        [2]    = {
+            type   = "getglobal",
+            start  = 13,
+            finish = 14,
+            parent = "<IGNORE>",
+            node   = "<IGNORE>",
+            [1]    = "a",
+        },
     },
 }
 

@@ -783,7 +783,7 @@ end
 }
 
 TEST[[
-for i = 1, 2<!!> 3 do
+for i = 1, 2<! !>3 do
 end
 ]]
 {
@@ -814,7 +814,7 @@ for i = 1, 2 do<!!>
         symbol = 'end',
         related = {
             {
-                start  = 1,
+                start  = 0,
                 finish = 3,
             },
         }

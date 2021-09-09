@@ -188,6 +188,10 @@ local ChunkFinishMap = {
     ['do']     = true,
     ['then']   = true,
     ['until']  = true,
+    [';']      = true,
+    [']']      = true,
+    [')']      = true,
+    ['}']      = true,
 }
 
 local State, Lua, Line, LineOffset, Chunk, Tokens, Index, LastTokenFinish
@@ -1071,7 +1075,7 @@ local function dropTail()
     end
 end
 
-local function parseExpList(stop)
+local function parseExpList()
     local list
     local wantSep = false
     while true do
@@ -1080,7 +1084,7 @@ local function parseExpList(stop)
         if not token then
             break
         end
-        if token == stop then
+        if ChunkFinishMap[token] then
             break
         end
         if token == ',' then
@@ -1099,20 +1103,13 @@ local function parseExpList(stop)
             Index = Index + 2
             goto CONTINUE
         else
-            if wantSep then
-                if not stop then
-                    break
-                end
-            end
             local exp = parseExp()
             if not exp then
                 break
             end
-            if stop then
-                dropTail()
-                if wantSep then
-                    missSymbol(',', list[#list].finish, exp.start)
-                end
+            dropTail()
+            if wantSep then
+                missSymbol(',', list[#list].finish, exp.start)
             end
             wantSep = true
             if not list then
@@ -1358,7 +1355,7 @@ local function parseSimple(node, enableCall)
                 node   = node,
             }
             Index = Index + 2
-            local args = parseExpList(')')
+            local args = parseExpList()
             if Tokens[Index + 1] == ')' then
                 call.finish = getPosition(Tokens[Index], 'right')
                 Index = Index + 2
