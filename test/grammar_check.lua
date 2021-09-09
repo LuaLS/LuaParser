@@ -461,7 +461,7 @@ x:m<!!>
 }
 
 TEST[[
-x = 1 <!and!>
+x = 1 and<!!>
 ]]
 {
     type = 'MISS_EXP',

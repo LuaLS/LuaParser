@@ -292,6 +292,9 @@ end
 
 local function unknownSymbol(start, finish, word)
     local token = word or Tokens[Index + 1]
+    if not token then
+        return false
+    end
     pushError {
         type   = 'UNKNOWN_SYMBOL',
         start  = start  or getPosition(Tokens[Index], 'left'),
@@ -300,11 +303,15 @@ local function unknownSymbol(start, finish, word)
             symbol = token,
         }
     }
+    return true
 end
 
 local function skipUnknownSymbol(stopSymbol)
-    unknownSymbol()
-    Index = Index + 2
+    if unknownSymbol() then
+        Index = Index + 2
+        return true
+    end
+    return false
 end
 
 local function skipNL()
@@ -975,6 +982,11 @@ local function parseNameOrList()
 end
 
 local function dropTail()
+    local token = Tokens[Index + 1]
+    if  token ~= '?'
+    and token ~= ':' then
+        return
+    end
     local pl, pt, pp = 0, 0, 0
     while true do
         local token = Tokens[Index + 1]
@@ -1240,7 +1252,12 @@ local function parseTable()
 end
 
 local function parseSimple(node, enableCall)
+    local lastMethod
     while true do
+        if  node.type == 'call'
+        and node.node == lastMethod then
+            lastMethod = nil
+        end
         skipSpace()
         local token = Tokens[Index + 1]
         if token == '.' then
@@ -1263,6 +1280,12 @@ local function parseSimple(node, enableCall)
             if field then
                 field.parent = node
                 field.type   = 'field'
+            else
+                pushError {
+                    type   = 'MISS_FIELD',
+                    start  = lastRightPosition(),
+                    finish = lastRightPosition(),
+                }
             end
             node.next = getfield
             node = getfield
@@ -1286,9 +1309,16 @@ local function parseSimple(node, enableCall)
             if method then
                 method.parent = node
                 method.type   = 'method'
+            else
+                pushError {
+                    type   = 'MISS_METHOD',
+                    start  = lastRightPosition(),
+                    finish = lastRightPosition(),
+                }
             end
-            node.next = getmethod
-            node = getmethod
+            node.next  = getmethod
+            node       = getmethod
+            lastMethod = getmethod
         elseif token == '(' then
             if not enableCall then
                 break
@@ -1411,6 +1441,18 @@ local function parseSimple(node, enableCall)
         else
             break
         end
+    end
+    if  node.type == 'call'
+    and node.node == lastMethod then
+        lastMethod = nil
+    end
+    if node == lastMethod then
+        if not enableCall then
+            lastMethod = nil
+        end
+    end
+    if lastMethod then
+        missSymbol('(', lastMethod.finish)
     end
     return node
 end
@@ -1791,6 +1833,8 @@ function parseExp(level)
         }
         if child then
             child.parent = exp
+        else
+            missExp()
         end
     else
         exp = parseExpUnit()
@@ -1811,8 +1855,11 @@ function parseExp(level)
         local isForward = SymbolForward[bopLevel]
         local child = parseExp(isForward and (bopLevel + 0.5) or bopLevel)
         if not child then
-            skipUnknownSymbol()
-            goto AGAIN
+            if skipUnknownSymbol() then
+                goto AGAIN
+            else
+                missExp()
+            end
         end
         local bin = {
             type   = 'binary',
