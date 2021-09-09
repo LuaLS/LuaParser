@@ -256,10 +256,13 @@ local function lastRightPosition()
     if Index < 2 then
         return 0
     end
-    if NLMap[Tokens[Index - 1]] then
+    local token = Tokens[Index - 1]
+    if NLMap[token] then
         return LastTokenFinish
+    elseif token then
+        return getPosition(Tokens[Index - 2] + #token - 1, 'right')
     else
-        return getPosition(Tokens[Index - 2] + #Tokens[Index - 1] - 1, 'right')
+        return getPosition(#Lua, 'right')
     end
 end
 
@@ -929,6 +932,9 @@ end
 local function parseName()
     local word = peekWord()
     if not word then
+        return nil
+    end
+    if ChunkFinishMap[word] then
         return nil
     end
     local startPos  = getPosition(Tokens[Index], 'left')
@@ -1647,7 +1653,8 @@ local function parseFunction(isLocal)
     Index = Index + 2
     skipSpace()
     local name
-    if Tokens[Index + 1] ~= '(' then
+    local hasLeftParen = Tokens[Index + 1] == '('
+    if not hasLeftParen then
         name = parseName()
         if not name then
             return func
@@ -1660,13 +1667,8 @@ local function parseFunction(isLocal)
         func.name   = name
         func.finish = name.finish
         skipSpace()
-        if Tokens[Index + 1] ~= '(' then
-            missSymbol ')'
-            return func
-        end
+        hasLeftParen = Tokens[Index + 1] == '('
     end
-    local parenLeft = getPosition(Tokens[Index], 'left')
-    Index = Index + 2
     pushChunk(func)
     local params
     if func.name and func.name.type == 'getmethod' then
@@ -1683,29 +1685,35 @@ local function parseFunction(isLocal)
             }
         end
     end
-    params = parseParams(params)
-    if params then
-        params.type   = 'funcargs'
-        params.start  = parenLeft
-        params.finish = lastRightPosition()
-        params.parent = func
-        func.args     = params
-        func.finish   = params.finish
-    end
-    skipSpace()
-    if Tokens[Index + 1] == ')' then
-        local parenRight = getPosition(Tokens[Index], 'right')
-        func.finish = parenRight
-        if params then
-            params.finish = parenRight
-        end
+    if hasLeftParen then
+        local parenLeft = getPosition(Tokens[Index], 'left')
         Index = Index + 2
-        skipSpace()
-    else
+        params = parseParams(params)
         if params then
-            params.finish = func.finish
+            params.type   = 'funcargs'
+            params.start  = parenLeft
+            params.finish = lastRightPosition()
+            params.parent = func
+            func.args     = params
+            func.finish   = params.finish
         end
-        missSymbol ')'
+        skipSpace()
+        if Tokens[Index + 1] == ')' then
+            local parenRight = getPosition(Tokens[Index], 'right')
+            func.finish = parenRight
+            if params then
+                params.finish = parenRight
+            end
+            Index = Index + 2
+            skipSpace()
+        else
+            if params then
+                params.finish = func.finish
+            end
+            missSymbol ')'
+        end
+    else
+        missSymbol '('
     end
     parseActions()
     if Tokens[Index + 1] == 'end' then
@@ -2230,10 +2238,16 @@ local function parseLabel()
     local label = parseName()
     skipSpace()
 
+    if not label then
+        missName()
+    end
+
     if Tokens[Index + 1] == '::' then
         Index = Index + 2
     else
-        missSymbol '::'
+        if label then
+            missSymbol '::'
+        end
     end
 
     if not label then
@@ -2697,6 +2711,23 @@ function parseAction()
     return nil, true
 end
 
+local function skipFirstComment()
+    if Tokens[Index + 1] ~= '#' then
+        return
+    end
+    while true do
+        Index = Index + 2
+        local token = Tokens[Index + 1]
+        if not token then
+            break
+        end
+        if NLMap[token] then
+            skipNL()
+            break
+        end
+    end
+end
+
 local function parseLua()
     local main = {
         type   = 'main',
@@ -2713,6 +2744,7 @@ local function parseLua()
         special= '_G',
         [1]    = State.ENVMode,
     }
+    skipFirstComment()
     while true do
         parseActions()
         if Index <= #Tokens then

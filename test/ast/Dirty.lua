@@ -320,6 +320,7 @@ CHECK 'function a:'
                 [2] = 8,
             },
             parent  = "<IGNORE>",
+            locals  = "<IGNORE>",
         },
     },
 }
