@@ -1578,6 +1578,33 @@ local function resolveName(node)
     return node
 end
 
+local function isChunkFinishToken(token)
+    local currentChunk = Chunk[#Chunk]
+    if not currentChunk then
+        return false
+    end
+    local tp = currentChunk.type
+    if tp == 'main' then
+        return false
+    end
+    if tp == 'for'
+    or tp == 'in'
+    or tp == 'loop' then
+        return token == 'do'
+            or token == 'end'
+    end
+    if tp == 'if'
+    or tp == 'ifblock'
+    or tp == 'elseifblock'
+    or tp == 'elseblock' then
+        return token == 'then'
+            or token == 'end'
+            or token == 'else'
+            or token == 'elseif'
+    end
+    return true
+end
+
 local function parseActions()
     while true do
         skipSpace()
@@ -1586,7 +1613,8 @@ local function parseActions()
             Index = Index + 2
             goto CONTINUE
         end
-        if ChunkFinishMap[token] then
+        if  ChunkFinishMap[token]
+        and isChunkFinishToken(token) then
             return
         end
         local _, failed = parseAction()
@@ -2143,7 +2171,8 @@ local function compileExpAsAction(exp)
     if GetToSetMap[exp.type] then
         skipSpace()
         local action, isSet = parseMultiVars(exp, parseExp)
-        if isSet then
+        if isSet
+        or action.type == 'getmethod' then
             return action
         end
     end
@@ -2401,11 +2430,17 @@ local function parseElseBlock()
 end
 
 local function parseIf()
+    local token = Tokens[Index + 1]
+    local left  = getPosition(Tokens[Index], 'left')
     local action  = {
         type   = 'if',
-        start  = getPosition(Tokens[Index], 'left'),
-        finish = getPosition(Tokens[Index] + #Tokens[Index + 1] - 1, 'right'),
+        start  = left,
+        finish = getPosition(Tokens[Index] + #token - 1, 'right'),
     }
+    if token ~= 'if' then
+        missSymbol('if', left, left)
+    end
+    local hasElse
     while true do
         local word = Tokens[Index + 1]
         local child
@@ -2418,6 +2453,16 @@ local function parseIf()
         end
         if not child then
             break
+        end
+        if hasElse then
+            pushError {
+                type   = 'BLOCK_AFTER_ELSE',
+                start  = child.start,
+                finish = child.finish,
+            }
+        end
+        if word == 'else' then
+            hasElse = true
         end
         action[#action+1] = child
         child.parent = action
