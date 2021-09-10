@@ -429,7 +429,7 @@ local function resolveLongString(finishMark)
             }
         end
     end
-    return stringResult, finishOffset + #finishMark - 1
+    return stringResult, getPosition(finishOffset + #finishMark - 1, 'right')
 end
 
 local function parseLongString()
@@ -450,10 +450,57 @@ local function parseLongString()
     }
 end
 
-local function skipComment()
+local function pushCommentHeadError(left)
+    if State.options.nonstandardSymbol and State.options.nonstandardSymbol['//'] then
+        return
+    end
+    pushError {
+        type   = 'ERR_COMMENT_PREFIX',
+        start  = left,
+        finish = left + 2,
+        fix    = {
+            title = 'FIX_COMMENT_PREFIX',
+            {
+                start  = left,
+                finish = left + 2,
+                text   = '--',
+            },
+        }
+    }
+end
+
+local function pushLongCommentError(left, right)
+    if State.options.nonstandardSymbol and State.options.nonstandardSymbol['/**/'] then
+        return
+    end
+    pushError {
+        type   = 'ERR_C_LONG_COMMENT',
+        start  = left,
+        finish = right,
+        fix    = {
+            title = 'FIX_C_LONG_COMMENT',
+            {
+                start  = left,
+                finish = left + 2,
+                text   = '--[[',
+            },
+            {
+                start  = right - 2,
+                finish = right,
+                text   =  '--]]'
+            },
+        }
+    }
+end
+
+local function skipComment(isAction)
     local token = Tokens[Index + 1]
     if token == '--'
-    or token == '//' then
+    or (token == '//' and isAction) then
+        local left = getPosition(Tokens[Index], 'left')
+        if token == '//' then
+            pushCommentHeadError(left)
+        end
         Index = Index + 2
         local longComment = parseLongString()
         if longComment then
@@ -469,16 +516,18 @@ local function skipComment()
         return true
     end
     if token == '/*' then
+        local left = getPosition(Tokens[Index], 'left')
         Index = Index + 2
-        resolveLongString '*/'
+        local result, right = resolveLongString '*/'
+        pushLongCommentError(left, right)
         return true
     end
     return false
 end
 
-local function skipSpace()
+local function skipSpace(isAction)
     repeat until not skipNL()
-            and  not skipComment()
+            and  not skipComment(isAction)
 end
 
 local function expectAssign()
@@ -1607,7 +1656,7 @@ end
 
 local function parseActions()
     while true do
-        skipSpace()
+        skipSpace(true)
         local token = Tokens[Index + 1]
         if token == ';' then
             Index = Index + 2
