@@ -1478,7 +1478,8 @@ TEST [[
 f() <!=!> 1
 ]]
 {
-    type = 'UNEXPECT_SYMBOL',
+    multi = 1,
+    type = 'UNKNOWN_SYMBOL',
     info = {
         symbol = '=',
     }
@@ -1502,7 +1503,7 @@ local goto = 1
 (nil)
 
 TEST[[
-local x = '<!\u!>{1000}'
+local x = '<!\u{1000}!>'
 ]]
 {
     type = 'ERR_ESC',
@@ -1513,7 +1514,7 @@ local x = '<!\u!>{1000}'
 }
 
 TEST[[
-local x = '<!\x!>ff'
+local x = '<!\xff!>'
 ]]
 {
     type = 'ERR_ESC',
@@ -1547,7 +1548,7 @@ local x = 1 <!<<!> 2
 }
 
 TEST[[
-local x = '<!\u!>{1000}'
+local x = '<!\u{1000}!>'
 ]]
 {
     type = 'ERR_ESC',
@@ -1568,7 +1569,7 @@ end
 Version = 'Lua 5.3'
 
 TEST[[
-local x <<!close!>> = 1
+local x <!<close>!> = 1
 ]]
 {
     type = 'UNSUPPORT_SYMBOL',
@@ -1593,7 +1594,7 @@ s = '<!\u{1FFFFF}!>'
 
 
 TEST[[
-s = '<!\u{111111111}!>'
+s = '\u<!{111111111}!>'
 ]]
 {
     type = 'UTF8_MAX',

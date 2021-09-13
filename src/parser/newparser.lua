@@ -576,6 +576,17 @@ local function parseLocalAttrs()
         else
             missSymbol '>'
         end
+        if State.version ~= 'Lua 5.4' then
+            pushError {
+                type    = 'UNSUPPORT_SYMBOL',
+                start   = attr.start,
+                finish  = attr.finish,
+                version = 'Lua 5.4',
+                info    = {
+                    version = State.version
+                }
+            }
+        end
     end
     return attrs
 end
@@ -677,8 +688,8 @@ local function parseStringUnicode()
     then
         pushError {
             type    = 'ERR_ESC',
-            start   = leftPos - 1,
-            finish  = getPosition(offset, 'right'),
+            start   = leftPos - 2,
+            finish  = rightPos,
             version = {'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
             info = {
                 version = State.version,
@@ -817,7 +828,8 @@ local function parseShortString()
                 goto CONTINUE
             end
             if nextToken == 'x' then
-                local x16 = ssub(Tokens[Index + 1], 2, 3)
+                local left = getPosition(Tokens[Index] - 1, 'left')
+                local x16  = ssub(Tokens[Index + 1], 2, 3)
                 local byte = tonumber(x16, 16)
                 if byte then
                     currentOffset = Tokens[Index] + 3
@@ -829,6 +841,17 @@ local function parseShortString()
                         type   = 'MISS_ESC_X',
                         start  = getPosition(currentOffset, 'left'),
                         finish = getPosition(currentOffset + 1, 'right'),
+                    }
+                end
+                if State.version == 'Lua 5.1' then
+                    pushError {
+                        type    = 'ERR_ESC',
+                        start   = left,
+                        finish  = left + 4,
+                        version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+                        info = {
+                            version = State.version,
+                        }
                     }
                 end
                 Index = Index + 2
@@ -2018,6 +2041,22 @@ local function parseBinaryOP(asAction, level)
             }
         end
     end
+    if token == '//'
+    or token == '<<'
+    or token == '>>' then
+        if  State.version ~= 'Lua 5.3'
+        and State.version ~= 'Lua 5.4' then
+            pushError {
+                type    = 'UNSUPPORT_SYMBOL',
+                version = {'Lua 5.3', 'Lua 5.4'},
+                start   = op.start,
+                finish  = op.finish,
+                info    = {
+                    version = State.version,
+                }
+            }
+        end
+    end
     Index = Index + 2
     return op, myLevel
 end
@@ -2442,6 +2481,7 @@ local function parseReturn()
 end
 
 local function parseLabel()
+    local left = getPosition(Tokens[Index], 'left')
     Index = Index + 2
     skipSpace()
     local label = parseName()
@@ -2465,6 +2505,18 @@ local function parseLabel()
 
     label.type = 'label'
     pushActionIntoCurrentChunk(label)
+    if State.version == 'Lua 5.1' then
+        pushError {
+            type   = 'UNSUPPORT_SYMBOL',
+            start  = left,
+            finish = lastRightPosition(),
+            version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+            info = {
+                version = State.version,
+            }
+        }
+        return
+    end
     return label
 end
 
