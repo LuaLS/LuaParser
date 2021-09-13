@@ -151,6 +151,7 @@ local BinarySymbol = {
 local BinaryAlias = {
     ['&&'] = 'and',
     ['||'] = 'or',
+    ['!='] = '~=',
 }
 
 local BinaryActionAlias = {
@@ -1983,6 +1984,28 @@ local function parseBinaryOP(asAction, level)
             }
         end
     end
+    if BinaryAlias[token] then
+        if State.options.nonstandardSymbol and State.options.nonstandardSymbol[token] then
+        else
+            pushError {
+                type   = 'ERR_NONSTANDARD_SYMBOL',
+                start  = op.start,
+                finish = op.finish,
+                info   = {
+                    symbol = symbol,
+                },
+                fix    = {
+                    title  = 'FIX_NONSTANDARD_SYMBOL',
+                    symbol = symbol,
+                    {
+                        start  = op.start,
+                        finish = op.finish,
+                        text   = symbol,
+                    },
+                }
+            }
+        end
+    end
     Index = Index + 2
     return op, myLevel
 end
@@ -2472,10 +2495,27 @@ local function parseIfBlock()
         missExp()
     end
     skipSpace()
-    if Tokens[Index + 1] == 'then' then
-        ifblock.finish     = getPosition(Tokens[Index] + 3, 'right')
+    local thenToken = Tokens[Index + 1]
+    if thenToken == 'then'
+    or thenToken == 'do' then
+        ifblock.finish     = getPosition(Tokens[Index] + #thenToken - 1, 'right')
         ifblock.keyword[3] = getPosition(Tokens[Index], 'left')
         ifblock.keyword[4] = ifblock.finish
+        if thenToken == 'do' then
+            pushError {
+                type   = 'ERR_THEN_AS_DO',
+                start  = ifblock.keyword[3],
+                finish = ifblock.keyword[4],
+                fix = {
+                    title = 'FIX_THEN_AS_DO',
+                    {
+                        start  = ifblock.keyword[3],
+                        finish = ifblock.keyword[4],
+                        text   = 'then',
+                    }
+                }
+            }
+        end
         Index = Index + 2
     else
         missSymbol 'then'
@@ -2509,10 +2549,27 @@ local function parseElseIfBlock()
         missExp()
     end
     skipSpace()
-    if Tokens[Index + 1] == 'then' then
-        elseifblock.finish     = getPosition(Tokens[Index] + 3, 'right')
+    local thenToken = Tokens[Index + 1]
+    if thenToken == 'then'
+    or thenToken == 'do' then
+        elseifblock.finish     = getPosition(Tokens[Index] + #thenToken - 1, 'right')
         elseifblock.keyword[3] = getPosition(Tokens[Index], 'left')
         elseifblock.keyword[4] = elseifblock.finish
+        if thenToken == 'do' then
+            pushError {
+                type   = 'ERR_THEN_AS_DO',
+                start  = elseifblock.keyword[3],
+                finish = elseifblock.keyword[4],
+                fix = {
+                    title = 'FIX_THEN_AS_DO',
+                    {
+                        start  = elseifblock.keyword[3],
+                        finish = elseifblock.keyword[4],
+                        text   = 'then',
+                    }
+                }
+            }
+        end
         Index = Index + 2
     else
         missSymbol 'then'
@@ -2723,10 +2780,29 @@ local function parseFor()
     end
 
     skipSpace()
-    if Tokens[Index + 1] == 'do' then
-        action.finish                     = getPosition(Tokens[Index] + 1, 'right')
-        action.keyword[#action.keyword+1] = getPosition(Tokens[Index], 'left')
-        action.keyword[#action.keyword+1] = action.finish
+    local doToken = Tokens[Index + 1]
+    if doToken == 'do'
+    or doToken == 'then' then
+        local left  = getPosition(Tokens[Index], 'left')
+        local right = getPosition(Tokens[Index] + #doToken - 1, 'right')
+        action.finish                     = left
+        action.keyword[#action.keyword+1] = left
+        action.keyword[#action.keyword+1] = right
+        if doToken == 'then' then
+            pushError {
+                type   = 'ERR_DO_AS_THEN',
+                start  = left,
+                finish = right,
+                fix = {
+                    title = 'FIX_DO_AS_THEN',
+                    {
+                        start  = left,
+                        finish = right,
+                        text    = 'do',
+                    }
+                }
+            }
+        end
         Index = Index + 2
     else
         missSymbol 'do'
@@ -2774,10 +2850,29 @@ local function parseWhile()
     end
 
     skipSpace()
-    if Tokens[Index + 1] == 'do' then
-        action.finish                     = getPosition(Tokens[Index] + 1, 'right')
-        action.keyword[#action.keyword+1] = getPosition(Tokens[Index], 'left')
-        action.keyword[#action.keyword+1] = action.finish
+    local doToken = Tokens[Index + 1]
+    if doToken == 'do'
+    or doToken == 'then' then
+        local left  = getPosition(Tokens[Index], 'left')
+        local right = getPosition(Tokens[Index] + #doToken - 1, 'right')
+        action.finish                     = left
+        action.keyword[#action.keyword+1] = left
+        action.keyword[#action.keyword+1] = right
+        if doToken == 'then' then
+            pushError {
+                type   = 'ERR_DO_AS_THEN',
+                start  = left,
+                finish = right,
+                fix = {
+                    title = 'FIX_DO_AS_THEN',
+                    {
+                        start  = left,
+                        finish = right,
+                        text    = 'do',
+                    }
+                }
+            }
+        end
         Index = Index + 2
     else
         missSymbol 'do'
