@@ -180,9 +180,9 @@ s = [===[a<!!>]======]
 }
 
 TEST[======[
-s = [===[a<!]=]!>]======]
+s = [===[a]=]<!!>]======]
 {
-    type = 'ERR_LSTRING_END',
+    type = 'MISS_SYMBOL',
     info = {
         symbol = ']===]',
     }
@@ -1119,39 +1119,35 @@ return {
 
 -- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua
 TEST[[
-f = 9<!e!>
+f = 9e<!!>
 ]]
 {
     type = 'MISS_EXPONENT',
-    multi = 1,
 }
 
 TEST[[
-f = 5.<!e!>
+f = 5.e<!!>
 ]]
 {
     type = 'MISS_EXPONENT',
-    multi = 1,
 }
 
 TEST[[
-f = .9<!e-!>
+f = .9e-<!!>
 ]]
 {
     type = 'MISS_EXPONENT',
-    multi = 1,
 }
 
 TEST[[
-f = 5.9<!e+!>
+f = 5.9e+<!!>
 ]]
 {
     type = 'MISS_EXPONENT',
-    multi = 1,
 }
 
 TEST[[
-hex = 0x<!G!>
+hex = 0x<!!>G
 ]]
 {
     type = 'MUST_X16',
@@ -1174,7 +1170,6 @@ long string
 ]==]
 <!!>]=============]
 {
-    multi = 2,
     type = 'MISS_SYMBOL',
     info = {
         symbol = ']===]',
@@ -1225,11 +1220,10 @@ comment
 }
 
 TEST[[
---[=[xxx<!]==]!>
-]]
+--[=[xxx]==]
+<!!>]]
 {
-    multi = 1,
-    type = 'ERR_LCOMMENT_END',
+    type = 'MISS_SYMBOL',
     info = {
         symbol = ']=]',
     },

@@ -394,45 +394,23 @@ local function resolveLongString(finishMark)
     end
     fastForwardToken(finishOffset + #finishMark)
     if miss then
-        local estart, _, efinish = smatch(Lua, '()(%]%=*%])()[%c%s]*$')
-        if estart then
-            local left  = getPosition(estart, 'left')
-            local right = getPosition(efinish - 1, 'right')
-            pushError {
-                type   = 'ERR_LSTRING_END',
-                start  = left,
-                finish = right,
-                info   = {
-                    symbol = finishMark,
-                },
-                fix    = {
-                    title = 'FIX_LSTRING_END',
-                    {
-                        start  = estart,
-                        finish = efinish,
-                        text   = finishMark,
-                    }
-                },
-            }
-        else
-            local pos = getPosition(finishOffset - 1, 'right')
-            pushError {
-                type   = 'MISS_SYMBOL',
-                start  = pos,
-                finish = pos,
-                info   = {
-                    symbol = finishMark,
-                },
-                fix    = {
-                    title = 'ADD_LSTRING_END',
-                    {
-                        start  = pos,
-                        finish = pos,
-                        text   = finishMark,
-                    }
-                },
-            }
-        end
+        local pos = getPosition(finishOffset - 1, 'right')
+        pushError {
+            type   = 'MISS_SYMBOL',
+            start  = pos,
+            finish = pos,
+            info   = {
+                symbol = finishMark,
+            },
+            fix    = {
+                title = 'ADD_LSTRING_END',
+                {
+                    start  = pos,
+                    finish = pos,
+                    text   = finishMark,
+                }
+            },
+        }
     end
     return stringResult, getPosition(finishOffset + #finishMark - 1, 'right')
 end
@@ -920,6 +898,13 @@ local function parseNumber10(start)
         end
         local exp = smatch(Lua, '^%d*', offset)
         offset = offset + #exp
+        if #exp == 0 then
+            pushError {
+                type   = 'MISS_EXPONENT',
+                start  = getPosition(offset - 1, 'right'),
+                finish = getPosition(offset - 1, 'right'),
+            }
+        end
     end
     return tonumber(ssub(Lua, start, offset - 1)), offset
 end
