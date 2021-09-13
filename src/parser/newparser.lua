@@ -1338,8 +1338,10 @@ end
 local function parseSimple(node, enableCall)
     local lastMethod
     while true do
-        if  node.type == 'call'
-        and node.node == lastMethod then
+        if lastMethod and node.node == lastMethod then
+            if node.type ~= 'call' then
+                missSymbol('(', node.node.finish, node.node.finish)
+            end
             lastMethod = nil
         end
         skipSpace()
@@ -1402,6 +1404,9 @@ local function parseSimple(node, enableCall)
             end
             node.next  = getmethod
             node       = getmethod
+            if lastMethod then
+                missSymbol('(', node.node.finish, node.node.finish)
+            end
             lastMethod = getmethod
         elseif token == '(' then
             if not enableCall then
