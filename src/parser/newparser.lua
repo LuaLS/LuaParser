@@ -1,4 +1,5 @@
 local tokens     = require 'parser.tokens'
+local guide      = require 'parser.guide'
 
 local sbyte      = string.byte
 local sfind      = string.find
@@ -623,7 +624,28 @@ local function pushChunk(chunk)
     Chunk[#Chunk+1] = chunk
 end
 
+local function resolveGoTo(gotos)
+    for i = 1, #gotos do
+        local action = gotos[i]
+        if not guide.getLabel(action, action[1]) then
+            pushError {
+                type   = 'NO_VISIBLE_LABEL',
+                start  = action.start,
+                finish = action.finish,
+                info   = {
+                    label = action[1],
+                }
+            }
+        end
+    end
+end
+
 local function popChunk()
+    local chunk = Chunk[#Chunk]
+    if chunk.gotos then
+        resolveGoTo(chunk.gotos)
+        chunk.gotos = nil
+    end
     Chunk[#Chunk] = nil
 end
 
@@ -1805,7 +1827,7 @@ local function isChunkFinishToken(token)
             or token == 'else'
             or token == 'elseif'
     end
-    return true
+    return token ~= 'do'
 end
 
 local function parseActions()
@@ -2625,6 +2647,15 @@ local function parseLabel()
 
     label.type = 'label'
     pushActionIntoCurrentChunk(label)
+
+    local chunk = Chunk[#Chunk]
+    if chunk then
+        if not chunk.labels then
+            chunk.labels = {}
+        end
+        chunk.labels[label[1]] = label
+    end
+
     if State.version == 'Lua 5.1' then
         pushError {
             type   = 'UNSUPPORT_SYMBOL',
@@ -2651,6 +2682,18 @@ local function parseGoTo()
     end
 
     action.type = 'goto'
+
+    for i = #Chunk, 1, -1 do
+        local chunk = Chunk[i]
+        if chunk.type == 'function'
+        or chunk.type == 'main' then
+            if not chunk.gotos then
+                chunk.gotos = {}
+            end
+            chunk.gotos[#chunk.gotos+1] = action
+            break
+        end
+    end
 
     pushActionIntoCurrentChunk(action)
     return action
