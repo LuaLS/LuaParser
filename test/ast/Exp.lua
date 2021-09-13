@@ -1071,6 +1071,7 @@ CHECK'function (...) end'
         [3] = 15,
         [4] = 18,
     },
+    vararg  = "<IGNORE>",
     args    = {
         type   = "funcargs",
         start  = 9,
@@ -1095,6 +1096,7 @@ CHECK'function (a, ...) end'
         [3] = 18,
         [4] = 21,
     },
+    vararg  = "<IGNORE>",
     args    = {
         type   = "funcargs",
         start  = 9,

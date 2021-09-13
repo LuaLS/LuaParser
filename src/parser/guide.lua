@@ -85,6 +85,7 @@ local breakBlockTypes = {
     ['in']          = true,
     ['loop']        = true,
     ['repeat']      = true,
+    ['for']         = true,
 }
 
 local childMap = {

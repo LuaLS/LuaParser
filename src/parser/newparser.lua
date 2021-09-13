@@ -200,7 +200,7 @@ local ChunkFinishMap = {
     ['}']      = true,
 }
 
-local State, Lua, Line, LineOffset, Chunk, Tokens, Index, LastTokenFinish
+local State, Lua, Line, LineOffset, Chunk, Tokens, Index, LastTokenFinish, Mode
 
 local parseExp, parseAction
 
@@ -1657,6 +1657,27 @@ local function parseVarargs()
         finish = getPosition(Tokens[Index] + 2, 'right'),
     }
     Index = Index + 2
+    for i = #Chunk, 1, -1 do
+        local chunk = Chunk[i]
+        if chunk.vararg then
+            if not chunk.vararg.ref then
+                chunk.vararg.ref = {}
+            end
+            chunk.vararg.ref[#chunk.vararg.ref+1] = varargs
+            varargs.node = chunk.vararg
+            break
+        end
+        if chunk.type == 'function' then
+            break
+        end
+    end
+    if not varargs.node and Mode == 'Lua' then
+        pushError {
+            type   = 'UNEXPECT_DOTS',
+            start  = varargs.start,
+            finish = varargs.finish,
+        }
+    end
     return varargs
 end
 
@@ -1822,12 +1843,15 @@ local function parseParams(params)
             if not params then
                 params = {}
             end
-            params[#params+1] = {
+            local vararg = {
                 type   = '...',
                 start  = getPosition(Tokens[Index], 'left'),
                 finish = getPosition(Tokens[Index] + 2, 'right'),
                 parent = params,
             }
+            local chunk = Chunk[#Chunk]
+            chunk.vararg = vararg
+            params[#params+1] = vararg
             if hasDots then
                 pushError {
                     type   = 'ARGS_AFTER_DOTS',
@@ -3084,12 +3108,31 @@ local function parseBreak()
         finish = returnRight,
     }
 
-    local chunk = Chunk[#Chunk]
-    if chunk then
-        if not chunk.breaks then
-            chunk.breaks = {}
+    local ok
+    for i = #Chunk, 1, -1 do
+        local chunk = Chunk[i]
+        if chunk.type == 'function' then
+            break
         end
-        chunk.breaks[#chunk.breaks+1] = action
+        if chunk.type == 'while'
+        or chunk.type == 'in'
+        or chunk.type == 'loop'
+        or chunk.type == 'repeat'
+        or chunk.type == 'for' then
+            if not chunk.breaks then
+                chunk.breaks = {}
+            end
+            chunk.breaks[#chunk.breaks+1] = action
+            ok = true
+            break
+        end
+    end
+    if not ok and Mode == 'Lua' then
+        pushError {
+            type   = 'BREAK_OUTSIDE',
+            start  = action.start,
+            finish = action.finish,
+        }
     end
 
     pushActionIntoCurrentChunk(action)
@@ -3244,6 +3287,7 @@ local function initState(lua, version, options)
 end
 
 return function (lua, mode, version, options)
+    Mode = mode
     initState(lua, version, options)
     skipSpace()
     if     mode == 'Lua' then
