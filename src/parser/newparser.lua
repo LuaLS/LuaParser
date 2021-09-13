@@ -1031,6 +1031,19 @@ local function parseName()
             finish = finishPos,
         }
     end
+    local isKeyWord
+    if KeyWord[word] then
+        isKeyWord = true
+    elseif word == 'goto' then
+        isKeyWord = State.version ~= 'Lua 5.1'
+    end
+    if isKeyWord then
+        pushError {
+            type   = 'KEYWORD',
+            start  = startPos,
+            finish = finishPos,
+        }
+    end
     return {
         type   = 'name',
         start  = startPos,
@@ -1779,23 +1792,32 @@ local function parseFunction(isLocal, isAction)
     }
     Index = Index + 2
     skipSpace()
-    local name
     local hasLeftParen = Tokens[Index + 1] == '('
     if not hasLeftParen then
-        name = parseName()
+        local name = parseName()
         if name then
+            local simple = parseSimple(name, false)
             if isLocal then
-                createLocal(name)
+                if simple == name then
+                    createLocal(name)
+                else
+                    resolveName(name)
+                    pushError {
+                        type   = 'UNEXPECT_LFUNC_NAME',
+                        start  = simple.start,
+                        finish = simple.finish,
+                    }
+                end
             else
-                name = parseSimple(resolveName(name), false)
+                resolveName(name)
             end
-            func.name   = name
-            func.finish = name.finish
+            func.name   = simple
+            func.finish = simple.finish
             if not isAction then
                 pushError {
                     type   = 'UNEXPECT_EFUNC_NAME',
-                    start  = name.start,
-                    finish = name.finish,
+                    start  = simple.start,
+                    finish = simple.finish,
                 }
             end
             skipSpace()
@@ -1805,12 +1827,12 @@ local function parseFunction(isLocal, isAction)
     pushChunk(func)
     local params
     if func.name and func.name.type == 'getmethod' then
-        if name.type == 'getmethod' then
+        if func.name.type == 'getmethod' then
             params = {}
             params[1] = createLocal {
                 start  = funcRight,
                 finish = funcRight,
-                method = name,
+                method = func.name,
                 parent = params,
                 tag    = 'self',
                 dummy  = true,
