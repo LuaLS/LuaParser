@@ -6,6 +6,7 @@ local smatch     = string.match
 local sgsub      = string.gsub
 local ssub       = string.sub
 local schar      = string.char
+local supper     = string.upper
 local uchar      = utf8.char
 local tconcat    = table.concat
 local tinsert    = table.insert
@@ -904,16 +905,19 @@ local function parseString()
 end
 
 local function parseNumber10(start)
+    local integer = true
     local integerPart = smatch(Lua, '^%d*', start)
     local offset = start + #integerPart
     -- float part
     if ssub(Lua, offset, offset) == '.' then
         local floatPart = smatch(Lua, '^%d*', offset + 1)
+        integer = false
         offset = offset + #floatPart + 1
     end
     -- exp part
     local echar = ssub(Lua, offset, offset)
     if CharMapE10[echar] then
+        integer = false
         offset = offset + 1
         local nextChar = ssub(Lua, offset, offset)
         if CharMapSign[nextChar] then
@@ -929,15 +933,17 @@ local function parseNumber10(start)
             }
         end
     end
-    return tonumber(ssub(Lua, start, offset - 1)), offset
+    return tonumber(ssub(Lua, start, offset - 1)), offset, integer
 end
 
 local function parseNumber16(start)
     local integerPart = smatch(Lua, '^[%da-fA-F]*', start)
     local offset = start + #integerPart
+    local integer = true
     -- float part
     if ssub(Lua, offset, offset) == '.' then
         local floatPart = smatch(Lua, '^[%da-fA-F]*', offset + 1)
+        integer = false
         offset = offset + #floatPart + 1
         if #integerPart == 0 and #floatPart == 0 then
             pushError {
@@ -959,6 +965,7 @@ local function parseNumber16(start)
     -- exp part
     local echar = ssub(Lua, offset, offset)
     if CharMapE16[echar] then
+        integer = false
         offset = offset + 1
         local nextChar = ssub(Lua, offset, offset)
         if CharMapSign[nextChar] then
@@ -968,25 +975,84 @@ local function parseNumber16(start)
         offset = offset + #exp
     end
     local n = tonumber(ssub(Lua, start - 2, offset - 1))
-    return n, offset
+    return n, offset, integer
 end
 
 local function parseNumber2(start)
     local bins = smatch(Lua, '^[01]*', start)
     local offset = start + #bins
+    if State.version ~= 'LuaJIT' then
+        pushError {
+            type    = 'UNSUPPORT_SYMBOL',
+            start   = getPosition(start - 2, 'left'),
+            finish  = getPosition(offset - 1, 'right'),
+            version = 'LuaJIT',
+            info    = {
+                version = 'Lua 5.4',
+            }
+        }
+    end
     return tonumber(bins, 2), offset
 end
 
-local function dropNumberTail(offset)
+local function dropNumberTail(offset, integer)
     local _, finish, word = sfind(Lua, '^([%.%w_\x80-\xff]+)', offset)
     if not finish then
         return offset
     end
-    pushError {
-        type   = 'MALFORMED_NUMBER',
-        start  = getPosition(offset, 'left'),
-        finish = getPosition(finish, 'right'),
-    }
+    if integer then
+        if     supper(ssub(word, 1, 2)) == 'LL' then
+            if State.version ~= 'LuaJIT' then
+                pushError {
+                    type    = 'UNSUPPORT_SYMBOL',
+                    start   = getPosition(offset, 'left'),
+                    finish  = getPosition(offset + 1, 'right'),
+                    version = 'LuaJIT',
+                    info    = {
+                        version = State.version,
+                    }
+                }
+            end
+            offset = offset + 2
+            word   = ssub(word, offset)
+        elseif supper(ssub(word, 1, 3)) == 'ULL' then
+            if State.version ~= 'LuaJIT' then
+                pushError {
+                    type    = 'UNSUPPORT_SYMBOL',
+                    start   = getPosition(offset, 'left'),
+                    finish  = getPosition(offset + 2, 'right'),
+                    version = 'LuaJIT',
+                    info    = {
+                        version = State.version,
+                    }
+                }
+            end
+            offset = offset + 3
+            word   = ssub(word, offset)
+        end
+    end
+    if supper(ssub(word, 1, 1)) == 'I' then
+        if State.version ~= 'LuaJIT' then
+            pushError {
+                type    = 'UNSUPPORT_SYMBOL',
+                start   = getPosition(offset, 'left'),
+                finish  = getPosition(offset, 'right'),
+                version = 'LuaJIT',
+                info    = {
+                    version = State.version,
+                }
+            }
+        end
+        offset = offset + 1
+        word   = ssub(word, offset)
+    end
+    if #word > 0 then
+        pushError {
+            type   = 'MALFORMED_NUMBER',
+            start  = getPosition(offset, 'left'),
+            finish = getPosition(finish, 'right'),
+        }
+    end
     return finish + 1
 end
 
@@ -1001,21 +1067,23 @@ local function parseNumber()
         neg = true
         offset = offset + 1
     end
-    local number
+    local number, integer
     local firstChar = ssub(Lua, offset, offset)
     if     firstChar == '.' then
         number, offset = parseNumber10(offset)
+        integer = false
     elseif firstChar == '0' then
         local nextChar = ssub(Lua, offset + 1, offset + 1)
         if CharMapN16[nextChar] then
-            number, offset = parseNumber16(offset + 2)
+            number, offset, integer = parseNumber16(offset + 2)
         elseif CharMapN2[nextChar] then
             number, offset = parseNumber2(offset + 2)
+            integer = true
         else
-            number, offset = parseNumber10(offset)
+            number, offset, integer = parseNumber10(offset)
         end
     elseif CharMapNumber[firstChar] then
-        number, offset = parseNumber10(offset)
+        number, offset, integer = parseNumber10(offset)
     else
         return nil
     end
@@ -1026,12 +1094,12 @@ local function parseNumber()
         number = - number
     end
     local result = {
-        type   = mtype(number) == 'integer' and 'integer' or 'number',
+        type   = integer and 'integer' or 'number',
         start  = startPos,
         finish = getPosition(offset - 1, 'right'),
         [1]    = number,
     }
-    offset = dropNumberTail(offset)
+    offset = dropNumberTail(offset, integer)
     fastForwardToken(offset)
     return result
 end

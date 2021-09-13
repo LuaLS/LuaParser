@@ -1616,7 +1616,7 @@ x = 42<!LL!>
 }
 
 TEST[[
-x = <!0b!>11011
+x = <!0b11011!>
 ]]
 {
     type = 'UNSUPPORT_SYMBOL',
@@ -1641,10 +1641,7 @@ TEST[[
 x = 1.23<!LL!>
 ]]
 {
-    type = 'UNKNOWN_SYMBOL',
-    info = {
-        symbol = 'LL'
-    }
+    type = 'MALFORMED_NUMBER',
 }
 
 Version = 'LuaJIT'
@@ -1665,18 +1662,12 @@ TEST[[
 x = 1.23<!LL!>
 ]]
 {
-    type = 'UNKNOWN_SYMBOL',
-    info = {
-        symbol = 'LL'
-    }
+    type = 'MALFORMED_NUMBER',
 }
 
 TEST[[
 x = 0b1<!2!>
 ]]
 {
-    type = 'UNKNOWN_SYMBOL',
-    info = {
-        symbol = '2'
-    }
+    type = 'MALFORMED_NUMBER',
 }
