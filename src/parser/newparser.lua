@@ -153,6 +153,10 @@ local BinaryAlias = {
     ['||'] = 'or',
 }
 
+local BinaryActionAlias = {
+    ['='] = '==',
+}
+
 local UnaryAlias = {
     ['!'] = 'not',
 }
@@ -1282,7 +1286,8 @@ local function parseTable()
             end
             goto CONTINUE
         end
-        local exp = parseExp()
+
+        local exp = parseExp(true)
         if exp then
             if wantSep then
                 pushError {
@@ -1944,9 +1949,11 @@ local function parseUnaryOP(level)
 end
 
 ---@param level integer # op level must greater than this level
-local function parseBinaryOP(level)
+local function parseBinaryOP(asAction, level)
     local token  = Tokens[Index + 1]
-    local symbol = BinarySymbol[token] and token or BinaryAlias[token]
+    local symbol = (BinarySymbol[token] and token)
+                or BinaryAlias[token]
+                or (not asAction and BinaryActionAlias[token])
     if not symbol then
         return nil
     end
@@ -1959,16 +1966,33 @@ local function parseBinaryOP(level)
         start  = getPosition(Tokens[Index], 'left'),
         finish = getPosition(Tokens[Index] + #token - 1, 'right'),
     }
+    if not asAction then
+        if token == '=' then
+            pushError {
+                type   = 'ERR_EQ_AS_ASSIGN',
+                start  = op.start,
+                finish = op.finish,
+                fix    = {
+                    title = 'FIX_EQ_AS_ASSIGN',
+                    {
+                        start  = op.start,
+                        finish = op.finish,
+                        text   = '==',
+                    }
+                }
+            }
+        end
+    end
     Index = Index + 2
     return op, myLevel
 end
 
-function parseExp(level)
+function parseExp(asAction, level)
     local exp
     local uop, uopLevel = parseUnaryOP(level)
     if uop then
         skipSpace()
-        local child = parseExp(uopLevel)
+        local child = parseExp(asAction, uopLevel)
         exp = {
             type   = 'unary',
             op     = uop,
@@ -1990,7 +2014,7 @@ function parseExp(level)
 
     while true do
         skipSpace()
-        local bop, bopLevel = parseBinaryOP(level)
+        local bop, bopLevel = parseBinaryOP(asAction, level)
         if not bop then
             break
         end
@@ -1998,7 +2022,7 @@ function parseExp(level)
         ::AGAIN::
         skipSpace()
         local isForward = SymbolForward[bopLevel]
-        local child = parseExp(isForward and (bopLevel + 0.5) or bopLevel)
+        local child = parseExp(asAction, isForward and (bopLevel + 0.5) or bopLevel)
         if not child then
             if skipUnknownSymbol() then
                 goto AGAIN
@@ -2102,7 +2126,7 @@ local function parseVarTails(parser, isLocal)
     end
     Index = Index + 2
     skipSpace()
-    local second = parser()
+    local second = parser(true)
     if not second then
         missName()
         return
@@ -2117,7 +2141,7 @@ local function parseVarTails(parser, isLocal)
     end
     Index = Index + 2
     skipSeps()
-    local third = parser()
+    local third = parser(true)
     if not third then
         missName()
         return second
@@ -2134,7 +2158,7 @@ local function parseVarTails(parser, isLocal)
         end
         Index = Index + 2
         skipSeps()
-        local name = parser()
+        local name = parser(true)
         if not name then
             missName()
             return second, rest
@@ -2909,7 +2933,7 @@ function parseAction()
         end
     end
 
-    local exp = parseExp()
+    local exp = parseExp(true)
     if exp then
         local action = compileExpAsAction(exp)
         if action then
