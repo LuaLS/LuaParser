@@ -536,6 +536,25 @@ local function expectAssign()
         Index = Index + 2
         return true
     end
+    if token == '==' then
+        local left  = getPosition(Tokens[Index], 'left')
+        local right = getPosition(Tokens[Index] + #token - 1, 'right')
+        pushError {
+            type   = 'ERR_ASSIGN_AS_EQ',
+            start  = left,
+            finish = right,
+            fix    = {
+                title = 'FIX_ASSIGN_AS_EQ',
+                {
+                    start  = left,
+                    finish = right,
+                    text   = '=',
+                }
+            }
+        }
+        Index = Index + 2
+        return true
+    end
     return false
 end
 
@@ -2228,6 +2247,28 @@ local function compileExpAsAction(exp)
 
     if exp.type == 'call' then
         return exp
+    end
+
+    if exp.type == 'binary' then
+        if GetToSetMap[exp[1].type] then
+            local op = exp.op
+            if op.type == '==' then
+                pushError {
+                    type   = 'ERR_ASSIGN_AS_EQ',
+                    start  = op.start,
+                    finish = op.finish,
+                    fix    = {
+                        title = 'FIX_ASSIGN_AS_EQ',
+                        {
+                            start  = op.start,
+                            finish = op.finish,
+                            text   = '=',
+                        }
+                    }
+                }
+                return
+            end
+        end
     end
 
     pushError {
