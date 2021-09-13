@@ -959,11 +959,11 @@ local function dropNumberTail(offset)
     if not finish then
         return offset
     end
-    unknownSymbol(
-        getPosition(offset, 'left'),
-        getPosition(offset, 'right'),
-        word
-    )
+    pushError {
+        type   = 'MALFORMED_NUMBER',
+        start  = getPosition(offset, 'left'),
+        finish = getPosition(finish, 'right'),
+    }
     return finish + 1
 end
 
@@ -1730,7 +1730,7 @@ local function parseParams(params)
             Index = Index + 2
             goto CONTINUE
         end
-        do
+        if CharMapWord[ssub(token, 1, 1)] then
             if lastSep == false then
                 missSymbol ','
             end

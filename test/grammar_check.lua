@@ -135,10 +135,7 @@ TEST[[
 n = 1<!a!>
 ]]
 {
-    type = 'UNKNOWN_SYMBOL',
-    info = {
-        symbol = 'a',
-    }
+    type = 'MALFORMED_NUMBER',
 }
 
 TEST[[
@@ -1238,21 +1235,20 @@ a = function (a,b,<!!>) end
 }
 
 TEST[[
-a = function (...<!,a!>) end
+a = function (...,<!a!>) end
 ]]
 {
     type = 'ARGS_AFTER_DOTS',
 }
 
 TEST[[
-local a = function (<!!>1) end
+local a = function (<!1!>) end
 ]]
 {
-    type = 'MISS_SYMBOL',
+    type = 'UNKNOWN_SYMBOL',
     info = {
-        symbol = ')',
+        symbol = '1',
     },
-    multi = 1,
 }
 
 TEST[[
@@ -1281,10 +1277,13 @@ local test = <!function!> ( a , b , c , ... )
 }
 
 TEST[[
-a = 3 <!/!> / 2
+a = 3 / <!/!> 2
 ]]
 {
-    type = 'MISS_EXP',
+    type = 'UNKNOWN_SYMBOL',
+    info = {
+        symbol = '/'
+    }
 }
 
 TEST[[
@@ -1298,21 +1297,27 @@ b = 1 <!&&!> 1
 }
 
 TEST[[
-b = 1 <!<!>> 0
+b = 1 <<!>!> 0
 ]]
 {
-    type = 'MISS_EXP',
+    type = 'UNKNOWN_SYMBOL',
+    info = {
+        symbol = '>',
+    }
 }
 
 TEST[[
-b = 1 <!<!> < 0
+b = 1 < <!<!> 0
 ]]
 {
-    type = 'MISS_EXP',
+    type = 'UNKNOWN_SYMBOL',
+    info = {
+        symbol = '<',
+    }
 }
 
 TEST[[
-concat2 = 2^<!3..1!>
+concat2 = 2^3.<!.1!>
 ]]
 {
     type = 'MALFORMED_NUMBER',
@@ -1340,13 +1345,10 @@ for k,v in pairs(t:any<!!>) do end
 }
 
 TEST[[
-for i=1,10<!,!> do end
+for i=1,10,<!!> do end
 ]]
 {
-    type = 'UNEXPECT_SYMBOL',
-    info = {
-        symbol = ','
-    },
+    type = 'MISS_EXP',
 }
 
 TEST[[
@@ -1367,7 +1369,7 @@ function func(a,b,c,<!!>) end
 }
 
 TEST[[
-function func(...<!,a!>) end
+function func(...,<!a!>) end
 ]]
 {
     type = 'ARGS_AFTER_DOTS'
