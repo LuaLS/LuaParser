@@ -1104,6 +1104,16 @@ local function parseNumber()
     return result
 end
 
+local function isKeyWord(word)
+    if KeyWord[word] then
+        return true
+    end
+    if word == 'goto' then
+        return State.version ~= 'Lua 5.1'
+    end
+    return false
+end
+
 local function parseName()
     local word = peekWord()
     if not word then
@@ -1122,13 +1132,7 @@ local function parseName()
             finish = finishPos,
         }
     end
-    local isKeyWord
-    if KeyWord[word] then
-        isKeyWord = true
-    elseif word == 'goto' then
-        isKeyWord = State.version ~= 'Lua 5.1'
-    end
-    if isKeyWord then
+    if isKeyWord(word) then
         pushError {
             type   = 'KEYWORD',
             start  = startPos,
@@ -1237,7 +1241,7 @@ local function dropTail()
     end
 end
 
-local function parseExpList()
+local function parseExpList(mini)
     local list
     local wantSep = false
     while true do
@@ -1265,6 +1269,16 @@ local function parseExpList()
             Index = Index + 2
             goto CONTINUE
         else
+            if mini then
+                if wantSep then
+                    break
+                end
+                local nextToken = peekWord()
+                if  isKeyWord(nextToken)
+                and nextToken ~= 'function' then
+                    break
+                end
+            end
             local exp = parseExp()
             if not exp then
                 break
@@ -1795,6 +1809,7 @@ local function isChunkFinishToken(token)
 end
 
 local function parseActions()
+    local rtn, last
     while true do
         skipSpace(true)
         local token = Tokens[Index + 1]
@@ -1804,13 +1819,26 @@ local function parseActions()
         end
         if  ChunkFinishMap[token]
         and isChunkFinishToken(token) then
-            return
+            break
         end
-        local _, failed = parseAction()
+        local action, failed = parseAction()
         if failed then
             break
         end
+        if action then
+            if action.type == 'return' then
+                rtn = action
+            end
+            last = action
+        end
         ::CONTINUE::
+    end
+    if rtn and rtn ~= last then
+        pushError {
+            type   = 'ACTION_AFTER_RETURN',
+            start  = rtn.start,
+            finish = rtn.finish,
+        }
     end
 end
 
@@ -2545,7 +2573,7 @@ local function parseReturn()
     local returnRight = getPosition(Tokens[Index] + 5, 'right')
     Index = Index + 2
     skipSpace()
-    local rtn = parseExpList()
+    local rtn = parseExpList(true)
     if rtn then
         rtn.type  = 'return'
         rtn.start = returnLeft
