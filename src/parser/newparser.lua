@@ -201,7 +201,9 @@ local ChunkFinishMap = {
     ['}']      = true,
 }
 
-local State, Lua, Line, LineOffset, Chunk, Tokens, Index, LastTokenFinish, Mode
+local State, Lua, Line, LineOffset, Chunk, Tokens, Index, LastTokenFinish, Mode, LocalCount
+
+local LocalLimit = 200
 
 local parseExp, parseAction
 
@@ -616,6 +618,14 @@ local function createLocal(obj, attrs)
             chunk.locals = locals
         end
         locals[#locals+1] = obj
+        LocalCount = LocalCount + 1
+        if LocalCount > LocalLimit then
+            pushError {
+                type   = 'LOCAL_LIMIT',
+                start  = obj.start,
+                finish = obj.finish,
+            }
+        end
     end
     return obj
 end
@@ -2023,6 +2033,8 @@ local function parseFunction(isLocal, isAction)
         },
     }
     Index = Index + 2
+    local LastLocalCount = LocalCount
+    LocalCount = 0
     skipSpace()
     local hasLeftParen = Tokens[Index + 1] == '('
     if not hasLeftParen then
@@ -2114,6 +2126,7 @@ local function parseFunction(isLocal, isAction)
     else
         missEnd(funcLeft, funcRight)
     end
+    LocalCount = LastLocalCount
     return func
 end
 
@@ -2661,6 +2674,9 @@ local function parseDo()
     else
         missEnd(doLeft, doRight)
     end
+    if obj.locals then
+        LocalCount = LocalCount - #obj.locals
+    end
 
     return obj
 end
@@ -2844,6 +2860,9 @@ local function parseIfBlock(parent)
     pushChunk(ifblock)
     parseActions()
     popChunk()
+    if ifblock.locals then
+        LocalCount = LocalCount - #ifblock.locals
+    end
     return ifblock
 end
 
@@ -2899,6 +2918,9 @@ local function parseElseIfBlock(parent)
     pushChunk(elseifblock)
     parseActions()
     popChunk()
+    if elseifblock.locals then
+        LocalCount = LocalCount - #elseifblock.locals
+    end
     return elseifblock
 end
 
@@ -2920,6 +2942,9 @@ local function parseElseBlock(parent)
     pushChunk(elseblock)
     parseActions()
     popChunk()
+    if elseblock.locals then
+        LocalCount = LocalCount - #elseblock.locals
+    end
     return elseblock
 end
 
@@ -3145,6 +3170,10 @@ local function parseFor()
         missEnd(action.keyword[1], action.keyword[2])
     end
 
+    if action.locals then
+        LocalCount = LocalCount - #action.locals
+    end
+
     return action
 end
 
@@ -3214,6 +3243,10 @@ local function parseWhile()
         missEnd(action.keyword[1], action.keyword[2])
     end
 
+    if action.locals then
+        LocalCount = LocalCount - #action.locals
+    end
+
     return action
 end
 
@@ -3256,6 +3289,10 @@ local function parseRepeat()
     popChunk()
     if action.filter then
         action.finish = action.filter.finish
+    end
+
+    if action.locals then
+        LocalCount = LocalCount - #action.locals
     end
 
     return action
@@ -3410,6 +3447,7 @@ local function parseLua()
         special= '_G',
         [1]    = State.ENVMode,
     }
+    LocalCount = 0
     skipFirstComment()
     while true do
         parseActions()
@@ -3431,6 +3469,7 @@ local function initState(lua, version, options)
     Line                = 0
     LineOffset          = 1
     LastTokenFinish     = 0
+    LocalCount          = 0
     Chunk               = {}
     Tokens              = tokens(lua)
     Index               = 1
