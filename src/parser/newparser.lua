@@ -577,6 +577,14 @@ local function parseLocalAttrs()
         if Tokens[Index + 1] == '>' then
             attr.finish = getPosition(Tokens[Index], 'right')
             Index = Index + 2
+        elseif Tokens[Index + 1] == '>=' then
+            attr.finish = getPosition(Tokens[Index], 'right')
+            pushError {
+                type   = 'MISS_SPACE_BETWEEN',
+                start  = getPosition(Tokens[Index], 'left'),
+                finish = getPosition(Tokens[Index] + 1, 'right'),
+            }
+            Index = Index + 2
         else
             missSymbol '>'
         end
@@ -1552,7 +1560,7 @@ local function parseTable()
     return tbl
 end
 
-local function parseSimple(node, enableCall)
+local function parseSimple(node, funcName)
     local lastMethod
     while true do
         if lastMethod and node.node == lastMethod then
@@ -1626,7 +1634,7 @@ local function parseSimple(node, enableCall)
             end
             lastMethod = getmethod
         elseif token == '(' then
-            if not enableCall then
+            if funcName then
                 break
             end
             local startPos = getPosition(Tokens[Index], 'left')
@@ -1672,7 +1680,7 @@ local function parseSimple(node, enableCall)
             end
             node = call
         elseif token == '{' then
-            if not enableCall then
+            if funcName then
                 break
             end
             local str = parseTable()
@@ -1693,7 +1701,7 @@ local function parseSimple(node, enableCall)
             str.parent = args
             return call
         elseif CharMapStrSH[token] then
-            if not enableCall then
+            if funcName then
                 break
             end
             local str = parseShortString()
@@ -1716,7 +1724,7 @@ local function parseSimple(node, enableCall)
         elseif CharMapStrLH[token] then
             local str = parseLongString()
             if str then
-                if not enableCall then
+                if funcName then
                     break
                 end
                 local call = {
@@ -1743,6 +1751,13 @@ local function parseSimple(node, enableCall)
                 index.node   = node
                 node.next    = index
                 node = index
+                if funcName then
+                    pushError {
+                        type   = 'INDEX_IN_FUNC_NAME',
+                        start  = index.bstart,
+                        finish = index.finish,
+                    }
+                end
             end
         else
             break
@@ -1753,7 +1768,7 @@ local function parseSimple(node, enableCall)
         lastMethod = nil
     end
     if node == lastMethod then
-        if not enableCall then
+        if funcName then
             lastMethod = nil
         end
     end
@@ -2040,7 +2055,7 @@ local function parseFunction(isLocal, isAction)
     if not hasLeftParen then
         local name = parseName()
         if name then
-            local simple = parseSimple(name, false)
+            local simple = parseSimple(name, true)
             if isLocal then
                 if simple == name then
                     createLocal(name)
@@ -2134,7 +2149,7 @@ local function parseExpUnit()
     local token = Tokens[Index + 1]
     if token == '(' then
         local paren = parseParen()
-        return parseSimple(paren, true)
+        return parseSimple(paren, false)
     end
 
     if token == '...' then
@@ -2181,7 +2196,7 @@ local function parseExpUnit()
 
     local node = parseName()
     if node then
-        return parseSimple(resolveName(node), true)
+        return parseSimple(resolveName(node), false)
     end
 
     return nil

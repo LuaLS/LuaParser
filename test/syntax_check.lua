@@ -467,6 +467,7 @@ TEST [[
 local x <const<!>=!> 1
 ]]
 {
+    multi = 1,
     type = 'MISS_SPACE_BETWEEN',
 }
 
