@@ -3462,9 +3462,9 @@ local function parseLua()
     pushChunk(main)
     createLocal{
         type   = 'local',
-        start  = 0,
-        finish = 0,
-        effect = 0,
+        start  = -1,
+        finish = -1,
+        effect = -1,
         parent = main,
         tag    = '_ENV',
         special= '_G',

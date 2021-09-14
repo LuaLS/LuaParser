@@ -19,7 +19,7 @@ local function main()
     --collectgarbage 'stop'
     unitTest 'ast'
     unitTest 'grammar'
-    unitTest 'lines'
+    --unitTest 'lines'
     unitTest 'grammar_check'
     unitTest 'syntax_check'
     --unitTest 'guide'
