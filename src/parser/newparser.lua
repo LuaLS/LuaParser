@@ -2458,6 +2458,16 @@ local function bindValue(n, v, index, lastValue, isLocal, isSet)
         n.effect = lastRightPosition()
     elseif isSet then
         n.type = GetToSetMap[n.type] or n.type
+        if n.type == 'setlocal' then
+            local loc = n.node
+            if loc.attrs then
+                pushError {
+                    type   = 'SET_CONST',
+                    start  = n.start,
+                    finish = n.finish,
+                }
+            end
+        end
     end
     if not v and lastValue then
         if lastValue.type == 'call'
