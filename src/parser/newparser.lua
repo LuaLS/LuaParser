@@ -624,10 +624,73 @@ local function pushChunk(chunk)
     Chunk[#Chunk+1] = chunk
 end
 
+local function resolveLable(label, obj)
+    if not label.ref then
+        label.ref = {}
+    end
+    label.ref[#label.ref+1] = obj
+    obj.node = label
+
+    -- 如果有局部变量在 goto 与 label 之间声明，
+    -- 并在 label 之后使用，则算作语法错误
+
+    -- 如果 label 在 goto 之前声明，那么不会有中间声明的局部变量
+    if obj.start > label.start then
+        return
+    end
+
+    local block = guide.getBlock(obj)
+    local locals = block and block.locals
+    if not locals then
+        return
+    end
+
+    for i = 1, #locals do
+        local loc = locals[i]
+        -- 检查局部变量声明位置为 goto 与 label 之间
+        if loc.start < obj.start or loc.finish > label.finish then
+            goto CONTINUE
+        end
+        -- 检查局部变量的使用位置在 label 之后
+        local refs = loc.ref
+        if not refs then
+            goto CONTINUE
+        end
+        for j = 1, #refs do
+            local ref = refs[j]
+            if ref.finish > label.finish then
+                pushError {
+                    type   = 'JUMP_LOCAL_SCOPE',
+                    start  = obj.start,
+                    finish = obj.finish,
+                    info   = {
+                        loc = loc[1],
+                    },
+                    relative = {
+                        {
+                            start  = label.start,
+                            finish = label.finish,
+                        },
+                        {
+                            start  = loc.start,
+                            finish = loc.finish,
+                        }
+                    },
+                }
+                return
+            end
+        end
+        ::CONTINUE::
+    end
+end
+
 local function resolveGoTo(gotos)
     for i = 1, #gotos do
         local action = gotos[i]
-        if not guide.getLabel(action, action[1]) then
+        local label  = guide.getLabel(action, action[1])
+        if label then
+            resolveLable(label, action)
+        else
             pushError {
                 type   = 'NO_VISIBLE_LABEL',
                 start  = action.start,
@@ -645,6 +708,10 @@ local function popChunk()
     if chunk.gotos then
         resolveGoTo(chunk.gotos)
         chunk.gotos = nil
+    end
+    local lastAction = chunk[#chunk]
+    if lastAction then
+        chunk.finish = lastAction.finish
     end
     Chunk[#Chunk] = nil
 end
@@ -2036,6 +2103,7 @@ local function parseFunction(isLocal, isAction)
         missSymbol '('
     end
     parseActions()
+    popChunk()
     if Tokens[Index + 1] == 'end' then
         local endLeft   = getPosition(Tokens[Index], 'left')
         local endRight  = getPosition(Tokens[Index] + 2, 'right')
@@ -2046,7 +2114,6 @@ local function parseFunction(isLocal, isAction)
     else
         missEnd(funcLeft, funcRight)
     end
-    popChunk()
     return func
 end
 
@@ -2330,7 +2397,6 @@ local function pushActionIntoCurrentChunk(action)
     if chunk then
         chunk[#chunk+1] = action
         action.parent   = chunk
-        chunk.finish    = action.finish
     end
 end
 
@@ -2573,8 +2639,10 @@ local function parseDo()
         },
     }
     Index = Index + 2
+    pushActionIntoCurrentChunk(obj)
     pushChunk(obj)
     parseActions()
+    popChunk()
     if Tokens[Index + 1] == 'end' then
         obj.finish     = getPosition(Tokens[Index] + 2, 'right')
         obj.keyword[3] = getPosition(Tokens[Index], 'left')
@@ -2583,9 +2651,6 @@ local function parseDo()
     else
         missEnd(doLeft, doRight)
     end
-    popChunk()
-
-    pushActionIntoCurrentChunk(obj)
 
     return obj
 end
@@ -2648,12 +2713,30 @@ local function parseLabel()
     label.type = 'label'
     pushActionIntoCurrentChunk(label)
 
-    local chunk = Chunk[#Chunk]
-    if chunk then
-        if not chunk.labels then
-            chunk.labels = {}
+    local block = guide.getBlock(label)
+    if block then
+        if not block.labels then
+            block.labels = {}
         end
-        chunk.labels[label[1]] = label
+        local name = label[1]
+        local olabel = guide.getLabel(block, name)
+        if olabel then
+            if State.version == 'Lua 5.4'
+            or block == guide.getBlock(olabel) then
+                pushError {
+                    type   = 'REDEFINED_LABEL',
+                    start  = label.start,
+                    finish = label.finish,
+                    relative = {
+                        {
+                            olabel.start,
+                            olabel.finish,
+                        }
+                    }
+                }
+            end
+        end
+        block.labels[name] = label
     end
 
     if State.version == 'Lua 5.1' then
@@ -2699,12 +2782,13 @@ local function parseGoTo()
     return action
 end
 
-local function parseIfBlock()
+local function parseIfBlock(parent)
     local ifLeft  = getPosition(Tokens[Index], 'left')
     local ifRight = getPosition(Tokens[Index] + 1, 'right')
     Index = Index + 2
     local ifblock = {
         type    = 'ifblock',
+        parent  = parent,
         start   = ifLeft,
         finish  = ifRight,
         keyword = {
@@ -2753,11 +2837,12 @@ local function parseIfBlock()
     return ifblock
 end
 
-local function parseElseIfBlock()
+local function parseElseIfBlock(parent)
     local ifLeft  = getPosition(Tokens[Index], 'left')
     local ifRight = getPosition(Tokens[Index] + 5, 'right')
     local elseifblock = {
         type    = 'elseifblock',
+        parent  = parent,
         start   = ifLeft,
         finish  = ifRight,
         keyword = {
@@ -2807,11 +2892,12 @@ local function parseElseIfBlock()
     return elseifblock
 end
 
-local function parseElseBlock()
+local function parseElseBlock(parent)
     local ifLeft  = getPosition(Tokens[Index], 'left')
     local ifRight = getPosition(Tokens[Index] + 3, 'right')
     local elseblock = {
         type    = 'elseblock',
+        parent  = parent,
         start   = ifLeft,
         finish  = ifRight,
         keyword = {
@@ -2835,6 +2921,7 @@ local function parseIf()
         start  = left,
         finish = getPosition(Tokens[Index] + #token - 1, 'right'),
     }
+    pushActionIntoCurrentChunk(action)
     if token ~= 'if' then
         missSymbol('if', left, left)
     end
@@ -2843,11 +2930,11 @@ local function parseIf()
         local word = Tokens[Index + 1]
         local child
         if     word == 'if' then
-            child = parseIfBlock()
+            child = parseIfBlock(action)
         elseif word == 'elseif' then
-            child = parseElseIfBlock()
+            child = parseElseIfBlock(action)
         elseif word == 'else' then
-            child = parseElseBlock()
+            child = parseElseBlock(action)
         end
         if not child then
             break
@@ -2863,7 +2950,6 @@ local function parseIf()
             hasElse = true
         end
         action[#action+1] = child
-        child.parent = action
         action.finish = child.finish
         skipSpace()
     end
@@ -2875,7 +2961,6 @@ local function parseIf()
         missEnd(action[1].keyword[1], action[1].keyword[2])
     end
 
-    pushActionIntoCurrentChunk(action)
     return action
 end
 
@@ -2889,6 +2974,7 @@ local function parseFor()
     action.keyword[1] = action.start
     action.keyword[2] = action.finish
     Index = Index + 2
+    pushActionIntoCurrentChunk(action)
     pushChunk(action)
     skipSpace()
     local nameOrList = parseNameOrList()
@@ -3037,6 +3123,7 @@ local function parseFor()
 
     skipSpace()
     parseActions()
+    popChunk()
 
     skipSpace()
     if Tokens[Index + 1] == 'end' then
@@ -3047,10 +3134,6 @@ local function parseFor()
     else
         missEnd(action.keyword[1], action.keyword[2])
     end
-
-    popChunk()
-
-    pushActionIntoCurrentChunk(action)
 
     return action
 end
@@ -3105,6 +3188,7 @@ local function parseWhile()
         missSymbol 'do'
     end
 
+    pushActionIntoCurrentChunk(action)
     pushChunk(action)
     skipSpace()
     parseActions()
@@ -3120,8 +3204,6 @@ local function parseWhile()
         missEnd(action.keyword[1], action.keyword[2])
     end
 
-    pushActionIntoCurrentChunk(action)
-
     return action
 end
 
@@ -3136,6 +3218,7 @@ local function parseRepeat()
     action.keyword[2] = action.finish
     Index = Index + 2
 
+    pushActionIntoCurrentChunk(action)
     pushChunk(action)
     skipSpace()
     parseActions()
@@ -3151,7 +3234,6 @@ local function parseRepeat()
         local filter = parseExp()
         if filter then
             action.filter = filter
-            action.finish = filter.finish
             filter.parent = action
         else
             missExp()
@@ -3162,8 +3244,9 @@ local function parseRepeat()
     end
 
     popChunk()
-
-    pushActionIntoCurrentChunk(action)
+    if action.filter then
+        action.finish = action.filter.finish
+    end
 
     return action
 end
