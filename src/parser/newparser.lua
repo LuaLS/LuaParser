@@ -1905,6 +1905,9 @@ local function resolveName(node)
             loc.ref = {}
         end
         loc.ref[#loc.ref+1] = node
+        if loc.special then
+            addSpecial(loc.special, node)
+        end
     else
         node.type = 'getglobal'
         local env = getLocal(State.ENVMode, node.start)
