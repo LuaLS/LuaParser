@@ -2520,6 +2520,9 @@ end
 local function bindValue(n, v, index, lastValue, isLocal, isSet)
     if isLocal then
         n.effect = lastRightPosition()
+        if v and v.special then
+            addSpecial(v.special, n)
+        end
     elseif isSet then
         n.type = GetToSetMap[n.type] or n.type
         if n.type == 'setlocal' then
