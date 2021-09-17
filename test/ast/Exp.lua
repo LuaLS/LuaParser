@@ -115,21 +115,10 @@ CHECK'1 < 2'
 }
 CHECK'- 1'
 {
-    type   = "unary",
+    type   = "integer",
     start  = 0,
     finish = 3,
-    op     = {
-        type   = "-",
-        start  = 0,
-        finish = 1,
-    },
-    [1]    = {
-        type   = "integer",
-        start  = 2,
-        finish = 3,
-        parent = "<IGNORE>",
-        [1]    = 1,
-    },
+    [1]    = -1,
 }
 CHECK'not not true'
 {
@@ -349,22 +338,11 @@ CHECK'- 1 + 2 * 3'
         finish = 5,
     },
     [1]    = {
-        type   = "unary",
+        type   = "integer",
         start  = 0,
         finish = 3,
         parent = "<IGNORE>",
-        op     = {
-            type   = "-",
-            start  = 0,
-            finish = 1,
-        },
-        [1]    = {
-            type   = "integer",
-            start  = 2,
-            finish = 3,
-            parent = "<IGNORE>",
-            [1]    = 1,
-        },
+        [1]    = -1,
     },
     [2]    = {
         type   = "binary",
@@ -403,22 +381,11 @@ CHECK'-1 + 2 * 3'
         finish = 4,
     },
     [1]    = {
-        type   = "unary",
+        type   = "integer",
         start  = 0,
         finish = 2,
         parent = "<IGNORE>",
-        op     = {
-            type   = "-",
-            start  = 0,
-            finish = 1,
-        },
-        [1]    = {
-            type   = "integer",
-            start  = 1,
-            finish = 2,
-            parent = "<IGNORE>",
-            [1]    = 1,
-        },
+        [1]    = -1,
     },
     [2]    = {
         type   = "binary",
@@ -676,88 +643,11 @@ CHECK'1 + - - - - - - - 1'
         [1]    = 1,
     },
     [2]    = {
-        type   = "unary",
+        type   = "integer",
         start  = 4,
         finish = 19,
         parent = "<IGNORE>",
-        op     = {
-            type   = "-",
-            start  = 4,
-            finish = 5,
-        },
-        [1]    = {
-            type   = "unary",
-            start  = 6,
-            finish = 19,
-            parent = "<IGNORE>",
-            op     = {
-                type   = "-",
-                start  = 6,
-                finish = 7,
-            },
-            [1]    = {
-                type   = "unary",
-                start  = 8,
-                finish = 19,
-                parent = "<IGNORE>",
-                op     = {
-                    type   = "-",
-                    start  = 8,
-                    finish = 9,
-                },
-                [1]    = {
-                    type   = "unary",
-                    start  = 10,
-                    finish = 19,
-                    parent = "<IGNORE>",
-                    op     = {
-                        type   = "-",
-                        start  = 10,
-                        finish = 11,
-                    },
-                    [1]    = {
-                        type   = "unary",
-                        start  = 12,
-                        finish = 19,
-                        parent = "<IGNORE>",
-                        op     = {
-                            type   = "-",
-                            start  = 12,
-                            finish = 13,
-                        },
-                        [1]    = {
-                            type   = "unary",
-                            start  = 14,
-                            finish = 19,
-                            parent = "<IGNORE>",
-                            op     = {
-                                type   = "-",
-                                start  = 14,
-                                finish = 15,
-                            },
-                            [1]    = {
-                                type   = "unary",
-                                start  = 16,
-                                finish = 19,
-                                parent = "<IGNORE>",
-                                op     = {
-                                    type   = "-",
-                                    start  = 16,
-                                    finish = 17,
-                                },
-                                [1]    = {
-                                    type   = "integer",
-                                    start  = 18,
-                                    finish = 19,
-                                    parent = "<IGNORE>",
-                                    [1]    = 1,
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-        },
+        [1]    = -1,
     },
 }
 CHECK'(1)'
