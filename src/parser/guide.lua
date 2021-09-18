@@ -182,7 +182,7 @@ end
         elseif type(def) == 'string' then
             text[#text+1] = ([[
 local o = obj.%s
-if o and not mark[o] then
+if not mark[o] then
     mark[o] = true
     index = index + 1
     list[index] = o
@@ -191,7 +191,7 @@ end
         else
             text[#text+1] = ([[
 local o = obj[%q]
-if o and not mark[o] then
+if not mark[o] then
     mark[o] = true
     index = index + 1
     list[index] = o
