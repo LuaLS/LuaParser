@@ -707,10 +707,13 @@ function m.eachSource(ast, callback)
             if not obj then
                 break
             end
-            index = index + 1
             if not mark[obj] then
+                index = index + 1
                 mark[obj] = true
                 addChilds(cache, obj)
+            else
+                cache[index] = cache[#cache]
+                cache[#cache] = nil
             end
         end
     end
