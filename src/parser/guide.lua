@@ -710,6 +710,8 @@ function m.eachSource(ast, callback)
             if not mark[obj] then
                 mark[obj] = true
                 addChilds(cache, obj)
+            else
+                cache[index] = false
             end
         end
     end
