@@ -144,24 +144,19 @@ local childMap = {
 }
 
 ---@type table<string, fun(obj: parser.guide.object, list: parser.guide.object[])>
-local compiledChildMap = setmetatable({}, {__index = function (self, name, mark)
+local compiledChildMap = setmetatable({}, {__index = function (self, name)
     local defs = childMap[name]
     if not defs then
         self[name] = false
         return false
     end
     local text = {}
-    text[#text+1] = 'local obj, list, mark = ...;local index = #list'
+    text[#text+1] = 'local obj, list = ...'
     for _, def in ipairs(defs) do
         if def == '#' then
             text[#text+1] = [[
 for i = 1, #obj do
-    local o = obj[i]
-    if not mark[o] then
-        mark[o] = true
-        index = index + 1
-        list[index] = o
-    end
+    list[#list+1] = obj[i]
 end
 ]]
         elseif type(def) == 'string' and def:sub(1, 1) == '#' then
@@ -170,33 +165,14 @@ end
 local childs = obj.%s
 if childs then
     for i = 1, #childs do
-        local o = childs[i]
-        if not mark[o] then
-            mark[o] = true
-            index = index + 1
-            list[index] = o
-        end
+        list[#list+1] = childs[i]
     end
 end
 ]]):format(key)
         elseif type(def) == 'string' then
-            text[#text+1] = ([[
-local o = obj.%s
-if not mark[o] then
-    mark[o] = true
-    index = index + 1
-    list[index] = o
-end
-]]):format(def)
+            text[#text+1] = ('list[#list+1] = obj.%s'):format(def)
         else
-            text[#text+1] = ([[
-local o = obj[%q]
-if not mark[o] then
-    mark[o] = true
-    index = index + 1
-    list[index] = o
-end
-]]):format(def)
+            text[#text+1] = ('list[#list+1] = obj[%q]'):format(def)
         end
     end
     local buf = table.concat(text, '\n')
@@ -608,7 +584,7 @@ function m.isBetweenRange(source, tStart, tFinish)
 end
 
 --- 添加child
-local function addChilds(list, obj, mark)
+local function addChilds(list, obj)
     local tp = obj.type
     if not tp then
         return
@@ -617,7 +593,7 @@ local function addChilds(list, obj, mark)
     if not f then
         return
     end
-    f(obj, list, mark)
+    f(obj, list)
 end
 
 --- 遍历所有包含offset的source
@@ -733,7 +709,7 @@ function m.eachSource(ast, callback)
             index = index + 1
             if not mark[obj] then
                 mark[obj] = true
-                addChilds(cache, obj, mark)
+                addChilds(cache, obj)
             end
         end
     end
