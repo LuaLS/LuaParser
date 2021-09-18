@@ -2145,7 +2145,6 @@ local function parseFunction(isLocal, isAction)
             params.finish = lastRightPosition()
             params.parent = func
             func.args     = params
-            func.finish   = params.finish
         end
         skipSpace()
         if Tokens[Index + 1] == ')' then
@@ -2157,6 +2156,7 @@ local function parseFunction(isLocal, isAction)
             Index = Index + 2
             skipSpace()
         else
+            func.finish = lastRightPosition()
             if params then
                 params.finish = func.finish
             end

@@ -221,6 +221,34 @@ CHECK 'local function'
     },
 }
 
+CHECK 'local function f('
+{
+    type   = "main",
+    start  = 0,
+    finish = 17,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "local",
+        start  = 15,
+        vstart = 6,
+        finish = 16,
+        effect = 16,
+        range  = 17,
+        parent = "<IGNORE>",
+        value  = {
+            type    = "function",
+            start   = 6,
+            finish  = 17,
+            keyword = {
+                [1] = 6,
+                [2] = 14,
+            },
+            parent  = "<IGNORE>",
+        },
+        [1]    = "f",
+    },
+}
+
 CHECK 'local function a(v'
 {
     type   = "main",
