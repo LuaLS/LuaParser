@@ -830,7 +830,6 @@ CHECK'table[1]'
 {
     type   = "getindex",
     start  = 0,
-    bstart = 5,
     finish = 8,
     node   = "<IGNORE>",
     index  = {
@@ -927,7 +926,6 @@ CHECK'(...)[1]'
 {
     type   = "getindex",
     start  = 0,
-    bstart = 5,
     finish = 8,
     node   = "<IGNORE>",
     index  = {
