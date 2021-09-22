@@ -476,7 +476,9 @@ local function skipComment(isAction)
     or (token == '//' and isAction) then
         local start = Tokens[Index]
         local left = getPosition(start, 'left')
+        local chead = false
         if token == '//' then
+            chead = true
             pushCommentHeadError(left)
         end
         Index = Index + 2
@@ -497,7 +499,7 @@ local function skipComment(isAction)
             Index = Index + 2
         end
         State.comms[#State.comms+1] = {
-            type   = 'comment.shot',
+            type   = chead and 'comment.cshort' or 'comment.short',
             start  = left,
             finish = getPosition(Tokens[Index], 'right'),
             text   = ssub(Lua, start + 2, Tokens[Index] and (Tokens[Index] - 1) or #Lua),
