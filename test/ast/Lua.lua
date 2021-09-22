@@ -1079,3 +1079,29 @@ f(x: number, y?: table<number, boolean>, z?: number|boolean, 1)
         },
     },
 }
+CHECK [[
+
+local s = [ [=[111]=] ]
+]]
+{
+    type   = "main",
+    start  = 0,
+    finish = 20000,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "local",
+        start  = 10006,
+        finish = 10007,
+        effect = 10009,
+        parent = "<IGNORE>",
+        [1]    = "s",
+    },
+    [2]    = {
+        type   = "string",
+        start  = 10012,
+        finish = 10021,
+        parent = "<IGNORE>",
+        [1]    = "111",
+        [2]    = "[=[",
+    },
+}

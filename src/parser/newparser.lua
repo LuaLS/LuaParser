@@ -416,11 +416,11 @@ local function parseLongString()
     fastForwardToken(finish + 1)
     local startPos     = getPosition(start, 'left')
     local finishMark   = sgsub(mark, '%[', ']')
-    local stringResult, finishOffset = resolveLongString(finishMark)
+    local stringResult, finishPos = resolveLongString(finishMark)
     return {
         type   = 'string',
         start  = startPos,
-        finish = getPosition(finishOffset, 'right'),
+        finish = finishPos,
         [1]    = stringResult,
         [2]    = mark,
     }
