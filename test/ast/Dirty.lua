@@ -972,3 +972,45 @@ f(if)
         },
     },
 }
+
+CHECK [[
+print(x == )
+]]
+{
+    type   = "main",
+    start  = 0,
+    finish = 10000,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "call",
+        start  = 0,
+        finish = 12,
+        parent = "<IGNORE>",
+        node   = "<IGNORE>",
+        args   = {
+            type   = "callargs",
+            start  = 5,
+            finish = 12,
+            parent = "<IGNORE>",
+            [1]    = {
+                type   = "binary",
+                start  = 6,
+                finish = 10,
+                parent = "<IGNORE>",
+                op     = {
+                    type   = "==",
+                    start  = 8,
+                    finish = 10,
+                },
+                [1]    = {
+                    type   = "getglobal",
+                    start  = 6,
+                    finish = 7,
+                    parent = "<IGNORE>",
+                    node   = "<IGNORE>",
+                    [1]    = "x",
+                },
+            },
+        },
+    },
+}

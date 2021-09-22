@@ -1663,6 +1663,7 @@ local function parseSimple(node, funcName)
                 call.finish = getPosition(Tokens[Index], 'right')
                 Index = Index + 2
             else
+                call.finish = lastRightPosition()
                 missSymbol ')'
             end
             if args then
