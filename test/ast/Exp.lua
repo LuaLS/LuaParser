@@ -1422,3 +1422,40 @@ CHECK 'notify'
     finish = 6,
     [1]    = "notify",
 }
+
+CHECK 'a ^ - b'
+{
+    type   = "binary",
+    start  = 0,
+    finish = 7,
+    op     = {
+        type   = "^",
+        start  = 2,
+        finish = 3,
+    },
+    [1]    = {
+        type   = "getglobal",
+        start  = 0,
+        finish = 1,
+        parent = "<IGNORE>",
+        [1]    = "a",
+    },
+    [2]    = {
+        type   = "unary",
+        start  = 4,
+        finish = 7,
+        parent = "<IGNORE>",
+        op     = {
+            type   = "-",
+            start  = 4,
+            finish = 5,
+        },
+        [1]    = {
+            type   = "getglobal",
+            start  = 6,
+            finish = 7,
+            parent = "<IGNORE>",
+            [1]    = "b",
+        },
+    },
+}

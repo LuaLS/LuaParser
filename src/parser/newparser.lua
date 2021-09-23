@@ -2243,16 +2243,13 @@ local function parseExpUnit()
     return nil
 end
 
-local function parseUnaryOP(level)
+local function parseUnaryOP()
     local token  = Tokens[Index + 1]
     local symbol = UnarySymbol[token] and token or UnaryAlias[token]
     if not symbol then
         return nil
     end
     local myLevel = UnarySymbol[symbol]
-    if level and myLevel < level then
-        return nil
-    end
     local op = {
         type   = symbol,
         start  = getPosition(Tokens[Index], 'left'),
@@ -2341,7 +2338,7 @@ end
 
 function parseExp(asAction, level)
     local exp
-    local uop, uopLevel = parseUnaryOP(level)
+    local uop, uopLevel = parseUnaryOP()
     if uop then
         skipSpace()
         local child = parseExp(asAction, uopLevel)
