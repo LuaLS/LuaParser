@@ -328,7 +328,18 @@ return {
     ---@type a
     b = 2,
 }
-]]
+]],
+[[
+local x = ...
+]],
+[[
+return not true
+]],
+[[
+for _ in _ do
+    do return end
+end
+]],
 }
 
 -- Dirty

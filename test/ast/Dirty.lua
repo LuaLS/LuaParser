@@ -943,7 +943,7 @@ end
 }
 
 CHECK [[
-f(if)
+f(break)
 ]]
 {
     type   = "main",
@@ -953,21 +953,21 @@ f(if)
     [1]    = {
         type   = "call",
         start  = 0,
-        finish = 5,
+        finish = 8,
         parent = "<IGNORE>",
         node   = "<IGNORE>",
         args   = {
             type   = "callargs",
             start  = 1,
-            finish = 5,
+            finish = 8,
             parent = "<IGNORE>",
             [1]    = {
                 type   = "getglobal",
                 start  = 2,
-                finish = 4,
+                finish = 7,
                 parent = "<IGNORE>",
                 node   = "<IGNORE>",
-                [1]    = "if",
+                [1]    = "break",
             },
         },
     },
