@@ -126,3 +126,20 @@ abcdef]]]=]
     [1]    = "abcdef",
     [2]    = "[[",
 }
+CHECK[['aaa]]
+{
+    type   = "string",
+    start  = 0,
+    finish = 4,
+    [1]    = "aaa",
+    [2]    = "'",
+}
+CHECK[['aaa
+]]
+{
+    type   = "string",
+    start  = 0,
+    finish = 4,
+    [1]    = "aaa",
+    [2]    = "'",
+}
