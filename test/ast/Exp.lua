@@ -1459,3 +1459,28 @@ CHECK 'a ^ - b'
         },
     },
 }
+
+CHECK [=[
+{
+[[]]
+}]=]
+{
+    type   = "table",
+    start  = 0,
+    finish = 20001,
+    [1]    = {
+        type   = "tableexp",
+        start  = 10000,
+        finish = 10004,
+        tindex = 1,
+        parent = "<IGNORE>",
+        value  = {
+            type   = "string",
+            start  = 10000,
+            finish = 10004,
+            parent = "<IGNORE>",
+            [1]    = "",
+            [2]    = "[[",
+        },
+    },
+}
