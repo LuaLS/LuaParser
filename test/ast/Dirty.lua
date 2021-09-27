@@ -1014,10 +1014,11 @@ print(x == )
         },
     },
 }
-CHECK[[
+CHECK [[
 local t = {
     a = 1,
-]]{
+]]
+{
     type   = "main",
     start  = 0,
     finish = 20000,
@@ -1055,6 +1056,45 @@ local t = {
                     [1]    = 1,
                 },
             },
+        },
+        [1]    = "t",
+    },
+}
+
+CHECK [[
+local t = function f() end
+]]
+{
+    type   = "main",
+    start  = 0,
+    finish = 10000,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "local",
+        start  = 6,
+        finish = 7,
+        effect = 26,
+        range  = 26,
+        parent = "<IGNORE>",
+        value  = {
+            name    = {
+                type   = "getglobal",
+                start  = 19,
+                finish = 20,
+                parent = "<IGNORE>",
+                node   = "<IGNORE>",
+                [1]    = "f",
+            },
+            type    = "function",
+            start   = 10,
+            finish  = 26,
+            keyword = {
+                [1] = 10,
+                [2] = 18,
+                [3] = 23,
+                [4] = 26,
+            },
+            parent  = "<IGNORE>",
         },
         [1]    = "t",
     },
