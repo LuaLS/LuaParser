@@ -1014,3 +1014,48 @@ print(x == )
         },
     },
 }
+CHECK[[
+local t = {
+    a = 1,
+]]{
+    type   = "main",
+    start  = 0,
+    finish = 20000,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "local",
+        start  = 6,
+        finish = 7,
+        effect = 10010,
+        range  = 10010,
+        parent = "<IGNORE>",
+        value  = {
+            type   = "table",
+            start  = 10,
+            finish = 10010,
+            parent = "<IGNORE>",
+            [1]    = {
+                type   = "tablefield",
+                start  = 10004,
+                finish = 10009,
+                parent = "<IGNORE>",
+                field  = {
+                    type   = "field",
+                    start  = 10004,
+                    finish = 10005,
+                    parent = "<IGNORE>",
+                    node   = "<IGNORE>",
+                    [1]    = "a",
+                },
+                value  = {
+                    type   = "integer",
+                    start  = 10008,
+                    finish = 10009,
+                    parent = "<IGNORE>",
+                    [1]    = 1,
+                },
+            },
+        },
+        [1]    = "t",
+    },
+}
