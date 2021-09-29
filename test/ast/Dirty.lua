@@ -1133,3 +1133,47 @@ end
         [1]    = "F",
     },
 }
+
+CHECK [[
+if true then
+    1
+end
+]]
+{
+    type   = "main",
+    start  = 0,
+    finish = 30000,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "if",
+        start  = 0,
+        finish = 20003,
+        parent = "<IGNORE>",
+        [1]    = {
+            type    = "ifblock",
+            start   = 0,
+            finish  = 10005,
+            keyword = {
+                [1] = 0,
+                [2] = 2,
+                [3] = 8,
+                [4] = 12,
+            },
+            parent  = "<IGNORE>",
+            filter  = {
+                type   = "boolean",
+                start  = 3,
+                finish = 7,
+                parent = "<IGNORE>",
+                [1]    = true,
+            },
+            [1]     = {
+                type   = "integer",
+                start  = 10004,
+                finish = 10005,
+                parent = "<IGNORE>",
+                [1]    = 1,
+            },
+        },
+    },
+}
