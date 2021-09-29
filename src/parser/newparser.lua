@@ -1992,7 +1992,9 @@ local function parseActions()
         end
         local action, failed = parseAction()
         if failed then
-            break
+            if not skipUnknownSymbol() then
+                break
+            end
         end
         if action then
             if action.type == 'return' then

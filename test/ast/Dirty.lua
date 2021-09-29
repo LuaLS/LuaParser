@@ -1099,3 +1099,37 @@ local t = function f() end
         [1]    = "t",
     },
 }
+
+CHECK [[
+function F()
+    in
+end
+]]
+{
+    type   = "main",
+    start  = 0,
+    finish = 30000,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "setglobal",
+        start  = 9,
+        vstart = 0,
+        finish = 10,
+        range  = 20003,
+        parent = "<IGNORE>",
+        node   = "<IGNORE>",
+        value  = {
+            type    = "function",
+            start   = 0,
+            finish  = 20003,
+            keyword = {
+                [1] = 0,
+                [2] = 8,
+                [3] = 20000,
+                [4] = 20003,
+            },
+            parent  = "<IGNORE>",
+        },
+        [1]    = "F",
+    },
+}
