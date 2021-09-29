@@ -1441,3 +1441,48 @@ end]]
         },
     },
 }
+
+CHECK [[
+if true then
+    X = print
+end
+]]
+{
+    type   = "if",
+    start  = 0,
+    finish = 20003,
+    [1]    = {
+        type    = "ifblock",
+        start   = 0,
+        finish  = 10013,
+        keyword = {
+            [1] = 0,
+            [2] = 2,
+            [3] = 8,
+            [4] = 12,
+        },
+        parent  = "<IGNORE>",
+        filter  = {
+            type   = "boolean",
+            start  = 3,
+            finish = 7,
+            parent = "<IGNORE>",
+            [1]    = true,
+        },
+        [1]     = {
+            type   = "setglobal",
+            start  = 10004,
+            finish = 10005,
+            range  = 10013,
+            parent = "<IGNORE>",
+            value  = {
+                type   = "getglobal",
+                start  = 10008,
+                finish = 10013,
+                parent = "<IGNORE>",
+                [1]    = "print",
+            },
+            [1]    = "X",
+        },
+    },
+}
