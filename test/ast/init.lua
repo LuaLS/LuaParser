@@ -142,7 +142,7 @@ local function test(type)
             if not state then
                 error(('语法树生成失败：%s'):format(err))
             end
-            parser:luadoc(state)
+            parser.luadoc(state)
             for _, doc in ipairs(state.ast.docs) do
                 doc.bindGroup = nil
                 doc.bindSources = nil
