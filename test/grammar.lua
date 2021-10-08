@@ -341,6 +341,11 @@ for _ in _ do
     do return end
 end
 ]],
+[[
+if true then
+    print(...)
+end
+]],
 }
 
 -- Dirty
