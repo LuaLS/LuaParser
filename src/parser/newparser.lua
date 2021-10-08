@@ -3645,8 +3645,18 @@ return function (lua, mode, version, options)
     elseif mode == 'Action' then
         State.ast = parseAction()
     end
+
     if State.ast then
         State.ast.state = State
+    end
+
+    while true do
+        if Index <= #Tokens then
+            unknownSymbol()
+            Index = Index + 2
+        else
+            break
+        end
     end
 
     return State
