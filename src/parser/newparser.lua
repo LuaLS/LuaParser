@@ -393,7 +393,7 @@ local function resolveLongString(finishMark)
         finishOffset = #Lua + 1
         miss = true
     end
-    local stringResult = ssub(Lua, start, finishOffset - 1)
+    local stringResult = start and ssub(Lua, start, finishOffset - 1)
     local lastLN = stringResult:find '[\r\n][^\r\n]*$'
     if lastLN then
         local result = stringResult
@@ -909,6 +909,9 @@ local function parseShortString()
             stringPool[stringIndex] = ssub(Lua, currentOffset, Tokens[Index] - 1)
             currentOffset = Tokens[Index]
             Index = Index + 2
+            if not Tokens[Index] then
+                goto CONTINUE
+            end
             -- has space?
             if Tokens[Index] - currentOffset > 1 then
                 pushError {
@@ -1531,8 +1534,8 @@ local function parseTable()
                 }
             end
             wantSep = true
-            index = index + 1
             if exp.type == 'varargs' then
+                index = index + 1
                 tbl[index] = exp
                 exp.parent = tbl
                 goto CONTINUE
@@ -1559,6 +1562,7 @@ local function parseTable()
                     else
                         missExp()
                     end
+                    index = index + 1
                     tbl[index] = tfield
                     goto CONTINUE
                 end
@@ -1572,6 +1576,7 @@ local function parseTable()
                 value  = exp,
             }
             exp.parent = texp
+            index = index + 1
             tbl[index] = texp
             goto CONTINUE
         end
@@ -1585,7 +1590,6 @@ local function parseTable()
                 }
             end
             wantSep = true
-            index = index + 1
             local tindex = parseIndex()
             skipSpace()
             if expectAssign() then
@@ -1600,6 +1604,7 @@ local function parseTable()
                 else
                     missExp()
                 end
+                index = index + 1
                 tbl[index] = tindex
             else
                 missSymbol '='
@@ -1956,7 +1961,7 @@ local function resolveName(node)
     else
         local ospeicals = State.options.special
         if ospeicals and ospeicals[name] then
-            addSpecial(name, node)
+            addSpecial(ospeicals[name], node)
         end
     end
     return node
