@@ -115,6 +115,21 @@ local function TEST(script)
     end
 end
 
+TEST [[
+local <!true!> = 1
+]]
+{
+    type = 'KEYWORD'
+}
+
+TEST [[
+local function f(<!true!>)
+end
+]]
+{
+    type = 'KEYWORD'
+}
+
 TEST[[
 function f()
     return <!...!>
