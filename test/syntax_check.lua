@@ -500,3 +500,18 @@ function mt<![]!>() end
     multi = 2,
     type  = 'INDEX_IN_FUNC_NAME'
 }
+
+Version = 'Lua 5.4'
+TEST [[
+goto<!!> = 1
+]]
+{
+    multi = 1,
+    type  = 'MISS_NAME'
+}
+
+Version = 'Lua 5.1'
+TEST [[
+goto = 1
+]]
+(nil)
