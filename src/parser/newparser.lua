@@ -572,7 +572,7 @@ local function expectAssign(isAction)
         or token == '-='
         or token == '*='
         or token == '/=' then
-            if not State.options.nonstandardSymbol[tokens] then
+            if not State.options.nonstandardSymbol[token] then
                 unknownSymbol()
             end
             Index = Index + 2
