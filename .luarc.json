@@ -1,0 +1,13 @@
+{
+    "$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
+    "diagnostics": {
+        "globals": [
+            "root",
+            "log",
+            "tracy"
+        ]
+    },
+    "runtime": {
+        "version": "Lua 5.4"
+    }
+}
