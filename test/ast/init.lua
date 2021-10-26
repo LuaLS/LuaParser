@@ -110,7 +110,6 @@ local function autoFix(myBuf, targetBuf)
     local pos = fileBuf:find(targetBuf, 1, true)
     local newFileBuf = fileBuf:sub(1, pos-1) .. myBuf .. fileBuf:sub(pos + #targetBuf)
     utility.saveFile(filename, newFileBuf)
-    return
 end
 
 local function test(type)

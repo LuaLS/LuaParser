@@ -1486,3 +1486,71 @@ end
         },
     },
 }
+
+CHECK [[
+f:read('a')
+]]
+{
+    type   = "call",
+    start  = 0,
+    finish = 11,
+    node   = "<IGNORE>",
+    args   = {
+        type   = "callargs",
+        start  = 6,
+        finish = 11,
+        parent = "<IGNORE>",
+        [1]    = {
+            next   = "<IGNORE>",
+            type   = "getglobal",
+            start  = 0,
+            finish = 1,
+            parent = "<IGNORE>",
+            mirror = "<IGNORE>",
+            dummy  = true,
+            [1]    = "f",
+        },
+        [2]    = {
+            type   = "string",
+            start  = 7,
+            finish = 10,
+            parent = "<IGNORE>",
+            [1]    = "a",
+            [2]    = "'",
+        },
+    },
+}
+
+CHECK [[
+f:read 'a'
+]]
+{
+    type   = "call",
+    start  = 0,
+    finish = 10,
+    node   = "<IGNORE>",
+    args   = {
+        type   = "callargs",
+        start  = 7,
+        finish = 10,
+        parent = "<IGNORE>",
+        [1]    = {
+            next   = "<IGNORE>",
+            type   = "getglobal",
+            start  = 0,
+            finish = 1,
+            parent = "<IGNORE>",
+            mirror = "<IGNORE>",
+            dummy  = true,
+            [1]    = "f",
+        },
+        [2]    = {
+            type   = "string",
+            start  = 7,
+            finish = 10,
+            parent = "<IGNORE>",
+            [1]    = "a",
+            [2]    = "'",
+        },
+    },
+}
