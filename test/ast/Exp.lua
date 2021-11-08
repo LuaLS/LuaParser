@@ -970,6 +970,7 @@ CHECK'function (...) end'
             start  = 10,
             finish = 13,
             parent = "<IGNORE>",
+            [1]    = "...",
         },
     },
 }
@@ -1003,6 +1004,7 @@ CHECK'function (a, ...) end'
             start  = 13,
             finish = 16,
             parent = "<IGNORE>",
+            [1]    = "...",
         },
     },
     locals  = "<IGNORE>",
