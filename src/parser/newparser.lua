@@ -2168,7 +2168,7 @@ local function parseFunction(isLocal, isAction)
     Index = Index + 2
     local LastLocalCount = LocalCount
     LocalCount = 0
-    skipSpace()
+    skipSpace(true)
     local hasLeftParen = Tokens[Index + 1] == '('
     if not hasLeftParen then
         local name = parseName()
@@ -2198,7 +2198,7 @@ local function parseFunction(isLocal, isAction)
                     finish = simple.finish,
                 }
             end
-            skipSpace()
+            skipSpace(true)
             hasLeftParen = Tokens[Index + 1] == '('
         end
     end
@@ -2229,7 +2229,7 @@ local function parseFunction(isLocal, isAction)
             params.parent = func
             func.args     = params
         end
-        skipSpace()
+        skipSpace(true)
         if Tokens[Index + 1] == ')' then
             local parenRight = getPosition(Tokens[Index], 'right')
             func.finish = parenRight
@@ -2237,7 +2237,7 @@ local function parseFunction(isLocal, isAction)
                 params.finish = parenRight
             end
             Index = Index + 2
-            skipSpace()
+            skipSpace(true)
         else
             func.finish = lastRightPosition()
             if params then
