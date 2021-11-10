@@ -2340,6 +2340,9 @@ local function parseBinaryOP(asAction, level)
     if not symbol then
         return nil
     end
+    if symbol == '//' and State.options.nonstandardSymbol['//'] then
+        return nil
+    end
     local myLevel = BinarySymbol[symbol]
     if level and myLevel < level then
         return nil
