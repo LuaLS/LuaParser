@@ -487,7 +487,13 @@ end
 local function skipComment(isAction)
     local token = Tokens[Index + 1]
     if token == '--'
-    or (token == '//' and isAction) then
+    or (
+        token == '//'
+        and (
+            isAction
+            or State.options.nonstandardSymbol['//']
+        )
+    ) then
         local start = Tokens[Index]
         local left = getPosition(start, 'left')
         local chead = false
@@ -1527,7 +1533,7 @@ local function parseTable()
     local index = 0
     local wantSep = false
     while true do
-        skipSpace()
+        skipSpace(true)
         local token = Tokens[Index + 1]
         if token == '}' then
             Index = Index + 2

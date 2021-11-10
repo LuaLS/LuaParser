@@ -1119,7 +1119,7 @@ local x = 1 // 2
         type   = "local",
         start  = 6,
         finish = 7,
-        effect = 11,
+        effect = 16,
         range  = 11,
         parent = "<IGNORE>",
         value  = {
@@ -1128,6 +1128,79 @@ local x = 1 // 2
             finish = 11,
             parent = "<IGNORE>",
             [1]    = 1,
+        },
+        [1]    = "x",
+    },
+}
+
+CHECK([[
+local x = {
+    1, // BAD
+    2, // GOOD
+    3, // GOOD
+}
+]], {
+    nonstandardSymbol = { ['//'] = true }
+})
+{
+    type   = "main",
+    start  = 0,
+    finish = 50000,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "local",
+        start  = 6,
+        finish = 7,
+        effect = 40001,
+        range  = 40001,
+        parent = "<IGNORE>",
+        value  = {
+            type   = "table",
+            start  = 10,
+            finish = 40001,
+            parent = "<IGNORE>",
+            [1]    = {
+                type   = "tableexp",
+                start  = 10004,
+                finish = 10005,
+                tindex = 1,
+                parent = "<IGNORE>",
+                value  = {
+                    type   = "integer",
+                    start  = 10004,
+                    finish = 10005,
+                    parent = "<IGNORE>",
+                    [1]    = 1,
+                },
+            },
+            [2]    = {
+                type   = "tableexp",
+                start  = 20004,
+                finish = 20005,
+                tindex = 2,
+                parent = "<IGNORE>",
+                value  = {
+                    type   = "integer",
+                    start  = 20004,
+                    finish = 20005,
+                    parent = "<IGNORE>",
+                    [1]    = 2,
+                },
+            },
+            [3]    = {
+                type   = "tableexp",
+                start  = 30004,
+                finish = 30005,
+                tindex = 3,
+                parent = "<IGNORE>",
+                value  = {
+                    type   = "integer",
+                    start  = 30004,
+                    finish = 30005,
+                    parent = "<IGNORE>",
+                    [1]    = 3,
+                },
+            },
         },
         [1]    = "x",
     },
