@@ -1105,3 +1105,30 @@ local s = [ [=[111]=] ]
         [2]    = "[=[",
     },
 }
+CHECK([[
+local x = 1 // 2
+]], {
+    nonstandardSymbol = { ['//'] = true }
+})
+{
+    type   = "main",
+    start  = 0,
+    finish = 10000,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "local",
+        start  = 6,
+        finish = 7,
+        effect = 11,
+        range  = 11,
+        parent = "<IGNORE>",
+        value  = {
+            type   = "integer",
+            start  = 10,
+            finish = 11,
+            parent = "<IGNORE>",
+            [1]    = 1,
+        },
+        [1]    = "x",
+    },
+}

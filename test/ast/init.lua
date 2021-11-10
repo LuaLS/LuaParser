@@ -117,9 +117,9 @@ local function test(type)
     if mode == 'Dirty' then
         mode = 'Lua'
     end
-    CHECK = function (buf)
+    CHECK = function (buf, opt)
         return function (target_ast)
-            local state, err = parser.compile(buf, mode, 'Lua 5.4')
+            local state, err = parser.compile(buf, mode, 'Lua 5.4', opt)
             if not state then
                 error(('语法树生成失败：%s'):format(err))
             end
