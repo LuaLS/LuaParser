@@ -432,6 +432,14 @@ local x <const> = 1
 }
 
 TEST[[
+local x <const> = 1
+function <!x!>() end
+]]
+{
+    type = 'SET_CONST',
+}
+
+TEST[[
 local x <close> = 1
 <!x!> = 2
 ]]
