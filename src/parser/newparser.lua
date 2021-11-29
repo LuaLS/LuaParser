@@ -367,6 +367,17 @@ local function skipNL()
     return false
 end
 
+local function getSavePoint()
+    local index = Index
+    local line  = Line
+    local lineOffset = LineOffset
+    return function ()
+        Index = index
+        Line  = line
+        LineOffset = lineOffset
+    end
+end
+
 local function fastForwardToken(offset)
     while true do
         local myOffset = Tokens[Index]
@@ -1549,7 +1560,7 @@ local function parseTable()
         end
         local lastRight = lastRightPosition()
 
-        local savePoint = Index
+        local savePoint = getSavePoint()
         local name = parseName()
         if name then
             skipSpace()
@@ -1585,7 +1596,7 @@ local function parseTable()
                 tbl[index] = tfield
                 goto CONTINUE
             end
-            Index = savePoint
+            savePoint()
         end
 
         local exp = parseExp(true)

@@ -1259,3 +1259,55 @@ return {
         },
     },
 }
+
+CHECK [[
+local x
+a = {
+    x
+}
+]]
+{
+    type   = "main",
+    start  = 0,
+    finish = 40000,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "local",
+        start  = 6,
+        finish = 7,
+        effect = 7,
+        parent = "<IGNORE>",
+        ref    = "<IGNORE>",
+        [1]    = "x",
+    },
+    [2]    = {
+        type   = "setglobal",
+        start  = 10000,
+        finish = 10001,
+        range  = 30001,
+        parent = "<IGNORE>",
+        node   = "<IGNORE>",
+        value  = {
+            type   = "table",
+            start  = 10004,
+            finish = 30001,
+            parent = "<IGNORE>",
+            [1]    = {
+                type   = "tableexp",
+                start  = 20004,
+                finish = 20005,
+                tindex = 1,
+                parent = "<IGNORE>",
+                value  = {
+                    type   = "getlocal",
+                    start  = 20004,
+                    finish = 20005,
+                    parent = "<IGNORE>",
+                    node   = "<IGNORE>",
+                    [1]    = "x",
+                },
+            },
+        },
+        [1]    = "a",
+    },
+}
