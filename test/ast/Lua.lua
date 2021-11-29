@@ -1205,3 +1205,57 @@ local x = {
         [1]    = "x",
     },
 }
+
+CHECK [[
+local x
+return {
+    x = 1,
+}
+]]
+{
+    type    = "main",
+    start   = 0,
+    finish  = 40000,
+    locals  = "<IGNORE>",
+    returns = "<IGNORE>",
+    [1]     = {
+        type   = "local",
+        start  = 6,
+        finish = 7,
+        effect = 7,
+        parent = "<IGNORE>",
+        [1]    = "x",
+    },
+    [2]     = {
+        type   = "return",
+        start  = 10000,
+        finish = 30001,
+        parent = "<IGNORE>",
+        [1]    = {
+            type   = "table",
+            start  = 10007,
+            finish = 30001,
+            parent = "<IGNORE>",
+            [1]    = {
+                type   = "tablefield",
+                start  = 20004,
+                finish = 20009,
+                parent = "<IGNORE>",
+                field  = {
+                    type   = "field",
+                    start  = 20004,
+                    finish = 20005,
+                    parent = "<IGNORE>",
+                    [1]    = "x",
+                },
+                value  = {
+                    type   = "integer",
+                    start  = 20008,
+                    finish = 20009,
+                    parent = "<IGNORE>",
+                    [1]    = 1,
+                },
+            },
+        },
+    },
+}

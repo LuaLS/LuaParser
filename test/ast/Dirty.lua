@@ -1045,7 +1045,6 @@ local t = {
                     start  = 10004,
                     finish = 10005,
                     parent = "<IGNORE>",
-                    node   = "<IGNORE>",
                     [1]    = "a",
                 },
                 value  = {
