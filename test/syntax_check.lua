@@ -530,3 +530,10 @@ TEST [[
 goto = 1
 ]]
 (nil)
+
+TEST [[
+return {
+    function () end
+}
+]]
+(nil)

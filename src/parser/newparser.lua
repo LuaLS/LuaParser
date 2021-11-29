@@ -371,10 +371,15 @@ local function getSavePoint()
     local index = Index
     local line  = Line
     local lineOffset = LineOffset
+    local errs  = State.errs
+    local errCount = #errs
     return function ()
         Index = index
         Line  = line
         LineOffset = lineOffset
+        for i = errCount + 1, #errs do
+            errs[i] = nil
+        end
     end
 end
 
