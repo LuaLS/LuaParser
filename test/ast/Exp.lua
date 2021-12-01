@@ -1215,6 +1215,66 @@ CHECK'{[x] = 1, [y] = 2}'
         },
     },
 }
+CHECK'{x = 1, y = 2, 3}'
+{
+    type   = "table",
+    start  = 0,
+    finish = 17,
+    [1]    = {
+        type   = "tablefield",
+        start  = 1,
+        finish = 6,
+        parent = "<IGNORE>",
+        field  = {
+            type   = "field",
+            start  = 1,
+            finish = 2,
+            parent = "<IGNORE>",
+            [1]    = "x",
+        },
+        value  = {
+            type   = "integer",
+            start  = 5,
+            finish = 6,
+            parent = "<IGNORE>",
+            [1]    = 1,
+        },
+    },
+    [2]    = {
+        type   = "tablefield",
+        start  = 8,
+        finish = 13,
+        parent = "<IGNORE>",
+        field  = {
+            type   = "field",
+            start  = 8,
+            finish = 9,
+            parent = "<IGNORE>",
+            [1]    = "y",
+        },
+        value  = {
+            type   = "integer",
+            start  = 12,
+            finish = 13,
+            parent = "<IGNORE>",
+            [1]    = 2,
+        },
+    },
+    [3]    = {
+        type   = "tableexp",
+        start  = 15,
+        finish = 16,
+        tindex = 1,
+        parent = "<IGNORE>",
+        value  = {
+            type   = "integer",
+            start  = 15,
+            finish = 16,
+            parent = "<IGNORE>",
+            [1]    = 3,
+        },
+    },
+}
 CHECK'{{}}'
 {
     type   = "table",
