@@ -1546,3 +1546,27 @@ CHECK [=[
         },
     },
 }
+
+CHECK [[
+{
+    [xxx]
+}
+]]
+{
+    type   = "table",
+    start  = 0,
+    finish = 20001,
+    [1]    = {
+        type   = "tableindex",
+        start  = 10004,
+        finish = 10009,
+        parent = "<IGNORE>",
+        index  = {
+            type   = "getglobal",
+            start  = 10005,
+            finish = 10008,
+            parent = "<IGNORE>",
+            [1]    = "xxx",
+        },
+    },
+}
