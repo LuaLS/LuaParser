@@ -56,7 +56,7 @@ for i, v in ipairs(sortList) do
     sortList[v] = i
 end
 local ignoreList = {
-    'specials', 'locals', 'ref', 'node', 'parent', 'extParent', 'returns', 'state', 'mirror', 'next', 'vararg',
+    'specials', 'locals', 'ref', 'node', 'parent', 'extParent', 'returns', 'state', 'mirror', 'next', 'vararg', 'originalComment', 'typeCache', 'eachCache'
 }
 
 local option = {
@@ -74,18 +74,13 @@ local option = {
             if tp1 == 'number' and tp2 == 'number' then
                 return a < b
             end
-            local s1 = sortList[a]
-            local s2 = sortList[b]
-            if s1 and not s2 then
-                return false
-            end
-            if s2 and not s1 then
-                return true
-            end
-            if s1 and s2 then
+            local s1 = sortList[a] or 9999
+            local s2 = sortList[b] or 9999
+            if s1 == s2 then
+                return a < b
+            else
                 return s1 < s2
             end
-            return a < b
         end)
     end,
     loop = ('%q'):format('<LOOP>'),
@@ -137,7 +132,7 @@ local function test(type)
     end
     LuaDoc = function (buf)
         return function (target_doc)
-            local state, err = parser.compile(buf, mode, 'Lua 5.4')
+            local state, err = parser.compile(buf, 'Lua', 'Lua 5.4')
             if not state then
                 error(('语法树生成失败：%s'):format(err))
             end
@@ -158,6 +153,24 @@ local function test(type)
             end
         end
     end
+    Comment = function (buf)
+        return function (target_comment)
+            local state, err = parser.compile(buf, mode, 'Lua 5.4')
+            if not state then
+                error(('语法树生成失败：%s'):format(err))
+            end
+            state.ast.state = nil
+            local result = utility.dump(state.comms, option)
+            local expect = utility.dump(target_comment, option)
+            if result ~= expect then
+                fs.create_directory(ROOT / 'test' / 'log')
+                utility.saveFile((ROOT / 'test' / 'log' / 'my_ast.ast'):string(), result)
+                utility.saveFile((ROOT / 'test' / 'log' / 'target_ast.ast'):string(), expect)
+                --autoFix(result, expect)
+                error(('语法树不相等：%s\n%s'):format(type, buf))
+            end
+        end
+    end
     require('ast.' .. type)
 end
 
@@ -169,4 +182,5 @@ test 'Exp'
 test 'Action'
 test 'Lua'
 test 'Dirty'
---test 'LuaDoc'
+test 'LuaDoc'
+test 'Comment'
