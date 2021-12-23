@@ -942,7 +942,7 @@ local function parseShortString()
         end
         if not token then
             stringIndex = stringIndex + 1
-            stringPool[stringIndex] = ssub(Lua, currentOffset)
+            stringPool[stringIndex] = ssub(Lua, currentOffset or -1)
             missSymbol(mark)
             break
         end
@@ -3714,7 +3714,7 @@ local function initState(lua, version, options)
                 return
             end
         end
-        err.level = err.level or 'error'
+        err.level = err.level or 'Error'
         errs[#errs+1] = err
         return err
     end
