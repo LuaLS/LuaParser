@@ -1,35 +1,43 @@
 Comment [[--AAA]]
 {
-    type   = "main",
-    start  = 0,
-    finish = 5,
-    locals = "<IGNORE>",
+    [1] = {
+        type   = "comment.short",
+        start  = 0,
+        finish = 5,
+        text   = "AAA",
+    },
 }
 
 Comment [[
 --AAA
 ]]
 {
-    type   = "main",
-    start  = 0,
-    finish = 5,
-    locals = "<IGNORE>",
+    [1] = {
+        type   = "comment.short",
+        start  = 0,
+        finish = 5,
+        text   = "AAA",
+    },
 }
 
 Comment [[//AAA]]
 {
-    type   = "main",
-    start  = 0,
-    finish = 5,
-    locals = "<IGNORE>",
+    [1] = {
+        type   = "comment.cshort",
+        start  = 0,
+        finish = 5,
+        text   = "AAA",
+    },
 }
 
 Comment [[
 //AAA
 ]]
 {
-    type   = "main",
-    start  = 0,
-    finish = 5,
-    locals = "<IGNORE>",
+    [1] = {
+        type   = "comment.cshort",
+        start  = 0,
+        finish = 5,
+        text   = "AAA",
+    },
 }

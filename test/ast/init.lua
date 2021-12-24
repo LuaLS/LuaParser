@@ -155,7 +155,11 @@ local function test(type)
     end
     Comment = function (buf)
         return function (target_comment)
-            local state, err = parser.compile(buf, mode, 'Lua 5.4')
+            local state, err = parser.compile(buf, mode, 'Lua 5.4', {
+                ['nonstandardSymbol'] = {
+                    ['//'] = true,
+                },
+            })
             if not state then
                 error(('语法树生成失败：%s'):format(err))
             end
