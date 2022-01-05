@@ -537,3 +537,19 @@ return {
 }
 ]]
 (nil)
+
+TEST [[
+<!return 1!>
+print(1)
+]]
+{
+    type = 'ACTION_AFTER_RETURN',
+}
+
+TEST [[
+<!return 1!>
+return 1
+]]
+{
+    type = 'ACTION_AFTER_RETURN',
+}
