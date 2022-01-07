@@ -437,6 +437,7 @@ CHECK 'return local a'
         finish = 14,
         effect = 14,
         parent = "<IGNORE>",
+        locPos = 7,
         [1]    = "a",
     },
 }
@@ -461,6 +462,7 @@ CHECK 'local x = ,'
         finish = 7,
         effect = 9,
         parent = "<IGNORE>",
+        locPos = 0,
         [1]    = "x",
     },
 }
@@ -478,6 +480,7 @@ CHECK 'local x = (a && b)'
         effect = 18,
         range  = 18,
         parent = "<IGNORE>",
+        locPos = 0,
         value  = {
             type   = "paren",
             start  = 10,
@@ -893,6 +896,7 @@ local a,b,,d
         finish = 7,
         effect = 12,
         parent = "<IGNORE>",
+        locPos = 0,
         [1]    = "a",
     },
     [2]    = {
@@ -1030,6 +1034,7 @@ local t = {
         effect = 10010,
         range  = 10010,
         parent = "<IGNORE>",
+        locPos = 0,
         value  = {
             type   = "table",
             start  = 10,
@@ -1075,15 +1080,8 @@ local t = function f() end
         effect = 26,
         range  = 26,
         parent = "<IGNORE>",
+        locPos = 0,
         value  = {
-            name    = {
-                type   = "getglobal",
-                start  = 19,
-                finish = 20,
-                parent = "<IGNORE>",
-                node   = "<IGNORE>",
-                [1]    = "f",
-            },
             type    = "function",
             start   = 10,
             finish  = 26,
@@ -1094,6 +1092,14 @@ local t = function f() end
                 [4] = 26,
             },
             parent  = "<IGNORE>",
+            name    = {
+                type   = "getglobal",
+                start  = 19,
+                finish = 20,
+                parent = "<IGNORE>",
+                node   = "<IGNORE>",
+                [1]    = "f",
+            },
         },
         [1]    = "t",
     },

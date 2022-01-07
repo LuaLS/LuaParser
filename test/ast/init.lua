@@ -42,7 +42,7 @@ local sortList = {
     'tag', 'special', 'keyword',
     'parent', 'extParent', 'child', 'mirror', 'dummy',
     'filter',
-    'node',
+    'node', 'locPos',
     'op', 'args',
     'loc', 'init', 'max', 'step', 'keys', 'exps', 'call', 'func',
     'dot', 'colon',
@@ -125,7 +125,7 @@ local function test(type)
                 fs.create_directory(ROOT / 'test' / 'log')
                 utility.saveFile((ROOT / 'test' / 'log' / 'my_ast.ast'):string(), result)
                 utility.saveFile((ROOT / 'test' / 'log' / 'target_ast.ast'):string(), expect)
-                --autoFix(result, expect)
+                autoFix(result, expect)
                 error(('语法树不相等：%s\n%s'):format(type, buf))
             end
         end
