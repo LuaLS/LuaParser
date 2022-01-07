@@ -49,7 +49,7 @@ local sortList = {
     'vararg',
     'field', 'index', 'method',
     'exp', 'value', 'vref',
-    'attrs',
+    'attrs', 'escs',
     'locals', 'ref', 'returns', 'breaks',
 }
 for i, v in ipairs(sortList) do
