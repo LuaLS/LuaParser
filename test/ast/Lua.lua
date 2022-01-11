@@ -612,6 +612,7 @@ end]]
         effect = 16,
         range  = 20003,
         parent = "<IGNORE>",
+        locPos = 0,
         value  = {
             type    = "function",
             start   = 6,
@@ -651,6 +652,7 @@ end]]
         effect = 16,
         range  = 20003,
         parent = "<IGNORE>",
+        locPos = 0,
         value  = {
             type    = "function",
             start   = 6,
@@ -698,6 +700,7 @@ end]]
         effect = 16,
         range  = 20003,
         parent = "<IGNORE>",
+        locPos = 0,
         value  = {
             type    = "function",
             start   = 6,
@@ -806,6 +809,7 @@ y, z = 3, 4
         effect = 10016,
         range  = 20003,
         parent = "<IGNORE>",
+        locPos = 10000,
         value  = {
             type    = "function",
             start   = 10006,

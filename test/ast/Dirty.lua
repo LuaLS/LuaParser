@@ -189,6 +189,7 @@ CHECK 'local function a'
         effect = 16,
         range  = 16,
         parent = "<IGNORE>",
+        locPos = 0,
         value  = {
             type    = "function",
             start   = 6,
@@ -235,6 +236,7 @@ CHECK 'local function f('
         effect = 16,
         range  = 17,
         parent = "<IGNORE>",
+        locPos = 0,
         value  = {
             type    = "function",
             start   = 6,
@@ -263,6 +265,7 @@ CHECK 'local function a(v'
         effect = 16,
         range  = 18,
         parent = "<IGNORE>",
+        locPos = 0,
         value  = {
             type    = "function",
             start   = 6,

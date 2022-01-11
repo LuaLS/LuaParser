@@ -463,10 +463,11 @@ CHECK'::CONTINUE::'
 }
 CHECK'goto CONTINUE'
 {
-    type   = "goto",
-    start  = 5,
-    finish = 13,
-    [1]    = "CONTINUE",
+    type     = "goto",
+    start    = 5,
+    finish   = 13,
+    keyStart = 0,
+    [1]      = "CONTINUE",
 }
 CHECK[[if 1 then
 end]]

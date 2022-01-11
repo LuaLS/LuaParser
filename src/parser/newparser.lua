@@ -1006,7 +1006,7 @@ local function parseShortString()
                 end
                 currentOffset = Tokens[Index] + #numbers
                 fastForwardToken(currentOffset)
-                local right = getPosition(currentOffset + 1, 'right')
+                local right = getPosition(currentOffset - 1, 'right')
                 local byte = tointeger(numbers)
                 if byte <= 255 then
                     stringIndex = stringIndex + 1
@@ -1078,7 +1078,7 @@ local function parseShortString()
                 skipNL()
                 local right = getPosition(currentOffset + 1, 'right')
                 escs[#escs+1] = escLeft
-                escs[#escs+1] = right
+                escs[#escs+1] = escLeft + 1
                 escs[#escs+1] = 'normal'
                 goto CONTINUE
             end
@@ -2853,6 +2853,7 @@ local function parseLocal()
             name.value  = func
             name.vstart = func.start
             name.range  = func.finish
+            name.locPos = locPos
             func.parent  = name
             pushActionIntoCurrentChunk(name)
             return name
@@ -3011,6 +3012,7 @@ local function parseLabel()
 end
 
 local function parseGoTo()
+    local start = getPosition(Tokens[Index], 'left')
     Index = Index + 2
     skipSpace()
 
@@ -3021,6 +3023,7 @@ local function parseGoTo()
     end
 
     action.type = 'goto'
+    action.keyStart = start
 
     for i = #Chunk, 1, -1 do
         local chunk = Chunk[i]
