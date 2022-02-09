@@ -1185,3 +1185,30 @@ end
         },
     },
 }
+CHECK [[
+local
+local x = 1
+]]
+{
+    type   = "main",
+    start  = 0,
+    finish = 20000,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "local",
+        start  = 10006,
+        finish = 10007,
+        effect = 10011,
+        range  = 10011,
+        parent = "<IGNORE>",
+        locPos = 10000,
+        value  = {
+            type   = "integer",
+            start  = 10010,
+            finish = 10011,
+            parent = "<IGNORE>",
+            [1]    = 1,
+        },
+        [1]    = "x",
+    },
+}
