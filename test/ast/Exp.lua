@@ -895,7 +895,6 @@ CHECK'obj:remove()'
             type   = "self",
             start  = 3,
             finish = 4,
-            effect = 4,
             parent = "<IGNORE>",
             [1]    = "self",
         },

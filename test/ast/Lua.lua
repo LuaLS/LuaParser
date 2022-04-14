@@ -958,7 +958,6 @@ A:B(1):C(2)
                 type   = "self",
                 start  = 6,
                 finish = 7,
-                effect = 7,
                 parent = "<IGNORE>",
                 [1]    = "self",
             },
