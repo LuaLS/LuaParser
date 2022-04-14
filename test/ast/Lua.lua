@@ -483,7 +483,9 @@ CHECK'local x <const>, y <close> = 1'
             [1]    = 1,
         },
         attrs  = {
-            [1] = {
+            type   = "localattrs",
+            parent = "<IGNORE>",
+            [1]    = {
                 type   = "localattr",
                 start  = 8,
                 finish = 15,
@@ -500,7 +502,9 @@ CHECK'local x <const>, y <close> = 1'
         effect = 30,
         parent = "<IGNORE>",
         attrs  = {
-            [1] = {
+            type   = "localattrs",
+            parent = "<IGNORE>",
+            [1]    = {
                 type   = "localattr",
                 start  = 19,
                 finish = 26,
@@ -951,38 +955,12 @@ A:B(1):C(2)
             finish = 11,
             parent = "<IGNORE>",
             [1]    = {
-                next   = "<IGNORE>",
-                type   = "call",
-                start  = 0,
-                finish = 6,
+                type   = "self",
+                start  = 6,
+                finish = 7,
+                effect = 7,
                 parent = "<IGNORE>",
-                mirror = "<IGNORE>",
-                dummy  = true,
-                node   = "<IGNORE>",
-                args   = {
-                    type   = "callargs",
-                    start  = 3,
-                    finish = 6,
-                    parent = "<IGNORE>",
-                    [1]    = {
-                        next   = "<IGNORE>",
-                        type   = "getglobal",
-                        start  = 0,
-                        finish = 1,
-                        parent = "<IGNORE>",
-                        mirror = "<IGNORE>",
-                        dummy  = true,
-                        node   = "<IGNORE>",
-                        [1]    = "A",
-                    },
-                    [2]    = {
-                        type   = "integer",
-                        start  = 4,
-                        finish = 5,
-                        parent = "<IGNORE>",
-                        [1]    = 1,
-                    },
-                },
+                [1]    = "self",
             },
             [2]    = {
                 type   = "integer",

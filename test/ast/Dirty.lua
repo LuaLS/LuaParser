@@ -397,14 +397,11 @@ CHECK 'function a:b(v'
                 finish = 14,
                 parent = "<IGNORE>",
                 [1]    = {
-                    type   = "local",
+                    type   = "self",
                     start  = 8,
                     finish = 8,
                     effect = 8,
-                    tag    = "self",
                     parent = "<IGNORE>",
-                    dummy  = true,
-                    method = "<LOOP>",
                     [1]    = "self",
                 },
                 [2]    = {

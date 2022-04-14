@@ -6,6 +6,7 @@ local parser     = require 'parser.newparser'
 local TokenTypes, TokenStarts, TokenFinishs, TokenContents, TokenMarks
 local Ci, Offset, pushWarning, NextComment, Lines
 local parseType
+---@type any
 local Parser = re.compile([[
 Main                <-  (Token / Sp)*
 Sp                  <-  %s+
@@ -120,6 +121,10 @@ Symbol              <-  ({} {
     end,
 })
 
+---@class parser.object
+---@field literal boolean
+---@field signs parser.object[]
+
 local function trim(str)
     return str:match '^%s*(%S+)%s*$'
 end
@@ -189,14 +194,14 @@ local function parseName(tp, parent)
         return nil
     end
     nextToken()
-    local class = {
+    local name = {
         type   = tp,
         start  = getStart(),
         finish = getFinish(),
         parent = parent,
         [1]    = nameText,
     }
-    return class
+    return name
 end
 
 local function nextSymbolOrError(symbol)
@@ -220,212 +225,36 @@ local function parseIndexField(tp, parent)
         return nil
     end
     nextToken()
-    local class = {
-        type   = tp,
-        start  = getStart(),
-        finish = getFinish(),
-        parent = parent,
-    }
-    local indexTP, index = nextToken()
-    if  indexTP ~= 'integer'
-    and indexTP ~= 'string' then
-        pushWarning {
-            type   = 'LUADOC_INDEX_MUST_INT',
-            start  = getStart(),
-            finish = getFinish(),
-        }
-    end
-    class[1] = index
-    nextSymbolOrError ']'
-    class.finish = getFinish()
-    return class
-end
-
-local function parseClass(parent)
-    local result = {
-        type   = 'doc.class',
-        parent = parent,
-        fields = {},
-    }
-    result.class = parseName('doc.class.name', result)
-    if not result.class then
-        pushWarning {
-            type   = 'LUADOC_MISS_CLASS_NAME',
-            start  = getFinish(),
-            finish = getFinish(),
-        }
-        return nil
-    end
-    result.start  = getStart()
-    result.finish = getFinish()
-    if not checkToken('symbol', ':', 1) then
-        return result
-    end
-    nextToken()
-
-    result.extends = {}
-
-    while true do
-        local extend = parseName('doc.extends.name', result)
-        if not extend then
-            pushWarning {
-                type   = 'LUADOC_MISS_CLASS_EXTENDS_NAME',
-                start  = getFinish(),
-                finish = getFinish(),
-            }
-            return result
-        end
-        result.extends[#result.extends+1] = extend
-        result.finish = getFinish()
-        if not checkToken('symbol', ',', 1) then
-            break
-        end
+    local start = getFinish() - 1
+    local indexTP, index = peekToken()
+    if indexTP == 'name' then
+        local field = parseType(parent)
+        nextSymbolOrError ']'
+        return field
+    else
         nextToken()
-    end
-    return result
-end
-
-local function parseTypeUnitArray(parent, node)
-    if not checkToken('symbol', '[]', 1) then
-        return nil
-    end
-    nextToken()
-    local result = {
-        type   = 'doc.type.array',
-        start  = node.start,
-        finish = getFinish(),
-        node   = node,
-        parent = parent,
-    }
-    node.parent = result
-    return result
-end
-
-local function parseTypeUnitTable(parent, node)
-    if not checkToken('symbol', '<', 1) then
-        return nil
-    end
-    if not nextSymbolOrError('<') then
-        return nil
-    end
-
-    local result = {
-        type   = 'doc.type.table',
-        start  = node.start,
-        node   = node,
-        parent = parent,
-    }
-
-    local key = parseType(result)
-    if not key or not nextSymbolOrError(',') then
-        return nil
-    end
-    local value = parseType(result)
-    if not value then
-        return nil
-    end
-    nextSymbolOrError('>')
-
-    node.parent = result
-    result.finish = getFinish()
-    result.tkey = key
-    result.tvalue = value
-
-    return result
-end
-
-local function parseDots(tp, parent)
-    if not checkToken('symbol', '...', 1) then
-        return
-    end
-    nextToken()
-    local dots = {
-        type   = tp,
-        start  = getStart(),
-        finish = getFinish(),
-        parent = parent,
-        [1]    = '...',
-    }
-    return dots
-end
-
-local function  parseTypeUnitFunction()
-    local typeUnit = {
-        type    = 'doc.type.function',
-        start   = getStart(),
-        args    = {},
-        returns = {},
-    }
-    if not nextSymbolOrError('(') then
-        return nil
-    end
-    while true do
-        if checkToken('symbol', ')', 1) then
-            nextToken()
-            break
-        end
-        local arg = {
-            type   = 'doc.type.arg',
-            parent = typeUnit,
+        local class = {
+            type   = tp,
+            start  = start,
+            finish = getFinish(),
+            parent = parent,
         }
-        arg.name = parseName('doc.type.name', arg)
-                or parseDots('doc.type.name', arg)
-        if not arg.name then
-            pushWarning {
-                type   = 'LUADOC_MISS_ARG_NAME',
-                start  = getFinish(),
-                finish = getFinish(),
-            }
-            break
-        end
-        if not arg.start then
-            arg.start = arg.name.start
-        end
-        if checkToken('symbol', '?', 1) then
-            nextToken()
-            arg.optional = true
-        end
-        arg.finish = getFinish()
-        if checkToken('symbol', ':', 1) then
-            nextToken()
-            arg.extends = parseType(arg)
-        end
-        arg.finish = getFinish()
-        typeUnit.args[#typeUnit.args+1] = arg
-        if checkToken('symbol', ',', 1) then
-            nextToken()
-        else
-            nextSymbolOrError(')')
-            break
-        end
+        class[1] = index
+        nextSymbolOrError ']'
+        class.finish = getFinish()
+        return class
     end
-    if checkToken('symbol', ':', 1) then
-        nextToken()
-        while true do
-            local rtn = parseType(typeUnit)
-            if not rtn then
-                break
-            end
-            if checkToken('symbol', '?', 1) then
-                nextToken()
-                rtn.optional = true
-            end
-            typeUnit.returns[#typeUnit.returns+1] = rtn
-            if checkToken('symbol', ',', 1) then
-                nextToken()
-            else
-                break
-            end
-        end
-    end
-    typeUnit.finish = getFinish()
-    return typeUnit
 end
 
-local function parseTypeUnitLiteralTable()
+local function parseTable(parent)
+    if not checkToken('symbol', '{', 1) then
+        return nil
+    end
+    nextToken()
     local typeUnit = {
-        type    = 'doc.type.ltable',
+        type    = 'doc.type.table',
         start   = getStart(),
+        parent  = parent,
         fields  = {},
     }
 
@@ -480,49 +309,330 @@ local function parseTypeUnitLiteralTable()
     return typeUnit
 end
 
+local function parseSigns(parent, mode)
+    if not checkToken('symbol', '<', 1) then
+        return nil
+    end
+    nextToken()
+    local signs = {}
+    while true do
+        local sign
+        if mode == 'name' then
+            sign = parseName('doc.generic.name', parent)
+            if not sign then
+                pushWarning {
+                    type   = 'LUADOC_MISS_SIGN_NAME',
+                    start  = getFinish(),
+                    finish = getFinish(),
+                }
+                break
+            end
+        elseif mode == 'type' then
+            sign = parseType(parent)
+            if not sign then
+                pushWarning {
+                    type   = 'LUADOC_MISS_TYPE_NAME',
+                    start  = getFinish(),
+                    finish = getFinish(),
+                }
+                break
+            end
+        end
+        signs[#signs+1] = sign
+        if checkToken('symbol', ',', 1) then
+            nextToken()
+        else
+            break
+        end
+    end
+    if not checkToken('symbol', '>', 1) then
+        pushWarning {
+            type   = 'LUADOC_MISS_SYMBOL',
+            start  = getFinish(),
+            finish = getFinish(),
+            symbol = {
+                symbol = '>',
+            }
+        }
+    end
+    nextToken()
+    return signs
+end
+
+local function parseClass(parent)
+    local result = {
+        type   = 'doc.class',
+        parent = parent,
+        fields = {},
+    }
+    result.class = parseName('doc.class.name', result)
+    if not result.class then
+        pushWarning {
+            type   = 'LUADOC_MISS_CLASS_NAME',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+        return nil
+    end
+    result.start  = getStart()
+    result.finish = getFinish()
+    result.signs  = parseSigns(result, 'name')
+    if not checkToken('symbol', ':', 1) then
+        return result
+    end
+    nextToken()
+
+    result.extends = {}
+
+    while true do
+        local extend = parseName('doc.extends.name', result)
+                    or parseTable(result)
+        if not extend then
+            pushWarning {
+                type   = 'LUADOC_MISS_CLASS_EXTENDS_NAME',
+                start  = getFinish(),
+                finish = getFinish(),
+            }
+            return result
+        end
+        result.extends[#result.extends+1] = extend
+        result.finish = getFinish()
+        if not checkToken('symbol', ',', 1) then
+            break
+        end
+        nextToken()
+    end
+    return result
+end
+
+local function parseTypeUnitArray(parent, node)
+    if not checkToken('symbol', '[]', 1) then
+        return nil
+    end
+    nextToken()
+    local result = {
+        type   = 'doc.type.array',
+        start  = node.start,
+        finish = getFinish(),
+        node   = node,
+        parent = parent,
+    }
+    node.parent = result
+    return result
+end
+
+local function parseDots(tp, parent)
+    if not checkToken('symbol', '...', 1) then
+        return
+    end
+    nextToken()
+    local dots = {
+        type   = tp,
+        start  = getStart(),
+        finish = getFinish(),
+        parent = parent,
+        [1]    = '...',
+    }
+    return dots
+end
+
+local function  parseTypeUnitFunction(parent)
+    if not checkToken('name', 'fun', 1) then
+        return nil
+    end
+    nextToken()
+    local typeUnit = {
+        type    = 'doc.type.function',
+        parent  = parent,
+        start   = getStart(),
+        args    = {},
+        returns = {},
+    }
+    if not nextSymbolOrError('(') then
+        return nil
+    end
+    while true do
+        if checkToken('symbol', ')', 1) then
+            nextToken()
+            break
+        end
+        local arg = {
+            type   = 'doc.type.arg',
+            parent = typeUnit,
+        }
+        arg.name = parseName('doc.type.arg.name', arg)
+                or parseDots('doc.type.arg.name', arg)
+        if not arg.name then
+            pushWarning {
+                type   = 'LUADOC_MISS_ARG_NAME',
+                start  = getFinish(),
+                finish = getFinish(),
+            }
+            break
+        end
+        if not arg.start then
+            arg.start = arg.name.start
+        end
+        if checkToken('symbol', '?', 1) then
+            nextToken()
+            arg.optional = true
+        end
+        arg.finish = getFinish()
+        if checkToken('symbol', ':', 1) then
+            nextToken()
+            arg.extends = parseType(arg)
+        end
+        arg.finish = getFinish()
+        typeUnit.args[#typeUnit.args+1] = arg
+        if checkToken('symbol', ',', 1) then
+            nextToken()
+        else
+            nextSymbolOrError(')')
+            break
+        end
+    end
+    if checkToken('symbol', ':', 1) then
+        nextToken()
+        while true do
+            local rtn = parseType(typeUnit)
+            if not rtn then
+                break
+            end
+            if checkToken('symbol', '?', 1) then
+                nextToken()
+                rtn.optional = true
+            end
+            typeUnit.returns[#typeUnit.returns+1] = rtn
+            if checkToken('symbol', ',', 1) then
+                nextToken()
+            else
+                break
+            end
+        end
+    end
+    typeUnit.finish = getFinish()
+    return typeUnit
+end
+
 local parseTypeUnit
 
-local function parseDocFunction(parent, content)
+local function parseFunction(parent)
+    local _, content = peekToken()
     if content == 'async' then
+        nextToken()
+        local pos = getStart()
         local tp, cont = peekToken()
         if tp == 'name' then
             if cont == 'fun' then
-                nextToken()
-                local func = parseTypeUnit(parent, cont)
+                local func = parseTypeUnit(parent)
                 if func then
                     func.async = true
+                    func.asyncPos = pos
                     return func
                 end
             end
         end
     end
     if content == 'fun' then
-        return parseTypeUnitFunction()
+        return parseTypeUnitFunction(parent)
     end
 end
 
-function parseTypeUnit(parent, content)
-    local result = parseDocFunction(parent, content)
-    if not result then
-        if content == '{' then
-            result = parseTypeUnitLiteralTable()
-        end
-    end
-    if not result then
-        result = {
-            type   = 'doc.type.name',
-            start  = getStart(),
-            finish = getFinish(),
-            [1]    = content,
-        }
-    end
-    if not result then
+local function parseString(parent)
+    local tp, content = peekToken()
+    if not tp or tp ~= 'string' then
         return nil
     end
-    result.parent = parent
+
+    nextToken()
+    -- compatibility
+    if content:sub(1, 1) == '"'
+    or content:sub(1, 1) == "'" then
+        if content:sub(1, 1) == content:sub(-1, -1) then
+            content = content:sub(2, -2)
+        end
+    end
+    local str = {
+        type   = 'doc.type.string',
+        start  = getStart(),
+        finish = getFinish(),
+        parent = parent,
+        [1]    = content,
+    }
+    return str
+end
+
+local function parseInteger(parent)
+    local tp, content = peekToken()
+    if not tp or tp ~= 'integer' then
+        return nil
+    end
+
+    nextToken()
+    local integer = {
+        type   = 'doc.type.integer',
+        start  = getStart(),
+        finish = getFinish(),
+        parent = parent,
+        [1]    = content,
+    }
+    return integer
+end
+
+local function parseBoolean(parent)
+    local tp, content = peekToken()
+    if not tp
+    or tp ~= 'name'
+    or (content ~= 'true' and content ~= 'false') then
+        return nil
+    end
+
+    nextToken()
+    local boolean = {
+        type   = 'doc.type.boolean',
+        start  = getStart(),
+        finish = getFinish(),
+        parent = parent,
+        [1]    = content == 'true' and true or false,
+    }
+    return boolean
+end
+
+local function parseParen(parent)
+    if not checkToken('symbol', '(', 1) then
+        return
+    end
+    nextToken()
+    local tp = parseType(parent)
+    nextSymbolOrError(')')
+    return tp
+end
+
+function parseTypeUnit(parent)
+    local result = parseFunction(parent)
+                or parseTable(parent)
+                or parseString(parent)
+                or parseInteger(parent)
+                or parseBoolean(parent)
+                or parseDots('doc.type.name', parent)
+                or parseParen(parent)
+    if not result then
+        local literal = checkToken('symbol', '`', 1)
+        if literal then
+            nextToken()
+        end
+        result = parseName('doc.type.name', parent)
+        if not result then
+            return nil
+        end
+        if literal then
+            result.literal = true
+            nextSymbolOrError '`'
+        end
+        result.signs = parseSigns(result, 'type')
+    end
     while true do
         local newResult = parseTypeUnitArray(parent, result)
-                    or    parseTypeUnitTable(parent, result)
         if not newResult then
             break
         end
@@ -532,34 +642,23 @@ function parseTypeUnit(parent, content)
 end
 
 local function parseResume(parent)
-    local result = {
-        type   = 'doc.resume',
-        parent = parent,
-    }
-
+    local default, additional
     if checkToken('symbol', '>', 1) then
         nextToken()
-        result.default = true
+        default = true
     end
 
     if checkToken('symbol', '+', 1) then
         nextToken()
-        result.additional = true
+        additional = true
     end
 
-    local tp = peekToken()
-    if tp ~= 'string' then
-        pushWarning {
-            type   = 'LUADOC_MISS_STRING',
-            start  = getFinish(),
-            finish = getFinish(),
-        }
-        return nil
+    local result = parseTypeUnit(parent)
+    if result then
+        result.default    = default
+        result.additional = additional
     end
-    local _, str = nextToken()
-    result[1] = str
-    result.start = getStart()
-    result.finish = getFinish()
+
     return result
 end
 
@@ -568,81 +667,18 @@ function parseType(parent)
         type    = 'doc.type',
         parent  = parent,
         types   = {},
-        enums   = {},
-        resumes = {},
     }
     while true do
-        local tp, content = peekToken()
-        if not tp then
+        local typeUnit = parseTypeUnit(result)
+        if not typeUnit then
             break
         end
 
-        -- 处理 `T` 的情况
-        local typeLiteral = nil
-        if tp == 'symbol' and content == '`' then
-            nextToken()
-            if not checkToken('symbol', '`', 2) then
-                break
-            end
-            tp, content = peekToken()
-            if not tp then
-                break
-            end
-            -- TypeLiteral，指代类型的字面值。比如，对于类 Cat 来说，它的 TypeLiteral 是 "Cat"
-            typeLiteral = true
+        result.types[#result.types+1] = typeUnit
+        if not result.start then
+            result.start = typeUnit.start
         end
 
-        if tp == 'name' then
-            nextToken()
-            local typeUnit = parseTypeUnit(result, content)
-            if not typeUnit then
-                break
-            end
-            if typeLiteral then
-                nextToken()
-                typeUnit.literal = true
-            end
-            result.types[#result.types+1] = typeUnit
-            if not result.start then
-                result.start = typeUnit.start
-            end
-        elseif tp == 'string' then
-            nextToken()
-            local typeEnum = {
-                type   = 'doc.type.enum',
-                start  = getStart(),
-                finish = getFinish(),
-                parent = result,
-                [1]    = content,
-            }
-            result.enums[#result.enums+1] = typeEnum
-            if not result.start then
-                result.start = typeEnum.start
-            end
-        elseif tp == 'symbol' and content == '{' then
-            nextToken()
-            local typeUnit = parseTypeUnit(result, content)
-            if not typeUnit then
-                break
-            end
-            result.types[#result.types+1] = typeUnit
-            if not result.start then
-                result.start = typeUnit.start
-            end
-        elseif tp == 'symbol' and content == '...' then
-            nextToken()
-            local vararg = {
-                type   = 'doc.type.name',
-                start  = getStart(),
-                finish = getFinish(),
-                parent = result,
-                [1]    = content,
-            }
-            result.types[#result.types+1] = vararg
-            if not result.start then
-                result.start = vararg.start
-            end
-        end
         if not checkToken('symbol', '|', 1) then
             break
         end
@@ -668,22 +704,23 @@ function parseType(parent)
             if currentRow < nextCommRow then
                 return false
             end
-            if nextComm.text:sub(1, 2) == '-@' then
+            if nextComm.text:match '^%-%s*%@' then
                 return false
             else
-                if nextComm.text:sub(1, 2) == '-|' then
+                local resumeHead = nextComm.text:match '^%-%s*%|'
+                if resumeHead then
                     NextComment(i)
                     row = row + i + 1
-                    local finishPos = nextComm.text:find('#', 3) or #nextComm.text
-                    parseTokens(nextComm.text:sub(3, finishPos), nextComm.start + 3)
+                    local finishPos = nextComm.text:find('#', #resumeHead + 1) or #nextComm.text
+                    parseTokens(nextComm.text:sub(#resumeHead + 1, finishPos), nextComm.start + #resumeHead + 1)
                     local resume = parseResume(result)
                     if resume then
                         if comments then
                             resume.comment = table.concat(comments, '\n')
                         else
-                            resume.comment = nextComm.text:match('#%s*(.+)', 3)
+                            resume.comment = nextComm.text:match('#%s*(.+)', #resumeHead + 1)
                         end
-                        result.resumes[#result.resumes+1] = resume
+                        result.types[#result.types+1] = resume
                         result.finish = resume.finish
                     end
                     comments = nil
@@ -715,7 +752,7 @@ function parseType(parent)
         while pushResume() do end
     end
 
-    if #result.types == 0 and #result.enums == 0 and #result.resumes == 0 then
+    if #result.types == 0 then
         pushWarning {
             type   = 'LUADOC_MISS_TYPE_NAME',
             start  = getFinish(),
@@ -740,6 +777,7 @@ local function parseAlias()
         return nil
     end
     result.start  = getStart()
+    result.signs  = parseSigns(result, 'name')
     result.extends = parseType(result)
     if not result.extends then
         pushWarning {
@@ -932,11 +970,10 @@ local function parseOverload()
         }
         return nil
     end
-    nextToken()
     local result = {
         type = 'doc.overload',
     }
-    result.overload = parseDocFunction(result, name)
+    result.overload = parseFunction(result)
     if not result.overload then
         return nil
     end
@@ -982,6 +1019,7 @@ local function parseVersion()
         end
         local version = {
             type   = 'doc.version.unit',
+            parent = result,
             start  = getStart(),
         }
         if tp == 'symbol' then
@@ -1220,6 +1258,7 @@ local function buildLuaDoc(comment)
                 type   = 'doc.tailcomment',
                 start  = cstart + comment.start,
                 finish = comment.finish,
+                parent = result,
                 text   = trimTailComment(text:sub(cstart)),
             }
         end
@@ -1260,19 +1299,30 @@ end
 local function bindGeneric(binded)
     local generics = {}
     for _, doc in ipairs(binded) do
-        if     doc.type == 'doc.generic' then
+        if doc.type == 'doc.generic' then
             for _, obj in ipairs(doc.generics) do
                 local name = obj.generic[1]
-                generics[name] = {}
+                generics[name] = true
             end
-        elseif doc.type == 'doc.param'
-        or     doc.type == 'doc.return'
-        or     doc.type == 'doc.type' then
+        end
+        if doc.type == 'doc.class'
+        or doc.type == 'doc.alias' then
+            if doc.signs then
+                for _, sign in ipairs(doc.signs) do
+                    local name = sign[1]
+                    generics[name] = true
+                end
+            end
+        end
+        if doc.type == 'doc.param'
+        or doc.type == 'doc.return'
+        or doc.type == 'doc.type'
+        or doc.type == 'doc.class'
+        or doc.type == 'doc.alias' then
             guide.eachSourceType(doc, 'doc.type.name', function (src)
                 local name = src[1]
                 if generics[name] then
-                    generics[name][#generics[name]+1] = src
-                    src.typeGeneric = generics
+                    src.type = 'doc.generic.name'
                 end
             end)
         end
@@ -1317,6 +1367,7 @@ local function bindDocsBetween(sources, binded, bindSources, start, finish)
             end
             if src.start >= start then
                 if src.type == 'local'
+                or src.type == 'self'
                 or src.type == 'setglobal'
                 or src.type == 'tablefield'
                 or src.type == 'tableindex'
@@ -1387,7 +1438,7 @@ end
 local bindDocAccept = {
     'local'     , 'setlocal'  , 'setglobal',
     'setfield'  , 'setmethod' , 'setindex' ,
-    'tablefield', 'tableindex',
+    'tablefield', 'tableindex', 'self'     ,
     'function'  , 'table'     , '...'      ,
 }
 

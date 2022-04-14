@@ -71,14 +71,8 @@ x = 1
         finish          = 13,
         range           = 13,
         parent          = "<IGNORE>",
-        eachCache       = "<IGNORE>",
-        enums           = {
-        },
         firstFinish     = 13,
         originalComment = "<IGNORE>",
-        resumes         = {
-        },
-        typeCache       = "<IGNORE>",
         types           = {
             [1] = {
                 type   = "doc.type.name",
@@ -104,14 +98,8 @@ x = 1
         finish          = 26,
         range           = 26,
         parent          = "<IGNORE>",
-        eachCache       = "<IGNORE>",
-        enums           = {
-        },
         firstFinish     = 26,
         originalComment = "<IGNORE>",
-        resumes         = {
-        },
-        typeCache       = "<IGNORE>",
         types           = {
             [1] = {
                 type   = "doc.type.name",
@@ -150,28 +138,8 @@ LuaDoc [[
         finish          = 26,
         range           = 26,
         parent          = "<IGNORE>",
-        eachCache       = "<IGNORE>",
-        enums           = {
-            [1] = {
-                type   = "doc.type.enum",
-                start  = 13,
-                finish = 18,
-                parent = "<IGNORE>",
-                [1]    = "'a'",
-            },
-            [2] = {
-                type   = "doc.type.enum",
-                start  = 21,
-                finish = 26,
-                parent = "<IGNORE>",
-                [1]    = "'b'",
-            },
-        },
         firstFinish     = 26,
         originalComment = "<IGNORE>",
-        resumes         = {
-        },
-        typeCache       = "<IGNORE>",
         types           = {
             [1] = {
                 type   = "doc.type.name",
@@ -179,6 +147,20 @@ LuaDoc [[
                 finish = 10,
                 parent = "<IGNORE>",
                 [1]    = "x",
+            },
+            [2] = {
+                type   = "doc.type.string",
+                start  = 13,
+                finish = 18,
+                parent = "<IGNORE>",
+                [1]    = "a",
+            },
+            [3] = {
+                type   = "doc.type.string",
+                start  = 21,
+                finish = 26,
+                parent = "<IGNORE>",
+                [1]    = "b",
             },
         },
     },
@@ -196,36 +178,30 @@ LuaDoc [[
         finish          = 30,
         range           = 30,
         parent          = "<IGNORE>",
-        eachCache       = "<IGNORE>",
-        enums           = {
+        firstFinish     = 30,
+        originalComment = "<IGNORE>",
+        types           = {
             [1] = {
-                type   = "doc.type.enum",
+                type   = "doc.type.string",
                 start  = 9,
                 finish = 14,
                 parent = "<IGNORE>",
-                [1]    = "'a'",
+                [1]    = "a",
             },
             [2] = {
-                type   = "doc.type.enum",
+                type   = "doc.type.string",
                 start  = 17,
                 finish = 22,
                 parent = "<IGNORE>",
-                [1]    = "'b'",
+                [1]    = "b",
             },
             [3] = {
-                type   = "doc.type.enum",
+                type   = "doc.type.string",
                 start  = 25,
                 finish = 30,
                 parent = "<IGNORE>",
-                [1]    = "'c'",
+                [1]    = "c",
             },
-        },
-        firstFinish     = 30,
-        originalComment = "<IGNORE>",
-        resumes         = {
-        },
-        typeCache       = "<IGNORE>",
-        types           = {
         },
     },
 }
@@ -255,11 +231,7 @@ x = 1
             start       = 18,
             finish      = 26,
             parent      = "<IGNORE>",
-            enums       = {
-            },
             firstFinish = 26,
-            resumes     = {
-            },
             types       = {
                 [1] = {
                     type   = "doc.type.name",
@@ -286,17 +258,12 @@ LuaDoc [[
         finish          = 15,
         range           = 15,
         parent          = "<IGNORE>",
-        eachCache       = "<IGNORE>",
         extends         = {
             type        = "doc.type",
             start       = 13,
             finish      = 15,
             parent      = "<IGNORE>",
-            enums       = {
-            },
             firstFinish = 15,
-            resumes     = {
-            },
             types       = {
                 [1] = {
                     type   = "doc.type.name",
@@ -316,7 +283,6 @@ LuaDoc [[
             parent = "<IGNORE>",
             [1]    = "a1",
         },
-        typeCache       = "<IGNORE>",
     },
 }
 
@@ -333,9 +299,7 @@ LuaDoc [[
         range           = 28,
         parent          = "<IGNORE>",
         returns         = "<IGNORE>",
-        eachCache       = "<IGNORE>",
         originalComment = "<IGNORE>",
-        typeCache       = "<IGNORE>",
     },
 }
 
@@ -352,9 +316,7 @@ LuaDoc [[
         range           = 28,
         parent          = "<IGNORE>",
         returns         = "<IGNORE>",
-        eachCache       = "<IGNORE>",
         originalComment = "<IGNORE>",
-        typeCache       = "<IGNORE>",
     },
 }
 
@@ -382,11 +344,7 @@ LuaDoc [[
             start       = 15,
             finish      = 23,
             parent      = "<IGNORE>",
-            enums       = {
-            },
             firstFinish = 23,
-            resumes     = {
-            },
             types       = {
                 [1] = {
                     type   = "doc.type.name",
@@ -425,11 +383,7 @@ LuaDoc [[
             start       = 23,
             finish      = 38,
             parent      = "<IGNORE>",
-            enums       = {
-            },
             firstFinish = 38,
-            resumes     = {
-            },
             types       = {
                 [1] = {
                     type   = "doc.type.name",
@@ -506,11 +460,7 @@ LuaDoc [[
                     start       = 16,
                     finish      = 22,
                     parent      = "<IGNORE>",
-                    enums       = {
-                    },
                     firstFinish = 22,
-                    resumes     = {
-                    },
                     types       = {
                         [1] = {
                             type   = "doc.type.name",
@@ -557,11 +507,7 @@ LuaDoc [[
                     start       = 16,
                     finish      = 22,
                     parent      = "<IGNORE>",
-                    enums       = {
-                    },
                     firstFinish = 22,
-                    resumes     = {
-                    },
                     types       = {
                         [1] = {
                             type   = "doc.type.name",
@@ -590,11 +536,7 @@ LuaDoc [[
                     start       = 28,
                     finish      = 34,
                     parent      = "<IGNORE>",
-                    enums       = {
-                    },
                     firstFinish = 34,
-                    resumes     = {
-                    },
                     types       = {
                         [1] = {
                             type   = "doc.type.name",
@@ -647,14 +589,8 @@ LuaDoc [[
         finish          = 15,
         range           = 15,
         parent          = "<IGNORE>",
-        eachCache       = "<IGNORE>",
-        enums           = {
-        },
         firstFinish     = 15,
         originalComment = "<IGNORE>",
-        resumes         = {
-        },
-        typeCache       = "<IGNORE>",
         types           = {
             [1] = {
                 type   = "doc.type.array",
@@ -679,70 +615,56 @@ LuaDoc [[
         finish          = 26,
         range           = 26,
         parent          = "<IGNORE>",
-        eachCache       = "<IGNORE>",
-        enums           = {
-        },
         firstFinish     = 26,
         originalComment = "<IGNORE>",
-        resumes         = {
-        },
-        typeCache       = "<IGNORE>",
         types           = {
             [1] = {
-                type   = "doc.type.table",
+                type   = "doc.type.name",
                 start  = 9,
-                finish = 26,
+                finish = 14,
                 parent = "<IGNORE>",
-                node   = "<IGNORE>",
-                tkey   = {
-                    type        = "doc.type",
-                    start       = 15,
-                    finish      = 18,
-                    parent      = "<IGNORE>",
-                    enums       = {
+                signs  = {
+                    [1] = {
+                        type        = "doc.type",
+                        start       = 15,
+                        finish      = 18,
+                        parent      = "<IGNORE>",
+                        firstFinish = 18,
+                        types       = {
+                            [1] = {
+                                type   = "doc.type.name",
+                                start  = 15,
+                                finish = 18,
+                                parent = "<IGNORE>",
+                                [1]    = "key",
+                            },
+                        },
                     },
-                    firstFinish = 18,
-                    resumes     = {
-                    },
-                    types       = {
-                        [1] = {
-                            type   = "doc.type.name",
-                            start  = 15,
-                            finish = 18,
-                            parent = "<IGNORE>",
-                            [1]    = "key",
+                    [2] = {
+                        type        = "doc.type",
+                        start       = 20,
+                        finish      = 25,
+                        parent      = "<IGNORE>",
+                        firstFinish = 25,
+                        types       = {
+                            [1] = {
+                                type   = "doc.type.name",
+                                start  = 20,
+                                finish = 25,
+                                parent = "<IGNORE>",
+                                [1]    = "value",
+                            },
                         },
                     },
                 },
-                tvalue = {
-                    type        = "doc.type",
-                    start       = 20,
-                    finish      = 25,
-                    parent      = "<IGNORE>",
-                    enums       = {
-                    },
-                    firstFinish = 25,
-                    resumes     = {
-                    },
-                    types       = {
-                        [1] = {
-                            type   = "doc.type.name",
-                            start  = 20,
-                            finish = 25,
-                            parent = "<IGNORE>",
-                            [1]    = "value",
-                        },
-                    },
-                },
+                [1]    = "table",
             },
         },
     },
 }
 
-OPTION.format['returns'] = nil
-OPTION.format['extends'] = function ()
-    return '"<IGNORE>"'
-end
+IGNORE_MAP['returns'] = nil
+IGNORE_MAP['extends'] = true
 LuaDoc [[
 ---@type fun(key1:t1, key2:t2):t3
 ]]
@@ -755,14 +677,8 @@ LuaDoc [[
         finish          = 33,
         range           = 33,
         parent          = "<IGNORE>",
-        eachCache       = "<IGNORE>",
-        enums           = {
-        },
         firstFinish     = 33,
         originalComment = "<IGNORE>",
-        resumes         = {
-        },
-        typeCache       = "<IGNORE>",
         types           = {
             [1] = {
                 type    = "doc.type.function",
@@ -777,7 +693,7 @@ LuaDoc [[
                         parent  = "<IGNORE>",
                         extends = "<IGNORE>",
                         name    = {
-                            type   = "doc.type.name",
+                            type   = "doc.type.arg.name",
                             start  = 13,
                             finish = 17,
                             parent = "<IGNORE>",
@@ -791,7 +707,7 @@ LuaDoc [[
                         parent  = "<IGNORE>",
                         extends = "<IGNORE>",
                         name    = {
-                            type   = "doc.type.name",
+                            type   = "doc.type.arg.name",
                             start  = 22,
                             finish = 26,
                             parent = "<IGNORE>",
@@ -805,11 +721,7 @@ LuaDoc [[
                         start       = 31,
                         finish      = 33,
                         parent      = "<IGNORE>",
-                        enums       = {
-                        },
                         firstFinish = 33,
-                        resumes     = {
-                        },
                         types       = {
                             [1] = {
                                 type   = "doc.type.name",
@@ -826,10 +738,8 @@ LuaDoc [[
     },
 }
 
-OPTION.format['returns'] = function ()
-    return '"<IGNORE>"'
-end
-OPTION.format['extends'] = nil
+IGNORE_MAP['returns'] = true
+IGNORE_MAP['extends'] = nil
 LuaDoc [[
 ---@param event string | "'onClosed'" | "'onData'"
 ]]
@@ -842,31 +752,12 @@ LuaDoc [[
         finish          = 50,
         range           = 50,
         parent          = "<IGNORE>",
-        eachCache       = "<IGNORE>",
         extends         = {
             type        = "doc.type",
             start       = 16,
             finish      = 50,
             parent      = "<IGNORE>",
-            enums       = {
-                [1] = {
-                    type   = "doc.type.enum",
-                    start  = 25,
-                    finish = 37,
-                    parent = "<IGNORE>",
-                    [1]    = "'onClosed'",
-                },
-                [2] = {
-                    type   = "doc.type.enum",
-                    start  = 40,
-                    finish = 50,
-                    parent = "<IGNORE>",
-                    [1]    = "'onData'",
-                },
-            },
             firstFinish = 50,
-            resumes     = {
-            },
             types       = {
                 [1] = {
                     type   = "doc.type.name",
@@ -874,6 +765,20 @@ LuaDoc [[
                     finish = 22,
                     parent = "<IGNORE>",
                     [1]    = "string",
+                },
+                [2] = {
+                    type   = "doc.type.string",
+                    start  = 25,
+                    finish = 37,
+                    parent = "<IGNORE>",
+                    [1]    = "onClosed",
+                },
+                [3] = {
+                    type   = "doc.type.string",
+                    start  = 40,
+                    finish = 50,
+                    parent = "<IGNORE>",
+                    [1]    = "onData",
                 },
             },
         },
@@ -886,7 +791,6 @@ LuaDoc [[
             parent = "<IGNORE>",
             [1]    = "event",
         },
-        typeCache       = "<IGNORE>",
     },
 }
 
@@ -919,11 +823,7 @@ LuaDoc [[
                         start       = 19,
                         finish      = 25,
                         parent      = "<IGNORE>",
-                        enums       = {
-                        },
                         firstFinish = 25,
-                        resumes     = {
-                        },
                         types       = {
                             [1] = {
                                 type   = "doc.type.name",
@@ -935,7 +835,7 @@ LuaDoc [[
                         },
                     },
                     name    = {
-                        type   = "doc.type.name",
+                        type   = "doc.type.arg.name",
                         start  = 17,
                         finish = 18,
                         parent = "<IGNORE>",

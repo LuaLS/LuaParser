@@ -8,7 +8,7 @@ local ipairs       = ipairs
 local next         = next
 local rawset       = rawset
 local move         = table.move
-local setmetatable = setmetatable
+local setmetatable = debug.setmetatable
 local mathType     = math.type
 local mathCeil     = math.ceil
 local getmetatable = getmetatable
@@ -16,15 +16,15 @@ local mathAbs      = math.abs
 local mathRandom   = math.random
 local ioOpen       = io.open
 local utf8Len      = utf8.len
+local getenv       = os.getenv
+local getupvalue   = debug.getupvalue
 local mathHuge     = math.huge
+local inf          = 1 / 0
+local nan          = 0 / 0
+local utf8         = utf8
+local error        = error
 
 _ENV = nil
-
-local function formatNumber(n)
-    local str = ('%.10f'):format(n)
-    str = str:gsub('%.?0*$', '')
-    return str
-end
 
 local function isInteger(n)
     if mathType then
@@ -32,6 +32,21 @@ local function isInteger(n)
     else
         return type(n) == 'number' and n % 1 == 0
     end
+end
+
+local function formatNumber(n)
+    if n == inf
+    or n == -inf
+    or n == nan
+    or n ~= n then -- IEEE 标准中，NAN 不等于自己。但是某些实现中没有遵守这个规则
+        return ('%q'):format(n)
+    end
+    if isInteger(n) then
+        return tostring(n)
+    end
+    local str = ('%.17f'):format(n)
+    str = str:gsub('%.?0*$', '')
+    return str
 end
 
 local TAB = setmetatable({}, { __index = function (self, n)
@@ -79,8 +94,10 @@ function m.dump(tbl, option)
     end
     local lines = {}
     local mark = {}
+    local stack = {}
     lines[#lines+1] = '{'
-    local function unpack(tbl, deep)
+    local function unpack(tbl)
+        local deep = #stack
         mark[tbl] = (mark[tbl] or 0) + 1
         local keys = {}
         local keymap = {}
@@ -122,6 +139,7 @@ function m.dump(tbl, option)
                 end)
             end
         end
+        local format = option['format']
         for _, key in ipairs(keys) do
             local keyWord = keymap[key]
             if option['noArrayKey']
@@ -138,16 +156,21 @@ function m.dump(tbl, option)
             end
             local value = tbl[key]
             local tp = type(value)
-            if option['format'] and option['format'][key] then
-                lines[#lines+1] = ('%s%s%s,'):format(TAB[deep+1], keyWord, option['format'][key](value, unpack, deep+1))
-            elseif tp == 'table' then
+            local vformat = type(format) == 'table' and option['format'][key] or format
+            if vformat then
+                value = vformat(value, unpack, deep+1, stack, key)
+                tp = type(value)
+            end
+            if tp == 'table' then
                 if mark[value] and mark[value] > 0 then
                     lines[#lines+1] = ('%s%s%s,'):format(TAB[deep+1], keyWord, option['loop'] or '"<Loop>"')
                 elseif deep >= (option['deep'] or mathHuge) then
                     lines[#lines+1] = ('%s%s%s,'):format(TAB[deep+1], keyWord, '"<Deep>"')
                 else
                     lines[#lines+1] = ('%s%s{'):format(TAB[deep+1], keyWord)
-                    unpack(value, deep+1)
+                    stack[#stack+1] = key
+                    unpack(value)
+                    stack[#stack] = nil
                     lines[#lines+1] = ('%s},'):format(TAB[deep+1])
                 end
             elseif tp == 'string' then
@@ -161,7 +184,7 @@ function m.dump(tbl, option)
         end
         mark[tbl] = mark[tbl] - 1
     end
-    unpack(tbl, 0)
+    unpack(tbl)
     lines[#lines+1] = '}'
     return tableConcat(lines, '\r\n')
 end
@@ -192,7 +215,10 @@ function m.equal(a, b)
         end
         return true
     elseif tp1 == 'number' then
-        return mathAbs(a - b) <= 1e-10
+        if mathAbs(a - b) <= 1e-10 then
+            return true
+        end
+        return tostring(a) == tostring(b)
     else
         return a == b
     end
@@ -257,17 +283,23 @@ end
 
 --- 读取文件
 ---@param path string
-function m.loadFile(path)
+function m.loadFile(path, keepBom)
     local f, e = ioOpen(path, 'rb')
     if not f then
         return nil, e
     end
-    if f:read(3) ~= '\xEF\xBB\xBF' then
-        f:seek("set")
-    end
-    local buf = f:read 'a'
+    local text = f:read 'a'
     f:close()
-    return buf
+    if not keepBom then
+        if text:sub(1, 3) == '\xEF\xBB\xBF' then
+            return text:sub(4)
+        end
+        if text:sub(1, 2) == '\xFF\xFE'
+        or text:sub(1, 2) == '\xFE\xFF' then
+            return text:sub(3)
+        end
+    end
+    return text
 end
 
 --- 写入文件
@@ -302,12 +334,12 @@ end
 
 --- 排序后遍历
 ---@param t table
-function m.sortPairs(t)
+function m.sortPairs(t, sorter)
     local keys = {}
     for k in pairs(t) do
         keys[#keys+1] = k
     end
-    tableSort(keys)
+    tableSort(keys, sorter)
     local i = 0
     return function ()
         i = i + 1
@@ -397,6 +429,10 @@ function m.defer(callback)
     return setmetatable({ callback }, deferMT)
 end
 
+function m.enableCloseFunction()
+    setmetatable(function () end, { __close = function (f) f() end })
+end
+
 local esc = {
     ["'"]  = [[\']],
     ['"']  = [[\"]],
@@ -462,11 +498,18 @@ function m.viewLiteral(v)
 end
 
 function m.utf8Len(str, start, finish)
-    local len, pos = utf8Len(str, start, finish, true)
-    if len then
-        return len
+    local len = 0
+    for _ = 1, 10000 do
+        local clen, pos = utf8Len(str, start, finish, true)
+        if clen then
+            len = len + clen
+            break
+        else
+            len = len + 1 + utf8Len(str, start, pos - 1, true)
+            start = pos + 1
+        end
     end
-    return 1 + m.utf8Len(str, start, pos-1) + m.utf8Len(str, pos+1, finish)
+    return len
 end
 
 function m.revertTable(t)
@@ -524,20 +567,161 @@ function m.tableMultiRemove(t, index)
     end
 end
 
-function m.hash2array(h, a)
-    a = a or {}
-    for k in pairs(h) do
-        a[#a+1] = k
+---遍历文本的每一行
+---@param text string
+---@param keepNL boolean # 保留换行符
+---@return fun(text:string):string
+function m.eachLine(text, keepNL)
+    local offset = 1
+    local lineCount = 0
+    local lastLine
+    return function ()
+        if offset > #text then
+            if not lastLine then
+                lastLine = ''
+                return ''
+            end
+            return nil
+        end
+        lineCount = lineCount + 1
+        local nl = text:find('[\r\n]', offset)
+        if not nl then
+            lastLine = text:sub(offset)
+            offset = #text + 1
+            return lastLine
+        end
+        local line
+        if text:sub(nl, nl + 1) == '\r\n' then
+            if keepNL then
+                line = text:sub(offset, nl + 1)
+            else
+                line = text:sub(offset, nl - 1)
+            end
+            offset = nl + 2
+        else
+            if keepNL then
+                line = text:sub(offset, nl)
+            else
+                line = text:sub(offset, nl - 1)
+            end
+            offset = nl + 1
+        end
+        return line
     end
-    return a
 end
 
-function m.array2hash(a, h)
-    h = h or {}
-    for _, v in ipairs(a) do
-        h[v] = true
+function m.sortByScore(tbl, callbacks)
+    if type(callbacks) ~= 'table' then
+        callbacks = { callbacks }
     end
-    return h
+    local size = #callbacks
+    local scoreCache = {}
+    for i = 1, size do
+        scoreCache[i] = {}
+    end
+    tableSort(tbl, function (a, b)
+        for i = 1, size do
+            local callback = callbacks[i]
+            local cache    = scoreCache[i]
+            local sa       = cache[a] or callback(a)
+            local sb       = cache[b] or callback(b)
+            cache[a] = sa
+            cache[b] = sb
+            if sa > sb then
+                return true
+            elseif sa < sb then
+                return false
+            end
+        end
+        return false
+    end)
+end
+
+---裁剪字符串
+---@param str string
+---@param mode? '"left"'|'"right"'
+---@return string
+function m.trim(str, mode)
+    if mode == "left" then
+        return str:gsub('^%s+', '')
+    end
+    if mode == "right" then
+        return str:gsub('%s+$', '')
+    end
+    return str:match '^%s*(%S+)%s*$'
+end
+
+function m.expandPath(path)
+    if type(path) ~= 'string' then
+        return nil
+    end
+    if path:sub(1, 1) == '~' then
+        local home = getenv('HOME')
+        if not home then -- has to be Windows
+            home = getenv 'USERPROFILE' or (getenv 'HOMEDRIVE' .. getenv 'HOMEPATH')
+        end
+        return home .. path:sub(2)
+    elseif path:sub(1, 1) == '$' then
+        path = path:gsub('%$([%w_]+)', getenv)
+        return path
+    end
+    return path
+end
+
+function m.arrayToHash(l)
+    local t = {}
+    for i = 1, #l do
+        t[l[i]] = true
+    end
+    return t
+end
+
+function m.switch()
+    local map = {}
+    local cachedCases = {}
+    local obj = {
+        case = function (self, name)
+            cachedCases[#cachedCases+1] = name
+            return self
+        end,
+        call = function (self, callback)
+            for i = 1, #cachedCases do
+                local name = cachedCases[i]
+                cachedCases[i] = nil
+                if map[name] then
+                    error('Repeated fields:' .. tostring(name))
+                end
+                map[name] = callback
+            end
+            return self
+        end,
+        getMap = function (self)
+            return map
+        end
+    }
+    return obj
+end
+
+---@param f async fun()
+function m.getUpvalue(f, name)
+    for i = 1, 999 do
+        local uname, value = getupvalue(f, i)
+        if not uname then
+            break
+        end
+        if name == uname then
+            return value, true
+        end
+    end
+    return nil, false
+end
+
+function m.stringStartWith(str, head)
+    return str:sub(1, #head) == head
+end
+
+function m.stringEndWith(str, tail)
+    return str:sub(-#tail) == tail
 end
 
 return m

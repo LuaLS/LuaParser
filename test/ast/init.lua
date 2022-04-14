@@ -40,7 +40,7 @@ local sortList = {
     'specials',
     'type', 'start', 'vstart', 'finish', 'effect', 'range', 'tindex',
     'tag', 'special', 'keyword',
-    'parent', 'extParent', 'child', 'mirror', 'dummy',
+    'parent', 'extParent', 'child',
     'filter',
     'node', 'locPos',
     'op', 'args',
@@ -58,8 +58,14 @@ end
 local ignoreList = {
     'specials', 'locals', 'ref', 'node', 'parent', 'extParent', 'returns', 'state', 'mirror', 'next', 'vararg', 'originalComment', 'typeCache', 'eachCache'
 }
+local ignoreMap = {}
+for i, v in ipairs(ignoreList) do
+    ignoreMap[v] = true
+end
 
-local option = {
+IGNORE_MAP = ignoreMap
+
+local myOption = {
     alignment = true,
     sorter = function (keys, keymap)
         table.sort(keys, function (a, b)
@@ -87,16 +93,46 @@ local option = {
     number = function (n)
         return ('%q'):format(n)
     end,
-    format = {},
+    format = function (value, _, _, _, key)
+        if ignoreMap[key] then
+            return '<IGNORE>'
+        end
+        if type(key) == 'string' and key:sub(1, 1) == '_' then
+            return nil
+        end
+        return value
+    end,
 }
 
-for _, key in ipairs(ignoreList) do
-    option.format[key] = function ()
-        return '"<IGNORE>"'
-    end
-end
-
-OPTION = option
+local targetOption = {
+    alignment = true,
+    sorter = function (keys, keymap)
+        table.sort(keys, function (a, b)
+            local tp1 = type(a)
+            local tp2 = type(b)
+            if tp1 == 'number' and tp2 ~= 'number' then
+                return false
+            end
+            if tp1 ~= 'number' and tp2 == 'number' then
+                return true
+            end
+            if tp1 == 'number' and tp2 == 'number' then
+                return a < b
+            end
+            local s1 = sortList[a] or 9999
+            local s2 = sortList[b] or 9999
+            if s1 == s2 then
+                return a < b
+            else
+                return s1 < s2
+            end
+        end)
+    end,
+    loop = ('%q'):format('<LOOP>'),
+    number = function (n)
+        return ('%q'):format(n)
+    end,
+}
 
 local function autoFix(myBuf, targetBuf)
     local info = debug.getinfo(3, 'Sl')
@@ -119,8 +155,8 @@ local function test(type)
                 error(('语法树生成失败：%s'):format(err))
             end
             state.ast.state = nil
-            local result = utility.dump(state.ast, option)
-            local expect = utility.dump(target_ast, option)
+            local result = utility.dump(state.ast, myOption)
+            local expect = utility.dump(target_ast, targetOption)
             if result ~= expect then
                 fs.create_directory(ROOT / 'test' / 'log')
                 utility.saveFile((ROOT / 'test' / 'log' / 'my_ast.ast'):string(), result)
@@ -142,13 +178,13 @@ local function test(type)
                 doc.bindSources = nil
             end
             state.ast.docs.groups = nil
-            local result = utility.dump(state.ast.docs, option)
-            local expect = utility.dump(target_doc, option)
+            local result = utility.dump(state.ast.docs, myOption)
+            local expect = utility.dump(target_doc, targetOption)
             if result ~= expect then
                 fs.create_directory(ROOT / 'test' / 'log')
                 utility.saveFile((ROOT / 'test' / 'log' / 'my_doc.ast'):string(), result)
                 utility.saveFile((ROOT / 'test' / 'log' / 'target_doc.ast'):string(), expect)
-                --autoFix(state.ast.luadocs, target_doc)
+                autoFix(result, expect)
                 error(('语法树不相等：%s\n%s'):format(type, buf))
             end
         end
@@ -164,8 +200,8 @@ local function test(type)
                 error(('语法树生成失败：%s'):format(err))
             end
             state.ast.state = nil
-            local result = utility.dump(state.comms, option)
-            local expect = utility.dump(target_comment, option)
+            local result = utility.dump(state.comms, myOption)
+            local expect = utility.dump(target_comment, targetOption)
             if result ~= expect then
                 fs.create_directory(ROOT / 'test' / 'log')
                 utility.saveFile((ROOT / 'test' / 'log' / 'my_ast.ast'):string(), result)
