@@ -6,6 +6,7 @@
             "type": "lua",
             "request": "launch",
             "stopOnEntry": false,
+            "luaexe": "${workspaceFolder}/bin/lua.exe",
             "program": "${workspaceRoot}/test/main.lua",
             "cwd": "${workspaceRoot}",
             "path": "${workspaceRoot}/bin/?.lua",
