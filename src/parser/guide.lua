@@ -16,6 +16,7 @@ local type         = type
 ---@field uri                   uri
 ---@field start                 integer
 ---@field finish                integer
+---@field range                 integer
 ---@field effect                integer
 ---@field attrs                 string[]
 ---@field specials              parser.object[]
@@ -56,6 +57,15 @@ local type         = type
 ---@field init                  parser.object
 ---@field step                  parser.object
 ---@field redundant             { max: integer, passed: integer }
+---@field filter                parser.object
+---@field loc                   parser.object
+---@field keyword               integer[]
+---@field casts                 parser.object[]
+---@field mode?                 '+' | '-'
+---@field hasGoTo?              true
+---@field hasReturn?            true
+---@field hasBreak?             true
+---@field hasError?             true
 ---@field _root                 parser.object
 
 ---@class guide
@@ -71,6 +81,7 @@ local blockTypes = {
     ['repeat']      = true,
     ['do']          = true,
     ['function']    = true,
+    ['if']          = true,
     ['ifblock']     = true,
     ['elseblock']   = true,
     ['elseifblock'] = true,
@@ -123,7 +134,6 @@ local childMap = {
     ['doc']                = {'#'},
     ['doc.class']          = {'class', '#extends', '#signs', 'comment'},
     ['doc.type']           = {'#types', 'name', 'comment'},
-    ['doc.type.name']      = {'#signs'},
     ['doc.alias']          = {'alias', 'extends', 'comment'},
     ['doc.param']          = {'param', 'extends', 'comment'},
     ['doc.return']         = {'#returns', 'comment'},
@@ -137,10 +147,14 @@ local childMap = {
     ['doc.type.literal']   = {'node'},
     ['doc.type.arg']       = {'name', 'extends'},
     ['doc.type.field']     = {'name', 'extends'},
+    ['doc.type.sign']      = {'node', '#signs'},
     ['doc.overload']       = {'overload', 'comment'},
     ['doc.see']            = {'name', 'field'},
     ['doc.version']        = {'#versions'},
     ['doc.diagnostic']     = {'#names'},
+    ['doc.as']             = {'as'},
+    ['doc.cast']           = {'loc', '#casts'},
+    ['doc.cast.block']     = {'extends'},
 }
 
 ---@type table<string, fun(obj: parser.object, list: parser.object[])>
@@ -239,6 +253,7 @@ function m.isLiteral(obj)
         or tp == 'doc.type.string'
         or tp == 'doc.type.integer'
         or tp == 'doc.type.boolean'
+        or tp == 'doc.type.code'
 end
 
 --- 获取字面量
@@ -393,6 +408,7 @@ function m.getRoot(obj)
         end
         local parent = obj.parent
         if not parent then
+            log.error('Can not find out root:', obj.type)
             return nil
         end
         obj = parent
@@ -413,6 +429,7 @@ function m.getUri(obj)
     return ''
 end
 
+---@return parser.object?
 function m.getENV(source, start)
     if not start then
         start = 1
@@ -446,38 +463,51 @@ function m.getFunctionVarArgs(func)
 end
 
 --- 获取指定区块中可见的局部变量
----@param block table
----@param name string {comment = '变量名'}
----@param pos integer {comment = '可见位置'}
-function m.getLocal(block, name, pos)
-    block = m.getBlock(block)
+---@param source parser.object
+---@param name string # 变量名
+---@param pos integer # 可见位置
+---@return parser.object?
+function m.getLocal(source, name, pos)
+    local block = source
+    -- find nearest source
     for _ = 1, 10000 do
         if not block then
             return nil
         end
-        local locals = block.locals
-        local res
-        if not locals then
-            goto CONTINUE
+        if block.start <= pos and block.finish >= pos then
+            break
         end
-        for i = 1, #locals do
-            local loc = locals[i]
-            if loc.effect > pos then
-                break
-            end
-            if loc[1] == name then
-                if not res or res.effect < loc.effect then
-                    res = loc
+        block = block.parent
+    end
+
+    m.eachSourceContain(block, pos, function (src)
+        if  blockTypes[src.type]
+        and (src.finish - src.start) < (block.finish - src.start) then
+            block = src
+        end
+    end)
+
+    for _ = 1, 10000 do
+        if not block then
+            break
+        end
+        local res
+        if block.locals then
+            for _, loc in ipairs(block.locals) do
+                if  loc[1] == name
+                and loc.effect <= pos then
+                    if not res or res.effect < loc.effect then
+                        res = loc
+                    end
                 end
             end
         end
         if res then
-            return res, res
+            return res
         end
-        ::CONTINUE::
-        block = m.getParentBlock(block)
+        block = block.parent
     end
-    error('guide.getLocal overstack')
+    return nil
 end
 
 --- 获取指定区块中所有的可见局部变量名称
@@ -602,6 +632,9 @@ local function addChilds(list, obj)
 end
 
 --- 遍历所有包含position的source
+---@param ast parser.object
+---@param position integer
+---@param callback fun(src: parser.object)
 function m.eachSourceContain(ast, position, callback)
     local list = { ast }
     local mark = {}
@@ -922,6 +955,7 @@ function m.getKeyNameOfLiteral(obj)
     end
 end
 
+---@return string?
 function m.getKeyName(obj)
     if not obj then
         return nil
@@ -966,8 +1000,6 @@ function m.getKeyName(obj)
         return obj[1]
     elseif tp == 'doc.type.field' then
         return obj.name[1]
-    elseif tp == 'dummy' then
-        return obj[1]
     end
     return m.getKeyNameOfLiteral(obj)
 end
@@ -1029,8 +1061,6 @@ function m.getKeyType(obj)
         return type(obj.field[1])
     elseif tp == 'doc.type.field' then
         return type(obj.name[1])
-    elseif tp == 'dummy' then
-        return 'string'
     end
     if tp == 'doc.field.name' then
         return type(obj[1])

@@ -117,6 +117,9 @@ local Specials = {
     ['xpcall']       = true,
     ['pairs']        = true,
     ['ipairs']       = true,
+    ['assert']       = true,
+    ['error']        = true,
+    ['type']         = true,
 }
 
 local UnarySymbol = {
@@ -537,6 +540,7 @@ local function skipComment(isAction)
         if longComment then
             longComment.type = 'comment.long'
             longComment.text = longComment[1]
+            longComment.mark = longComment[2]
             longComment[1]   = nil
             longComment[2]   = nil
             State.comms[#State.comms+1] = longComment
@@ -689,9 +693,6 @@ local function parseLocalAttrs()
 end
 
 local function createLocal(obj, attrs)
-    if not obj then
-        return nil
-    end
     obj.type   = 'local'
     obj.effect = obj.finish
 
@@ -2817,6 +2818,17 @@ local function compileExpAsAction(exp)
     end
 
     if exp.type == 'call' then
+        if exp.node.special == 'error' then
+            for i = #Chunk, 1, -1 do
+                local block = Chunk[i]
+                if block.type == 'ifblock'
+                or block.type == 'elseifblock'
+                or block.type == 'else' then
+                    block.hasError = true
+                    break
+                end
+            end
+        end
         return exp
     end
 
@@ -2891,7 +2903,11 @@ local function parseLocal()
     pushActionIntoCurrentChunk(loc)
     skipSpace()
     parseMultiVars(loc, parseName, true)
-    loc.effect = lastRightPosition()
+    if loc.value then
+        loc.effect = loc.value.finish
+    else
+        loc.effect = loc.finish
+    end
 
     return loc
 end
@@ -2946,13 +2962,22 @@ local function parseReturn()
     end
     pushActionIntoCurrentChunk(rtn)
     for i = #Chunk, 1, -1 do
-        local func = Chunk[i]
-        if func.type == 'function'
-        or func.type == 'main' then
-            if not func.returns then
-                func.returns = {}
+        local block = Chunk[i]
+        if block.type == 'function'
+        or block.type == 'main' then
+            if not block.returns then
+                block.returns = {}
             end
-            func.returns[#func.returns+1] = rtn
+            block.returns[#block.returns+1] = rtn
+            break
+        end
+    end
+    for i = #Chunk, 1, -1 do
+        local block = Chunk[i]
+        if block.type == 'ifblock'
+        or block.type == 'elseifblock'
+        or block.type == 'else' then
+            block.hasReturn = true
             break
         end
     end
@@ -3049,6 +3074,15 @@ local function parseGoTo()
                 chunk.gotos = {}
             end
             chunk.gotos[#chunk.gotos+1] = action
+            break
+        end
+    end
+    for i = #Chunk, 1, -1 do
+        local chunk = Chunk[i]
+        if chunk.type == 'ifblock'
+        or chunk.type == 'elseifblock'
+        or chunk.type == 'elseblock' then
+            chunk.hasGoTo = true
             break
         end
     end
@@ -3583,6 +3617,15 @@ local function parseBreak()
             end
             chunk.breaks[#chunk.breaks+1] = action
             ok = true
+            break
+        end
+    end
+    for i = #Chunk, 1, -1 do
+        local chunk = Chunk[i]
+        if chunk.type == 'ifblock'
+        or chunk.type == 'elseifblock'
+        or chunk.type == 'elseblock' then
+            chunk.hasBreak = true
             break
         end
     end

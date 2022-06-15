@@ -93,15 +93,17 @@ local myOption = {
     number = function (n)
         return ('%q'):format(n)
     end,
-    format = function (value, _, _, _, key)
-        if ignoreMap[key] then
-            return '<IGNORE>'
+    format = setmetatable({}, { __index = function (_, key)
+        return function (value, _, _, _)
+            if ignoreMap[key] then
+                return '<IGNORE>'
+            end
+            if type(key) == 'string' and key:sub(1, 1) == '_' then
+                return nil
+            end
+            return value
         end
-        if type(key) == 'string' and key:sub(1, 1) == '_' then
-            return nil
-        end
-        return value
-    end,
+    end}),
 }
 
 local targetOption = {

@@ -17,7 +17,7 @@
             ],
             "arg": [
             ],
-            "consoleCoding": "utf8",
+            "console": "internalConsole",
             "sourceCoding": "utf8",
             "luaVersion": "5.4",
             "luaArch": "x86_64",
@@ -38,7 +38,7 @@
             ],
             "arg": [
             ],
-            "consoleCoding": "utf8",
+            "console": "internalConsole",
             "sourceCoding": "utf8",
             "luaVersion": "5.4",
             "luaArch": "x86_64",

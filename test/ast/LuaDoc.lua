@@ -154,6 +154,7 @@ LuaDoc [[
                 finish = 18,
                 parent = "<IGNORE>",
                 [1]    = "a",
+                [2]    = "'",
             },
             [3] = {
                 type   = "doc.type.string",
@@ -161,6 +162,7 @@ LuaDoc [[
                 finish = 26,
                 parent = "<IGNORE>",
                 [1]    = "b",
+                [2]    = "'",
             },
         },
     },
@@ -187,6 +189,7 @@ LuaDoc [[
                 finish = 14,
                 parent = "<IGNORE>",
                 [1]    = "a",
+                [2]    = "'",
             },
             [2] = {
                 type   = "doc.type.string",
@@ -194,6 +197,7 @@ LuaDoc [[
                 finish = 22,
                 parent = "<IGNORE>",
                 [1]    = "b",
+                [2]    = "'",
             },
             [3] = {
                 type   = "doc.type.string",
@@ -201,6 +205,7 @@ LuaDoc [[
                 finish = 30,
                 parent = "<IGNORE>",
                 [1]    = "c",
+                [2]    = "'",
             },
         },
     },
@@ -619,10 +624,11 @@ LuaDoc [[
         originalComment = "<IGNORE>",
         types           = {
             [1] = {
-                type   = "doc.type.name",
+                type   = "doc.type.sign",
                 start  = 9,
-                finish = 14,
+                finish = 26,
                 parent = "<IGNORE>",
+                node   = "<IGNORE>",
                 signs  = {
                     [1] = {
                         type        = "doc.type",
@@ -657,7 +663,6 @@ LuaDoc [[
                         },
                     },
                 },
-                [1]    = "table",
             },
         },
     },
@@ -772,6 +777,7 @@ LuaDoc [[
                     finish = 37,
                     parent = "<IGNORE>",
                     [1]    = "onClosed",
+                    [2]    = "'",
                 },
                 [3] = {
                     type   = "doc.type.string",
@@ -779,6 +785,7 @@ LuaDoc [[
                     finish = 50,
                     parent = "<IGNORE>",
                     [1]    = "onData",
+                    [2]    = "'",
                 },
             },
         },

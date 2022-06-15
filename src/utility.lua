@@ -8,6 +8,7 @@ local ipairs       = ipairs
 local next         = next
 local rawset       = rawset
 local move         = table.move
+local tableRemove  = table.remove
 local setmetatable = debug.setmetatable
 local mathType     = math.type
 local mathCeil     = math.ceil
@@ -21,8 +22,8 @@ local getupvalue   = debug.getupvalue
 local mathHuge     = math.huge
 local inf          = 1 / 0
 local nan          = 0 / 0
-local utf8         = utf8
 local error        = error
+local assert       = assert
 
 _ENV = nil
 
@@ -44,7 +45,7 @@ local function formatNumber(n)
     if isInteger(n) then
         return tostring(n)
     end
-    local str = ('%.17f'):format(n)
+    local str = ('%.10f'):format(n)
     str = str:gsub('%.?0*$', '')
     return str
 end
@@ -83,7 +84,7 @@ local m = {}
 
 --- 打印表的结构
 ---@param tbl table
----@param option table {optional = 'self'}
+---@param option? table
 ---@return string
 function m.dump(tbl, option)
     if not option then
@@ -139,7 +140,6 @@ function m.dump(tbl, option)
                 end)
             end
         end
-        local format = option['format']
         for _, key in ipairs(keys) do
             local keyWord = keymap[key]
             if option['noArrayKey']
@@ -156,10 +156,10 @@ function m.dump(tbl, option)
             end
             local value = tbl[key]
             local tp = type(value)
-            local vformat = type(format) == 'table' and option['format'][key] or format
-            if vformat then
-                value = vformat(value, unpack, deep+1, stack, key)
-                tp = type(value)
+            local format = option['format'] and option['format'][key]
+            if format then
+                value = format(value, unpack, deep+1, stack)
+                tp    = type(value)
             end
             if tp == 'table' then
                 if mark[value] and mark[value] > 0 then
@@ -318,8 +318,8 @@ function m.saveFile(path, content)
 end
 
 --- 计数器
----@param init integer {optional = 'after'}
----@param step integer {optional = 'after'}
+---@param init? integer
+---@param step? integer
 ---@return fun():integer
 function m.counter(init, step)
     if not step then
@@ -349,8 +349,8 @@ function m.sortPairs(t, sorter)
 end
 
 --- 深拷贝（不处理元表）
----@param source table
----@param target table {optional = 'self'}
+---@param source  table
+---@param target? table
 function m.deepCopy(source, target)
     local mark = {}
     local function copy(a, b)
@@ -569,26 +569,26 @@ end
 
 ---遍历文本的每一行
 ---@param text string
----@param keepNL boolean # 保留换行符
----@return fun(text:string):string
+---@param keepNL? boolean # 保留换行符
+---@return fun(text:string):string, integer
 function m.eachLine(text, keepNL)
     local offset = 1
     local lineCount = 0
     local lastLine
     return function ()
+        lineCount = lineCount + 1
         if offset > #text then
             if not lastLine then
                 lastLine = ''
-                return ''
+                return '', lineCount
             end
             return nil
         end
-        lineCount = lineCount + 1
         local nl = text:find('[\r\n]', offset)
         if not nl then
             lastLine = text:sub(offset)
             offset = #text + 1
-            return lastLine
+            return lastLine, lineCount
         end
         local line
         if text:sub(nl, nl + 1) == '\r\n' then
@@ -606,7 +606,7 @@ function m.eachLine(text, keepNL)
             end
             offset = nl + 1
         end
-        return line
+        return line, lineCount
     end
 end
 
@@ -643,12 +643,12 @@ end
 ---@return string
 function m.trim(str, mode)
     if mode == "left" then
-        return str:gsub('^%s+', '')
+        return (str:gsub('^%s+', ''))
     end
     if mode == "right" then
-        return str:gsub('%s+$', '')
+        return (str:gsub('%s+$', ''))
     end
-    return str:match '^%s*(%S+)%s*$'
+    return (str:match '^%s*(.-)%s*$')
 end
 
 function m.expandPath(path)
@@ -676,29 +676,67 @@ function m.arrayToHash(l)
     return t
 end
 
-function m.switch()
-    local map = {}
-    local cachedCases = {}
-    local obj = {
-        case = function (self, name)
-            cachedCases[#cachedCases+1] = name
-            return self
-        end,
-        call = function (self, callback)
-            for i = 1, #cachedCases do
-                local name = cachedCases[i]
-                cachedCases[i] = nil
-                if map[name] then
-                    error('Repeated fields:' .. tostring(name))
-                end
-                map[name] = callback
-            end
-            return self
-        end,
-        getMap = function (self)
-            return map
+---@class switch
+---@field cachedCases string[]
+---@field map table<string, function>
+---@field _default fun(...):...
+local switchMT = {}
+switchMT.__index = switchMT
+
+---@param name string
+---@return switch
+function switchMT:case(name)
+    self.cachedCases[#self.cachedCases+1] = name
+    return self
+end
+
+---@param callback async fun(...):...
+---@return switch
+function switchMT:call(callback)
+    for i = 1, #self.cachedCases do
+        local name = self.cachedCases[i]
+        self.cachedCases[i] = nil
+        if self.map[name] then
+            error('Repeated fields:' .. tostring(name))
         end
-    }
+        self.map[name] = callback
+    end
+    return self
+end
+
+---@param callback fun(...):...
+---@return switch
+function switchMT:default(callback)
+    self._default = callback
+    return self
+end
+
+function switchMT:getMap()
+    return self.map
+end
+
+---@param name string
+---@return boolean
+function switchMT:has(name)
+    return self.map[name] ~= nil
+end
+
+---@param name string
+---@return ...
+function switchMT:__call(name, ...)
+    local callback = self.map[name] or self._default
+    if not callback then
+        return
+    end
+    return callback(...)
+end
+
+---@return switch
+function m.switch()
+    local obj = setmetatable({
+        map = {},
+        cachedCases = {},
+    }, switchMT)
     return obj
 end
 
@@ -723,5 +761,78 @@ end
 function m.stringEndWith(str, tail)
     return str:sub(-#tail) == tail
 end
+
+function m.defaultTable(default)
+    return setmetatable({}, { __index = function (t, k)
+        local v = default(k)
+        t[k] = v
+        return v
+    end })
+end
+
+function m.multiTable(count, default)
+    local current
+    if default then
+        current = setmetatable({}, { __index = function (t, k)
+            local v = default(k)
+            t[k] = v
+            return v
+        end })
+    else
+        current = setmetatable({}, { __index = function (t, k)
+            local v = {}
+            t[k] = v
+            return v
+        end })
+    end
+    for _ = 3, count do
+        current = setmetatable({}, { __index = function (t, k)
+            t[k] = current
+            return current
+        end })
+    end
+    return current
+end
+
+function m.getTableKeys(t, sorter)
+    local keys = {}
+    for k in pairs(t) do
+        keys[#keys+1] = k
+    end
+    if sorter == true then
+        tableSort(keys)
+    elseif sorter then
+        tableSort(keys, sorter)
+    end
+    return keys
+end
+
+function m.arrayHas(array, value)
+    for i = 1, #array do
+        if array[i] == value then
+            return true
+        end
+    end
+    return false
+end
+
+function m.arrayInsert(array, value)
+    if not m.arrayHas(array, value) then
+        array[#array+1] = value
+    end
+end
+
+function m.arrayRemove(array, value)
+    for i = 1, #array do
+        if array[i] == value then
+            tableRemove(array, i)
+            return
+        end
+    end
+end
+
+m.MODE_K  = { __mode = 'k' }
+m.MODE_V  = { __mode = 'v' }
+m.MODE_KV = { __mode = 'kv' }
 
 return m

@@ -456,24 +456,25 @@ end]]
     start  = 0,
     finish = 20003,
     [1]    = {
-        type    = "ifblock",
-        start   = 0,
-        finish  = 10010,
-        keyword = {
+        type      = "ifblock",
+        start     = 0,
+        finish    = 10010,
+        keyword   = {
             [1] = 0,
             [2] = 2,
             [3] = 5,
             [4] = 9,
         },
-        parent  = "<IGNORE>",
-        filter  = {
+        parent    = "<IGNORE>",
+        filter    = {
             type   = "integer",
             start  = 3,
             finish = 4,
             parent = "<IGNORE>",
             [1]    = 1,
         },
-        [1]     = {
+        hasReturn = true,
+        [1]       = {
             type   = "return",
             start  = 10004,
             finish = 10010,
@@ -491,24 +492,25 @@ end]]
     start  = 0,
     finish = 40003,
     [1]    = {
-        type    = "ifblock",
-        start   = 0,
-        finish  = 10010,
-        keyword = {
+        type      = "ifblock",
+        start     = 0,
+        finish    = 10010,
+        keyword   = {
             [1] = 0,
             [2] = 2,
             [3] = 5,
             [4] = 9,
         },
-        parent  = "<IGNORE>",
-        filter  = {
+        parent    = "<IGNORE>",
+        filter    = {
             type   = "integer",
             start  = 3,
             finish = 4,
             parent = "<IGNORE>",
             [1]    = 1,
         },
-        [1]     = {
+        hasReturn = true,
+        [1]       = {
             type   = "return",
             start  = 10004,
             finish = 10010,
@@ -542,24 +544,25 @@ end]]
     start  = 0,
     finish = 40003,
     [1]    = {
-        type    = "ifblock",
-        start   = 0,
-        finish  = 10010,
-        keyword = {
+        type      = "ifblock",
+        start     = 0,
+        finish    = 10010,
+        keyword   = {
             [1] = 0,
             [2] = 2,
             [3] = 5,
             [4] = 9,
         },
-        parent  = "<IGNORE>",
-        filter  = {
+        parent    = "<IGNORE>",
+        filter    = {
             type   = "integer",
             start  = 3,
             finish = 4,
             parent = "<IGNORE>",
             [1]    = 1,
         },
-        [1]     = {
+        hasReturn = true,
+        [1]       = {
             type   = "return",
             start  = 10004,
             finish = 10010,
@@ -567,24 +570,25 @@ end]]
         },
     },
     [2]    = {
-        type    = "elseifblock",
-        start   = 20000,
-        finish  = 30010,
-        keyword = {
+        type      = "elseifblock",
+        start     = 20000,
+        finish    = 30010,
+        keyword   = {
             [1] = 20000,
             [2] = 20006,
             [3] = 20009,
             [4] = 20013,
         },
-        parent  = "<IGNORE>",
-        filter  = {
+        parent    = "<IGNORE>",
+        filter    = {
             type   = "integer",
             start  = 20007,
             finish = 20008,
             parent = "<IGNORE>",
             [1]    = 1,
         },
-        [1]     = {
+        hasReturn = true,
+        [1]       = {
             type   = "return",
             start  = 30004,
             finish = 30010,
@@ -604,24 +608,25 @@ end]]
     start  = 0,
     finish = 60003,
     [1]    = {
-        type    = "ifblock",
-        start   = 0,
-        finish  = 10010,
-        keyword = {
+        type      = "ifblock",
+        start     = 0,
+        finish    = 10010,
+        keyword   = {
             [1] = 0,
             [2] = 2,
             [3] = 5,
             [4] = 9,
         },
-        parent  = "<IGNORE>",
-        filter  = {
+        parent    = "<IGNORE>",
+        filter    = {
             type   = "integer",
             start  = 3,
             finish = 4,
             parent = "<IGNORE>",
             [1]    = 1,
         },
-        [1]     = {
+        hasReturn = true,
+        [1]       = {
             type   = "return",
             start  = 10004,
             finish = 10010,
@@ -629,24 +634,25 @@ end]]
         },
     },
     [2]    = {
-        type    = "elseifblock",
-        start   = 20000,
-        finish  = 30010,
-        keyword = {
+        type      = "elseifblock",
+        start     = 20000,
+        finish    = 30010,
+        keyword   = {
             [1] = 20000,
             [2] = 20006,
             [3] = 20009,
             [4] = 20013,
         },
-        parent  = "<IGNORE>",
-        filter  = {
+        parent    = "<IGNORE>",
+        filter    = {
             type   = "integer",
             start  = 20007,
             finish = 20008,
             parent = "<IGNORE>",
             [1]    = 1,
         },
-        [1]     = {
+        hasReturn = true,
+        [1]       = {
             type   = "return",
             start  = 30004,
             finish = 30010,
