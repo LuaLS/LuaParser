@@ -1200,8 +1200,10 @@ return {
             [1]    = {
                 type   = "tablefield",
                 start  = 20004,
-                finish = 20009,
+                finish = 20005,
+                range  = 20009,
                 parent = "<IGNORE>",
+                node   = "<IGNORE>",
                 field  = {
                     type   = "field",
                     start  = 20004,
