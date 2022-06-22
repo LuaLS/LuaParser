@@ -894,6 +894,7 @@ local docSwitch = util.switch()
                 docType.optional = true
             end
             docType.name = parseName('doc.return.name', docType)
+                        or parseDots('doc.return.name', docType)
             result.returns[#result.returns+1] = docType
             if not checkToken('symbol', ',', 1) then
                 break
@@ -1373,37 +1374,45 @@ local function buildLuaDoc(comment)
     }
 end
 
-local function isTailComment(text, binded)
-    local lastDoc       = binded[#binded]
-    local left          = lastDoc.originalComment.start
+local function isTailComment(text, doc)
+    if not doc then
+        return false
+    end
+    local left          = doc.originalComment.start
     local row, col      = guide.rowColOf(left)
     local lineStart     = Lines[row] or 0
     local hasCodeBefore = text:sub(lineStart, lineStart + col):find '[%w_]'
     return hasCodeBefore
 end
 
-local function isNextLine(binded, doc)
-    if not binded then
+local function isContinuedDoc(lastDoc, nextDoc)
+    if not nextDoc then
         return false
     end
-    local lastDoc = binded[#binded]
     if lastDoc.type == 'doc.type'
     or lastDoc.type == 'doc.module' then
         return false
     end
     if lastDoc.type == 'doc.class'
     or lastDoc.type == 'doc.field' then
-        if  doc.type ~= 'doc.field'
-        and doc.type ~= 'doc.comment'
-        and doc.type ~= 'doc.overload' then
+        if  nextDoc.type ~= 'doc.field'
+        and nextDoc.type ~= 'doc.comment'
+        and nextDoc.type ~= 'doc.overload' then
             return false
         end
     end
-    if doc.type == 'doc.cast' then
+    if nextDoc.type == 'doc.cast' then
+        return false
+    end
+    return true
+end
+
+local function isNextLine(lastDoc, nextDoc)
+    if not nextDoc then
         return false
     end
     local lastRow = guide.rowColOf(lastDoc.finish)
-    local newRow  = guide.rowColOf(doc.start)
+    local newRow  = guide.rowColOf(nextDoc.start)
     return newRow - lastRow == 1
 end
 
@@ -1471,17 +1480,26 @@ local function bindDocsBetween(sources, binded, bindSources, start, finish)
     end
 
     -- 从前往后进行绑定
+    local skipUntil
     for i = index, max do
         local src = sources[i]
         if src and src.start >= start then
             if src.start >= finish then
                 break
             end
+            if skipUntil then
+                if skipUntil > src.start then
+                    goto CONTINUE
+                else
+                    skipUntil = nil
+                end
+            end
             -- 遇到table后中断，处理以下情况：
             -- ---@type AAA
             -- local t = {x = 1, y = 2}
             if src.type == 'table' then
-                break
+                skipUntil = skipUntil or src.finish
+                goto CONTINUE
             end
             if src.start >= start then
                 if src.type == 'local'
@@ -1498,6 +1516,7 @@ local function bindDocsBetween(sources, binded, bindSources, start, finish)
                     bindSources[#bindSources+1] = src
                 end
             end
+            ::CONTINUE::
         end
     end
 end
@@ -1572,19 +1591,28 @@ local function bindDocs(state)
         return a.start < b.start
     end)
     local binded
-    for _, doc in ipairs(state.ast.docs) do
-        if not isNextLine(binded, doc) then
-            bindDoc(sources, binded)
+    for i, doc in ipairs(state.ast.docs) do
+        if not binded then
             binded = {}
             state.ast.docs.groups[#state.ast.docs.groups+1] = binded
         end
         binded[#binded+1] = doc
-        if isTailComment(text, binded) then
+        if isTailComment(text, doc) then
             bindDoc(sources, binded)
             binded = nil
+        else
+            local nextDoc = state.ast.docs[i+1]
+            if not isNextLine(doc, nextDoc) then
+                bindDoc(sources, binded)
+                binded = nil
+            end
+            if  not isContinuedDoc(doc, nextDoc)
+            and not isTailComment(text, nextDoc) then
+                bindDoc(sources, binded)
+                binded = nil
+            end
         end
     end
-    bindDoc(sources, binded)
 end
 
 return function (state)

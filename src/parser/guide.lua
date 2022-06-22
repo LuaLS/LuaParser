@@ -10,9 +10,11 @@ local type         = type
 ---@field type                  string
 ---@field special               string
 ---@field tag                   string
----@field args                  parser.object[]
+---@field args                  { [integer]: parser.object, start: integer, finish: integer }
 ---@field locals                parser.object[]
 ---@field returns               parser.object[]
+---@field exps                  parser.object[]
+---@field keys                  parser.object[]
 ---@field uri                   uri
 ---@field start                 integer
 ---@field finish                integer
@@ -66,6 +68,7 @@ local type         = type
 ---@field hasReturn?            true
 ---@field hasBreak?             true
 ---@field hasError?             true
+---@field [integer]             parser.object|any
 ---@field _root                 parser.object
 
 ---@class guide
@@ -254,6 +257,7 @@ function m.isLiteral(obj)
         or tp == 'doc.type.integer'
         or tp == 'doc.type.boolean'
         or tp == 'doc.type.code'
+        or tp == 'doc.type.array'
 end
 
 --- 获取字面量
@@ -1243,6 +1247,7 @@ local basicTypeMap = {
     ['false']    = true,
     ['nil']      = true,
     ['boolean']  = true,
+    ['integer']  = true,
     ['number']   = true,
     ['string']   = true,
     ['table']    = true,
