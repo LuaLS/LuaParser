@@ -1211,3 +1211,116 @@ local x = 1
         [1]    = "x",
     },
 }
+CHECK [[
+return function ()
+    local function fff(xxx)
+        for f in xx
+    end
+end
+]]
+{
+    type    = "main",
+    start   = 0,
+    finish  = 50000,
+    locals  = "<IGNORE>",
+    returns = "<IGNORE>",
+    [1]     = {
+        type   = "return",
+        start  = 0,
+        finish = 40003,
+        parent = "<IGNORE>",
+        [1]    = {
+            type    = "function",
+            start   = 7,
+            finish  = 40003,
+            keyword = {
+                [1] = 7,
+                [2] = 15,
+            },
+            parent  = "<IGNORE>",
+            locals  = "<IGNORE>",
+            [1]     = {
+                type   = "local",
+                start  = 10019,
+                vstart = 10010,
+                finish = 10022,
+                effect = 10022,
+                range  = 40003,
+                parent = "<IGNORE>",
+                locPos = 10004,
+                value  = {
+                    type    = "function",
+                    start   = 10010,
+                    finish  = 40003,
+                    keyword = {
+                        [1] = 10010,
+                        [2] = 10018,
+                        [3] = 40000,
+                        [4] = 40003,
+                    },
+                    parent  = "<IGNORE>",
+                    args    = {
+                        type   = "funcargs",
+                        start  = 10022,
+                        finish = 10027,
+                        parent = "<IGNORE>",
+                        [1]    = {
+                            type   = "local",
+                            start  = 10023,
+                            finish = 10026,
+                            effect = 10026,
+                            parent = "<IGNORE>",
+                            [1]    = "xxx",
+                        },
+                    },
+                    locals  = "<IGNORE>",
+                    [1]     = {
+                        type    = "in",
+                        start   = 20008,
+                        finish  = 30007,
+                        keyword = {
+                            [1] = 20008,
+                            [2] = 20011,
+                            [3] = 20014,
+                            [4] = 20016,
+                            [5] = 30004,
+                            [6] = 30007,
+                        },
+                        parent  = "<IGNORE>",
+                        keys    = {
+                            type   = "list",
+                            start  = 20012,
+                            finish = 20013,
+                            range  = 20016,
+                            parent = "<IGNORE>",
+                            [1]    = {
+                                type   = "local",
+                                start  = 20012,
+                                finish = 20013,
+                                effect = 20019,
+                                parent = "<IGNORE>",
+                                [1]    = "f",
+                            },
+                        },
+                        exps    = {
+                            type   = "list",
+                            start  = 20017,
+                            finish = 20019,
+                            parent = "<IGNORE>",
+                            [1]    = {
+                                type   = "getglobal",
+                                start  = 20017,
+                                finish = 20019,
+                                parent = "<IGNORE>",
+                                node   = "<IGNORE>",
+                                [1]    = "xx",
+                            },
+                        },
+                        locals  = "<IGNORE>",
+                    },
+                },
+                [1]    = "fff",
+            },
+        },
+    },
+}
