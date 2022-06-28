@@ -1275,3 +1275,63 @@ a = {
         [1]    = "a",
     },
 }
+
+CHECK [[
+x, y, z = 1, func()
+]]
+{
+    type   = "main",
+    start  = 0,
+    finish = 10000,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "setglobal",
+        start  = 0,
+        finish = 1,
+        range  = 11,
+        parent = "<IGNORE>",
+        node   = "<IGNORE>",
+        value  = {
+            type   = "integer",
+            start  = 10,
+            finish = 11,
+            parent = "<IGNORE>",
+            [1]    = 1,
+        },
+        [1]    = "x",
+    },
+    [2]    = {
+        type   = "setglobal",
+        start  = 3,
+        finish = 4,
+        range  = 19,
+        parent = "<IGNORE>",
+        node   = "<IGNORE>",
+        value  = {
+            type   = "select",
+            start  = 13,
+            finish = 19,
+            parent = "<IGNORE>",
+            vararg = "<IGNORE>",
+            sindex = 1,
+        },
+        [1]    = "y",
+    },
+    [3]    = {
+        type   = "setglobal",
+        start  = 6,
+        finish = 7,
+        range  = 19,
+        parent = "<IGNORE>",
+        node   = "<IGNORE>",
+        value  = {
+            type   = "select",
+            start  = 13,
+            finish = 19,
+            parent = "<IGNORE>",
+            vararg = "<IGNORE>",
+            sindex = 2,
+        },
+        [1]    = "z",
+    },
+}
