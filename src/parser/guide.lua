@@ -12,7 +12,7 @@ local type         = type
 ---@field tag                   string
 ---@field args                  { [integer]: parser.object, start: integer, finish: integer }
 ---@field locals                parser.object[]
----@field returns               parser.object[]
+---@field returns?              parser.object[]
 ---@field exps                  parser.object[]
 ---@field keys                  parser.object[]
 ---@field uri                   uri
@@ -240,7 +240,7 @@ local function formatNumber(n)
 end
 
 --- 是否是字面量
----@param obj parser.object
+---@param obj table
 ---@return boolean
 function m.isLiteral(obj)
     local tp = obj.type
@@ -478,7 +478,9 @@ function m.getLocal(source, name, pos)
         if not block then
             return nil
         end
-        if block.start <= pos and block.finish >= pos then
+        if  block.start <= pos
+        and block.finish >= pos
+        and blockTypes[block.type] then
             break
         end
         block = block.parent
@@ -823,6 +825,8 @@ function m.positionToOffset(state, position)
     return m.positionToOffsetByLines(state.lines, position)
 end
 
+---@param lines integer[]
+---@param offset integer
 function m.offsetToPositionByLines(lines, offset)
     local left  = 0
     local right = #lines
@@ -885,6 +889,7 @@ local isSetMap = {
     ['doc.alias.name']    = true,
     ['doc.field.name']    = true,
     ['doc.type.field']    = true,
+    ['doc.type.array']    = true,
 }
 function m.isSet(source)
     local tp = source.type
@@ -1084,13 +1089,13 @@ end
 --- 返回的2个 `list` 分别为基准block到达 a 与 b 的路径。
 ---@param a table
 ---@param b table
----@return string|boolean mode
+---@return string|false mode
 ---@return table pathA?
 ---@return table pathB?
 function m.getPath(a, b, sameFunction)
     --- 首先测试双方在同一个函数内
     if sameFunction and m.getParentFunction(a) ~= m.getParentFunction(b) then
-        return false
+        return false, nil, nil
     end
     local mode
     local objA
@@ -1134,7 +1139,7 @@ function m.getPath(a, b, sameFunction)
         end
     end
     if not start then
-        return nil
+        return false, nil, nil
     end
     -- pathA: {   1, 2, 3}
     -- pathB: {5, 6, 2, 3}
@@ -1225,6 +1230,15 @@ function m.isInString(ast, position)
             return true
         end
     end)
+end
+
+function m.isInComment(ast, offset)
+    for _, com in ipairs(ast.state.comms) do
+        if offset >= com.start and offset <= com.finish then
+            return true
+        end
+    end
+    return false
 end
 
 function m.isOOP(source)

@@ -269,14 +269,13 @@ end
 ---@return string          word
 ---@return parser.position startPosition
 ---@return parser.position finishPosition
----@return integer         newOffset
 local function peekWord()
     local word = Tokens[Index + 1]
     if not word then
-        return nil
+        return nil, nil, nil
     end
     if not CharMapWord[ssub(word, 1, 1)] then
-        return nil
+        return nil, nil, nil
     end
     local startPos  = getPosition(Tokens[Index] , 'left')
     local finishPos = getPosition(Tokens[Index] + #word - 1, 'right')
@@ -553,11 +552,12 @@ local function skipComment(isAction)
             end
             Index = Index + 2
         end
+        local right = Tokens[Index] and (Tokens[Index] - 1) or #Lua
         State.comms[#State.comms+1] = {
             type   = chead and 'comment.cshort' or 'comment.short',
             start  = left,
-            finish = lastRightPosition(),
-            text   = ssub(Lua, start + 2, Tokens[Index] and (Tokens[Index] - 1) or #Lua),
+            finish = getPosition(right, 'right'),
+            text   = ssub(Lua, start + 2, right),
         }
         return true
     end
@@ -1024,7 +1024,7 @@ local function parseShortString()
                 fastForwardToken(currentOffset)
                 local right = getPosition(currentOffset - 1, 'right')
                 local byte = tointeger(numbers)
-                if byte <= 255 then
+                if byte and byte <= 255 then
                     stringIndex = stringIndex + 1
                     stringPool[stringIndex] = schar(byte)
                 else
@@ -2597,29 +2597,29 @@ local function parseSetValues()
     skipSpace()
     local first = parseExp()
     if not first then
-        return nil
+        return nil, nil, nil
     end
     skipSpace()
     if Tokens[Index + 1] ~= ',' then
-        return first
+        return first, nil, nil
     end
     Index = Index + 2
     skipSeps()
     local second = parseExp()
     if not second then
         missExp()
-        return first
+        return first, nil, nil
     end
     skipSpace()
     if Tokens[Index + 1] ~= ',' then
-        return first, second
+        return first, second, nil
     end
     Index = Index + 2
     skipSeps()
     local third = parseExp()
     if not third then
         missExp()
-        return first, second
+        return first, second, nil
     end
 
     local rest = { third }
@@ -2651,14 +2651,14 @@ end
 ---@return parser.object[] rest
 local function parseVarTails(parser, isLocal)
     if Tokens[Index + 1] ~= ',' then
-        return
+        return nil, nil
     end
     Index = Index + 2
     skipSpace()
     local second = parser(true)
     if not second then
         missName()
-        return
+        return nil, nil
     end
     if isLocal then
         createLocal(second, parseLocalAttrs())
@@ -2666,14 +2666,14 @@ local function parseVarTails(parser, isLocal)
     end
     skipSpace()
     if Tokens[Index + 1] ~= ',' then
-        return second
+        return second, nil
     end
     Index = Index + 2
     skipSeps()
     local third = parser(true)
     if not third then
         missName()
-        return second
+        return second, nil
     end
     if isLocal then
         createLocal(third, parseLocalAttrs())
@@ -3792,6 +3792,7 @@ local function initState(lua, version, options)
     Chunk               = {}
     Tokens              = tokens(lua)
     Index               = 1
+    ---@class parser.state
     local state = {
         version = version,
         lua     = lua,
