@@ -266,16 +266,16 @@ local function getPosition(offset, leftOrRight)
     end
 end
 
----@return string          word
----@return parser.position startPosition
----@return parser.position finishPosition
+---@return string?          word
+---@return parser.position? startPosition
+---@return parser.position? finishPosition
 local function peekWord()
     local word = Tokens[Index + 1]
     if not word then
-        return nil, nil, nil
+        return nil
     end
     if not CharMapWord[ssub(word, 1, 1)] then
-        return nil, nil, nil
+        return nil
     end
     local startPos  = getPosition(Tokens[Index] , 'left')
     local finishPos = getPosition(Tokens[Index] + #word - 1, 'right')
@@ -612,7 +612,14 @@ local function expectAssign(isAction)
         if token == '+='
         or token == '-='
         or token == '*='
-        or token == '/=' then
+        or token == '/='
+        or token == '%='
+        or token == '^='
+        or token == '//='
+        or token == '|='
+        or token == '&='
+        or token == '>>='
+        or token == '<<=' then
             if not State.options.nonstandardSymbol[token] then
                 unknownSymbol()
             end
@@ -2590,36 +2597,36 @@ local function skipSeps()
     end
 end
 
----@return parser.object   first
----@return parser.object   second
----@return parser.object[] rest
+---@return parser.object?   first
+---@return parser.object?   second
+---@return parser.object[]? rest
 local function parseSetValues()
     skipSpace()
     local first = parseExp()
     if not first then
-        return nil, nil, nil
+        return nil
     end
     skipSpace()
     if Tokens[Index + 1] ~= ',' then
-        return first, nil, nil
+        return first
     end
     Index = Index + 2
     skipSeps()
     local second = parseExp()
     if not second then
         missExp()
-        return first, nil, nil
+        return first
     end
     skipSpace()
     if Tokens[Index + 1] ~= ',' then
-        return first, second, nil
+        return first, second
     end
     Index = Index + 2
     skipSeps()
     local third = parseExp()
     if not third then
         missExp()
-        return first, second, nil
+        return first, second
     end
 
     local rest = { third }
@@ -2647,18 +2654,18 @@ local function pushActionIntoCurrentChunk(action)
     end
 end
 
----@return parser.object   second
----@return parser.object[] rest
+---@return parser.object?   second
+---@return parser.object[]? rest
 local function parseVarTails(parser, isLocal)
     if Tokens[Index + 1] ~= ',' then
-        return nil, nil
+        return nil
     end
     Index = Index + 2
     skipSpace()
     local second = parser(true)
     if not second then
         missName()
-        return nil, nil
+        return nil
     end
     if isLocal then
         createLocal(second, parseLocalAttrs())
@@ -2666,14 +2673,14 @@ local function parseVarTails(parser, isLocal)
     end
     skipSpace()
     if Tokens[Index + 1] ~= ',' then
-        return second, nil
+        return second
     end
     Index = Index + 2
     skipSeps()
     local third = parser(true)
     if not third then
         missName()
-        return second, nil
+        return second
     end
     if isLocal then
         createLocal(third, parseLocalAttrs())
@@ -2833,7 +2840,8 @@ local function compileExpAsAction(exp)
                 local block = Chunk[i]
                 if block.type == 'ifblock'
                 or block.type == 'elseifblock'
-                or block.type == 'else' then
+                or block.type == 'elseblock'
+                or block.type == 'function' then
                     block.hasError = true
                     break
                 end
@@ -2986,7 +2994,8 @@ local function parseReturn()
         local block = Chunk[i]
         if block.type == 'ifblock'
         or block.type == 'elseifblock'
-        or block.type == 'else' then
+        or block.type == 'elseblock'
+        or block.type == 'function' then
             block.hasReturn = true
             break
         end
