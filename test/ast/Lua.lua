@@ -618,18 +618,19 @@ end]]
         parent = "<IGNORE>",
         locPos = 0,
         value  = {
-            type    = "function",
-            start   = 6,
-            finish  = 20003,
-            keyword = {
+            type      = "function",
+            start     = 6,
+            finish    = 20003,
+            keyword   = {
                 [1] = 6,
                 [2] = 14,
                 [3] = 20000,
                 [4] = 20003,
             },
-            parent  = "<IGNORE>",
-            returns = "<IGNORE>",
-            [1]     = {
+            parent    = "<IGNORE>",
+            returns   = "<IGNORE>",
+            hasReturn = true,
+            [1]       = {
                 type   = "return",
                 start  = 10004,
                 finish = 10010,
@@ -658,18 +659,19 @@ end]]
         parent = "<IGNORE>",
         locPos = 0,
         value  = {
-            type    = "function",
-            start   = 6,
-            finish  = 20003,
-            keyword = {
+            type      = "function",
+            start     = 6,
+            finish    = 20003,
+            keyword   = {
                 [1] = 6,
                 [2] = 14,
                 [3] = 20000,
                 [4] = 20003,
             },
-            parent  = "<IGNORE>",
-            returns = "<IGNORE>",
-            [1]     = {
+            parent    = "<IGNORE>",
+            returns   = "<IGNORE>",
+            hasReturn = true,
+            [1]       = {
                 type   = "return",
                 start  = 10004,
                 finish = 10014,
@@ -706,17 +708,17 @@ end]]
         parent = "<IGNORE>",
         locPos = 0,
         value  = {
-            type    = "function",
-            start   = 6,
-            finish  = 20003,
-            keyword = {
+            type      = "function",
+            start     = 6,
+            finish    = 20003,
+            keyword   = {
                 [1] = 6,
                 [2] = 14,
                 [3] = 20000,
                 [4] = 20003,
             },
-            parent  = "<IGNORE>",
-            args    = {
+            parent    = "<IGNORE>",
+            args      = {
                 type   = "funcargs",
                 start  = 16,
                 finish = 22,
@@ -738,9 +740,10 @@ end]]
                     [1]    = "c",
                 },
             },
-            locals  = "<IGNORE>",
-            returns = "<IGNORE>",
-            [1]     = {
+            locals    = "<IGNORE>",
+            returns   = "<IGNORE>",
+            hasReturn = true,
+            [1]       = {
                 type   = "return",
                 start  = 10004,
                 finish = 10010,

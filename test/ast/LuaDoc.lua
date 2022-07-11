@@ -3,6 +3,8 @@ LuaDoc [[
 ]]
 {
     type   = "doc",
+    start  = 0,
+    finish = 10000,
     parent = "<IGNORE>",
     [1]    = {
         type            = "doc.class",
@@ -10,6 +12,8 @@ LuaDoc [[
         finish          = 15,
         range           = 15,
         parent          = "<IGNORE>",
+        bindComments    = {
+        },
         class           = {
             type   = "doc.class.name",
             start  = 10,
@@ -18,6 +22,8 @@ LuaDoc [[
             [1]    = "Class",
         },
         fields          = {
+        },
+        operators       = {
         },
         originalComment = "<IGNORE>",
     },
@@ -29,6 +35,8 @@ local x = 1
 ]]
 {
     type   = "doc",
+    start  = 0,
+    finish = 20000,
     parent = "<IGNORE>",
     [1]    = {
         type            = "doc.class",
@@ -36,6 +44,9 @@ local x = 1
         finish          = 28,
         range           = 28,
         parent          = "<IGNORE>",
+        bindComments    = {
+        },
+        bindSource      = "<IGNORE>",
         class           = {
             type   = "doc.class.name",
             start  = 10,
@@ -54,6 +65,8 @@ local x = 1
         },
         fields          = {
         },
+        operators       = {
+        },
         originalComment = "<IGNORE>",
     },
 }
@@ -64,6 +77,8 @@ x = 1
 ]]
 {
     type   = "doc",
+    start  = 0,
+    finish = 20000,
     parent = "<IGNORE>",
     [1]    = {
         type            = "doc.type",
@@ -71,6 +86,7 @@ x = 1
         finish          = 13,
         range           = 13,
         parent          = "<IGNORE>",
+        bindSource      = "<IGNORE>",
         firstFinish     = 13,
         originalComment = "<IGNORE>",
         types           = {
@@ -91,6 +107,8 @@ x = 1
 ]]
 {
     type   = "doc",
+    start  = 0,
+    finish = 20000,
     parent = "<IGNORE>",
     [1]    = {
         type            = "doc.type",
@@ -98,6 +116,7 @@ x = 1
         finish          = 26,
         range           = 26,
         parent          = "<IGNORE>",
+        bindSource      = "<IGNORE>",
         firstFinish     = 26,
         originalComment = "<IGNORE>",
         types           = {
@@ -131,6 +150,8 @@ LuaDoc [[
 ]]
 {
     type   = "doc",
+    start  = 0,
+    finish = 10000,
     parent = "<IGNORE>",
     [1]    = {
         type            = "doc.type",
@@ -173,6 +194,8 @@ LuaDoc [[
 ]]
 {
     type   = "doc",
+    start  = 0,
+    finish = 10000,
     parent = "<IGNORE>",
     [1]    = {
         type            = "doc.type",
@@ -217,6 +240,8 @@ x = 1
 ]]
 {
     type   = "doc",
+    start  = 0,
+    finish = 20000,
     parent = "<IGNORE>",
     [1]    = {
         type            = "doc.alias",
@@ -230,6 +255,8 @@ x = 1
             finish = 17,
             parent = "<IGNORE>",
             [1]    = "Handler",
+        },
+        bindComments    = {
         },
         extends         = {
             type        = "doc.type",
@@ -256,6 +283,8 @@ LuaDoc [[
 ]]
 {
     type   = "doc",
+    start  = 0,
+    finish = 10000,
     parent = "<IGNORE>",
     [1]    = {
         type            = "doc.param",
@@ -296,6 +325,8 @@ LuaDoc [[
 ]]
 {
     type   = "doc",
+    start  = 0,
+    finish = 10000,
     parent = "<IGNORE>",
     [1]    = {
         type            = "doc.return",
@@ -313,6 +344,8 @@ LuaDoc [[
 ]]
 {
     type   = "doc",
+    start  = 0,
+    finish = 10000,
     parent = "<IGNORE>",
     [1]    = {
         type            = "doc.return",
@@ -330,6 +363,8 @@ LuaDoc [[
 ]]
 {
     type   = "doc",
+    start  = 0,
+    finish = 10000,
     parent = "<IGNORE>",
     [1]    = {
         type            = "doc.field",
@@ -343,6 +378,8 @@ LuaDoc [[
             finish = 14,
             parent = "<IGNORE>",
             [1]    = "open",
+        },
+        bindComments    = {
         },
         extends         = {
             type        = "doc.type",
@@ -369,6 +406,8 @@ LuaDoc [[
 ]]
 {
     type   = "doc",
+    start  = 0,
+    finish = 10000,
     parent = "<IGNORE>",
     [1]    = {
         type            = "doc.field",
@@ -382,6 +421,8 @@ LuaDoc [[
             finish = 22,
             parent = "<IGNORE>",
             [1]    = "open",
+        },
+        bindComments    = {
         },
         extends         = {
             type        = "doc.type",
@@ -416,6 +457,8 @@ LuaDoc [[
 ]]
 {
     type   = "doc",
+    start  = 0,
+    finish = 10000,
     parent = "<IGNORE>",
     [1]    = {
         type            = "doc.generic",
@@ -447,6 +490,8 @@ LuaDoc [[
 ]]
 {
     type   = "doc",
+    start  = 0,
+    finish = 10000,
     parent = "<IGNORE>",
     [1]    = {
         type            = "doc.generic",
@@ -494,6 +539,8 @@ LuaDoc [[
 ]]
 {
     type   = "doc",
+    start  = 0,
+    finish = 10000,
     parent = "<IGNORE>",
     [1]    = {
         type            = "doc.generic",
@@ -570,6 +617,8 @@ LuaDoc [[
 ]]
 {
     type   = "doc",
+    start  = 0,
+    finish = 10000,
     parent = "<IGNORE>",
     [1]    = {
         type            = "doc.vararg",
@@ -587,6 +636,8 @@ LuaDoc [[
 ]]
 {
     type   = "doc",
+    start  = 0,
+    finish = 10000,
     parent = "<IGNORE>",
     [1]    = {
         type            = "doc.type",
@@ -613,6 +664,8 @@ LuaDoc [[
 ]]
 {
     type   = "doc",
+    start  = 0,
+    finish = 10000,
     parent = "<IGNORE>",
     [1]    = {
         type            = "doc.type",
@@ -675,6 +728,8 @@ LuaDoc [[
 ]]
 {
     type   = "doc",
+    start  = 0,
+    finish = 10000,
     parent = "<IGNORE>",
     [1]    = {
         type            = "doc.type",
@@ -750,6 +805,8 @@ LuaDoc [[
 ]]
 {
     type   = "doc",
+    start  = 0,
+    finish = 10000,
     parent = "<IGNORE>",
     [1]    = {
         type            = "doc.param",
@@ -806,6 +863,8 @@ LuaDoc [[
 ]]
 {
     type   = "doc",
+    start  = 0,
+    finish = 10000,
     parent = "<IGNORE>",
     [1]    = {
         type            = "doc.overload",

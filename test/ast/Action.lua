@@ -518,15 +518,16 @@ end]]
         },
     },
     [2]    = {
-        type    = "elseblock",
-        start   = 20000,
-        finish  = 30010,
-        keyword = {
+        type      = "elseblock",
+        start     = 20000,
+        finish    = 30010,
+        keyword   = {
             [1] = 20000,
             [2] = 20004,
         },
-        parent  = "<IGNORE>",
-        [1]     = {
+        parent    = "<IGNORE>",
+        hasReturn = true,
+        [1]       = {
             type   = "return",
             start  = 30004,
             finish = 30010,
@@ -660,15 +661,16 @@ end]]
         },
     },
     [3]    = {
-        type    = "elseblock",
-        start   = 40000,
-        finish  = 50010,
-        keyword = {
+        type      = "elseblock",
+        start     = 40000,
+        finish    = 50010,
+        keyword   = {
             [1] = 40000,
             [2] = 40004,
         },
-        parent  = "<IGNORE>",
-        [1]     = {
+        parent    = "<IGNORE>",
+        hasReturn = true,
+        [1]       = {
             type   = "return",
             start  = 50004,
             finish = 50010,
@@ -1189,18 +1191,19 @@ end]]
     finish = 13,
     range  = 20003,
     value  = {
-        type    = "function",
-        start   = 0,
-        finish  = 20003,
-        keyword = {
+        type      = "function",
+        start     = 0,
+        finish    = 20003,
+        keyword   = {
             [1] = 0,
             [2] = 8,
             [3] = 20000,
             [4] = 20003,
         },
-        parent  = "<IGNORE>",
-        returns = "<IGNORE>",
-        [1]     = {
+        parent    = "<IGNORE>",
+        returns   = "<IGNORE>",
+        hasReturn = true,
+        [1]       = {
             type   = "return",
             start  = 10004,
             finish = 10010,
@@ -1220,17 +1223,17 @@ end]]
     finish = 13,
     range  = 20003,
     value  = {
-        type    = "function",
-        start   = 0,
-        finish  = 20003,
-        keyword = {
+        type      = "function",
+        start     = 0,
+        finish    = 20003,
+        keyword   = {
             [1] = 0,
             [2] = 8,
             [3] = 20000,
             [4] = 20003,
         },
-        parent  = "<IGNORE>",
-        args    = {
+        parent    = "<IGNORE>",
+        args      = {
             type   = "funcargs",
             start  = 13,
             finish = 16,
@@ -1244,9 +1247,10 @@ end]]
                 [1]    = "a",
             },
         },
-        locals  = "<IGNORE>",
-        returns = "<IGNORE>",
-        [1]     = {
+        locals    = "<IGNORE>",
+        returns   = "<IGNORE>",
+        hasReturn = true,
+        [1]       = {
             type   = "return",
             start  = 10004,
             finish = 10010,
@@ -1279,17 +1283,17 @@ end]]
         [1]    = "c",
     },
     value  = {
-        type    = "function",
-        start   = 0,
-        finish  = 20003,
-        keyword = {
+        type      = "function",
+        start     = 0,
+        finish    = 20003,
+        keyword   = {
             [1] = 0,
             [2] = 8,
             [3] = 20000,
             [4] = 20003,
         },
-        parent  = "<IGNORE>",
-        args    = {
+        parent    = "<IGNORE>",
+        args      = {
             type   = "funcargs",
             start  = 14,
             finish = 23,
@@ -1327,9 +1331,10 @@ end]]
                 [1]    = "c",
             },
         },
-        locals  = "<IGNORE>",
-        returns = "<IGNORE>",
-        [1]     = {
+        locals    = "<IGNORE>",
+        returns   = "<IGNORE>",
+        hasReturn = true,
+        [1]       = {
             type   = "return",
             start  = 10004,
             finish = 10010,
@@ -1361,17 +1366,17 @@ end]]
         [1]    = "f",
     },
     value  = {
-        type    = "function",
-        start   = 0,
-        finish  = 20003,
-        keyword = {
+        type      = "function",
+        start     = 0,
+        finish    = 20003,
+        keyword   = {
             [1] = 0,
             [2] = 8,
             [3] = 20000,
             [4] = 20003,
         },
-        parent  = "<IGNORE>",
-        args    = {
+        parent    = "<IGNORE>",
+        args      = {
             type   = "funcargs",
             start  = 12,
             finish = 14,
@@ -1386,9 +1391,10 @@ end]]
                 [1]    = "self",
             },
         },
-        locals  = "<IGNORE>",
-        returns = "<IGNORE>",
-        [1]     = {
+        locals    = "<IGNORE>",
+        returns   = "<IGNORE>",
+        hasReturn = true,
+        [1]       = {
             type   = "return",
             start  = 10004,
             finish = 10015,
