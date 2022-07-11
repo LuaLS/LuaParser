@@ -1366,3 +1366,56 @@ local x, y
         [1]    = "y",
     },
 }
+
+CHECK [[
+local _ENV = nil
+]]
+{
+    type   = "main",
+    start  = 0,
+    finish = 10000,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "local",
+        start  = 6,
+        finish = 10,
+        effect = 16,
+        range  = 16,
+        parent = "<IGNORE>",
+        locPos = 0,
+        value  = {
+            type   = "nil",
+            start  = 13,
+            finish = 16,
+            parent = "<IGNORE>",
+        },
+        [1]    = "_ENV",
+    },
+}
+
+CHECK [[
+_ENV = nil
+]]
+{
+    type   = "main",
+    start  = 0,
+    finish = 10000,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "local",
+        start  = 0,
+        finish = 4,
+        effect = 10,
+        range  = 10,
+        parent = "<IGNORE>",
+        node   = "<IGNORE>",
+        locPos = 0,
+        value  = {
+            type   = "nil",
+            start  = 7,
+            finish = 10,
+            parent = "<IGNORE>",
+        },
+        [1]    = "_ENV",
+    },
+}
