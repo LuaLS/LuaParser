@@ -894,7 +894,7 @@ local a,b,,d
         type   = "local",
         start  = 6,
         finish = 7,
-        effect = 7,
+        effect = 12,
         parent = "<IGNORE>",
         locPos = 0,
         [1]    = "a",

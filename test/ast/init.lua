@@ -36,6 +36,7 @@ local function eq(a, b)
     return a == b
 end
 
+---@type {[string]: integer, [integer]: string}
 local sortList = {
     'specials',
     'type', 'start', 'vstart', 'finish', 'effect', 'range', 'tindex',

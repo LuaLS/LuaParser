@@ -102,7 +102,7 @@ CHECK'local x, y, z'
         type   = "local",
         start  = 6,
         finish = 7,
-        effect = 7,
+        effect = 13,
         parent = "<IGNORE>",
         locPos = 0,
         [1]    = "x",
@@ -134,7 +134,7 @@ CHECK'local x, y, z = 1, 2, 3'
         type   = "local",
         start  = 6,
         finish = 7,
-        effect = 17,
+        effect = 23,
         range  = 17,
         parent = "<IGNORE>",
         locPos = 0,
@@ -190,7 +190,7 @@ CHECK'local x, y = y, x'
         type   = "local",
         start  = 6,
         finish = 7,
-        effect = 14,
+        effect = 17,
         range  = 14,
         parent = "<IGNORE>",
         locPos = 0,
@@ -312,7 +312,7 @@ CHECK'local x, y = f(), nil'
         type   = "local",
         start  = 6,
         finish = 7,
-        effect = 16,
+        effect = 21,
         range  = 16,
         parent = "<IGNORE>",
         locPos = 0,
@@ -431,7 +431,7 @@ CHECK'local x, y = ..., nil'
         type   = "local",
         start  = 6,
         finish = 7,
-        effect = 16,
+        effect = 21,
         range  = 16,
         parent = "<IGNORE>",
         locPos = 0,
@@ -769,7 +769,7 @@ y, z = 3, 4
         type   = "local",
         start  = 6,
         finish = 7,
-        effect = 17,
+        effect = 20,
         range  = 17,
         parent = "<IGNORE>",
         locPos = 0,
@@ -1336,5 +1336,33 @@ x, y, z = 1, func()
             sindex = 2,
         },
         [1]    = "z",
+    },
+}
+
+CHECK [[
+local x, y
+-- comments
+]]
+{
+    type   = "main",
+    start  = 0,
+    finish = 20000,
+    locals = "<IGNORE>",
+    [1]    = {
+        type   = "local",
+        start  = 6,
+        finish = 7,
+        effect = 10,
+        parent = "<IGNORE>",
+        locPos = 0,
+        [1]    = "x",
+    },
+    [2]    = {
+        type   = "local",
+        start  = 9,
+        finish = 10,
+        effect = 10,
+        parent = "<IGNORE>",
+        [1]    = "y",
     },
 }
