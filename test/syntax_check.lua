@@ -58,7 +58,6 @@ local function catchTarget(script, sep)
     lns[#lns+1] = math.maxinteger
     local codes = {}
     local pos   = 1
-    ---@type integer[]
     local list = {}
     local cuted = 0
     local lastLine = 0
@@ -553,3 +552,40 @@ return 1
 {
     type = 'ACTION_AFTER_RETURN',
 }
+
+TEST [[
+f
+<!()!>
+]]
+{
+    type = 'AMBIGUOUS_SYNTAX',
+}
+
+TEST [[
+f:xx
+<!()!>
+]]
+{
+    type = 'AMBIGUOUS_SYNTAX',
+}
+
+TEST [[
+f
+<!()!>
+.x = 1
+]]
+{
+    type = 'AMBIGUOUS_SYNTAX',
+}
+
+TEST [[
+f
+''
+]]
+(nil)
+
+TEST [[
+f
+{}
+]]
+(nil)
