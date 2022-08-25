@@ -11,7 +11,7 @@ local function scanDirectory(path)
 
     local function scan(path)
         if fs.is_directory(path) then
-            for path in path:list_directory() do
+            for path in fs.pairs(path) do
                 scan(path)
             end
         else
