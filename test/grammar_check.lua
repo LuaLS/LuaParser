@@ -1031,8 +1031,8 @@ end
 TEST[[
 if true then
 else
-<!elseif true then!>
-end
+<!elseif true then
+!>end
 ]]
 {
     type = 'BLOCK_AFTER_ELSE',

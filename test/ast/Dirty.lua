@@ -50,12 +50,12 @@ a
     [1]    = {
         type   = "if",
         start  = 0,
-        finish = 10001,
+        finish = 20000,
         parent = "<IGNORE>",
         [1]    = {
             type    = "ifblock",
             start   = 0,
-            finish  = 10001,
+            finish  = 20000,
             keyword = {
                 [1] = 0,
                 [2] = 2,
@@ -92,12 +92,12 @@ a
     [1]    = {
         type   = "if",
         start  = 0,
-        finish = 10001,
+        finish = 20000,
         parent = "<IGNORE>",
         [1]    = {
             type    = "ifblock",
             start   = 0,
-            finish  = 10001,
+            finish  = 20000,
             keyword = {
                 [1] = 0,
                 [2] = 2,
@@ -934,7 +934,7 @@ end
         [1]    = {
             type    = "ifblock",
             start   = 0,
-            finish  = 12,
+            finish  = 10000,
             keyword = {
                 [1] = 0,
                 [2] = 2,
@@ -1159,7 +1159,7 @@ end
         [1]    = {
             type    = "ifblock",
             start   = 0,
-            finish  = 10005,
+            finish  = 20000,
             keyword = {
                 [1] = 0,
                 [2] = 2,
