@@ -19,7 +19,7 @@ X16                 <-  [a-fA-F0-9]
 Token               <-  Integer / Name / String / Code / Symbol
 Name                <-  ({} {%name} {})
                     ->  Name
-Integer             <-  ({} {[0-9]+} !'.' {})
+Integer             <-  ({} {'-'? [0-9]+} !'.' {})
                     ->  Integer
 Code                <-  ({} '`' { (!'`' .)*} '`' {})
                     ->  Code
@@ -147,6 +147,7 @@ Symbol              <-  ({} {
 ---@field async? boolean
 ---@field versions? table[]
 ---@field names? parser.object[]
+---@field path? string
 
 local function parseTokens(text, offset)
     Ci = 0
@@ -1403,8 +1404,47 @@ local docSwitch = util.switch()
 
         return result
     end)
+    : case 'source'
+    : call(function (doc)
+        local fullSource = doc:sub(#'source' + 1)
+        if not fullSource or fullSource == '' then
+            return
+        end
+        fullSource = util.trim(fullSource)
+        if fullSource == '' then
+            return
+        end
+        local source, line, char = fullSource:match('^(.-):?(%d*):?(%d*)$')
+        source = source or fullSource
+        line   = tonumber(line) or 1
+        char   = tonumber(char) or 0
+        local result = {
+            type   = 'doc.source',
+            start  = getStart(),
+            finish = getFinish(),
+            path   = source,
+            line   = line,
+            char   = char,
+        }
+        return result
+    end)
+    : case 'enum'
+    : call(function ()
+        local name = parseName('doc.enum.name')
+        if not name then
+            return nil
+        end
+        local result = {
+            type   = 'doc.enum',
+            start  = name.start,
+            finish = name.finish,
+            enum   = name,
+        }
+        name.parent = result
+        return result
+    end)
 
-local function convertTokens()
+local function convertTokens(doc)
     local tp, text = nextToken()
     if not tp then
         return
@@ -1417,7 +1457,7 @@ local function convertTokens()
         }
         return nil
     end
-    return docSwitch(text)
+    return docSwitch(text, doc)
 end
 
 local function trimTailComment(text)
@@ -1457,7 +1497,7 @@ local function buildLuaDoc(comment)
     local doc = text:sub(startPos)
 
     parseTokens(doc, comment.start + startPos)
-    local result, rests = convertTokens()
+    local result, rests = convertTokens(doc)
     if result then
         result.range = comment.finish
         local finish = result.firstFinish or result.finish
@@ -1516,8 +1556,11 @@ local function isContinuedDoc(lastDoc, nextDoc)
         return true
     end
     if lastDoc.type == 'doc.type'
-    or lastDoc.type == 'doc.module' then
-        return false
+    or lastDoc.type == 'doc.module'
+    or lastDoc.type == 'doc.enum' then
+        if nextDoc.type ~= 'doc.comment' then
+            return false
+        end
     end
     if lastDoc.type == 'doc.class'
     or lastDoc.type == 'doc.field'
@@ -1525,7 +1568,8 @@ local function isContinuedDoc(lastDoc, nextDoc)
         if  nextDoc.type ~= 'doc.field'
         and nextDoc.type ~= 'doc.operator'
         and nextDoc.type ~= 'doc.comment'
-        and nextDoc.type ~= 'doc.overload' then
+        and nextDoc.type ~= 'doc.overload'
+        and nextDoc.type ~= 'doc.source' then
             return false
         end
     end
@@ -1585,6 +1629,14 @@ local function bindGeneric(binded)
     end
 end
 
+local function bindDocWithSource(doc, source)
+    if not source.bindDocs then
+        source.bindDocs = {}
+    end
+    source.bindDocs[#source.bindDocs+1] = doc
+    doc.bindSource = source
+end
+
 local function bindDoc(source, binded)
     local isParam = source.type == 'self'
                 or  source.type == 'local'
@@ -1601,11 +1653,14 @@ local function bindDoc(source, binded)
         if doc.type == 'doc.class'
         or doc.type == 'doc.deprecated'
         or doc.type == 'doc.version'
-        or doc.type == 'doc.module' then
+        or doc.type == 'doc.module'
+        or doc.type == 'doc.source' then
             if source.type == 'function'
             or isParam then
                 goto CONTINUE
             end
+            bindDocWithSource(doc, source)
+            ok = true
         elseif doc.type == 'doc.type' then
             if source.type == 'function'
             or isParam
@@ -1613,6 +1668,8 @@ local function bindDoc(source, binded)
                 goto CONTINUE
             end
             source._bindedDocType = true
+            bindDocWithSource(doc, source)
+            ok = true
         elseif doc.type == 'doc.overload' then
             if not source.bindDocs then
                 source.bindDocs = {}
@@ -1621,48 +1678,61 @@ local function bindDoc(source, binded)
             if source.type ~= 'function' then
                 doc.bindSource = source
             end
+            bindDocWithSource(doc, source)
+            ok = true
         elseif doc.type == 'doc.param' then
-            local suc
             if  isParam
             and doc.param[1] == source[1] then
-                suc = true
+                bindDocWithSource(doc, source)
+                ok = true
             elseif source.type == '...'
             and    doc.param[1] == '...' then
-                suc = true
+                bindDocWithSource(doc, source)
+                ok = true
             elseif source.type == 'self'
             and    doc.param[1] == 'self' then
-                suc = true
-            end
-            if source.type == 'function' then
+                bindDocWithSource(doc, source)
+                ok = true
+            elseif source.type == 'function' then
                 if not source.bindDocs then
                     source.bindDocs = {}
                 end
-                source.bindDocs[#source.bindDocs+1] = doc
-            end
-
-            if not suc then
-                goto CONTINUE
+                source.bindDocs[#source.bindDocs + 1] = doc
+                if source.args then
+                    for _, arg in ipairs(source.args) do
+                        if arg[1] == doc.param[1] then
+                            bindDocWithSource(doc, arg)
+                            break
+                        end
+                    end
+                end
             end
         elseif doc.type == 'doc.vararg' then
-            if source.type ~= '...' then
-                goto CONTINUE
+            if source.type == '...' then
+                bindDocWithSource(doc, source)
+                ok = true
             end
         elseif doc.type == 'doc.return'
         or     doc.type == 'doc.generic'
         or     doc.type == 'doc.async'
         or     doc.type == 'doc.nodiscard' then
-            if source.type ~= 'function' then
+            if source.type == 'function' then
+                bindDocWithSource(doc, source)
+                ok = true
+            end
+        elseif doc.type == 'doc.enum' then
+            if source.type == 'table' then
+                bindDocWithSource(doc, source)
+                ok = true
+            end
+            if source.value and source.value.type == 'table' then
+                bindDocWithSource(doc, source.value)
                 goto CONTINUE
             end
-        elseif doc.type ~= 'doc.comment' then
-            goto CONTINUE
+        elseif doc.type == 'doc.comment' then
+            bindDocWithSource(doc, source)
+            ok = true
         end
-        if not source.bindDocs then
-            source.bindDocs = {}
-        end
-        source.bindDocs[#source.bindDocs+1] = doc
-        doc.bindSource = source
-        ok = true
         ::CONTINUE::
     end
     return ok
@@ -1710,6 +1780,7 @@ local function bindDocsBetween(sources, binded, start, finish)
                 or src.type == 'setindex'
                 or src.type == 'setmethod'
                 or src.type == 'function'
+                or src.type == 'table'
                 or src.type == '...' then
                     if bindDoc(src, binded) then
                         ok = true
@@ -1744,11 +1815,16 @@ end
 local function bindCommentsAndFields(binded)
     local class
     local comments = {}
+    local source
     for _, doc in ipairs(binded) do
         if doc.type == 'doc.class' then
             -- 多个class连续写在一起，只有最后一个class可以绑定source
             if class then
                 class.bindSource = nil
+            end
+            if source then
+                doc.source = source
+                source.bindSource = doc
             end
             class = doc
             bindCommentsToDoc(doc, comments)
@@ -1757,6 +1833,10 @@ local function bindCommentsAndFields(binded)
             if class then
                 class.fields[#class.fields+1] = doc
                 doc.class = class
+            end
+            if source then
+                doc.source = source
+                source.bindSource = doc
             end
             bindCommentsToDoc(doc, comments)
             comments = {}
@@ -1767,12 +1847,18 @@ local function bindCommentsAndFields(binded)
             end
             bindCommentsToDoc(doc, comments)
             comments = {}
-        elseif doc.type == 'doc.alias' then
+        elseif doc.type == 'doc.alias'
+        or     doc.type == 'doc.enum' then
             bindCommentsToDoc(doc, comments)
             comments = {}
         elseif doc.type == 'doc.comment' then
             comments[#comments+1] = doc
+        elseif doc.type == 'doc.source' then
+            source = doc
+            goto CONTINUE
         end
+        source = nil
+        ::CONTINUE::
     end
 end
 
