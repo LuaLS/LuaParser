@@ -592,3 +592,31 @@ f
 
 TEST '\v\f'
 (nil)
+
+TEST [=[
+print(<![[]]!>:gsub())
+]=]
+{
+    type = 'NEED_PAREN',
+}
+
+TEST [=[
+print(<!''!>:gsub())
+]=]
+{
+    type = 'NEED_PAREN',
+}
+
+TEST [=[
+print(<!""!>:gsub())
+]=]
+{
+    type = 'NEED_PAREN',
+}
+
+TEST [=[
+print(<!{}!>:gsub())
+]=]
+{
+    type = 'NEED_PAREN',
+}
