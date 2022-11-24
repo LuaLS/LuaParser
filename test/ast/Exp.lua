@@ -925,6 +925,12 @@ CHECK'function () end'
         [3] = 12,
         [4] = 15,
     },
+    args    = {
+        type   = "funcargs",
+        start  = 9,
+        finish = 11,
+        parent = "<IGNORE>",
+    },
 }
 CHECK'function (...) end'
 {

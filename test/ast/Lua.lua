@@ -628,6 +628,12 @@ end]]
                 [4] = 20003,
             },
             parent    = "<IGNORE>",
+            args      = {
+                type   = "funcargs",
+                start  = 16,
+                finish = 18,
+                parent = "<IGNORE>",
+            },
             returns   = "<IGNORE>",
             hasReturn = true,
             [1]       = {
@@ -669,6 +675,12 @@ end]]
                 [4] = 20003,
             },
             parent    = "<IGNORE>",
+            args      = {
+                type   = "funcargs",
+                start  = 16,
+                finish = 18,
+                parent = "<IGNORE>",
+            },
             returns   = "<IGNORE>",
             hasReturn = true,
             [1]       = {
@@ -828,6 +840,12 @@ y, z = 3, 4
                 [4] = 20003,
             },
             parent  = "<IGNORE>",
+            args    = {
+                type   = "funcargs",
+                start  = 10016,
+                finish = 10018,
+                parent = "<IGNORE>",
+            },
         },
         [1]    = "f",
     },

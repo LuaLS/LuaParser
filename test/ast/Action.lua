@@ -185,6 +185,12 @@ CHECK'x = function () end'
             [4] = 19,
         },
         parent  = "<IGNORE>",
+        args    = {
+            type   = "funcargs",
+            start  = 13,
+            finish = 15,
+            parent = "<IGNORE>",
+        },
     },
     [1]    = "x",
 }
@@ -218,6 +224,12 @@ CHECK'x.y = function () end'
             [4] = 21,
         },
         parent  = "<IGNORE>",
+        args    = {
+            type   = "funcargs",
+            start  = 15,
+            finish = 17,
+            parent = "<IGNORE>",
+        },
     },
 }
 CHECK'require "xxx"'
@@ -1201,6 +1213,12 @@ end]]
             [4] = 20003,
         },
         parent    = "<IGNORE>",
+        args      = {
+            type   = "funcargs",
+            start  = 13,
+            finish = 15,
+            parent = "<IGNORE>",
+        },
         returns   = "<IGNORE>",
         hasReturn = true,
         [1]       = {

@@ -246,6 +246,12 @@ CHECK 'local function f('
                 [2] = 14,
             },
             parent  = "<IGNORE>",
+            args    = {
+                type   = "funcargs",
+                start  = 16,
+                finish = 17,
+                parent = "<IGNORE>",
+            },
         },
         [1]    = "f",
     },
@@ -1094,6 +1100,12 @@ local t = function f() end
                 [4] = 26,
             },
             parent  = "<IGNORE>",
+            args    = {
+                type   = "funcargs",
+                start  = 20,
+                finish = 22,
+                parent = "<IGNORE>",
+            },
             name    = {
                 type   = "getglobal",
                 start  = 19,
@@ -1136,6 +1148,12 @@ end
                 [4] = 20003,
             },
             parent  = "<IGNORE>",
+            args    = {
+                type   = "funcargs",
+                start  = 10,
+                finish = 12,
+                parent = "<IGNORE>",
+            },
         },
         [1]    = "F",
     },
@@ -1238,6 +1256,12 @@ end
                 [2] = 15,
             },
             parent  = "<IGNORE>",
+            args    = {
+                type   = "funcargs",
+                start  = 16,
+                finish = 18,
+                parent = "<IGNORE>",
+            },
             locals  = "<IGNORE>",
             [1]     = {
                 type   = "local",

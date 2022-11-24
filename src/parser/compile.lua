@@ -1721,7 +1721,23 @@ local function checkAmbiguityCall(call, parenPos)
     }
 end
 
+local function bindSpecial(source, name)
+    if Specials[name] then
+        addSpecial(name, source)
+    else
+        local ospeicals = State.options.special
+        if ospeicals and ospeicals[name] then
+            addSpecial(ospeicals[name], source)
+        end
+    end
+end
+
 local function parseSimple(node, funcName)
+    local currentName
+    if node.type == 'getglobal'
+    or node.type == 'getlocal' then
+        currentName = node[1]
+    end
     local lastMethod
     while true do
         if lastMethod and node.node == lastMethod then
@@ -1752,6 +1768,16 @@ local function parseSimple(node, funcName)
             if field then
                 field.parent = getfield
                 field.type   = 'field'
+                if currentName then
+                    if node.type == 'getlocal'
+                    or node.type == 'getglobal'
+                    or node.type == 'getfield' then
+                        currentName = currentName .. '.' .. field[1]
+                        bindSpecial(getfield, currentName)
+                    else
+                        currentName = nil
+                    end
+                end
             else
                 pushError {
                     type   = 'MISS_FIELD',
@@ -2019,7 +2045,7 @@ local function resolveName(node)
     if not node then
         return nil
     end
-    local loc  = getLocal(node[1], node.start)
+    local loc = getLocal(node[1], node.start)
     if loc then
         node.type = 'getlocal'
         node.node = loc
@@ -2042,14 +2068,7 @@ local function resolveName(node)
         end
     end
     local name = node[1]
-    if Specials[name] then
-        addSpecial(name, node)
-    else
-        local ospeicals = State.options.special
-        if ospeicals and ospeicals[name] then
-            addSpecial(ospeicals[name], node)
-        end
-    end
+    bindSpecial(node, name)
     return node
 end
 
@@ -2270,16 +2289,15 @@ local function parseFunction(isLocal, isAction)
         end
     end
     if hasLeftParen then
+        params = params or {}
         local parenLeft = getPosition(Tokens[Index], 'left')
         Index = Index + 2
         params = parseParams(params)
-        if params then
-            params.type   = 'funcargs'
-            params.start  = parenLeft
-            params.finish = lastRightPosition()
-            params.parent = func
-            func.args     = params
-        end
+        params.type   = 'funcargs'
+        params.start  = parenLeft
+        params.finish = lastRightPosition()
+        params.parent = func
+        func.args     = params
         skipSpace(true)
         if Tokens[Index + 1] == ')' then
             local parenRight = getPosition(Tokens[Index], 'right')
@@ -3818,6 +3836,7 @@ local function initState(lua, version, options)
     Index               = 1
     ---@class parser.state
     ---@field uri uri
+    ---@field lines integer[]
     local state = {
         version = version,
         lua     = lua,
@@ -3826,6 +3845,7 @@ local function initState(lua, version, options)
         comms   = {},
         lines   = {
             [0] = 1,
+            size = #lua,
         },
         options = options or {},
     }
@@ -3854,8 +3874,6 @@ local function initState(lua, version, options)
         errs[#errs+1] = err
         return err
     end
-
-    state.pushError = pushError
 end
 
 return function (lua, mode, version, options)

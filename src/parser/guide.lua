@@ -4,7 +4,7 @@ local type         = type
 ---@class parser.object
 ---@field bindDocs              parser.object[]
 ---@field bindGroup             parser.object[]
----@field bindSource            parser.object[]
+---@field bindSource            parser.object
 ---@field value                 parser.object
 ---@field parent                parser.object
 ---@field type                  string
@@ -13,6 +13,7 @@ local type         = type
 ---@field args                  { [integer]: parser.object, start: integer, finish: integer }
 ---@field locals                parser.object[]
 ---@field returns?              parser.object[]
+---@field breaks?               parser.object[]
 ---@field exps                  parser.object[]
 ---@field keys                  parser.object
 ---@field uri                   uri
@@ -44,6 +45,7 @@ local type         = type
 ---@field exp                   parser.object
 ---@field alias                 parser.object
 ---@field class                 parser.object
+---@field enum                  parser.object
 ---@field vararg                parser.object
 ---@field param                 parser.object
 ---@field overload              parser.object
@@ -71,13 +73,16 @@ local type         = type
 ---@field hasBreak?             true
 ---@field hasError?             true
 ---@field [integer]             parser.object|any
----@field _root                 parser.object
+---@field package _root          parser.object
 
 ---@class guide
 ---@field debugMode boolean
 local m = {}
 
 m.ANY = {"<ANY>"}
+
+m.namePattern = '[%a_\x80-\xff][%w_\x80-\xff]*'
+m.namePatternFull = '^' .. m.namePattern .. '$'
 
 local blockTypes = {
     ['while']       = true,
@@ -140,6 +145,7 @@ local childMap = {
     ['doc.class']          = {'class', '#extends', '#signs', 'comment'},
     ['doc.type']           = {'#types', 'name', 'comment'},
     ['doc.alias']          = {'alias', 'extends', 'comment'},
+    ['doc.enum']           = {'enum', 'extends', 'comment'},
     ['doc.param']          = {'param', 'extends', 'comment'},
     ['doc.return']         = {'#returns', 'comment'},
     ['doc.field']          = {'field', 'extends', 'comment'},
@@ -154,13 +160,13 @@ local childMap = {
     ['doc.type.field']     = {'name', 'extends'},
     ['doc.type.sign']      = {'node', '#signs'},
     ['doc.overload']       = {'overload', 'comment'},
-    ['doc.see']            = {'name', 'field'},
+    ['doc.see']            = {'name', 'comment'},
     ['doc.version']        = {'#versions'},
     ['doc.diagnostic']     = {'#names'},
     ['doc.as']             = {'as'},
     ['doc.cast']           = {'loc', '#casts'},
     ['doc.cast.block']     = {'extends'},
-    ['doc.operator']       = {'op', 'exp', 'extends'}
+    ['doc.operator']       = {'op', 'exp', 'extends'},
 }
 
 ---@type table<string, fun(obj: parser.object, list: parser.object[])>
@@ -275,17 +281,10 @@ function m.isLiteral(obj)
 end
 
 --- 获取字面量
----@param obj parser.object
+---@param obj table
 ---@return any
 function m.getLiteral(obj)
-    local tp = obj.type
-    if     tp == 'boolean' then
-        return obj[1]
-    elseif tp == 'string' then
-        return obj[1]
-    elseif tp == 'number' then
-        return obj[1]
-    elseif tp == 'integer' then
+    if m.isLiteral(obj) then
         return obj[1]
     end
     return nil
@@ -629,7 +628,7 @@ end
 --- 遍历所有包含position的source
 ---@param ast parser.object
 ---@param position integer
----@param callback fun(src: parser.object)
+---@param callback fun(src: parser.object): any
 function m.eachSourceContain(ast, position, callback)
     local list = { ast }
     local mark = {}
@@ -738,7 +737,7 @@ end
 
 --- 遍历所有的source
 ---@param ast parser.object
----@param callback fun(src: parser.object)
+---@param callback fun(src: parser.object): boolean?
 function m.eachSource(ast, callback)
     local cache = ast._eachCache
     if not cache then
@@ -809,12 +808,24 @@ end
 ---@param col integer
 ---@return integer
 function m.positionOf(row, col)
-    return row * 10000 + col
+    return row * 10000 + math.min(col, 10000 - 1)
 end
 
 function m.positionToOffsetByLines(lines, position)
     local row, col = m.rowColOf(position)
-    return (lines[row] or 1) + col - 1
+    if row < 0 then
+        return 0
+    end
+    if row > #lines then
+        return lines.size
+    end
+    local offset = lines[row] + col - 1
+    if lines[row + 1] and offset >= lines[row + 1] then
+        return lines[row + 1] - 1
+    elseif offset > lines.size then
+        return lines.size
+    end
+    return offset
 end
 
 --- 返回全文光标位置
@@ -883,9 +894,11 @@ local isSetMap = {
     ['label']             = true,
     ['doc.class']         = true,
     ['doc.alias']         = true,
+    ['doc.enum']          = true,
     ['doc.field']         = true,
     ['doc.class.name']    = true,
     ['doc.alias.name']    = true,
+    ['doc.enum.name']     = true,
     ['doc.field.name']    = true,
     ['doc.type.field']    = true,
     ['doc.type.array']    = true,
@@ -940,26 +953,14 @@ function m.getKeyNameOfLiteral(obj)
     if tp == 'field'
     or     tp == 'method' then
         return obj[1]
-    elseif tp == 'string' then
-        local s = obj[1]
-        if s then
-            return s
-        end
-    elseif tp == 'number' then
-        local n = obj[1]
-        if n then
-            return obj[1]
-        end
-    elseif tp == 'integer' then
-        local n = obj[1]
-        if n then
-            return obj[1]
-        end
-    elseif tp == 'boolean' then
-        local b = obj[1]
-        if b then
-            return b
-        end
+    elseif tp == 'string'
+    or     tp == 'number'
+    or     tp == 'integer'
+    or     tp == 'boolean'
+    or     tp == 'doc.type.integer'
+    or     tp == 'doc.type.string'
+    or     tp == 'doc.type.boolean' then
+        return obj[1]
     end
 end
 
@@ -995,19 +996,20 @@ function m.getKeyName(obj)
     elseif tp == 'tableexp' then
         return obj.tindex
     elseif tp == 'field'
-    or     tp == 'method'
-    or     tp == 'doc.see.field' then
+    or     tp == 'method' then
         return obj[1]
     elseif tp == 'doc.class' then
         return obj.class[1]
     elseif tp == 'doc.alias' then
         return obj.alias[1]
+    elseif tp == 'doc.enum' then
+        return obj.enum[1]
     elseif tp == 'doc.field' then
         return obj.field[1]
     elseif tp == 'doc.field.name' then
         return obj[1]
     elseif tp == 'doc.type.field' then
-        return obj.name[1]
+        return m.getKeyName(obj.name)
     end
     return m.getKeyNameOfLiteral(obj)
 end
@@ -1058,12 +1060,13 @@ function m.getKeyType(obj)
     elseif tp == 'tableexp' then
         return 'integer'
     elseif tp == 'field'
-    or     tp == 'method'
-    or     tp == 'doc.see.field' then
+    or     tp == 'method' then
         return 'string'
     elseif tp == 'doc.class' then
         return 'string'
     elseif tp == 'doc.alias' then
+        return 'string'
+    elseif tp == 'doc.enum' then
         return 'string'
     elseif tp == 'doc.field' then
         return type(obj.field[1])
@@ -1283,6 +1286,48 @@ end
 ---@return boolean
 function m.isBlockType(source)
     return blockTypes[source.type] == true
+end
+
+---@param source parser.object
+---@return parser.object?
+function m.getSelfNode(source)
+    if source.type == 'getlocal'
+    or source.type == 'setlocal' then
+        source = source.node
+    end
+    if source.type ~= 'self' then
+        return nil
+    end
+    local args = source.parent
+    if args.type == 'callargs' then
+        local call = args.parent
+        if call.type ~= 'call' then
+            return nil
+        end
+        local getmethod = call.node
+        if getmethod.type ~= 'getmethod' then
+            return nil
+        end
+        return getmethod.node
+    end
+    if args.type == 'funcargs' then
+        return m.getFunctionSelfNode(args.parent)
+    end
+    return nil
+end
+
+---@param func parser.object
+---@return parser.object?
+function m.getFunctionSelfNode(func)
+    if func.type ~= 'function' then
+        return nil
+    end
+    local parent = func.parent
+    if parent.type == 'setmethod'
+    or parent.type == 'setfield' then
+        return parent.node
+    end
+    return nil
 end
 
 return m

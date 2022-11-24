@@ -14,6 +14,8 @@ LuaDoc [[
         parent          = "<IGNORE>",
         bindComments    = {
         },
+        calls           = {
+        },
         class           = {
             type   = "doc.class.name",
             start  = 10,
@@ -47,6 +49,8 @@ local x = 1
         bindComments    = {
         },
         bindSource      = "<IGNORE>",
+        calls           = {
+        },
         class           = {
             type   = "doc.class.name",
             start  = 10,
