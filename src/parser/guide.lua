@@ -628,7 +628,7 @@ end
 --- 遍历所有包含position的source
 ---@param ast parser.object
 ---@param position integer
----@param callback fun(src: parser.object): any
+---@param callback fun(src: parser.object, position: integer): any
 function m.eachSourceContain(ast, position, callback)
     local list = { ast }
     local mark = {}
@@ -643,7 +643,7 @@ function m.eachSourceContain(ast, position, callback)
             mark[obj] = true
             if m.isInRange(obj, position) then
                 if m.isContain(obj, position) then
-                    local res = callback(obj)
+                    local res = callback(obj, position)
                     if res ~= nil then
                         return res
                     end
@@ -1229,13 +1229,15 @@ function m.isGlobal(source)
     return false
 end
 
+local function inString(source, position)
+	if  source.type == 'string'
+	and source.start < position then
+		return true
+	end
+end
+
 function m.isInString(ast, position)
-    return m.eachSourceContain(ast, position, function (source)
-        if  source.type == 'string'
-        and source.start < position then
-            return true
-        end
-    end)
+    return m.eachSourceContain(ast, position, inString)
 end
 
 function m.isInComment(ast, offset)

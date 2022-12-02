@@ -443,6 +443,10 @@ local esc = {
     ['\n'] = '\\\n',
 }
 
+local function serializeNumber(char)
+	return ('\\%03d'):format(char:byte())
+end
+
 function m.viewString(str, quo)
     if not quo then
         if str:find('[\r\n]') then
@@ -454,14 +458,10 @@ function m.viewString(str, quo)
         end
     end
     if quo == "'" then
-        str = str:gsub('[\000-\008\011-\012\014-\031\127]', function (char)
-            return ('\\%03d'):format(char:byte())
-        end)
+        str = str:gsub('[\000-\008\011-\012\014-\031\127]', serializeNumber)
         return quo .. str:gsub([=[['\r\n]]=], esc) .. quo
     elseif quo == '"' then
-        str = str:gsub('[\000-\008\011-\012\014-\031\127]', function (char)
-            return ('\\%03d'):format(char:byte())
-        end)
+        str = str:gsub('[\000-\008\011-\012\014-\031\127]', serializeNumber)
         return quo .. str:gsub([=[["\r\n]]=], esc) .. quo
     else
         local eqnum = #quo - 2

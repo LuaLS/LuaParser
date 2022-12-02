@@ -210,10 +210,10 @@ local function getMark()
     return TokenMarks[Ci]
 end
 
-local function try(callback)
+local function try(callback, params)
     local savePoint = Ci
     -- rollback
-    local suc = callback()
+    local suc = callback(params)
     if not suc then
         Ci = savePoint
     end
@@ -376,6 +376,24 @@ local function parseDots(tp, parent)
     return dots
 end
 
+local function getReturnName(params)
+	local returnName = parseName('doc.return.name', params.typeUnit)
+					or parseDots('doc.return.name', params.typeUnit)
+	if not returnName then
+		return false
+	end
+	if checkToken('symbol', ':', 1) then
+		nextToken()
+		params.name = returnName
+		return true
+	end
+	if returnName[1] == '...' then
+		params.name = returnName
+		return false
+	end
+	return false
+end
+
 local function  parseTypeUnitFunction(parent)
     if not checkToken('name', 'fun', 1) then
         return nil
@@ -440,23 +458,7 @@ local function  parseTypeUnitFunction(parent)
         end
         while true do
             local name
-            try(function ()
-                local returnName = parseName('doc.return.name', typeUnit)
-                                or parseDots('doc.return.name', typeUnit)
-                if not returnName then
-                    return false
-                end
-                if checkToken('symbol', ':', 1) then
-                    nextToken()
-                    name = returnName
-                    return true
-                end
-                if returnName[1] == '...' then
-                    name = returnName
-                    return false
-                end
-                return false
-            end)
+            try(getReturnName, { name = name, typeUnit = typeUnit })
             local rtn = parseType(typeUnit)
             if not rtn then
                 break
@@ -805,6 +807,26 @@ function parseType(parent)
     return result
 end
 
+local function checkField(result)
+	local tp, value = nextToken()
+	if tp == 'name' then
+		if value == 'public'
+		or value == 'protected'
+		or value == 'private'
+		or value == 'package' then
+			local tp2 = peekToken(1)
+			local tp3 = peekToken(2)
+			if tp2 == 'name' and not tp3 then
+				return false
+			end
+			result.visible = value
+			result.start = getStart()
+			return true
+		end
+	end
+	return false
+end
+
 local docSwitch = util.switch()
     : case 'class'
     : call(function ()
@@ -978,25 +1000,7 @@ local docSwitch = util.switch()
         local result = {
             type = 'doc.field',
         }
-        try(function ()
-            local tp, value = nextToken()
-            if tp == 'name' then
-                if value == 'public'
-                or value == 'protected'
-                or value == 'private'
-                or value == 'package' then
-                    local tp2 = peekToken(1)
-                    local tp3 = peekToken(2)
-                    if tp2 == 'name' and not tp3 then
-                        return false
-                    end
-                    result.visible = value
-                    result.start = getStart()
-                    return true
-                end
-            end
-            return false
-        end)
+        try(checkField, result)
         result.field = parseName('doc.field.name', result)
                     or parseIndexField(result)
         if not result.field then
@@ -1940,15 +1944,17 @@ local bindDocAccept = {
     'function'  , 'table'     , '...'      ,
 }
 
+local function sorter(a, b)
+	return a.start < b.start
+end
+
 local function bindDocs(state)
     local text = state.lua
     local sources = {}
     guide.eachSourceTypes(state.ast, bindDocAccept, function (src)
         sources[#sources+1] = src
     end)
-    table.sort(sources, function (a, b)
-        return a.start < b.start
-    end)
+    table.sort(sources, sorter)
     local binded
     for i, doc in ipairs(state.ast.docs) do
         if not binded then
@@ -1993,9 +1999,7 @@ end
 return function (state)
     local ast = state.ast
     local comments = state.comms
-    table.sort(comments, function (a, b)
-        return a.start < b.start
-    end)
+    table.sort(comments, sorter)
     ast.docs = {
         type   = 'doc',
         parent = ast,
