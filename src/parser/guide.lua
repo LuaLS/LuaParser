@@ -776,6 +776,9 @@ function m.eachChild(source, callback)
 end
 
 --- 获取指定的 special
+---@param ast parser.object
+---@param name string
+---@param callback fun(src: parser.object)
 function m.eachSpecialOf(ast, name, callback)
     local root = m.getRoot(ast)
     local state = root.state
@@ -1006,7 +1009,11 @@ function m.getKeyName(obj)
         return obj.enum[1]
     elseif tp == 'doc.field' then
         return obj.field[1]
-    elseif tp == 'doc.field.name' then
+    elseif tp == 'doc.field.name'
+    or     tp == 'doc.type.name'
+    or     tp == 'doc.class.name'
+    or     tp == 'doc.alias.name'
+    or     tp == 'doc.enum.name' then
         return obj[1]
     elseif tp == 'doc.type.field' then
         return m.getKeyName(obj.name)
