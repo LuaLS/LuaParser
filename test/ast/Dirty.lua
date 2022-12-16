@@ -55,6 +55,7 @@ a
         [1]    = {
             type    = "ifblock",
             start   = 0,
+            bstart  = 7,
             finish  = 20000,
             keyword = {
                 [1] = 0,
@@ -103,6 +104,7 @@ a
         [1]    = {
             type    = "ifblock",
             start   = 0,
+            bstart  = 12,
             finish  = 20000,
             keyword = {
                 [1] = 0,
@@ -205,6 +207,7 @@ CHECK 'local function a'
         value  = {
             type    = "function",
             start   = 6,
+            bstart  = 16,
             finish  = 16,
             keyword = {
                 [1] = 6,
@@ -225,6 +228,7 @@ CHECK 'local function'
     [1]    = {
         type    = "function",
         start   = 6,
+        bstart  = 14,
         finish  = 14,
         keyword = {
             [1] = 6,
@@ -252,6 +256,7 @@ CHECK 'local function f('
         value  = {
             type    = "function",
             start   = 6,
+            bstart  = 17,
             finish  = 17,
             keyword = {
                 [1] = 6,
@@ -287,6 +292,7 @@ CHECK 'local function a(v'
         value  = {
             type    = "function",
             start   = 6,
+            bstart  = 18,
             finish  = 18,
             keyword = {
                 [1] = 6,
@@ -330,6 +336,7 @@ CHECK 'function a'
         value  = {
             type    = "function",
             start   = 0,
+            bstart  = 10,
             finish  = 10,
             keyword = {
                 [1] = 0,
@@ -363,6 +370,7 @@ CHECK 'function a:'
         value  = {
             type    = "function",
             start   = 0,
+            bstart  = 11,
             finish  = 11,
             keyword = {
                 [1] = 0,
@@ -403,6 +411,7 @@ CHECK 'function a:b(v'
         value  = {
             type    = "function",
             start   = 0,
+            bstart  = 14,
             finish  = 14,
             keyword = {
                 [1] = 0,
@@ -952,6 +961,7 @@ end
         [1]    = {
             type    = "ifblock",
             start   = 0,
+            bstart  = 12,
             finish  = 10000,
             keyword = {
                 [1] = 0,
@@ -1104,6 +1114,7 @@ local t = function f() end
         value  = {
             type    = "function",
             start   = 10,
+            bstart  = 22,
             finish  = 26,
             keyword = {
                 [1] = 10,
@@ -1152,6 +1163,7 @@ end
         value  = {
             type    = "function",
             start   = 0,
+            bstart  = 12,
             finish  = 20003,
             keyword = {
                 [1] = 0,
@@ -1189,6 +1201,7 @@ end
         [1]    = {
             type    = "ifblock",
             start   = 0,
+            bstart  = 12,
             finish  = 20000,
             keyword = {
                 [1] = 0,
@@ -1268,6 +1281,7 @@ end
         [1]    = {
             type    = "function",
             start   = 7,
+            bstart  = 18,
             finish  = 40003,
             keyword = {
                 [1] = 7,
@@ -1293,6 +1307,7 @@ end
                 value  = {
                     type    = "function",
                     start   = 10010,
+                    bstart  = 10027,
                     finish  = 40003,
                     keyword = {
                         [1] = 10010,
@@ -1319,6 +1334,7 @@ end
                     [1]     = {
                         type    = "in",
                         start   = 20008,
+                        bstart  = 20019,
                         finish  = 30007,
                         keyword = {
                             [1] = 20008,

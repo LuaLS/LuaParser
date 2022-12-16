@@ -39,15 +39,15 @@ end
 ---@type {[string]: integer, [integer]: string}
 local sortList = {
     'specials',
-    'type', 'start', 'vstart', 'finish', 'effect', 'range', 'tindex',
+    'type', 'start', 'vstart', 'bstart', 'finish', 'effect', 'range', 'tindex',
     'tag', 'special', 'keyword',
     'parent', 'extParent', 'child',
     'filter',
+    'vararg',
     'node', 'locPos',
     'op', 'args',
     'loc', 'init', 'max', 'step', 'keys', 'exps', 'call', 'func',
     'dot', 'colon',
-    'vararg',
     'field', 'index', 'method',
     'exp', 'value', 'vref',
     'attrs', 'escs',

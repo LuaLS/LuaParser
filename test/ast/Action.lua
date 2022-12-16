@@ -177,6 +177,7 @@ CHECK'x = function () end'
     value  = {
         type    = "function",
         start   = 4,
+        bstart  = 15,
         finish  = 19,
         keyword = {
             [1] = 4,
@@ -216,6 +217,7 @@ CHECK'x.y = function () end'
     value  = {
         type    = "function",
         start   = 6,
+        bstart  = 17,
         finish  = 21,
         keyword = {
             [1] = 6,
@@ -345,6 +347,7 @@ CHECK'do end'
 {
     type    = "do",
     start   = 0,
+    bstart  = 2,
     finish  = 6,
     keyword = {
         [1] = 0,
@@ -357,6 +360,7 @@ CHECK'do x = 1 end'
 {
     type    = "do",
     start   = 0,
+    bstart  = 2,
     finish  = 12,
     keyword = {
         [1] = 0,
@@ -443,6 +447,7 @@ end]]
     [1]    = {
         type    = "ifblock",
         start   = 0,
+        bstart  = 9,
         finish  = 10000,
         keyword = {
             [1] = 0,
@@ -476,6 +481,7 @@ end]]
     [1]    = {
         type      = "ifblock",
         start     = 0,
+        bstart    = 9,
         finish    = 20000,
         keyword   = {
             [1] = 0,
@@ -518,6 +524,7 @@ end]]
     [1]    = {
         type      = "ifblock",
         start     = 0,
+        bstart    = 9,
         finish    = 20000,
         keyword   = {
             [1] = 0,
@@ -550,6 +557,7 @@ end]]
     [2]    = {
         type      = "elseblock",
         start     = 20000,
+        bstart    = 20004,
         finish    = 40000,
         keyword   = {
             [1] = 20000,
@@ -577,6 +585,7 @@ end]]
     [1]    = {
         type      = "ifblock",
         start     = 0,
+        bstart    = 9,
         finish    = 20000,
         keyword   = {
             [1] = 0,
@@ -609,6 +618,7 @@ end]]
     [2]    = {
         type      = "elseifblock",
         start     = 20000,
+        bstart    = 20013,
         finish    = 40000,
         keyword   = {
             [1] = 20000,
@@ -653,6 +663,7 @@ end]]
     [1]    = {
         type      = "ifblock",
         start     = 0,
+        bstart    = 9,
         finish    = 20000,
         keyword   = {
             [1] = 0,
@@ -685,6 +696,7 @@ end]]
     [2]    = {
         type      = "elseifblock",
         start     = 20000,
+        bstart    = 20013,
         finish    = 40000,
         keyword   = {
             [1] = 20000,
@@ -717,6 +729,7 @@ end]]
     [3]    = {
         type      = "elseblock",
         start     = 40000,
+        bstart    = 40004,
         finish    = 60000,
         keyword   = {
             [1] = 40000,
@@ -745,6 +758,7 @@ end]]
     [1]    = {
         type    = "ifblock",
         start   = 0,
+        bstart  = 9,
         finish  = 10000,
         keyword = {
             [1] = 0,
@@ -770,6 +784,7 @@ end]]
     [2]    = {
         type    = "elseifblock",
         start   = 10000,
+        bstart  = 10013,
         finish  = 20000,
         keyword = {
             [1] = 10000,
@@ -795,6 +810,7 @@ end]]
     [3]    = {
         type    = "elseifblock",
         start   = 20000,
+        bstart  = 20013,
         finish  = 30000,
         keyword = {
             [1] = 20000,
@@ -820,6 +836,7 @@ end]]
     [4]    = {
         type    = "elseifblock",
         start   = 30000,
+        bstart  = 30013,
         finish  = 40000,
         keyword = {
             [1] = 30000,
@@ -855,6 +872,7 @@ end]]
     [1]    = {
         type    = "ifblock",
         start   = 0,
+        bstart  = 9,
         finish  = 30000,
         keyword = {
             [1] = 0,
@@ -884,6 +902,7 @@ end]]
             [1]    = {
                 type    = "ifblock",
                 start   = 10004,
+                bstart  = 10013,
                 finish  = 20004,
                 keyword = {
                     [1] = 10004,
@@ -921,6 +940,7 @@ end]]
     [1]    = {
         type    = "ifblock",
         start   = 0,
+        bstart  = 9,
         finish  = 10000,
         keyword = {
             [1] = 0,
@@ -946,6 +966,7 @@ end]]
     [2]    = {
         type    = "elseifblock",
         start   = 10000,
+        bstart  = 10013,
         finish  = 20000,
         keyword = {
             [1] = 10000,
@@ -971,6 +992,7 @@ end]]
     [3]    = {
         type    = "elseblock",
         start   = 20000,
+        bstart  = 20004,
         finish  = 30000,
         keyword = {
             [1] = 20000,
@@ -986,6 +1008,7 @@ end]]
 {
     type    = "loop",
     start   = 0,
+    bstart  = 13,
     finish  = 20003,
     keyword = {
         [1] = 0,
@@ -1032,6 +1055,7 @@ end]]
 {
     type    = "loop",
     start   = 0,
+    bstart  = 17,
     finish  = 20003,
     keyword = {
         [1] = 0,
@@ -1085,6 +1109,7 @@ end]]
 {
     type    = "in",
     start   = 0,
+    bstart  = 11,
     finish  = 20003,
     keyword = {
         [1] = 0,
@@ -1139,6 +1164,7 @@ end]]
 {
     type    = "in",
     start   = 0,
+    bstart  = 23,
     finish  = 20003,
     keyword = {
         [1] = 0,
@@ -1223,6 +1249,7 @@ end]]
 {
     type    = "while",
     start   = 0,
+    bstart  = 11,
     finish  = 20003,
     keyword = {
         [1] = 0,
@@ -1259,6 +1286,7 @@ until 1]]
 {
     type    = "repeat",
     start   = 0,
+    bstart  = 6,
     finish  = 20007,
     keyword = {
         [1] = 0,
@@ -1307,6 +1335,7 @@ end]]
     value  = {
         type      = "function",
         start     = 0,
+        bstart    = 15,
         finish    = 20003,
         keyword   = {
             [1] = 0,
@@ -1345,6 +1374,7 @@ end]]
     value  = {
         type      = "function",
         start     = 0,
+        bstart    = 16,
         finish    = 20003,
         keyword   = {
             [1] = 0,
@@ -1405,6 +1435,7 @@ end]]
     value  = {
         type      = "function",
         start     = 0,
+        bstart    = 23,
         finish    = 20003,
         keyword   = {
             [1] = 0,
@@ -1488,6 +1519,7 @@ end]]
     value  = {
         type      = "function",
         start     = 0,
+        bstart    = 14,
         finish    = 20003,
         keyword   = {
             [1] = 0,
@@ -1543,6 +1575,7 @@ end
     [1]    = {
         type    = "ifblock",
         start   = 0,
+        bstart  = 12,
         finish  = 20000,
         keyword = {
             [1] = 0,
