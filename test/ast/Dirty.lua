@@ -63,17 +63,11 @@ a
             },
             parent  = "<IGNORE>",
             filter  = {
-                type   = "filter",
+                type   = "boolean",
                 start  = 3,
                 finish = 7,
                 parent = "<IGNORE>",
-                exp    = {
-                    type   = "boolean",
-                    start  = 3,
-                    finish = 7,
-                    parent = "<IGNORE>",
-                    [1]    = true,
-                },
+                [1]    = true,
             },
             [1]     = {
                 type   = "getglobal",
@@ -114,17 +108,11 @@ a
             },
             parent  = "<IGNORE>",
             filter  = {
-                type   = "filter",
+                type   = "boolean",
                 start  = 3,
                 finish = 7,
                 parent = "<IGNORE>",
-                exp    = {
-                    type   = "boolean",
-                    start  = 3,
-                    finish = 7,
-                    parent = "<IGNORE>",
-                    [1]    = true,
-                },
+                [1]    = true,
             },
             [1]     = {
                 type   = "getglobal",
@@ -1211,17 +1199,11 @@ end
             },
             parent  = "<IGNORE>",
             filter  = {
-                type   = "filter",
+                type   = "boolean",
                 start  = 3,
                 finish = 7,
                 parent = "<IGNORE>",
-                exp    = {
-                    type   = "boolean",
-                    start  = 3,
-                    finish = 7,
-                    parent = "<IGNORE>",
-                    [1]    = true,
-                },
+                [1]    = true,
             },
             [1]     = {
                 type   = "integer",

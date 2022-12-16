@@ -457,17 +457,11 @@ end]]
         },
         parent  = "<IGNORE>",
         filter  = {
-            type   = "filter",
+            type   = "integer",
             start  = 3,
             finish = 4,
             parent = "<IGNORE>",
-            exp    = {
-                type   = "integer",
-                start  = 3,
-                finish = 4,
-                parent = "<IGNORE>",
-                [1]    = 1,
-            },
+            [1]    = 1,
         },
     },
 }
@@ -491,17 +485,11 @@ end]]
         },
         parent    = "<IGNORE>",
         filter    = {
-            type   = "filter",
+            type   = "integer",
             start  = 3,
             finish = 4,
             parent = "<IGNORE>",
-            exp    = {
-                type   = "integer",
-                start  = 3,
-                finish = 4,
-                parent = "<IGNORE>",
-                [1]    = 1,
-            },
+            [1]    = 1,
         },
         hasReturn = true,
         [1]       = {
@@ -534,17 +522,11 @@ end]]
         },
         parent    = "<IGNORE>",
         filter    = {
-            type   = "filter",
+            type   = "integer",
             start  = 3,
             finish = 4,
             parent = "<IGNORE>",
-            exp    = {
-                type   = "integer",
-                start  = 3,
-                finish = 4,
-                parent = "<IGNORE>",
-                [1]    = 1,
-            },
+            [1]    = 1,
         },
         hasReturn = true,
         [1]       = {
@@ -595,17 +577,11 @@ end]]
         },
         parent    = "<IGNORE>",
         filter    = {
-            type   = "filter",
+            type   = "integer",
             start  = 3,
             finish = 4,
             parent = "<IGNORE>",
-            exp    = {
-                type   = "integer",
-                start  = 3,
-                finish = 4,
-                parent = "<IGNORE>",
-                [1]    = 1,
-            },
+            [1]    = 1,
         },
         hasReturn = true,
         [1]       = {
@@ -628,17 +604,11 @@ end]]
         },
         parent    = "<IGNORE>",
         filter    = {
-            type   = "filter",
+            type   = "integer",
             start  = 20007,
             finish = 20008,
             parent = "<IGNORE>",
-            exp    = {
-                type   = "integer",
-                start  = 20007,
-                finish = 20008,
-                parent = "<IGNORE>",
-                [1]    = 1,
-            },
+            [1]    = 1,
         },
         hasReturn = true,
         [1]       = {
@@ -673,17 +643,11 @@ end]]
         },
         parent    = "<IGNORE>",
         filter    = {
-            type   = "filter",
+            type   = "integer",
             start  = 3,
             finish = 4,
             parent = "<IGNORE>",
-            exp    = {
-                type   = "integer",
-                start  = 3,
-                finish = 4,
-                parent = "<IGNORE>",
-                [1]    = 1,
-            },
+            [1]    = 1,
         },
         hasReturn = true,
         [1]       = {
@@ -706,17 +670,11 @@ end]]
         },
         parent    = "<IGNORE>",
         filter    = {
-            type   = "filter",
+            type   = "integer",
             start  = 20007,
             finish = 20008,
             parent = "<IGNORE>",
-            exp    = {
-                type   = "integer",
-                start  = 20007,
-                finish = 20008,
-                parent = "<IGNORE>",
-                [1]    = 1,
-            },
+            [1]    = 1,
         },
         hasReturn = true,
         [1]       = {
@@ -768,17 +726,11 @@ end]]
         },
         parent  = "<IGNORE>",
         filter  = {
-            type   = "filter",
+            type   = "integer",
             start  = 3,
             finish = 4,
             parent = "<IGNORE>",
-            exp    = {
-                type   = "integer",
-                start  = 3,
-                finish = 4,
-                parent = "<IGNORE>",
-                [1]    = 1,
-            },
+            [1]    = 1,
         },
     },
     [2]    = {
@@ -794,17 +746,11 @@ end]]
         },
         parent  = "<IGNORE>",
         filter  = {
-            type   = "filter",
+            type   = "integer",
             start  = 10007,
             finish = 10008,
             parent = "<IGNORE>",
-            exp    = {
-                type   = "integer",
-                start  = 10007,
-                finish = 10008,
-                parent = "<IGNORE>",
-                [1]    = 1,
-            },
+            [1]    = 1,
         },
     },
     [3]    = {
@@ -820,17 +766,11 @@ end]]
         },
         parent  = "<IGNORE>",
         filter  = {
-            type   = "filter",
+            type   = "integer",
             start  = 20007,
             finish = 20008,
             parent = "<IGNORE>",
-            exp    = {
-                type   = "integer",
-                start  = 20007,
-                finish = 20008,
-                parent = "<IGNORE>",
-                [1]    = 1,
-            },
+            [1]    = 1,
         },
     },
     [4]    = {
@@ -846,17 +786,11 @@ end]]
         },
         parent  = "<IGNORE>",
         filter  = {
-            type   = "filter",
+            type   = "integer",
             start  = 30007,
             finish = 30008,
             parent = "<IGNORE>",
-            exp    = {
-                type   = "integer",
-                start  = 30007,
-                finish = 30008,
-                parent = "<IGNORE>",
-                [1]    = 1,
-            },
+            [1]    = 1,
         },
     },
 }
@@ -882,17 +816,11 @@ end]]
         },
         parent  = "<IGNORE>",
         filter  = {
-            type   = "filter",
+            type   = "integer",
             start  = 3,
             finish = 4,
             parent = "<IGNORE>",
-            exp    = {
-                type   = "integer",
-                start  = 3,
-                finish = 4,
-                parent = "<IGNORE>",
-                [1]    = 1,
-            },
+            [1]    = 1,
         },
         [1]     = {
             type   = "if",
@@ -912,17 +840,11 @@ end]]
                 },
                 parent  = "<IGNORE>",
                 filter  = {
-                    type   = "filter",
+                    type   = "integer",
                     start  = 10007,
                     finish = 10008,
                     parent = "<IGNORE>",
-                    exp    = {
-                        type   = "integer",
-                        start  = 10007,
-                        finish = 10008,
-                        parent = "<IGNORE>",
-                        [1]    = 2,
-                    },
+                    [1]    = 2,
                 },
             },
         },
@@ -950,17 +872,11 @@ end]]
         },
         parent  = "<IGNORE>",
         filter  = {
-            type   = "filter",
+            type   = "integer",
             start  = 3,
             finish = 4,
             parent = "<IGNORE>",
-            exp    = {
-                type   = "integer",
-                start  = 3,
-                finish = 4,
-                parent = "<IGNORE>",
-                [1]    = 1,
-            },
+            [1]    = 1,
         },
     },
     [2]    = {
@@ -976,17 +892,11 @@ end]]
         },
         parent  = "<IGNORE>",
         filter  = {
-            type   = "filter",
+            type   = "integer",
             start  = 10007,
             finish = 10008,
             parent = "<IGNORE>",
-            exp    = {
-                type   = "integer",
-                start  = 10007,
-                finish = 10008,
-                parent = "<IGNORE>",
-                [1]    = 1,
-            },
+            [1]    = 1,
         },
     },
     [3]    = {
@@ -1260,17 +1170,11 @@ end]]
         [6] = 20003,
     },
     filter  = {
-        type   = "filter",
+        type   = "boolean",
         start  = 6,
         finish = 10,
         parent = "<IGNORE>",
-        exp    = {
-            type   = "boolean",
-            start  = 6,
-            finish = 10,
-            parent = "<IGNORE>",
-            [1]    = true,
-        },
+        [1]    = true,
     },
     [1]     = {
         type   = "return",
@@ -1295,17 +1199,11 @@ until 1]]
         [4] = 20005,
     },
     filter  = {
-        type   = "filter",
+        type   = "integer",
         start  = 20006,
         finish = 20007,
         parent = "<IGNORE>",
-        exp    = {
-            type   = "integer",
-            start  = 20006,
-            finish = 20007,
-            parent = "<IGNORE>",
-            [1]    = 1,
-        },
+        [1]    = 1,
     },
     breaks  = {
         [1] = {
@@ -1585,17 +1483,11 @@ end
         },
         parent  = "<IGNORE>",
         filter  = {
-            type   = "filter",
+            type   = "boolean",
             start  = 3,
             finish = 7,
             parent = "<IGNORE>",
-            exp    = {
-                type   = "boolean",
-                start  = 3,
-                finish = 7,
-                parent = "<IGNORE>",
-                [1]    = true,
-            },
+            [1]    = true,
         },
         [1]     = {
             type   = "setglobal",
