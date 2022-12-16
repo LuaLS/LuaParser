@@ -21,6 +21,7 @@ local type         = type
 ---@field finish                integer
 ---@field range                 integer
 ---@field effect                integer
+---@field bstart                integer
 ---@field attrs                 string[]
 ---@field specials              parser.object[]
 ---@field labels                parser.object[]
@@ -140,7 +141,6 @@ local childMap = {
     ['list']        = {'#'},
     ['binary']      = {1, 2},
     ['unary']       = { 1 },
-    ['filter']      = {'exp'},
 
     ['doc']                = {'#'},
     ['doc.class']          = {'class', '#extends', '#signs', 'comment'},
