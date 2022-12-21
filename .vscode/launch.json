@@ -28,6 +28,7 @@
             "type": "lua",
             "request": "launch",
             "stopOnEntry": false,
+            "luaexe": "${workspaceFolder}/bin/lua.exe",
             "program": "${workspaceRoot}/test/performance.lua",
             "cwd": "${workspaceRoot}",
             "path": "${workspaceRoot}/bin/?.lua",
@@ -38,6 +39,7 @@
                 "DEBUG=true",
             ],
             "arg": [
+                "D:/Github/vscode-lua/server"
             ],
             "console": "internalConsole",
             "sourceCoding": "utf8",
