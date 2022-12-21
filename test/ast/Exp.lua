@@ -918,6 +918,7 @@ CHECK'function () end'
 {
     type    = "function",
     start   = 0,
+    bstart  = 11,
     finish  = 15,
     keyword = {
         [1] = 0,
@@ -936,6 +937,7 @@ CHECK'function (...) end'
 {
     type    = "function",
     start   = 0,
+    bstart  = 14,
     finish  = 18,
     keyword = {
         [1] = 0,
@@ -962,6 +964,7 @@ CHECK'function (a, ...) end'
 {
     type    = "function",
     start   = 0,
+    bstart  = 17,
     finish  = 21,
     keyword = {
         [1] = 0,

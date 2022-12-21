@@ -620,6 +620,7 @@ end]]
         value  = {
             type      = "function",
             start     = 6,
+            bstart    = 18,
             finish    = 20003,
             keyword   = {
                 [1] = 6,
@@ -667,6 +668,7 @@ end]]
         value  = {
             type      = "function",
             start     = 6,
+            bstart    = 18,
             finish    = 20003,
             keyword   = {
                 [1] = 6,
@@ -722,6 +724,7 @@ end]]
         value  = {
             type      = "function",
             start     = 6,
+            bstart    = 22,
             finish    = 20003,
             keyword   = {
                 [1] = 6,
@@ -832,6 +835,7 @@ y, z = 3, 4
         value  = {
             type    = "function",
             start   = 10006,
+            bstart  = 10018,
             finish  = 20003,
             keyword = {
                 [1] = 10006,

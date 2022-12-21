@@ -1,65 +1,56 @@
-local function test(lpeg, buf)
-    local P = lpeg.P
-    local V = lpeg.V
-    local S = lpeg.S
-    local R = lpeg.R
-    local paser = P
-    {
-        V'Value',
-        Nl          = P'\r\n' + S'\r\n',
-        Sp          = S' \t',
-        Spnl        = (V'Sp' + V'Nl')^0,
-        Bool        = P'true' + P'false',
-        Int         = '0' + (P'-'^-1 * R'09'^1),
-        Float       = P'-'^-1 * ('0' + R'09'^1) * '.' * R'09'^0 * V'FloatSuffix'^-1,
-        Bad         = (R'09' + R'az' + R'AZ')^1,
-        FloatSuffix = S'eE' * P'-'^-1 * R'09'^1,
-        Null        = P'null',
-        String      = '"'
-                    * ('\\' * P(1) + (P(1) - '"'))^0
-                    * '"',
-        Table       = V'Spnl'
-                    * S'[{' * V'Spnl'
-                        * (
-                              V'Object'
-                            + V'Value'
-                            + P','    * V'Spnl'
-                        )^0 * V'Spnl'
-                    * S']}' * V'Spnl',
-        Object      = V'Spnl' * V'Key' * V'Spnl' * V'Value' * V'Spnl',
-        Key         = V'String' * V'Spnl' * ':',
-        Value       = V'Table'
-                    + V'Bool'
-                    + V'Null'
-                    + V'String'
-                    + V'Float'
-                    + V'Int'
-                    + V'Bad'
-    }
-    local clock = os.clock()
-    local res
-    for _ = 1, 1000 do
-        res = paser:match(buf)
-    end
-    local passed = os.clock() - clock
-    assert(res == #buf + 1)
-    print(passed)
+local path = arg[1]
+if not path then
+    print('No path!')
+    return
 end
 
-local f = io.open [[test\perform\test.json]]
-local buf = f:read 'a'
-f:close()
+print('Input path = ' .. path)
 
-collectgarbage 'stop'
+local root = arg[0] .. '\\..\\..'
+package.path = package.path .. ';' .. root .. '\\src\\?.lua'
+                            .. ';' .. root .. '\\src\\?\\init.lua'
+                            .. ';' .. root .. '\\test\\?.lua'
+                            .. ';' .. root .. '\\test\\?\\init.lua'
 
-print('===========test lpeg-1.0.1-DEBUG====================')
-test(package.loadlib('bin/lpeg-1.0.1-DEBUG.dll', 'luaopen_lpeg')(), buf)
+local fs     = require 'bee.filesystem'
+local util   = require 'utility'
+local parser = require 'parser'
 
-print('===========test lpeg-1.0.2-DEBUG====================')
-test(package.loadlib('bin/lpeg-1.0.2-DEBUG.dll', 'luaopen_lpeg')(), buf)
+local function scanFiles(fspath, callback)
+    if fs.is_directory(fspath) then
+        for subpath in fs.pairs(fspath) do
+            scanFiles(subpath, callback)
+        end
+    else
+        callback(fspath)
+    end
+end
 
-print('===========test lpeg-1.0.1-NDEBUG====================')
-test(package.loadlib('bin/lpeg-1.0.1-NDEBUG.dll', 'luaopen_lpeg')(), buf)
+print('Scanning files...')
+local fileNames = {}
+scanFiles(fs.path(path), function (fullPath)
+    if fullPath:extension():string() ~= '.lua' then
+        return
+    end
+    fileNames[#fileNames+1] = fullPath:string()
+end)
 
-print('===========test lpeg-1.0.2-NDEBUG====================')
-test(package.loadlib('bin/lpeg-1.0.2-NDEBUG.dll', 'luaopen_lpeg')(), buf)
+print('Loading files...')
+local files = {}
+local size = 0
+for _, fileName in ipairs(fileNames) do
+    local file = util.loadFile(fileName)
+    files[#files+1] = file
+    size = size + #file
+end
+
+print(('Loaded %d files, total size = %.3f KB'):format(#files, size / 1000))
+print('Start parsing...')
+local clock = os.clock()
+for _, file in ipairs(files) do
+    local state = parser.compile(file, 'Lua', 'Lua 5.4')
+    parser.luadoc(state)
+end
+local passed = os.clock() - clock
+
+print(('Total time = %.3f s, speed = %.3f MB/s'):format(passed, size / passed / 1000 / 1000))

@@ -21,6 +21,7 @@ local type         = type
 ---@field finish                integer
 ---@field range                 integer
 ---@field effect                integer
+---@field bstart                integer
 ---@field attrs                 string[]
 ---@field specials              parser.object[]
 ---@field labels                parser.object[]
@@ -139,7 +140,7 @@ local childMap = {
     ['getfield']    = {'node', 'field'},
     ['list']        = {'#'},
     ['binary']      = {1, 2},
-    ['unary']       = {1},
+    ['unary']       = { 1 },
 
     ['doc']                = {'#'},
     ['doc.class']          = {'class', '#extends', '#signs', 'comment'},
@@ -776,6 +777,9 @@ function m.eachChild(source, callback)
 end
 
 --- 获取指定的 special
+---@param ast parser.object
+---@param name string
+---@param callback fun(src: parser.object)
 function m.eachSpecialOf(ast, name, callback)
     local root = m.getRoot(ast)
     local state = root.state
@@ -1006,7 +1010,11 @@ function m.getKeyName(obj)
         return obj.enum[1]
     elseif tp == 'doc.field' then
         return obj.field[1]
-    elseif tp == 'doc.field.name' then
+    elseif tp == 'doc.field.name'
+    or     tp == 'doc.type.name'
+    or     tp == 'doc.class.name'
+    or     tp == 'doc.alias.name'
+    or     tp == 'doc.enum.name' then
         return obj[1]
     elseif tp == 'doc.type.field' then
         return m.getKeyName(obj.name)
