@@ -579,41 +579,57 @@ f
 }
 
 TEST [===[
-[[
+print [[
 <![[!>
 ]]
 ]===]
+{
+    type = 'NESTING_LONG_MARK',
+}
 
 TEST [===[
 print [[
 <![[!>
 ]]
 ]===]
-
-TEST [===[
-[=[
-[=[
-]=]
-]===]
+{
+    type = 'NESTING_LONG_MARK',
+}
 
 TEST [===[
 print [=[
 [=[
 ]=]
 ]===]
+(nil)
+
+TEST [===[
+print [=[
+[=[
+]=]
+]===]
+(nil)
+
+TEST [===[
+print [[]]
+print [[]]
+]===]
+(nil)
 
 Version = 'Lua 5.4'
 TEST [===[
-[[
+print [[
 [[
 ]]
 ]===]
+(nil)
 
 TEST [===[
 print [[
 [[
 ]]
 ]===]
+(nil)
 
 TEST [[
 f
