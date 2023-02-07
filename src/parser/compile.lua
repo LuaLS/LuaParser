@@ -2871,6 +2871,8 @@ local function compileExpAsAction(exp)
         local isLocal
         if exp.type == 'getlocal' and exp[1] == State.ENVMode then
             exp.special = nil
+            -- TODO: need + 1 at the end
+            LocalCount = LocalCount - 1
             local loc = createLocal(exp, parseLocalAttrs())
             loc.locPos = exp.start
             loc.effect = maxinteger
@@ -3392,8 +3394,8 @@ local function parseFor()
             end
         end
         -- for x in ... uses 4 variables
-        LocalCount = LocalCount + 3
         forStateVars = 3
+        LocalCount = LocalCount + forStateVars
         if name then
             local loc = createLocal(name)
             loc.parent    = action
