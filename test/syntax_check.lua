@@ -631,6 +631,8 @@ print [[
 ]===]
 (nil)
 
+Version = 'Lua 5.4'
+
 TEST [[
 f
 ''
