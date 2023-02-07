@@ -3393,7 +3393,7 @@ local function parseFor()
         end
         -- for x in ... uses 4 variables
         LocalCount = LocalCount + 3
-        forStateVars = true
+        forStateVars = 3
         if name then
             local loc = createLocal(name)
             loc.parent    = action
@@ -3485,6 +3485,13 @@ local function parseFor()
             missExp()
         end
 
+        if State.version == 'Lua 5.4' then
+            forStateVars = 4
+        else
+            forStateVars = 3
+        end
+        LocalCount = LocalCount + forStateVars
+
         if list then
             local lastName  = list[#list]
             list.range  = lastName and lastName.range or inRight
@@ -3547,7 +3554,7 @@ local function parseFor()
         LocalCount = LocalCount - #action.locals
     end
     if forStateVars then
-        LocalCount = LocalCount - 3
+        LocalCount = LocalCount - forStateVars
     end
 
     return action
