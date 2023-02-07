@@ -232,7 +232,7 @@ local ListFinishMap = {
     ['while']    = true,
 }
 
-local State, Lua, Line, LineOffset, Chunk, Tokens, Index, LastTokenFinish, Mode, LocalCount
+local State, Lua, Line, LineOffset, Chunk, Tokens, Index, LastTokenFinish, Mode, LocalCount, LocalLimited
 
 local LocalLimit = 200
 
@@ -728,7 +728,8 @@ local function createLocal(obj, attrs)
         end
         locals[#locals+1] = obj
         LocalCount = LocalCount + 1
-        if LocalCount > LocalLimit then
+        if not LocalLimited and LocalCount > LocalLimit then
+            LocalLimited = true
             pushError {
                 type   = 'LOCAL_LIMIT',
                 start  = obj.start,
@@ -2252,8 +2253,6 @@ local function parseFunction(isLocal, isAction)
         },
     }
     Index = Index + 2
-    local LastLocalCount = LocalCount
-    LocalCount = 0
     skipSpace(true)
     local hasLeftParen = Tokens[Index + 1] == '('
     if not hasLeftParen then
@@ -2289,6 +2288,8 @@ local function parseFunction(isLocal, isAction)
             hasLeftParen = Tokens[Index + 1] == '('
         end
     end
+    local LastLocalCount = LocalCount
+    LocalCount = 0
     pushChunk(func)
     local params
     if func.name and func.name.type == 'getmethod' then
@@ -3868,6 +3869,7 @@ local function initState(lua, version, options)
     LineOffset          = 1
     LastTokenFinish     = 0
     LocalCount          = 0
+    LocalLimited        = false
     Chunk               = {}
     Tokens              = tokens(lua)
     Index               = 1
