@@ -3376,6 +3376,7 @@ local function parseFor()
         missName()
     end
     skipSpace()
+    local forStateVars
     -- for i =
     if expectAssign() then
         action.type = 'loop'
@@ -3390,6 +3391,9 @@ local function parseFor()
                 name = nameOrList[1]
             end
         end
+        -- for x in ... uses 4 variables
+        LocalCount = LocalCount + 3
+        forStateVars = true
         if name then
             local loc = createLocal(name)
             loc.parent    = action
@@ -3541,6 +3545,9 @@ local function parseFor()
 
     if action.locals then
         LocalCount = LocalCount - #action.locals
+    end
+    if forStateVars then
+        LocalCount = LocalCount - 3
     end
 
     return action
