@@ -2352,6 +2352,11 @@ local function parseFunction(isLocal, isAction)
 end
 
 local function checkNeedParen(source)
+    local token = Tokens[Index + 1]
+    if  token ~= '.'
+    and token ~= ':' then
+        return source
+    end
     local exp = parseSimple(source, false)
     if exp == source then
         return exp

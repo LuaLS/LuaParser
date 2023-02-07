@@ -675,3 +675,27 @@ print(<!{}!>:gsub())
 {
     type = 'NEED_PAREN',
 }
+
+TEST [[
+local t = ''
+(function () end)()
+]]
+(nil)
+
+TEST [[
+local t = ""
+(function () end)()
+]]
+(nil)
+
+TEST [[
+local t = {}
+(function () end)()
+]]
+(nil)
+
+TEST [=[
+local t = [[]]
+(function () end)()
+]=]
+(nil)
