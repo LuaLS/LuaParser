@@ -795,3 +795,17 @@ TestWith 'LuaJIT' [[
 local goto = 1
 ]]
 (nil)
+
+TestWith 'LuaJIT' [[
+local goto]]
+(nil)
+
+TestWith 'LuaJIT' [[
+f(1, goto, 2)
+]]
+(nil)
+
+TestWith 'LuaJIT' [[
+local function f(x, goto, y) end
+]]
+(nil)
