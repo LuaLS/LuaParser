@@ -82,7 +82,8 @@ local m = {}
 
 m.ANY = {"<ANY>"}
 
-m.namePattern = '[%a_\x80-\xff][%w_\x80-\xff]*'
+m.notNamePattern  = '[^%w_\x80-\xff]'
+m.namePattern     = '[%a_\x80-\xff][%w_\x80-\xff]*'
 m.namePatternFull = '^' .. m.namePattern .. '$'
 
 local blockTypes = {
@@ -178,6 +179,7 @@ local childMap = {
     ['doc.cast']           = {'name', '#casts'},
     ['doc.cast.block']     = {'extends'},
     ['doc.operator']       = {'op', 'exp', 'extends'},
+    ['doc.meta']           = {'name'},
 }
 
 ---@type table<string, fun(obj: parser.object, list: parser.object[])>
@@ -476,6 +478,9 @@ function m.getLocal(source, name, pos)
     for _ = 1, 10000 do
         if not block then
             return nil
+        end
+        if block.type == 'main' then
+            break
         end
         if  block.start <= pos
         and block.finish >= pos
