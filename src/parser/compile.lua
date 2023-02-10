@@ -2235,7 +2235,7 @@ local function parseParams(params)
                     finish = getPosition(Tokens[Index] + #token - 1, 'right'),
                 }
             end
-            if isKeyWord(token, Tokens[Index + 2]) then
+            if isKeyWord(token, Tokens[Index + 3]) then
                 pushError {
                     type   = 'KEYWORD',
                     start  = getPosition(Tokens[Index], 'left'),
