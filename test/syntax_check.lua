@@ -114,6 +114,16 @@ local function TEST(script)
     end
 end
 
+function TestWith(version)
+    return function (script)
+        return function (expect)
+            Version = version
+            TEST(script)(expect)
+            Version = 'Lua 5.4'
+        end
+    end
+end
+
 TEST [[
 local <!true!> = 1
 ]]
@@ -773,4 +783,15 @@ TEST [=[
 local t = [[]]
 (function () end)()
 ]=]
+(nil)
+
+TestWith 'LuaJIT' [[
+goto LABEL
+::LABEL::
+]]
+(nil)
+
+TestWith 'LuaJIT' [[
+local goto = 1
+]]
 (nil)
