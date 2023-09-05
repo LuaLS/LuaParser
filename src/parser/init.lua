@@ -1,8 +1,8 @@
-local api = {
-    compile    = require 'parser.compile',
-    lines      = require 'parser.lines',
-    guide      = require 'parser.guide',
-    luadoc     = require 'parser.luadoc',
-}
+local class = require 'class'
 
-return api
+---@class LuaParser
+local M = class.declare 'LuaParser'
+
+require 'parser.compile'
+
+return M
