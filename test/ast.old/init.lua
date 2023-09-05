@@ -218,8 +218,6 @@ local function test(type)
     require('ast.' .. type)
 end
 
-require 'test.ast.nil'
-
 test 'Nil'
 test 'Boolean'
 test 'String'

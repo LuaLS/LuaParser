@@ -1,4 +1,4 @@
-local tokens     = require 'parser.tokens'
+local tokens     = require 'src.parser.lexer'
 local guide      = require 'parser.guide'
 
 local sbyte      = string.byte
