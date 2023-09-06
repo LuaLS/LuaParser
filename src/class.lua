@@ -67,7 +67,11 @@ function M.declare(name, super)
         if r == nil then
             local f = getter[k]
             if f then
-                return f(self)
+                local res, needCache = f(self)
+                if needCache then
+                    self[k] = res
+                end
+                return res
             else
                 return nil
             end

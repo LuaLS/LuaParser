@@ -30,6 +30,8 @@ function M:__init(code, version, options)
     -- 词法分析结果
     self.lexer       = lexer.parseLua(code)
     self.index       = 1
+    -- 错误信息
+    self.errors      = {}
 
     if options then
         if options.nonestandardSymbols then
