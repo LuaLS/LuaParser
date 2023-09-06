@@ -3,7 +3,7 @@ local parser = require 'parser'
 local function TEST(code)
     return function (expect)
         local ast = parser.compile(code)
-        local node = ast:parseNil()
+        local node = ast:parseBoolean()
         assert(node)
         for k, v in pairs(expect) do
             assert(node[k] == v)
@@ -11,15 +11,17 @@ local function TEST(code)
     end
 end
 
-TEST [[nil]]
+TEST [[true]]
 {
-    type    = "nil",
+    type    = "boolean",
     left    = 0,
-    right   = 3,
+    finish  = 4,
+    value   = true,
 }
-TEST [[   nil]]
+TEST [[false]]
 {
-    type    = "nil",
-    left    = 3,
-    right   = 6,
+    type    = "boolean",
+    left    = 0,
+    right   = 5,
+    value   = false,
 }

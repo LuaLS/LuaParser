@@ -1,10 +1,7 @@
 local class = require 'class'
 
----@alias LuaParser.Node.Type
----| 'nil'
-
 ---@class LuaParser.Node.Base: Class.Base
----@field status LuaParser.Status
+---@field ast LuaParser.Ast
 ---@field type LuaParser.Node.Type
 ---@field start integer # 开始位置（偏移）
 ---@field finish integer # 结束位置（偏移）
@@ -25,7 +22,7 @@ end
 ---@param self LuaParser.Node.Base
 ---@return integer
 Base.__getter.left = function (self)
-    local row, col = self.status.lexer:rowcol(self.start)
+    local row, col = self.ast.lexer:rowcol(self.start)
     local start = row * self.rowcolMulti + col
     self.left = start
     return start
@@ -34,7 +31,7 @@ end
 ---@param self LuaParser.Node.Base
 ---@return integer
 Base.__getter.right = function (self)
-    local row, col = self.status.lexer:rowcol(self.finish)
+    local row, col = self.ast.lexer:rowcol(self.finish)
     local finish = row * self.rowcolMulti + col
     self.right = finish
     return finish
@@ -72,7 +69,8 @@ Base.__getter.finishCol = function (self)
     return finishCol
 end
 
----@class LuaParser.Node.Nil
-local Nil = class.declare('LuaParser.Node.Nil', 'LuaParser.Node.Base')
+---@class LuaParser.Node.Boolean
+---@field value boolean
+local Boolean = class.declare('LuaParser.Node.Boolean', 'LuaParser.Node.Base')
 
-Nil.type = 'nil'
+Boolean.type = 'boolean'
