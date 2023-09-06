@@ -16,9 +16,10 @@
                 "-e",
                 "DEBUG=true",
             ],
-            "arg": [
+            "outputCapture": [
+                "print"
             ],
-            "console": "internalConsole",
+            "internalConsoleOptions": "openOnSessionStart",
             "sourceCoding": "utf8",
             "luaVersion": "5.4",
             "luaArch": "x86_64",

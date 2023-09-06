@@ -64,10 +64,14 @@ local M = class.declare 'Lexer'
 ---@param mode 'Lua' | 'Cat'
 function M:__init(code, mode)
     local results = Parser:match(code)
+    ---@type string[]
     self.tokens = {} -- 分离出来的词
+    ---@type integer[]
     self.poses  = {} -- 每个词的开始位置（偏移）
+    ---@type LuaParser.Lexer.Type[]
     self.types  = {} -- 每个词的类型
-    self.nls    = {} -- 每个换行符的开始位置（偏移）
+    ---@type integer[]
+    self.nls    = {} -- 每个换行符的结束位置（偏移）
     self.ci     = 1  -- 当前词的索引
     for i, res in ipairs(results) do
         if i % 3 == 1 then
@@ -77,7 +81,7 @@ function M:__init(code, mode)
         elseif i % 3 == 0 then
             self.types[#self.types+1] = res
             if res == 'NL' then
-                self.nls[#self.nls+1] = results[i-2]
+                self.nls[#self.nls+1] = results[i-2] + #results[i-1]
             end
         end
     end
@@ -96,12 +100,58 @@ end
 
 -- 消耗一个词，返回这个词
 ---@param count? integer # 默认为1表示消耗一个词，2表示消耗两个词，以此类推
+---@return string
+---@return LuaParser.Lexer.Type
+---@return integer
 function M:next(count)
     local i = self.ci + (count or 1)
     local token = self.tokens[i]
     local tp    = self.types[i]
+    local pos   = self.poses[i]
     self.ci = i
-    return token, tp
+    return token, tp, pos
+end
+
+-- 获取当前词的2侧光标位置
+---@param offset? integer # 偏移量，默认为0
+---@return integer
+---@return integer
+function M:getPos(offset)
+    local i = self.ci + (offset or 0)
+    local token = self.tokens[i]
+    local pos   = self.poses[i]
+    return pos - 1, pos + #token - 1
+end
+
+-- 根据偏移量获取行列
+---@param offset integer
+---@return integer row # 第一行是0
+---@return integer col # 第一列是0
+function M:rowcol(offset)
+    local nls = self.nls
+
+    if #nls == 0 then
+        return 0, offset
+    end
+
+    if offset < nls[1] then
+        return 0, offset
+    end
+
+    -- 使用二分法查找
+    local low, high = 1, #nls
+    while low <= high do
+        local mid = (low + high) // 2
+        if offset < nls[mid] then
+            high = mid - 1
+        elseif offset >= nls[mid+1] then
+            low = mid + 1
+        else
+            return mid, offset - nls[mid]
+        end
+    end
+
+    return 0, offset
 end
 
 local API = {}

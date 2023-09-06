@@ -5,12 +5,29 @@
             "root",
             "log",
             "tracy"
-        ]
+        ],
+        "groupFileStatus": {
+            "ambiguity": "Any",
+            "await": "Any",
+            "duplicate": "Any",
+            "global": "Any",
+            "luadoc": "Any",
+            "redefined": "Any",
+            "strict": "Any",
+            "type-check": "Any",
+            "unbalanced": "Any",
+            "unused": "Any"
+        }
     },
     "runtime": {
         "version": "Lua 5.4"
     },
     "workspace": {
         "preloadFileSize": 1000
+    },
+    "type": {
+        "weakNilCheck": false,
+        "weakUnionCheck": false,
+        "castNumberToInteger": false
     }
 }

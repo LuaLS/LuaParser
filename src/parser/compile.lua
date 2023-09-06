@@ -1,5 +1,5 @@
 local class = require 'class'
-local lexer = require 'src.parser.lexer'
+local lexer = require 'parser.lexer'
 
 ---@class LuaParser
 local M = class.get 'LuaParser'
@@ -59,11 +59,50 @@ function S:__init(code, version, options)
     end
 end
 
+-- 跳过换行符
+---@return boolean # 是否成功跳过换行符
+function S:skipNL()
+    local _, tp = self.lexer:peek()
+    if tp == 'NL' then
+        self.lexer:next()
+        return true
+    end
+    return false
+end
+
+-- 跳过注释
+---@param inState? boolean # 是否是语句
+---@return boolean # 是否成功跳过注释
+function S:skipComment(inState)
+    local token, tp = self.lexer:peek()
+    if token == '--'
+    or (token == '//' and (inState or self.nssymbolMap['//'])) then
+
+    end
+end
+
+-- 跳过注释
+
 -- 跳过空白符
 ---@param inState? boolean # 是否是语句
 function S:skipSpace(inState)
     repeat until not self:skipNL()
             and  not self:skipComment(inState)
+end
+
+---@return LuaParser.Node.Nil?
+function S:parseNil()
+    local token = self.lexer:peek()
+    if token ~= 'nil' then
+        return nil
+    end
+    local start, finish = self.lexer:getPos()
+    self.lexer:next()
+    return class.new('LuaParser.Node.Nil', {
+        status  = self,
+        start   = start,
+        finish  = finish,
+    })
 end
 
 -- 编译Lua代码
@@ -75,6 +114,7 @@ end
 ---@param code string # lua代码
 ---@param version? LuaParser.LuaVersion # 默认为 '5.4'
 ---@param options? LuaParser.CompileOptions
+---@return LuaParser.Status
 function M.compile(code, version, options)
     local status = class.new 'LuaParser.Status' (code, version, options)
     status:compile()
