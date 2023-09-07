@@ -88,7 +88,19 @@ local M = class.declare 'LuaParser.Ast'
 -- 解析数字（可以带负号）
 ---@return LuaParser.Node.Float | LuaParser.Node.Integer | nil
 function M:parseNumber()
-    local savePoint = self.lexer:savePoint()
+    -- 快速判断是否为数字
+    if self.lexer:peek() == '-' then
+        local token, tp = self.lexer:peek(1)
+        if token ~= '.' and tp ~= 'Num' then
+            return
+        end
+    else
+        local token, tp = self.lexer:peek()
+        if token ~= '.' and tp ~= 'Num' then
+            return
+        end
+    end
+
     local start = self.lexer:range()
     local neg = self.lexer:skipToken '-'
 
@@ -96,7 +108,6 @@ function M:parseNumber()
             or   self:parseNumber2()
             or   self:parseNumber10()
     if not node then
-        savePoint()
         return nil
     end
 

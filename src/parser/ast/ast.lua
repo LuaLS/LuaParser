@@ -69,7 +69,6 @@ function M:skipComment(inState)
     end
 end
 
-
 -- 跳过空白符
 ---@private
 ---@param inState? boolean # 是否是语句

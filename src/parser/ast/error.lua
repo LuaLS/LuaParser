@@ -26,3 +26,12 @@ function M:pushError(errorCode, start, finish, extra)
         extra  = extra,
     })
 end
+
+-- 添加错误“缺少符号”
+---@param start integer
+---@param symbol string
+function M:pushErrorMissSymbol(start, symbol)
+    self:pushError('MISS_SYMBOL', start, start, {
+        symbol = symbol,
+    })
+end

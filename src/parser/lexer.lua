@@ -64,6 +64,7 @@ local M = class.declare 'Lexer'
 ---@param mode 'Lua' | 'Cat'
 function M:__init(code, mode)
     local results = Parser:match(code)
+    self.len = #code -- 总长度
     ---@type string[]
     self.tokens = {} -- 分离出来的词
     ---@type integer[]
@@ -133,6 +134,17 @@ end
 ---@return boolean
 function M:skipToken(token)
     if self.tokens[self.ci] == token then
+        self.ci = self.ci + 1
+        return true
+    end
+    return false
+end
+
+-- 跳过一个指定的类型，返回是否成功
+---@param tp LuaParser.Lexer.Type
+---@return boolean
+function M:skipType(tp)
+    if self.types[self.ci] == tp then
         self.ci = self.ci + 1
         return true
     end

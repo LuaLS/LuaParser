@@ -7,6 +7,8 @@ local Nil = class.declare('LuaParser.Node.Nil', 'LuaParser.Node.Base')
 
 Nil.type = 'nil'
 
+Nil.view = 'nil'
+
 ---@class LuaParser.Ast
 local M = class.declare 'LuaParser.Ast'
 

@@ -5,9 +5,7 @@ local function TEST(code)
         local ast = parser.compile(code)
         local node = ast:parseNil()
         assert(node)
-        for k, v in pairs(expect) do
-            assert(node[k] == v)
-        end
+        Match(node, expect)
     end
 end
 
