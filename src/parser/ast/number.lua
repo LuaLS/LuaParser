@@ -1,26 +1,22 @@
 local class = require 'class'
 
----@alias LuaParser.Node.Type 'Number' | 'Integer'
+---@alias LuaParser.Node.Type 'Float' | 'Integer'
 
----@class LuaParser.Node.Number: LuaParser.Node.Base
+---@class LuaParser.Node.Float: LuaParser.Node.Base
 ---@field value number
+---@field valuei? number # 虚数
 ---@field numBase 2 | 10 | 16
-local Number = class.declare('LuaParser.Node.Number', 'LuaParser.Node.Base')
+---@field view string
+local Float = class.declare('LuaParser.Node.Float', 'LuaParser.Node.Base')
 
-Number.type = 'number'
+Float.type = 'float'
 
----@param self LuaParser.Node.Number
----@return number
----@return true
-Number.__getter.value = function (self)
-    local value = tonumber(self.code) or 0.0
-    return value, true
-end
+Float.value = 0.0
 
----@param self LuaParser.Node.Number
+---@param self LuaParser.Node.Float
 ---@return 2 | 10 | 16
 ---@return true
-Number.__getter.numBase = function (self)
+Float.__getter.numBase = function (self)
     local mark = self.code:sub(1, 2)
     if mark == '0b' or mark == '0B' then
         return 2, true
@@ -31,20 +27,32 @@ Number.__getter.numBase = function (self)
     end
 end
 
+---@param self LuaParser.Node.Float
+---@return string
+---@return true
+Float.__getter.view = function (self)
+    local num = self.valuei or self.value
+    local view = ('%.10f'):format(num):gsub('0+$', '')
+    if view:sub(-1) == '.' then
+        view = view .. '0'
+    end
+    if self.valuei then
+        view = ('0+%si'):format(view)
+    end
+    return view, true
+end
+
 ---@class LuaParser.Node.Integer: LuaParser.Node.Base
 ---@field value integer
+---@field valuei? number # 虚数
 ---@field numBase 2 | 10 | 16
+---@field intTail? 'LL' | 'ULL'
+---@field view string
 local Integer = class.declare('LuaParser.Node.Integer', 'LuaParser.Node.Base')
 
 Integer.type = 'integer'
 
----@param self LuaParser.Node.Integer
----@return integer
----@return true
-Integer.__getter.value = function (self)
-    local value = tonumber(self.code) or 0 --[[@as integer]]
-    return value, true
-end
+Integer.value = 0
 
 ---@param self LuaParser.Node.Integer
 ---@return 2 | 10 | 16
@@ -60,31 +68,133 @@ Integer.__getter.numBase = function (self)
     end
 end
 
+---@param self LuaParser.Node.Integer
+---@return string
+---@return true
+Integer.__getter.view = function (self)
+    local view = tostring(self.valuei or self.value)
+    if self.intTail then
+        view = view .. self.intTail
+    end
+    if self.valuei then
+        view = ('0+%si'):format(view)
+    end
+    return view, true
+end
+
 ---@class LuaParser.Ast
 local M = class.declare 'LuaParser.Ast'
 
 -- 解析数字（可以带负号）
----@return LuaParser.Node.Number | LuaParser.Node.Integer | nil
+---@return LuaParser.Node.Float | LuaParser.Node.Integer | nil
 function M:parseNumber()
+    local savePoint = self.lexer:savePoint()
     local start = self.lexer:range()
-    self.lexer:skipToken '-'
+    local neg = self.lexer:skipToken '-'
 
     local node = self:parseNumber16()
             or   self:parseNumber2()
             or   self:parseNumber10()
     if not node then
+        savePoint()
         return nil
     end
 
     ---@cast start -?
 
     node.start = start
+    if neg then
+        node.value = - node.value
+        if node.valuei then
+            node.valuei = - node.valuei
+        end
+    end
 
     return node
 end
 
+---@private
+---@param curOffset integer
+function M:fastForwardNumber(curOffset)
+    local word = self.code:match('^[%.%w_\x80-\xff]+', curOffset)
+    if not word then
+        self.lexer:fastForward(curOffset - 1)
+        return
+    end
+    self:pushError('MALFORMED_NUMBER', curOffset - 1, curOffset - 1 + #word)
+    self.lexer:fastForward(curOffset - 1 + #word)
+end
+
+---@private
+---@param curOffset integer
+---@return boolean
+function M:parseNumberI(curOffset)
+    if self.code:find('^[iI]', curOffset) then
+        if not self.jit then
+            self:pushError('UNSUPPORT_SYMBOL', curOffset, curOffset, {
+                version = self.version,
+                needVer = 'LuaJIT',
+            })
+        end
+        return true
+    end
+    return false
+end
+
+---@private
+---@param value number?
+---@param startPos integer
+---@param curOffset integer
+---@return LuaParser.Node.Float
+function M:buildFloat(value, startPos, curOffset)
+    local valuei
+    if self:parseNumberI(curOffset) then
+        curOffset = curOffset + 1
+        valuei = value
+    end
+    self:fastForwardNumber(curOffset)
+    return class.new('LuaParser.Node.Float', {
+        ast     = self,
+        start   = startPos,
+        finish  = curOffset - 1,
+        value   = valuei and 0.0 or value,
+        valuei  = valuei,
+    })
+end
+
+---@private
+---@param value integer?
+---@param startPos integer
+---@param curOffset integer
+---@return LuaParser.Node.Integer
+function M:buildInteger(value, startPos, curOffset)
+    local valuei, intTail
+    if self:parseNumberI(curOffset) then
+        curOffset = curOffset + 1
+        valuei = value
+    else
+        if self.code:find('^[uU][lL][lL]', curOffset)
+        or self.code:find('^[lL][lL][uU]', curOffset) then
+            curOffset = curOffset + 3
+            intTail = 'ULL'
+        elseif self.code:find('^[lL][lL]', curOffset) then
+            curOffset = curOffset + 2
+            intTail = 'LL'
+        end
+    end
+    self:fastForwardNumber(curOffset)
+    return class.new('LuaParser.Node.Integer', {
+        ast     = self,
+        start   = startPos,
+        finish  = curOffset - 1,
+        value   = valuei and 0 or value,
+        valuei  = valuei,
+        intTail = intTail,
+    })
+end
+
 -- 解析十六进制数字（不支持负号）
----@return LuaParser.Node.Number | LuaParser.Node.Integer | nil
+---@return LuaParser.Node.Float | LuaParser.Node.Integer | nil
 function M:parseNumber16()
     local token, _, pos = self.lexer:peek()
 
@@ -92,19 +202,11 @@ function M:parseNumber16()
         return nil
     end
     ---@cast pos -?
-
-    local nextToken, _, nextPos = self.lexer:peek(1)
-    if nextToken ~= 'x' and nextToken ~= 'X' then
-        return nil
-    end
-    ---@cast nextPos -?
-
-    -- 0x 必须连在一起
-    if pos + 1 ~= nextPos then
-        return nil
+    if not self.code:match('^[xX]', pos + 2) then
+        return
     end
 
-    local curOffset = nextPos + 2
+    local curOffset = pos + 3
 
     local intPart, intOffset = self.code:match('^([%da-fA-F]+)()', curOffset)
     if intOffset then
@@ -116,14 +218,17 @@ function M:parseNumber16()
         curOffset = numOffset
     end
 
-    local expPart, expOffset = self.code:match('^[pP][+-]?(%d+)()')
+    local expPart, expOffset = self.code:match('^[pP][+-]?(%d*)()', curOffset)
     if expOffset then
         curOffset = expOffset
+        if #expPart == 0 then
+            self:pushError('MISS_EXPONENT', curOffset - 1, curOffset - 1)
+        end
     end
 
     if not intPart then
         if not numPart then
-            self:pushError('MUST_X16', nextPos + 1, nextPos + 1)
+            self:pushError('MUST_X16', pos + 2, pos + 2)
         end
         if numPart == '' then
             self:pushError('MUST_X16', numOffset - 1, numOffset - 1)
@@ -131,10 +236,83 @@ function M:parseNumber16()
     end
 
     if numPart or expPart then
-        return class.new('LuaParser.Node.Number', {
-            ast     = self,
-            start   = pos,
-            finish  = curOffset - 1,
+        local value = tonumber(self.code:sub(pos + 1, curOffset - 1))
+        return self:buildFloat(value, pos, curOffset)
+    else
+        local value = math.tointeger(self.code:sub(pos + 1, curOffset - 1))
+        return self:buildInteger(value, pos, curOffset)
+    end
+end
+
+-- 解析二进制数字（不支持负号）
+---@return LuaParser.Node.Integer | nil
+function M:parseNumber2()
+    local token, _, pos = self.lexer:peek()
+
+    if token ~= '0' then
+        return nil
+    end
+    ---@cast pos -?
+    if not self.code:match('^[bB]', pos + 2) then
+        return
+    end
+
+    local bins = self.code:match('^([01]*)', pos + 3)
+    local curOffset = pos + 3 + #bins
+    local value = tonumber(bins, 2)
+
+    if not self.jit then
+        self:pushError('UNSUPPORT_SYMBOL', pos + 2, curOffset - 1, {
+            version = self.version,
+            needVer = 'LuaJIT',
         })
+    end
+
+    return self:buildInteger(value, pos, curOffset)
+end
+
+-- 解析十进制数字（不支持负号）
+---@return LuaParser.Node.Float | LuaParser.Node.Integer | nil
+function M:parseNumber10()
+    local token, tp, pos = self.lexer:peek()
+    if token ~= '.' and tp ~= 'Num' then
+        return nil
+    end
+    ---@cast pos -?
+
+    local curOffset = pos + 1
+
+    local intPart, intOffset = self.code:match('^(%d+)()', curOffset)
+    if intOffset then
+        curOffset = intOffset
+    end
+
+    local numPart, numOffset = self.code:match('^%.(%d*)()', curOffset)
+    if numOffset then
+        curOffset = numOffset
+    end
+
+    local expPart, expOffset = self.code:match('^[eE][+-]?(%d*)()', curOffset)
+    if expOffset then
+        curOffset = expOffset
+        if #expPart == 0 then
+            self:pushError('MISS_EXPONENT', curOffset - 1, curOffset - 1)
+        end
+    end
+
+    if not intPart then
+        if numPart == '' then
+            self.lexer:next()
+            self:pushError('UNKNOWN_SYMBOL', pos, pos + 1)
+            return nil
+        end
+    end
+
+    if numPart or expPart then
+        local value = tonumber(self.code:sub(pos + 1, curOffset - 1))
+        return self:buildFloat(value, pos, curOffset)
+    else
+        local value = math.tointeger(self.code:sub(pos + 1, curOffset - 1))
+        return self:buildInteger(value, pos, curOffset)
     end
 end

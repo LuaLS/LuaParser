@@ -1,6 +1,7 @@
 local class = require 'class'
 local lexer = require 'parser.lexer'
 
+require 'parser.ast.error'
 require 'parser.ast.nil'
 require 'parser.ast.boolean'
 require 'parser.ast.number'
@@ -12,7 +13,7 @@ local M = class.declare 'LuaParser.Ast'
 
 -- Lua版本
 ---@type LuaParser.LuaVersion
-M.version = '5.4'
+M.version = 'Lua 5.4'
 -- 是否为LuaJIT
 M.jit     = false
 -- 是否支持Unicode标识符
@@ -24,7 +25,7 @@ M.unicodeName = false
 function M:__init(code, version, options)
     -- 代码内容
     self.code        = code
-    self.version     = version or '5.4'
+    self.version     = version or 'Lua 5.4'
     -- 非标准符号的映射表
     self.nssymbolMap = {}
     -- 词法分析结果
@@ -45,6 +46,7 @@ function M:__init(code, version, options)
 end
 
 -- 跳过换行符
+---@private
 ---@return boolean # 是否成功跳过换行符
 function M:skipNL()
     local _, tp = self.lexer:peek()
@@ -56,19 +58,20 @@ function M:skipNL()
 end
 
 -- 跳过注释
+---@private
 ---@param inState? boolean # 是否是语句
 ---@return boolean # 是否成功跳过注释
 function M:skipComment(inState)
-    local token, tp = self.lexer:peek()
+    local token = self.lexer:peek()
     if token == '--'
     or (token == '//' and (inState or self.nssymbolMap['//'])) then
 
     end
 end
 
--- 跳过注释
 
 -- 跳过空白符
+---@private
 ---@param inState? boolean # 是否是语句
 function M:skipSpace(inState)
     repeat until not self:skipNL()

@@ -182,6 +182,15 @@ function M:rowcol(offset)
     return 0, offset
 end
 
+-- 设置保存点
+---@return fun()
+function M:savePoint()
+    local ci = self.ci
+    return function ()
+        self.ci = ci
+    end
+end
+
 local API = {}
 
 -- 对Lua代码进行分词

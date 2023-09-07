@@ -6,10 +6,10 @@ require 'parser.ast.ast'
 local M = class.get 'LuaParser'
 
 ---@alias LuaParser.LuaVersion
----| '5.1'
----| '5.2'
----| '5.3'
----| '5.4'
+---| 'Lua 5.1'
+---| 'Lua 5.2'
+---| 'Lua 5.3'
+---| 'Lua 5.4'
 
 ---@alias LuaParser.NonestandardSymbol
 ---|'//' | '/**/'
