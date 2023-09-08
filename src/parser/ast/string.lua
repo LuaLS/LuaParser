@@ -1,5 +1,4 @@
 local class = require 'class'
-local util  = require 'utility'
 
 ---@alias LuaParser.Node.Type 'String'
 
@@ -54,7 +53,7 @@ end
 ---@return string
 ---@return true
 String.__getter.view = function (self)
-    return util.viewString(self.value, self.quo), true
+    return self.value, true
 end
 
 ---@class LuaParser.Ast
