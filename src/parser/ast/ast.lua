@@ -6,6 +6,7 @@ require 'parser.ast.nil'
 require 'parser.ast.boolean'
 require 'parser.ast.number'
 require 'parser.ast.string'
+require 'parser.ast.comment'
 
 ---@class LuaParser.Ast
 ---@overload fun(code: string, version: LuaParser.LuaVersion, options: LuaParser.CompileOptions): LuaParser.Ast
