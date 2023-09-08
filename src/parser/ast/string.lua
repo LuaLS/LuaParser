@@ -7,11 +7,24 @@ local util  = require 'utility'
 ---@field value string
 ---@field view string
 ---@field quo string
----@field escs table|false
+---@field escs? table
 ---@field missQuo? true
 local String = class.declare('LuaParser.Node.String', 'LuaParser.Node.Base')
 
 String.type = 'string'
+
+local escMap = {
+    ['a']  = '\a',
+    ['b']  = '\b',
+    ['f']  = '\f',
+    ['n']  = '\n',
+    ['r']  = '\r',
+    ['t']  = '\t',
+    ['v']  = '\v',
+    ['\\'] = '\\',
+    ['\''] = '\'',
+    ['\"'] = '\"',
+}
 
 ---@param self LuaParser.Node.String
 ---@return string
@@ -19,26 +32,15 @@ String.type = 'string'
 String.__getter.value = function (self)
     if self.quo == "'"
     or self.quo == '"' then
-        local value
-        if self.missQuo then
-            value = self.ast.code:sub(self.start + 2, self.finish)
-        else
-            value = self.ast.code:sub(self.start + 2, self.finish - 1)
-        end
-        if not value:find '\\' then
-            return value, true
-        end
-        local pieces = {}
-        
-        return value, true
+        error('短字符串应该在解析时求值！')
     else
-        local value
+        local raw
         if self.missQuo then
-            value = self.ast.code:sub(self.start + #self.quo + 1, self.finish - 1)
+            raw = self.ast.code:sub(self.start + #self.quo + 1, self.finish - 1)
         else
-            value = self.ast.code:sub(self.start + #self.quo + 1, self.finish - #self.quo)
+            raw = self.ast.code:sub(self.start + #self.quo + 1, self.finish - #self.quo)
         end
-        value = self.code
+        local value = raw
             : gsub('\r\n', '\n')
             : gsub('\r', '\n')
             : gsub('^\n', '')
@@ -61,7 +63,8 @@ local M = class.declare 'LuaParser.Ast'
 function M:parseString()
     local token = self.lexer:peek()
     if token == '"'
-    or token == "'" then
+    or token == "'"
+    or token == '`' then
         return self:parseShortString()
     end
     if token == '[' then
@@ -84,46 +87,139 @@ function M:parseShortString()
         self:pushError('ERR_NONSTANDARD_SYMBOL', pos, pos + 1)
     end
 
+    local pieces = {}
     local curOffset = pos + 2
-    local missQuo
     while true do
-        local char, offset = self.code:match([[([\\\r\n'"`])()]], curOffset)
+        local char, offset = self.code:match('([\\\r\n\'"`])()', curOffset)
         if char == quo then
+            pieces[#pieces+1] = self.code:sub(curOffset, offset - 2)
             curOffset = offset
             break
         end
         if not char then
+            pieces[#pieces+1] = self.code:sub(curOffset)
             curOffset = #self.code + 1
-            missQuo = true
             self:pushErrorMissSymbol(curOffset - 1, quo)
             break
         end
         if char == '\r'
         or char == '\n' then
-            curOffset = offset
-            missQuo = true
+            pieces[#pieces+1] = self.code:sub(curOffset, offset - 2)
+            curOffset = offset - 1
             self:pushErrorMissSymbol(curOffset - 1, quo)
             break
         end
         if char == '\\' then
+            if not pieces then
+                pieces = {}
+            end
+            pieces[#pieces+1] = self.code:sub(curOffset, offset - 2)
             self.lexer:fastForward(offset - 1)
             local curToken, curType, curPos = self.lexer:peek()
-            if curType == 'NL' then
-                curOffset = curPos + #curToken + 1
+            if not curToken then
+                curOffset = offset
                 goto continue
             end
-            if curToken == 'z' then
+            ---@cast curPos -?
+            if curType == 'NL' then
+                curOffset = curPos + #curToken + 1
+                pieces[#pieces+1] = '\n'
+                goto continue
+            end
+            if curType == 'Num' then
+                local numWord = curToken:sub(1, 3)
+                curOffset = offset + #numWord
+                local num = math.tointeger(numWord)
+                if num and num >= 0 and num <= 255 then
+                    pieces[#pieces+1] = string.char(num)
+                else
+                    self:pushError('ERR_ESC_DEC', curPos, curPos + #numWord, {
+                        min = '000',
+                        max = '255',
+                    })
+                end
+                goto continue
+            end
+            local escChar = self.code:sub(offset, offset)
+            if escChar == 'z' then
+                self.lexer:fastForward(offset)
                 repeat until not self.lexer:skipType 'NL'
                 local _, _, afterPos = self.lexer:peek()
                 curOffset = afterPos and (afterPos + 1) or (#self.code + 1)
                 goto continue
             end
+            if escChar == 'x' then
+                local code = self.code:match('^%x%x', offset + 1)
+                if code then
+                    curOffset = offset + 3
+                    local num = tonumber(code, 16)
+                    pieces[#pieces+1] = string.char(num)
+                else
+                    curOffset = offset + 1
+                    self:pushError('ERR_ESC_X', curPos, curPos + 1)
+                end
+                if self.versionNum <= 51 then
+                    self:pushError('ERR_ESC', curPos, curPos + 3)
+                end
+                goto continue
+            end
+            if escChar == 'u' then
+                local leftP, word, rightP, tailOffset = self.code:match('^({)(%w*)(}?)()', offset + 1)
+                if not leftP then
+                    self:pushErrorMissSymbol(offset - 1, '{')
+                    curOffset = offset
+                    goto continue
+                end
+                if #word == 0 then
+                    self:pushError('UTF8_SMALL', offset + 1, offset + 1)
+                else
+                    local num = tonumber(word, 16)
+                    if num then
+                        if self.versionNum >= 54 then
+                            if num < 0 or num > 0x7FFFFFFF then
+                                self:pushError('UTF8_MAX', offset + 1, offset + #word, {
+                                    min = '00000000',
+                                    max = '7FFFFFFF',
+                                })
+                            end
+                        else
+                            self:pushError('UTF8_MAX', offset + 1, offset + #word, {
+                                min     = '000000',
+                                max     = '10FFFF',
+                                needVer = num <= 0x7FFFFFFF and 'Lua 5.4' or nil,
+                            })
+                        end
+                        if num >= 0 and num <= 0x7FFFFFFF then
+                            pieces[#pieces+1] = utf8.char(num)
+                        end
+                    else
+                        self:pushError('MUST_X16', offset + 1, offset + #word)
+                    end
+                end
+                if rightP == '' then
+                    self:pushErrorMissSymbol(tailOffset - 1, '}')
+                end
+                curOffset = tailOffset
+                goto continue
+            end
+            if escMap[escChar] then
+                curOffset = offset + 1
+                pieces[#pieces+1] = escMap[escChar]
+                goto continue
+            else
+                curOffset = offset + 1
+                self:pushError('ERR_ESC', offset - 2, offset)
+                goto continue
+            end
+            goto continue
         end
+        pieces[#pieces+1] = self.code:sub(curOffset, offset - 1)
         curOffset = offset
         ::continue::
     end
 
     local finishPos = curOffset - 1
+    self.lexer:fastForward(finishPos)
     if quo == '`' then
         quo = '"'
     end
@@ -133,7 +229,7 @@ function M:parseShortString()
         start   = pos,
         finish  = finishPos,
         quo     = quo,
-        missQuo = missQuo,
+        value   = table.concat(pieces),
     })
 end
 
@@ -158,7 +254,7 @@ function M:parseLongString()
         self:pushErrorMissSymbol(finishPos, finishQuo)
     end
 
-    if quo == '[[' and self.version == 'Lua 5.1' then
+    if quo == '[[' and self.versionNum <= 51 then
         local nestOffset = self.code:find('[[', pos + #quo + 1, true)
         if nestOffset and nestOffset < finishOffset then
             self:pushError('NESTING_LONG_MARK', nestOffset - 1, nestOffset + 1)

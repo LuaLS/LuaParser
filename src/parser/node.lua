@@ -14,7 +14,7 @@ local class = require 'class'
 ---@field code string # 对应的代码
 local Base = class.declare 'LuaParser.Node.Base'
 
-Base.rowcolMulti = 10000
+local rowcolMulti = 10000
 
 Base.__getter.type = function ()
     error('No type')
@@ -25,7 +25,7 @@ end
 ---@return true
 Base.__getter.left = function (self)
     local row, col = self.ast.lexer:rowcol(self.start)
-    local start = row * self.rowcolMulti + col
+    local start = row * rowcolMulti + col
     return start, true
 end
 
@@ -34,7 +34,7 @@ end
 ---@return true
 Base.__getter.right = function (self)
     local row, col = self.ast.lexer:rowcol(self.finish)
-    local finish = row * self.rowcolMulti + col
+    local finish = row * rowcolMulti + col
     return finish, true
 end
 
@@ -42,7 +42,7 @@ end
 ---@return integer
 ---@return true
 Base.__getter.startRow = function (self)
-    local startRow = self.left // self.rowcolMulti
+    local startRow = self.left // rowcolMulti
     return startRow, true
 end
 
@@ -50,7 +50,7 @@ end
 ---@return integer
 ---@return true
 Base.__getter.startCol = function (self)
-    local startCol = self.left % self.rowcolMulti
+    local startCol = self.left % rowcolMulti
     return startCol, true
 end
 
@@ -58,7 +58,7 @@ end
 ---@return integer
 ---@return true
 Base.__getter.finishRow = function (self)
-    local finishRow = self.right // self.rowcolMulti
+    local finishRow = self.right // rowcolMulti
     return finishRow, true
 end
 
@@ -66,7 +66,7 @@ end
 ---@return integer
 ---@return true
 Base.__getter.finishCol = function (self)
-    local finishCol = self.right % self.rowcolMulti
+    local finishCol = self.right % rowcolMulti
     return finishCol, true
 end
 

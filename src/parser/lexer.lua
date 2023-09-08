@@ -82,7 +82,7 @@ function M:__init(code, mode)
         elseif i % 3 == 0 then
             self.types[#self.types+1] = res
             if res == 'NL' then
-                self.nls[#self.nls+1] = results[i-2] + #results[i-1] + 1
+                self.nls[#self.nls+1] = results[i-2] + #results[i-1] - 1
             end
         end
     end
@@ -152,10 +152,10 @@ function M:skipType(tp)
 end
 
 -- 快进到某个光标位置
----@param offset integer
-function M:fastForward(offset)
+---@param pos integer
+function M:fastForward(pos)
     for i = self.ci + 1, #self.poses do
-        if self.poses[i] >= offset then
+        if self.poses[i] >= pos then
             self.ci = i
             return
         end
@@ -176,6 +176,10 @@ function M:rowcol(offset)
 
     if offset < nls[1] then
         return 0, offset
+    end
+
+    if offset >= nls[#nls] then
+        return #nls, offset - nls[#nls]
     end
 
     -- 使用二分法查找

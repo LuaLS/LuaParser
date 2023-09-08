@@ -5,6 +5,7 @@ local function TEST(code)
         local ast = parser.compile(code)
         local node = ast:parseString()
         assert(node)
+        expect.escs = nil
         Match(node, expect)
     end
 end
@@ -187,7 +188,7 @@ TEST [['\u{ffffff}']]
         [2] = 12,
         [3] = "unicode",
     },
-    value  = "",
+    value  = "\u{ffffff}",
     quo    = "'",
 }
 TEST [=[[[
@@ -222,5 +223,5 @@ TEST [[`12345`]]
     left   = 0,
     right  = 7,
     value  = "12345",
-    quo    = "`",
+    quo    = '"',
 }

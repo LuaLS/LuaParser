@@ -11,20 +11,14 @@ require 'parser.ast.string'
 ---@overload fun(code: string, version: LuaParser.LuaVersion, options: LuaParser.CompileOptions): LuaParser.Ast
 local M = class.declare 'LuaParser.Ast'
 
--- Lua版本
----@type LuaParser.LuaVersion
-M.version = 'Lua 5.4'
--- 是否为LuaJIT
-M.jit     = false
--- 是否支持Unicode标识符
-M.unicodeName = false
-
 ---@param code string # lua代码
 ---@param version? LuaParser.LuaVersion
 ---@param options? LuaParser.CompileOptions
 function M:__init(code, version, options)
     -- 代码内容
     self.code        = code
+    -- Lua版本
+    ---@type LuaParser.LuaVersion
     self.version     = version or 'Lua 5.4'
     -- 非标准符号的映射表
     self.nssymbolMap = {}
@@ -34,13 +28,19 @@ function M:__init(code, version, options)
     -- 错误信息
     self.errors      = {}
 
+    local major, minor = self.version:match 'Lua (%d+)%.(%d+)'
+    ---@type integer
+    self.versionNum = major * 10 + minor
+
     if options then
         if options.nonestandardSymbols then
             for _, s in ipairs(options.nonestandardSymbols) do
                 self.nssymbolMap[s] = true
             end
         end
+        -- 是否为LuaJIT
         self.jit = options.jit
+        -- 是否支持Unicode标识符
         self.unicodeName = options.unicodeName
     end
 end
