@@ -3,6 +3,8 @@ local util  = require 'utility'
 
 ---@alias LuaParser.Node.Type 'String'
 
+---@alias LuaParser.EscMode 'normal' | 'unicode' | 'err' | 'byte'
+
 ---@class LuaParser.Node.String: LuaParser.Node.Base
 ---@field value string
 ---@field view string
@@ -88,6 +90,22 @@ function M:parseShortString()
     end
 
     local pieces = {}
+    local escs
+
+    ---@param mode LuaParser.EscMode
+    ---@param start integer
+    ---@param finish integer
+    local function pushEsc(mode, start, finish)
+        if not escs then
+            escs = {}
+        end
+
+        local i = #escs
+        escs[i+1] = start
+        escs[i+2] = finish
+        escs[i+3] = mode
+    end
+
     local curOffset = pos + 2
     while true do
         local char, offset = self.code:match('([\\\r\n\'"`])()', curOffset)
@@ -110,29 +128,30 @@ function M:parseShortString()
             break
         end
         if char == '\\' then
-            if not pieces then
-                pieces = {}
-            end
             pieces[#pieces+1] = self.code:sub(curOffset, offset - 2)
             self.lexer:fastForward(offset - 1)
             local curToken, curType, curPos = self.lexer:peek()
             if not curToken then
+                pushEsc('err', offset - 2, offset - 1)
                 curOffset = offset
                 goto continue
             end
             ---@cast curPos -?
-            if curType == 'NL' then
+            if curType == 'NL' and curPos == offset - 1 then
+                pushEsc('normal', offset - 2, offset - 1)
                 curOffset = curPos + #curToken + 1
                 pieces[#pieces+1] = '\n'
                 goto continue
             end
-            if curType == 'Num' then
+            if curType == 'Num' and curPos == offset - 1 then
                 local numWord = curToken:sub(1, 3)
                 curOffset = offset + #numWord
                 local num = math.tointeger(numWord)
                 if num and num >= 0 and num <= 255 then
+                    pushEsc('byte', offset - 2, offset - 1 + #numWord)
                     pieces[#pieces+1] = string.char(num)
                 else
+                    pushEsc('err', offset - 2, offset - 1 + #numWord)
                     self:pushError('ERR_ESC_DEC', curPos, curPos + #numWord, {
                         min = '000',
                         max = '255',
@@ -142,6 +161,7 @@ function M:parseShortString()
             end
             local escChar = self.code:sub(offset, offset)
             if escChar == 'z' then
+                pushEsc('normal', offset - 2, offset)
                 self.lexer:fastForward(offset)
                 repeat until not self.lexer:skipType 'NL'
                 local _, _, afterPos = self.lexer:peek()
@@ -151,10 +171,12 @@ function M:parseShortString()
             if escChar == 'x' then
                 local code = self.code:match('^%x%x', offset + 1)
                 if code then
+                    pushEsc('byte', offset - 2, offset + 2)
                     curOffset = offset + 3
                     local num = tonumber(code, 16)
                     pieces[#pieces+1] = string.char(num)
                 else
+                    pushEsc('err', offset - 2, offset - 1)
                     curOffset = offset + 1
                     self:pushError('ERR_ESC_X', curPos, curPos + 1)
                 end
@@ -166,10 +188,12 @@ function M:parseShortString()
             if escChar == 'u' then
                 local leftP, word, rightP, tailOffset = self.code:match('^({)(%w*)(}?)()', offset + 1)
                 if not leftP then
+                    pushEsc('err', offset - 2, offset - 1)
                     self:pushErrorMissSymbol(offset - 1, '{')
                     curOffset = offset
                     goto continue
                 end
+                pushEsc('unicode', offset - 2, tailOffset - 1)
                 if #word == 0 then
                     self:pushError('UTF8_SMALL', offset + 1, offset + 1)
                 else
@@ -203,10 +227,12 @@ function M:parseShortString()
                 goto continue
             end
             if escMap[escChar] then
+                pushEsc('normal', offset - 2, offset)
                 curOffset = offset + 1
                 pieces[#pieces+1] = escMap[escChar]
                 goto continue
             else
+                pushEsc('err', offset - 2, offset)
                 curOffset = offset + 1
                 self:pushError('ERR_ESC', offset - 2, offset)
                 goto continue
@@ -230,6 +256,7 @@ function M:parseShortString()
         finish  = finishPos,
         quo     = quo,
         value   = table.concat(pieces),
+        escs    = escs,
     })
 end
 

@@ -5,7 +5,6 @@ local function TEST(code)
         local ast = parser.compile(code)
         local node = ast:parseString()
         assert(node)
-        expect.escs = nil
         Match(node, expect)
     end
 end
@@ -120,7 +119,7 @@ TEST [['\xff']]
     right  = 6,
     escs   = {
         [1] = 1,
-        [2] = 6,
+        [2] = 5,
         [3] = "byte",
     },
     value  = "\xff",
@@ -133,10 +132,49 @@ TEST [['\x1A']]
     right  = 6,
     escs   = {
         [1] = 1,
-        [2] = 6,
+        [2] = 5,
         [3] = "byte",
     },
     value  = "\26",
+    quo    = "'",
+}
+TEST [['\32']]
+{
+    type   = "string",
+    left   = 0,
+    right  = 5,
+    escs   = {
+        [1] = 1,
+        [2] = 4,
+        [3] = "byte",
+    },
+    value  = " ",
+    quo    = "'",
+}
+TEST [['\123']]
+{
+    type   = "string",
+    left   = 0,
+    right  = 6,
+    escs   = {
+        [1] = 1,
+        [2] = 5,
+        [3] = "byte",
+    },
+    value  = "{",
+    quo    = "'",
+}
+TEST [['\0123']]
+{
+    type   = "string",
+    left   = 0,
+    right  = 7,
+    escs   = {
+        [1] = 1,
+        [2] = 5,
+        [3] = "byte",
+    },
+    value  = "\0123",
     quo    = "'",
 }
 TEST [['\492']]
@@ -147,7 +185,7 @@ TEST [['\492']]
     escs   = {
         [1] = 1,
         [2] = 5,
-        [3] = "byte",
+        [3] = "err",
     },
     value  = "",
     quo    = "'",
@@ -159,7 +197,7 @@ TEST [['\u{3b1}']]
     right  = 9,
     escs   = {
         [1] = 1,
-        [2] = 9,
+        [2] = 8,
         [3] = "unicode",
     },
     value  = "α",
@@ -172,7 +210,7 @@ TEST [['\u{0}']]
     right  = 7,
     escs   = {
         [1] = 1,
-        [2] = 7,
+        [2] = 6,
         [3] = "unicode",
     },
     value  = "\0",
@@ -185,7 +223,7 @@ TEST [['\u{ffffff}']]
     right  = 12,
     escs   = {
         [1] = 1,
-        [2] = 12,
+        [2] = 11,
         [3] = "unicode",
     },
     value  = "\u{ffffff}",
