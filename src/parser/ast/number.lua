@@ -134,7 +134,7 @@ function M:fastForwardNumber(curOffset)
         self.lexer:fastForward(curOffset - 1)
         return
     end
-    self:pushError('MALFORMED_NUMBER', curOffset - 1, curOffset - 1 + #word)
+    self:throw('MALFORMED_NUMBER', curOffset - 1, curOffset - 1 + #word)
     self.lexer:fastForward(curOffset - 1 + #word)
 end
 
@@ -144,7 +144,7 @@ end
 function M:parseNumberI(curOffset)
     if self.code:find('^[iI]', curOffset) then
         if not self.jit then
-            self:pushError('UNSUPPORT_SYMBOL', curOffset, curOffset, {
+            self:throw('UNSUPPORT_SYMBOL', curOffset, curOffset, {
                 version = self.version,
                 needVer = 'LuaJIT',
             })
@@ -235,16 +235,16 @@ function M:parseNumber16()
     if expOffset then
         curOffset = expOffset
         if #expPart == 0 then
-            self:pushError('MISS_EXPONENT', curOffset - 1, curOffset - 1)
+            self:throw('MISS_EXPONENT', curOffset - 1, curOffset - 1)
         end
     end
 
     if not intPart then
         if not numPart then
-            self:pushError('MUST_X16', pos + 2, pos + 2)
+            self:throw('MUST_X16', pos + 2, pos + 2)
         end
         if numPart == '' then
-            self:pushError('MUST_X16', numOffset - 1, numOffset - 1)
+            self:throw('MUST_X16', numOffset - 1, numOffset - 1)
         end
     end
 
@@ -275,7 +275,7 @@ function M:parseNumber2()
     local value = tonumber(bins, 2)
 
     if not self.jit then
-        self:pushError('UNSUPPORT_SYMBOL', pos + 2, curOffset - 1, {
+        self:throw('UNSUPPORT_SYMBOL', pos + 2, curOffset - 1, {
             version = self.version,
             needVer = 'LuaJIT',
         })
@@ -309,14 +309,14 @@ function M:parseNumber10()
     if expOffset then
         curOffset = expOffset
         if #expPart == 0 then
-            self:pushError('MISS_EXPONENT', curOffset - 1, curOffset - 1)
+            self:throw('MISS_EXPONENT', curOffset - 1, curOffset - 1)
         end
     end
 
     if not intPart then
         if numPart == '' then
             self.lexer:next()
-            self:pushError('UNKNOWN_SYMBOL', pos, pos + 1)
+            self:throw('UNKNOWN_SYMBOL', pos, pos + 1)
             return nil
         end
     end

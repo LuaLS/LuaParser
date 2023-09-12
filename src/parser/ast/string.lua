@@ -85,7 +85,7 @@ function M:parseShortString()
     ---@cast pos -?
 
     if quo == '`' and not self.nssymbolMap['`'] then
-        self:pushError('ERR_NONSTANDARD_SYMBOL', pos, pos + 1)
+        self:throw('ERR_NONSTANDARD_SYMBOL', pos, pos + 1)
     end
 
     local pieces = {}
@@ -116,14 +116,14 @@ function M:parseShortString()
         if not char then
             pieces[#pieces+1] = self.code:sub(curOffset)
             curOffset = #self.code + 1
-            self:pushErrorMissSymbol(curOffset - 1, quo)
+            self:throwMissSymbol(curOffset - 1, quo)
             break
         end
         if char == '\r'
         or char == '\n' then
             pieces[#pieces+1] = self.code:sub(curOffset, offset - 2)
             curOffset = offset - 1
-            self:pushErrorMissSymbol(curOffset - 1, quo)
+            self:throwMissSymbol(curOffset - 1, quo)
             break
         end
         if char == '\\' then
@@ -151,7 +151,7 @@ function M:parseShortString()
                     pieces[#pieces+1] = string.char(num)
                 else
                     pushEsc('err', offset - 2, offset - 1 + #numWord)
-                    self:pushError('ERR_ESC_DEC', curPos, curPos + #numWord, {
+                    self:throw('ERR_ESC_DEC', curPos, curPos + #numWord, {
                         min = '000',
                         max = '255',
                     })
@@ -177,10 +177,10 @@ function M:parseShortString()
                 else
                     pushEsc('err', offset - 2, offset - 1)
                     curOffset = offset + 1
-                    self:pushError('ERR_ESC_X', curPos, curPos + 1)
+                    self:throw('ERR_ESC_X', curPos, curPos + 1)
                 end
                 if self.versionNum <= 51 then
-                    self:pushError('ERR_ESC', curPos, curPos + 3)
+                    self:throw('ERR_ESC', curPos, curPos + 3)
                 end
                 goto continue
             end
@@ -188,25 +188,25 @@ function M:parseShortString()
                 local leftP, word, rightP, tailOffset = self.code:match('^({)(%w*)(}?)()', offset + 1)
                 if not leftP then
                     pushEsc('err', offset - 2, offset - 1)
-                    self:pushErrorMissSymbol(offset - 1, '{')
+                    self:throwMissSymbol(offset - 1, '{')
                     curOffset = offset
                     goto continue
                 end
                 pushEsc('unicode', offset - 2, tailOffset - 1)
                 if #word == 0 then
-                    self:pushError('UTF8_SMALL', offset + 1, offset + 1)
+                    self:throw('UTF8_SMALL', offset + 1, offset + 1)
                 else
                     local num = tonumber(word, 16)
                     if num then
                         if self.versionNum >= 54 then
                             if num < 0 or num > 0x7FFFFFFF then
-                                self:pushError('UTF8_MAX', offset + 1, offset + #word, {
+                                self:throw('UTF8_MAX', offset + 1, offset + #word, {
                                     min = '00000000',
                                     max = '7FFFFFFF',
                                 })
                             end
                         else
-                            self:pushError('UTF8_MAX', offset + 1, offset + #word, {
+                            self:throw('UTF8_MAX', offset + 1, offset + #word, {
                                 min     = '000000',
                                 max     = '10FFFF',
                                 needVer = num <= 0x7FFFFFFF and 'Lua 5.4' or nil,
@@ -216,11 +216,11 @@ function M:parseShortString()
                             pieces[#pieces+1] = utf8.char(num)
                         end
                     else
-                        self:pushError('MUST_X16', offset + 1, offset + #word)
+                        self:throw('MUST_X16', offset + 1, offset + #word)
                     end
                 end
                 if rightP == '' then
-                    self:pushErrorMissSymbol(tailOffset - 1, '}')
+                    self:throwMissSymbol(tailOffset - 1, '}')
                 end
                 curOffset = tailOffset
                 goto continue
@@ -233,7 +233,7 @@ function M:parseShortString()
             else
                 pushEsc('err', offset - 2, offset)
                 curOffset = offset + 1
-                self:pushError('ERR_ESC', offset - 2, offset)
+                self:throw('ERR_ESC', offset - 2, offset)
                 goto continue
             end
             goto continue
@@ -277,13 +277,13 @@ function M:parseLongString()
     else
         finishPos = #self.code
         missQuo = true
-        self:pushErrorMissSymbol(finishPos, finishQuo)
+        self:throwMissSymbol(finishPos, finishQuo)
     end
 
     if quo == '[[' and self.versionNum <= 51 then
         local nestOffset = self.code:find('[[', pos + #quo + 1, true)
         if nestOffset and nestOffset < finishOffset then
-            self:pushError('NESTING_LONG_MARK', nestOffset - 1, nestOffset + 1)
+            self:throw('NESTING_LONG_MARK', nestOffset - 1, nestOffset + 1)
         end
     end
 

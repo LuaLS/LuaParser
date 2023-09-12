@@ -12,6 +12,7 @@ local class = require 'class'
 ---@field finishRow integer # 结束行号
 ---@field finishCol integer # 结束列号
 ---@field code string # 对应的代码
+---@field parent LuaParser.Node.Base
 local Base = class.declare 'LuaParser.Node.Base'
 
 local rowcolMulti = 10000

@@ -1,8 +1,8 @@
-local parser = require 'parser'
+local class = require 'class'
 
 local function TEST(code)
     return function (expect)
-        local ast = parser.compile(code)
+        local ast = class.new 'LuaParser.Ast' (code)
         local node = ast:parseNumber()
         assert(node)
         Match(node, expect)

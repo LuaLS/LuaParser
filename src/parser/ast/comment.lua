@@ -47,7 +47,7 @@ function M:parseShortComment(inState)
     if  token == '--'
     or (token == '//' and (inState or self.nssymbolMap['//'])) then
         if token == '//' and not self.nssymbolMap['//'] then
-            self:pushError('ERR_COMMENT_PREFIX', pos, pos + 2)
+            self:throw('ERR_COMMENT_PREFIX', pos, pos + 2)
         end
         local offset = self.code:find('[\r\n]', pos + 2) or (#self.code + 1)
         self.lexer:fastForward(offset)
@@ -78,7 +78,7 @@ function M:parseLongComment()
     elseif token == '/*' then
         finishQuo = '*/'
         if not self.nssymbolMap['/**/'] then
-            self:pushError('ERR_C_LONG_COMMENT', pos, pos + 1)
+            self:throw('ERR_C_LONG_COMMENT', pos, pos + 1)
         end
     else
         return nil
@@ -87,7 +87,7 @@ function M:parseLongComment()
     if offset then
         self.lexer:fastForward(offset + #finishQuo - 1)
     else
-        self:pushErrorMissSymbol(#self.code, finishQuo)
+        self:throwMissSymbol(#self.code, finishQuo)
         self.lexer:fastForward(#self.code)
     end
     return class.new('LuaParser.Node.Comment', {

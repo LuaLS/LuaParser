@@ -11,17 +11,17 @@ function M:parseID(nodeType, required)
     local token, tp, pos = self.lexer:peek()
     if tp ~= 'Word' then
         if required then
-            self:pushError('MISS_NAME', self:getLastPos(), self:getLastPos())
+            self:throw('MISS_NAME', self:getLastPos(), self:getLastPos())
         end
         return nil
     end
     ---@cast token -?
     ---@cast pos -?
     if not self.unicodeName and token:find '[\x80-\xff]' then
-        self:pushError('UNICODE_NAME', pos, pos + #token)
+        self:throw('UNICODE_NAME', pos, pos + #token)
     end
     if self:isKeyWord(token) then
-        self:pushError('KEYWORD', pos, pos + #token)
+        self:throw('KEYWORD', pos, pos + #token)
     end
     self.lexer:next()
     return class.new(nodeType, {
@@ -36,6 +36,7 @@ end
 ---@param atLeastOne? true
 ---@return T[]
 function M:parseIDList(nodeType, atLeastOne)
+    ---@type LuaParser.Node.ID[]
     local list = {}
     local first = self:parseID(nodeType, atLeastOne)
     list[#list+1] = first
@@ -53,7 +54,10 @@ function M:parseIDList(nodeType, atLeastOne)
                 break
             end
         else
-            self:pushErrorMissSymbol(self:getLastPos(), ',')
+            if tp == 'Word' and self:isKeyWord(token) then
+                break
+            end
+            self:throwMissSymbol(self:getLastPos(), ',')
         end
         local id = self:parseID(nodeType, true)
         if id then

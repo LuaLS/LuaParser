@@ -1,7 +1,7 @@
 local class = require 'class'
 local lexer = require 'parser.lexer'
 
-require 'parser.ast.node'
+require 'parser.ast.base'
 require 'parser.ast.error'
 require 'parser.ast.nil'
 require 'parser.ast.boolean'
@@ -85,7 +85,7 @@ end
 ---@private
 ---@param inState? boolean # 是否是语句
 function M:skipSpace(inState)
-    self.lastRightCI = self.lexer.ci
+    self.lastRightCI = self.lexer.ci - 1
     repeat until not self:skipNL()
             and  not self:skipComment(inState)
 end

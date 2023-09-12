@@ -14,6 +14,7 @@ LocalDef.type = 'localdef'
 
 ---@class LuaParser.Node.Local: LuaParser.Node.Base
 ---@field parent LuaParser.Node.LocalDef
+---@field index integer
 ---@field value? LuaParser.Node.Exp
 local Local = class.declare('LuaParser.Node.Local', 'LuaParser.Node.Base')
 
@@ -27,19 +28,37 @@ function M:parseLocal()
     end
     self.lexer:next()
 
-    self:skipSpace()
-    local vars = self:parseIDList('LuaParser.Node.Local', true)
     local localdef = class.new('LuaParser.Node.LocalDef', {
         ast    = self,
-        vars   = vars,
         start  = pos,
-        finish = #vars > 0 and vars[#vars].finish or pos + 5,
     })
 
+    self:skipSpace()
+    local vars = self:parseIDList('LuaParser.Node.Local', true)
+    localdef.vars = vars
     for i = 1, #vars do
         local var = vars[i]
         var.parent = localdef
+        var.index  = i
     end
+
+    self:skipSpace()
+    if self.lexer:consume '=' then
+        self:skipSpace()
+        local values = self:parseExpList(true)
+        localdef.values = values
+        for i = 1, #values do
+            local value = values[i]
+            value.parent = localdef
+
+            local var = vars[i]
+            if var then
+                var.value = value
+            end
+        end
+    end
+
+    localdef.finish = self:getLastPos()
 
     return localdef
 end

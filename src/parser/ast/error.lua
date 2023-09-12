@@ -17,7 +17,7 @@ local M = class.declare 'LuaParser.Ast'
 ---@param start integer
 ---@param finish integer
 ---@param extra table?
-function M:pushError(errorCode, start, finish, extra)
+function M:throw(errorCode, start, finish, extra)
     self.errors[#self.errors+1] = class.new('LuaParser.Node.Error', {
         code   = errorCode,
         ast    = self,
@@ -30,8 +30,8 @@ end
 -- 添加错误“缺少符号”
 ---@param start integer
 ---@param symbol string
-function M:pushErrorMissSymbol(start, symbol)
-    self:pushError('MISS_SYMBOL', start, start, {
+function M:throwMissSymbol(start, symbol)
+    self:throw('MISS_SYMBOL', start, start, {
         symbol = symbol,
     })
 end
@@ -40,6 +40,6 @@ end
 ---@param symbol string
 function M:assertSymbol(symbol)
     if not self.lexer:consume(symbol) then
-        self:pushErrorMissSymbol(self:getLastPos(), symbol)
+        self:throwMissSymbol(self:getLastPos(), symbol)
     end
 end

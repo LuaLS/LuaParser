@@ -10,6 +10,8 @@ function Match(result, expect)
     end
 end
 
+require 'parser'
+
 require 'test.ast.nil'
 require 'test.ast.boolean'
 require 'test.ast.string'

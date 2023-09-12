@@ -31,5 +31,6 @@ local M = class.get 'LuaParser'
 ---@return LuaParser.Ast
 function M.compile(code, version, options)
     local ast = class.new 'LuaParser.Ast' (code, version, options)
+    ast:parseMain()
     return ast
 end
