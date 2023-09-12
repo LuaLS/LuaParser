@@ -11,7 +11,6 @@ end
 
 TEST [['123']]
 {
-    type   = "string",
     left   = 0,
     right  = 5,
     value  = "123",
@@ -19,7 +18,6 @@ TEST [['123']]
 }
 TEST [['123\'']]
 {
-    type   = "string",
     left   = 0,
     right  = 7,
     escs   = {
@@ -33,7 +31,6 @@ TEST [['123\'']]
 TEST [['123\z
     345']]
 {
-    type   = "string",
     left   = 0,
     right  = 10008,
     escs   = {
@@ -48,7 +45,6 @@ TEST [['123\z
 TEST [['123\
 345']]
 {
-    type   = "string",
     left   = 0,
     right  = 10004,
     escs   = {
@@ -62,7 +58,6 @@ TEST [['123\
 }
 TEST [===[[[123]]]===]
 {
-    type   = "string",
     left   = 0,
     right  = 7,
     value  = "123",
@@ -71,7 +66,6 @@ TEST [===[[[123]]]===]
 TEST [===[[[123
 345]]]===]
 {
-    type   = "string",
     left   = 0,
     right  = 10005,
     value  = "123\
@@ -80,7 +74,6 @@ TEST [===[[[123
 }
 TEST [['alo\n123"']]
 {
-    type   = "string",
     left   = 0,
     right  = 11,
     escs   = {
@@ -94,7 +87,6 @@ TEST [['alo\n123"']]
 }
 TEST [['\97lo\10\04923"']]
 {
-    type   = "string",
     left   = 0,
     right  = 17,
     escs   = {
@@ -114,7 +106,6 @@ TEST [['\97lo\10\04923"']]
 }
 TEST [['\xff']]
 {
-    type   = "string",
     left   = 0,
     right  = 6,
     escs   = {
@@ -127,7 +118,6 @@ TEST [['\xff']]
 }
 TEST [['\x1A']]
 {
-    type   = "string",
     left   = 0,
     right  = 6,
     escs   = {
@@ -140,7 +130,6 @@ TEST [['\x1A']]
 }
 TEST [['\32']]
 {
-    type   = "string",
     left   = 0,
     right  = 5,
     escs   = {
@@ -153,7 +142,6 @@ TEST [['\32']]
 }
 TEST [['\123']]
 {
-    type   = "string",
     left   = 0,
     right  = 6,
     escs   = {
@@ -166,7 +154,6 @@ TEST [['\123']]
 }
 TEST [['\0123']]
 {
-    type   = "string",
     left   = 0,
     right  = 7,
     escs   = {
@@ -179,7 +166,6 @@ TEST [['\0123']]
 }
 TEST [['\492']]
 {
-    type   = "string",
     left   = 0,
     right  = 6,
     escs   = {
@@ -192,7 +178,6 @@ TEST [['\492']]
 }
 TEST [['\u{3b1}']]
 {
-    type   = "string",
     left   = 0,
     right  = 9,
     escs   = {
@@ -205,7 +190,6 @@ TEST [['\u{3b1}']]
 }
 TEST [['\u{0}']]
 {
-    type   = "string",
     left   = 0,
     right  = 7,
     escs   = {
@@ -218,7 +202,6 @@ TEST [['\u{0}']]
 }
 TEST [['\u{ffffff}']]
 {
-    type   = "string",
     left   = 0,
     right  = 12,
     escs   = {
@@ -232,7 +215,6 @@ TEST [['\u{ffffff}']]
 TEST [=[[[
 abcdef]]]=]
 {
-    type   = "string",
     left   = 0,
     right  = 10008,
     value  = "abcdef",
@@ -240,7 +222,6 @@ abcdef]]]=]
 }
 TEST [['aaa]]
 {
-    type   = "string",
     left   = 0,
     right  = 4,
     value  = "aaa",
@@ -249,7 +230,6 @@ TEST [['aaa]]
 TEST [['aaa
 ]]
 {
-    type   = "string",
     left   = 0,
     right  = 4,
     value  = "aaa",
@@ -257,7 +237,6 @@ TEST [['aaa
 }
 TEST [[`12345`]]
 {
-    type   = "string",
     left   = 0,
     right  = 7,
     value  = "12345",

@@ -1,8 +1,5 @@
 local class = require 'class'
 
----@class LuaParser.Ast
-local M = class.declare 'LuaParser.Ast'
-
 ---@class LuaParser.Node.LocalDef: LuaParser.Node.Base
 ---@field vars LuaParser.Node.Local[]
 ---@field values? LuaParser.Node.Exp[]
@@ -16,12 +13,16 @@ LocalDef.type = 'localdef'
 ---@field parent LuaParser.Node.LocalDef
 ---@field index integer
 ---@field value? LuaParser.Node.Exp
+---@field refs? LuaParser.Node.Var[]
 local Local = class.declare('LuaParser.Node.Local', 'LuaParser.Node.Base')
 
 Local.type = 'local'
 
+---@class LuaParser.Ast
+local Ast = class.declare 'LuaParser.Ast'
+
 ---@return LuaParser.Node.LocalDef?
-function M:parseLocal()
+function Ast:parseLocal()
     local token, _, pos = self.lexer:peek()
     if token ~= 'local' then
         return nil
@@ -31,6 +32,7 @@ function M:parseLocal()
     local localdef = class.new('LuaParser.Node.LocalDef', {
         ast    = self,
         start  = pos,
+        refs   = {},
     })
 
     self:skipSpace()

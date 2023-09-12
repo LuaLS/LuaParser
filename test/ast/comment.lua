@@ -11,7 +11,6 @@ end
 
 TEST [[--AAA]]
 {
-    type    = "comment",
     left    = 0,
     right   = 5,
     subtype = 'short',
@@ -20,7 +19,6 @@ TEST [[--AAA]]
 
 TEST [[//AAA]]
 {
-    type    = "comment",
     left    = 0,
     right   = 5,
     subtype = 'short',
@@ -31,7 +29,6 @@ TEST [===[--[[
 1234
 ]]]===]
 {
-    type    = "comment",
     left    = 0,
     right   = 20002,
     subtype = 'long',
@@ -42,7 +39,6 @@ TEST [===[/*
 1234
 */]===]
 {
-    type    = "comment",
     left    = 0,
     right   = 20002,
     subtype = 'long',

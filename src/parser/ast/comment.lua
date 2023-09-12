@@ -1,7 +1,5 @@
 local class = require 'class'
 
----@alias LuaParser.LuaParser.Node.Type 'comment'
-
 ---@class LuaParser.Node.Comment: LuaParser.Node.Base
 ---@field subtype 'short' | 'long'
 ---@field value string
@@ -27,18 +25,18 @@ Comment.__getter.value = function (self)
 end
 
 ---@class LuaParser.Ast
-local M = class.declare 'LuaParser.Ast'
+local Ast = class.declare 'LuaParser.Ast'
 
 ---@param inState? boolean
 ---@return LuaParser.Node.Comment?
-function M:parseComment(inState)
+function Ast:parseComment(inState)
     return self:parseLongComment()
         or self:parseShortComment(inState)
 end
 
 ---@param inState? boolean
 ---@return LuaParser.Node.Comment?
-function M:parseShortComment(inState)
+function Ast:parseShortComment(inState)
     local token, _, pos = self.lexer:peek()
     if not token then
         return nil
@@ -62,7 +60,7 @@ function M:parseShortComment(inState)
 end
 
 ---@return LuaParser.Node.Comment?
-function M:parseLongComment()
+function Ast:parseLongComment()
     local token, _, pos = self.lexer:peek()
     if not token then
         return nil

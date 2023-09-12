@@ -2,7 +2,6 @@ local class = require 'class'
 
 ---@class LuaParser.Node.Base: Class.Base
 ---@field ast LuaParser.Ast
----@field type LuaParser.Node.Type
 ---@field start integer # 开始位置（偏移）
 ---@field finish integer # 结束位置（偏移）
 ---@field left integer # 开始位置（行号与列号合并）
@@ -83,5 +82,5 @@ end
 ---@return string
 ---@return true
 Base.__getter.parent = function (self)
-    error('未设置父节点：' .. tostring(self.type))
+    error('未设置父节点：' .. class.type(self))
 end

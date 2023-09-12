@@ -1,13 +1,13 @@
 local class = require 'class'
 
 ---@class LuaParser.Ast
-local M = class.declare 'LuaParser.Ast'
+local Ast = class.declare 'LuaParser.Ast'
 
 ---@generic T: LuaParser.Node.ID
 ---@param nodeType `T`
 ---@param required? true
 ---@return T?
-function M:parseID(nodeType, required)
+function Ast:parseID(nodeType, required)
     local token, tp, pos = self.lexer:peek()
     if tp ~= 'Word' then
         if required then
@@ -35,7 +35,7 @@ end
 ---@param nodeType `T`
 ---@param atLeastOne? true
 ---@return T[]
-function M:parseIDList(nodeType, atLeastOne)
+function Ast:parseIDList(nodeType, atLeastOne)
     ---@type LuaParser.Node.ID[]
     local list = {}
     local first = self:parseID(nodeType, atLeastOne)
@@ -68,7 +68,7 @@ function M:parseIDList(nodeType, atLeastOne)
 end
 
 -- goto 单独处理
-M.keyWordMap = {
+Ast.keyWordMap = {
     ['and']      = true,
     ['break']    = true,
     ['do']       = true,
@@ -94,7 +94,7 @@ M.keyWordMap = {
 
 ---@param word string
 ---@return boolean
-function M:isKeyWord(word)
+function Ast:isKeyWord(word)
     if self.keyWordMap[word] then
         return true
     end

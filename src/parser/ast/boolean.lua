@@ -1,7 +1,5 @@
 local class = require 'class'
 
----@alias LuaParser.Node.Type 'boolean'
-
 ---@class LuaParser.Node.Boolean: LuaParser.Node.Base
 ---@field value boolean
 ---@field view string
@@ -14,11 +12,11 @@ Boolean.__getter.view = function (self)
 end
 
 ---@class LuaParser.Ast
-local M = class.declare 'LuaParser.Ast'
+local Ast = class.declare 'LuaParser.Ast'
 
 -- 解析布尔值
 ---@return LuaParser.Node.Boolean?
-function M:parseBoolean()
+function Ast:parseBoolean()
     local token = self.lexer:peek()
     if token == 'true' then
         local start, finish = self.lexer:range()

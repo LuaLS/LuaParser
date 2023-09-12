@@ -1,7 +1,5 @@
 local class = require 'class'
 
----@alias LuaParser.Node.Type 'String'
-
 ---@alias LuaParser.EscMode 'normal' | 'unicode' | 'err' | 'byte'
 
 ---@class LuaParser.Node.String: LuaParser.Node.Base
@@ -57,11 +55,11 @@ String.__getter.view = function (self)
 end
 
 ---@class LuaParser.Ast
-local M = class.declare 'LuaParser.Ast'
+local Ast = class.declare 'LuaParser.Ast'
 
 -- 解析字符串
 ---@return LuaParser.Node.String?
-function M:parseString()
+function Ast:parseString()
     local token = self.lexer:peek()
     if token == '"'
     or token == "'"
@@ -76,7 +74,7 @@ end
 
 -- 解析短字符串
 ---@return LuaParser.Node.String?
-function M:parseShortString()
+function Ast:parseShortString()
     local quo, _, pos = self.lexer:peek()
     if quo ~= '"' and quo ~= "'" and quo ~= '`' then
         return nil
@@ -261,7 +259,7 @@ end
 
 -- 解析长字符串
 ---@return LuaParser.Node.String?
-function M:parseLongString()
+function Ast:parseLongString()
     local _, _, pos = self.lexer:peek()
     local quo = self.code:match('^(%[=*%[)', pos + 1)
     if not quo then

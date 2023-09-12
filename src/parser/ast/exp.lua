@@ -1,7 +1,7 @@
 local class = require 'class'
 
 ---@class LuaParser.Ast
-local M = class.declare 'LuaParser.Ast'
+local Ast = class.declare 'LuaParser.Ast'
 
 ---@alias LuaParser.Node.Exp
 ---| LuaParser.Node.Nil
@@ -11,7 +11,7 @@ local M = class.declare 'LuaParser.Ast'
 
 ---@param required? true
 ---@return LuaParser.Node.Exp?
-function M:parseExp(required)
+function Ast:parseExp(required)
     -- TODO
     local exp = self:parseNumber()
 
@@ -24,7 +24,7 @@ end
 
 ---@param atLeastOne? true
 ---@return LuaParser.Node.Exp[]
-function M:parseExpList(atLeastOne)
+function Ast:parseExpList(atLeastOne)
     ---@type LuaParser.Node.Exp[]
     local list = {}
     local first = self:parseExp(atLeastOne)

@@ -11,13 +11,11 @@ end
 
 TEST [[nil]]
 {
-    type    = "nil",
     left    = 0,
     right   = 3,
 }
 TEST [[   nil]]
 {
-    type    = "nil",
     left    = 3,
     right   = 6,
 }

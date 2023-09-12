@@ -1,7 +1,5 @@
 local class = require 'class'
 
----@alias LuaParser.Node.Type 'Float' | 'Integer'
-
 ---@alias LuaParser.Node.Number LuaParser.Node.Float | LuaParser.Node.Integer
 
 ---@class LuaParser.Node.Float: LuaParser.Node.Base
@@ -85,11 +83,11 @@ Integer.__getter.view = function (self)
 end
 
 ---@class LuaParser.Ast
-local M = class.declare 'LuaParser.Ast'
+local Ast = class.declare 'LuaParser.Ast'
 
 -- 解析数字（可以带负号）
 ---@return LuaParser.Node.Float | LuaParser.Node.Integer | nil
-function M:parseNumber()
+function Ast:parseNumber()
     -- 快速判断是否为数字
     if self.lexer:peek() == '-' then
         local token, tp = self.lexer:peek(1)
@@ -128,7 +126,7 @@ end
 
 ---@private
 ---@param curOffset integer
-function M:fastForwardNumber(curOffset)
+function Ast:fastForwardNumber(curOffset)
     local word = self.code:match('^[%.%w_\x80-\xff]+', curOffset)
     if not word then
         self.lexer:fastForward(curOffset - 1)
@@ -141,7 +139,7 @@ end
 ---@private
 ---@param curOffset integer
 ---@return boolean
-function M:parseNumberI(curOffset)
+function Ast:parseNumberI(curOffset)
     if self.code:find('^[iI]', curOffset) then
         if not self.jit then
             self:throw('UNSUPPORT_SYMBOL', curOffset, curOffset, {
@@ -159,7 +157,7 @@ end
 ---@param startPos integer
 ---@param curOffset integer
 ---@return LuaParser.Node.Float
-function M:buildFloat(value, startPos, curOffset)
+function Ast:buildFloat(value, startPos, curOffset)
     local valuei
     if self:parseNumberI(curOffset) then
         curOffset = curOffset + 1
@@ -180,7 +178,7 @@ end
 ---@param startPos integer
 ---@param curOffset integer
 ---@return LuaParser.Node.Integer
-function M:buildInteger(value, startPos, curOffset)
+function Ast:buildInteger(value, startPos, curOffset)
     local valuei, intTail
     if self:parseNumberI(curOffset) then
         curOffset = curOffset + 1
@@ -208,7 +206,7 @@ end
 
 -- 解析十六进制数字（不支持负号）
 ---@return LuaParser.Node.Float | LuaParser.Node.Integer | nil
-function M:parseNumber16()
+function Ast:parseNumber16()
     local token, _, pos = self.lexer:peek()
 
     if token ~= '0' then
@@ -259,7 +257,7 @@ end
 
 -- 解析二进制数字（不支持负号）
 ---@return LuaParser.Node.Integer | nil
-function M:parseNumber2()
+function Ast:parseNumber2()
     local token, _, pos = self.lexer:peek()
 
     if token ~= '0' then
@@ -286,7 +284,7 @@ end
 
 -- 解析十进制数字（不支持负号）
 ---@return LuaParser.Node.Float | LuaParser.Node.Integer | nil
-function M:parseNumber10()
+function Ast:parseNumber10()
     local token, tp, pos = self.lexer:peek()
     if token ~= '.' and tp ~= 'Num' then
         return nil

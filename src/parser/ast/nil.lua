@@ -1,7 +1,5 @@
 local class = require 'class'
 
----@alias LuaParser.Node.Type 'nil'
-
 ---@class LuaParser.Node.Nil: LuaParser.Node.Base
 local Nil = class.declare('LuaParser.Node.Nil', 'LuaParser.Node.Base')
 
@@ -10,11 +8,11 @@ Nil.type = 'nil'
 Nil.view = 'nil'
 
 ---@class LuaParser.Ast
-local M = class.declare 'LuaParser.Ast'
+local Ast = class.declare 'LuaParser.Ast'
 
 -- 解析 nil
 ---@return LuaParser.Node.Nil?
-function M:parseNil()
+function Ast:parseNil()
     local token = self.lexer:peek()
     if token ~= 'nil' then
         return nil

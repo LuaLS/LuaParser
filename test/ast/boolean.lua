@@ -11,14 +11,12 @@ end
 
 TEST [[true]]
 {
-    type    = "boolean",
     left    = 0,
     finish  = 4,
     value   = true,
 }
 TEST [[false]]
 {
-    type    = "boolean",
     left    = 0,
     right   = 5,
     value   = false,

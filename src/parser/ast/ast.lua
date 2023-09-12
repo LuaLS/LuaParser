@@ -12,6 +12,7 @@ require 'parser.ast.exp'
 require 'parser.ast.state'
 require 'parser.ast.id'
 require 'parser.ast.local'
+require 'parser.ast.var'
 
 ---@class LuaParser.Ast
 ---@overload fun(code: string, version: LuaParser.LuaVersion, options: LuaParser.CompileOptions): LuaParser.Ast
