@@ -3,6 +3,10 @@ local class = require 'class'
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
+---@alias LuaParser.Node.ID
+---| LuaParser.Node.Local
+---| LuaParser.Node.Var
+
 ---@generic T: LuaParser.Node.ID
 ---@param nodeType `T`
 ---@param required? true

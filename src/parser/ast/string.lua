@@ -10,8 +10,6 @@ local class = require 'class'
 ---@field missQuo? true
 local String = class.declare('LuaParser.Node.String', 'LuaParser.Node.Base')
 
-String.type = 'string'
-
 local escMap = {
     ['a']  = '\a',
     ['b']  = '\b',

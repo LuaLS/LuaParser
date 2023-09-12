@@ -3,8 +3,6 @@ local class = require 'class'
 ---@class LuaParser.Node.Nil: LuaParser.Node.Base
 local Nil = class.declare('LuaParser.Node.Nil', 'LuaParser.Node.Base')
 
-Nil.type = 'nil'
-
 Nil.view = 'nil'
 
 ---@class LuaParser.Ast

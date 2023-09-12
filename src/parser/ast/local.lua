@@ -5,18 +5,12 @@ local class = require 'class'
 ---@field values? LuaParser.Node.Exp[]
 local LocalDef = class.declare('LuaParser.Node.LocalDef', 'LuaParser.Node.Base')
 
-LocalDef.type = 'localdef'
-
----@alias LuaParser.Node.ID LuaParser.Node.Local
-
 ---@class LuaParser.Node.Local: LuaParser.Node.Base
 ---@field parent LuaParser.Node.LocalDef
 ---@field index integer
 ---@field value? LuaParser.Node.Exp
 ---@field refs? LuaParser.Node.Var[]
 local Local = class.declare('LuaParser.Node.Local', 'LuaParser.Node.Base')
-
-Local.type = 'local'
 
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'

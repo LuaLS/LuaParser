@@ -5,8 +5,6 @@ local class = require 'class'
 ---@field view string
 local Boolean = class.declare('LuaParser.Node.Boolean', 'LuaParser.Node.Base')
 
-Boolean.type = 'boolean'
-
 Boolean.__getter.view = function (self)
     return tostring(self.value), true
 end

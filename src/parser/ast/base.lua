@@ -16,10 +16,6 @@ local Base = class.declare 'LuaParser.Node.Base'
 
 local rowcolMulti = 10000
 
-Base.__getter.type = function ()
-    error('No type')
-end
-
 ---@param self LuaParser.Node.Base
 ---@return integer
 ---@return true

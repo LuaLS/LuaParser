@@ -5,8 +5,6 @@ local class = require 'class'
 ---@field value string
 local Comment = class.declare('LuaParser.Node.Comment', 'LuaParser.Node.Base')
 
-Comment.type = 'comment'
-
 ---@param self LuaParser.Node.Comment
 ---@return string
 ---@return true
