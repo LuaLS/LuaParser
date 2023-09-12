@@ -2,6 +2,8 @@ local class = require 'class'
 
 ---@alias LuaParser.Node.Type 'Float' | 'Integer'
 
+---@alias LuaParser.Node.Number LuaParser.Node.Float | LuaParser.Node.Integer
+
 ---@class LuaParser.Node.Float: LuaParser.Node.Base
 ---@field value number
 ---@field valuei? number # 虚数

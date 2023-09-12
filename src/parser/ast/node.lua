@@ -77,3 +77,10 @@ Base.__getter.code = function (self)
     local code = self.ast.code:sub(self.start + 1, self.finish)
     return code, true
 end
+
+---@param self LuaParser.Node.Base
+---@return string
+---@return true
+Base.__getter.parent = function (self)
+    error('未设置父节点：' .. tostring(self.type))
+end

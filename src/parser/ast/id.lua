@@ -1,0 +1,107 @@
+local class = require 'class'
+
+---@class LuaParser.Ast
+local M = class.declare 'LuaParser.Ast'
+
+---@generic T: LuaParser.Node.ID
+---@param nodeType `T`
+---@param required? true
+---@return T?
+function M:parseID(nodeType, required)
+    local token, tp, pos = self.lexer:peek()
+    if tp ~= 'Word' then
+        if required then
+            self:pushError('MISS_NAME', self:getLastPos(), self:getLastPos())
+        end
+        return nil
+    end
+    ---@cast token -?
+    ---@cast pos -?
+    if not self.unicodeName and token:find '[\x80-\xff]' then
+        self:pushError('UNICODE_NAME', pos, pos + #token)
+    end
+    if self:isKeyWord(token) then
+        self:pushError('KEYWORD', pos, pos + #token)
+    end
+    self.lexer:next()
+    return class.new(nodeType, {
+        id     = token,
+        start  = pos,
+        finish = pos + #token,
+    })
+end
+
+---@generic T: LuaParser.Node.ID
+---@param nodeType `T`
+---@param atLeastOne? true
+---@return T[]
+function M:parseIDList(nodeType, atLeastOne)
+    local list = {}
+    local first = self:parseID(nodeType, atLeastOne)
+    list[#list+1] = first
+    while true do
+        self:skipSpace()
+        local token, tp = self.lexer:peek()
+        if not token then
+            break
+        end
+        if tp == 'Symbol' then
+            if token == ',' then
+                self.lexer:next()
+                self:skipSpace()
+            else
+                break
+            end
+        else
+            self:pushErrorMissSymbol(self:getLastPos(), ',')
+        end
+        local id = self:parseID(nodeType, true)
+        if id then
+            list[#list+1] = id
+        end
+    end
+    return list
+end
+
+-- goto 单独处理
+M.keyWordMap = {
+    ['and']      = true,
+    ['break']    = true,
+    ['do']       = true,
+    ['else']     = true,
+    ['elseif']   = true,
+    ['end']      = true,
+    ['false']    = true,
+    ['for']      = true,
+    ['function'] = true,
+    ['if']       = true,
+    ['in']       = true,
+    ['local']    = true,
+    ['nil']      = true,
+    ['not']      = true,
+    ['or']       = true,
+    ['repeat']   = true,
+    ['return']   = true,
+    ['then']     = true,
+    ['true']     = true,
+    ['until']    = true,
+    ['while']    = true,
+}
+
+---@param word string
+---@return boolean
+function M:isKeyWord(word)
+    if self.keyWordMap[word] then
+        return true
+    end
+    if word == 'goto' then
+        if self.jit then
+            -- LuaJIT 中只有 `goto Word` 才认为 goto 是关键字
+            local _, nextType = self.lexer:peek(1)
+            return nextType == 'Word'
+        end
+        -- Lua 5.2 开始 goto 是关键字
+        return self.versionNum >= 52
+    end
+    return false
+end

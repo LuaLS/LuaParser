@@ -35,3 +35,11 @@ function M:pushErrorMissSymbol(start, symbol)
         symbol = symbol,
     })
 end
+
+-- 断言下个符号，如果成功则消耗，否则报错
+---@param symbol string
+function M:assertSymbol(symbol)
+    if not self.lexer:consume(symbol) then
+        self:pushErrorMissSymbol(self:getLastPos(), symbol)
+    end
+end

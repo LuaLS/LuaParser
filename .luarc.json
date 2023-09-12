@@ -32,5 +32,8 @@
         "weakNilCheck": false,
         "weakUnionCheck": false,
         "castNumberToInteger": false
+    },
+    "hover": {
+        "expandAlias": false
     }
 }

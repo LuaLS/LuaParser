@@ -115,6 +115,17 @@ function M:next(count)
     return token, tp, pos
 end
 
+-- 消耗一个指定的词，返回是否成功
+---@param token string
+---@return boolean
+function M:consume(token)
+    if self.tokens[self.ci] == token then
+        self.ci = self.ci + 1
+        return true
+    end
+    return false
+end
+
 -- 获取当前词的2侧光标位置
 ---@param offset? integer # 偏移量，默认为0
 ---@return integer?

@@ -1,12 +1,17 @@
 local class = require 'class'
 local lexer = require 'parser.lexer'
 
+require 'parser.ast.node'
 require 'parser.ast.error'
 require 'parser.ast.nil'
 require 'parser.ast.boolean'
 require 'parser.ast.number'
 require 'parser.ast.string'
 require 'parser.ast.comment'
+require 'parser.ast.exp'
+require 'parser.ast.state'
+require 'parser.ast.id'
+require 'parser.ast.local'
 
 ---@class LuaParser.Ast
 ---@overload fun(code: string, version: LuaParser.LuaVersion, options: LuaParser.CompileOptions): LuaParser.Ast
@@ -22,12 +27,17 @@ function M:__init(code, version, options)
     ---@type LuaParser.LuaVersion
     self.version     = version or 'Lua 5.4'
     -- 非标准符号的映射表
+    ---@type table<string, true>
     self.nssymbolMap = {}
     -- 词法分析结果
     self.lexer       = lexer.parseLua(code)
     self.index       = 1
     -- 错误信息
+    ---@type LuaParser.Node.Error[]
     self.errors      = {}
+    -- 注释
+    ---@type LuaParser.Node.Comment[]
+    self.comments    = {}
 
     local major, minor = self.version:match 'Lua (%d+)%.(%d+)'
     ---@type integer
@@ -63,23 +73,36 @@ end
 ---@param inState? boolean # 是否是语句
 ---@return boolean # 是否成功跳过注释
 function M:skipComment(inState)
-    local token = self.lexer:peek()
-    if token == '--'
-    or (token == '//' and (inState or self.nssymbolMap['//'])) then
-
+    local comment = self:parseComment(inState)
+    if comment then
+        self.comments[#self.comments+1] = comment
+        return true
     end
+    return false
 end
 
 -- 跳过空白符
 ---@private
 ---@param inState? boolean # 是否是语句
 function M:skipSpace(inState)
+    self.lastRightCI = self.lexer.ci
     repeat until not self:skipNL()
             and  not self:skipComment(inState)
 end
 
+-- 获取上个词的右侧位置（不包括换行符和注释）
+---@return integer
+function M:getLastPos()
+    if not self.lastRightCI then
+        return 0
+    end
+    local token = self.lexer.tokens[self.lastRightCI]
+    local pos   = self.lexer.poses[self.lastRightCI]
+    return pos + #token
+end
+
 -- 编译Lua代码
-function M:compile()
+function M:parseMain()
     self:skipSpace()
 end
 
