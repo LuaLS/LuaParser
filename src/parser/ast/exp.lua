@@ -4,16 +4,14 @@ local class = require 'class'
 local Ast = class.declare 'LuaParser.Ast'
 
 ---@alias LuaParser.Node.Exp
----| LuaParser.Node.Nil
----| LuaParser.Node.Boolean
----| LuaParser.Node.Number
----| LuaParser.Node.String
+---| LuaParser.Node.Term
 
+-- 解析表达式
 ---@param required? true
 ---@return LuaParser.Node.Exp?
 function Ast:parseExp(required)
     -- TODO
-    local exp = self:parseNumber()
+    local exp = self:parseTerm()
 
     if not exp and required then
         self:throw('MISS_EXP', self:getLastPos(), self:getLastPos())
@@ -22,6 +20,7 @@ function Ast:parseExp(required)
     return exp
 end
 
+-- 解析表达式列表，以逗号分隔
 ---@param atLeastOne? true
 ---@return LuaParser.Node.Exp[]
 function Ast:parseExpList(atLeastOne)
@@ -54,4 +53,24 @@ function Ast:parseExpList(atLeastOne)
         end
     end
     return list
+end
+
+---@alias LuaParser.Node.Term
+---| LuaParser.Node.Nil
+---| LuaParser.Node.Boolean
+---| LuaParser.Node.Number
+---| LuaParser.Node.String
+---| LuaParser.Node.Var
+
+-- 解析表达式中的一项
+---@return LuaParser.Node.Term?
+function Ast:parseTerm()
+    -- TODO
+    local term = self:parseNil()
+            or   self:parseBoolean()
+            or   self:parseNumber()
+            or   self:parseString()
+            or   self:parseVar()
+
+    return term
 end
