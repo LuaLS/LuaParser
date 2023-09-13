@@ -9,7 +9,7 @@ local Var = class.declare('LuaParser.Node.Var', 'LuaParser.Node.Base')
 ---@field subtype 'field' | 'method' | 'index'
 ---@field key LuaParser.Node.FieldID
 ---@field next? LuaParser.Node.Field
----@field last? LuaParser.Node.Field | LuaParser.Node.TermHead
+---@field last? LuaParser.Node.Term
 local Field = class.declare('LuaParser.Node.Field', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.FieldID: LuaParser.Node.Base
@@ -34,8 +34,9 @@ function Ast:parseVar()
     return var
 end
 
+---@param last LuaParser.Node.Term
 ---@return LuaParser.Node.Field?
-function Ast:parseField()
+function Ast:parseField(last)
     local token, _, pos = self.lexer:peek()
     if token == '.'
     or token == ':' then
@@ -43,13 +44,18 @@ function Ast:parseField()
         self:skipSpace()
         local key = self:parseID('LuaParser.Node.FieldID', true)
         if key then
-            return class.new('LuaParser.Node.Field', {
+            local field = class.new('LuaParser.Node.Field', {
                 ast        = self,
                 start      = pos,
                 finish     = key.finish,
                 subtype    = (token == '.') and 'field' or 'method',
                 key        = key,
+                last       = last,
             })
+            last.next   = field
+            last.parent = field
+            key.parent  = field
+            return field
         end
         return nil
     end
@@ -59,13 +65,18 @@ function Ast:parseField()
         if key then
             self:skipSpace()
             self:assertSymbol(']')
-            return class.new('LuaParser.Node.Field', {
+            local field = class.new('LuaParser.Node.Field', {
                 ast        = self,
                 start      = pos,
                 finish     = self:getLastPos(),
                 subtype    = 'index',
                 key        = key,
+                last       = last,
             })
+            last.parent = field
+            last.next   = field
+            key.parent  = field
+            return field
         end
     end
     return nil

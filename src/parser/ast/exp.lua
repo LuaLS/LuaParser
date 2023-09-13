@@ -69,6 +69,7 @@ end
 
 ---@alias LuaParser.Node.TermChain
 ---| LuaParser.Node.Field
+---| LuaParser.Node.Call
 
 -- 解析表达式中的一项
 ---@return LuaParser.Node.Term?
@@ -89,19 +90,15 @@ function Ast:parseTerm()
 
     while true do
         self:skipSpace()
-        local token, tp, pos = self.lexer:peek()
-        if not token then
+
+        local chain = self:parseField(current)
+                or    self:parseCall(current)
+
+        if chain then
+            current = chain
+        else
             break
         end
-        local field = self:parseField()
-        if field then
-            current.next = field
-            field.last = current
-            current = field
-            goto continue
-        end
-        break
-        ::continue::
     end
 
     return current

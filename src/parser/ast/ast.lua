@@ -13,6 +13,8 @@ require 'parser.ast.state'
 require 'parser.ast.id'
 require 'parser.ast.local'
 require 'parser.ast.var'
+require 'parser.ast.call'
+require 'parser.ast.table'
 
 ---@class LuaParser.Ast
 ---@overload fun(code: string, version: LuaParser.LuaVersion, options: LuaParser.CompileOptions): LuaParser.Ast
@@ -86,19 +88,21 @@ end
 ---@private
 ---@param inState? boolean # 是否是语句
 function M:skipSpace(inState)
-    self.lastRightCI = self.lexer.ci - 1
+    self.lastRightCI = self.lexer.ci
     repeat until not self:skipNL()
             and  not self:skipComment(inState)
+    self.lastSpaceCI = self.lexer.ci
 end
 
 -- 获取上个词的右侧位置（不包括换行符和注释）
 ---@return integer
 function M:getLastPos()
-    if not self.lastRightCI then
-        return 0
+    local ci = self.lexer.ci
+    if ci == self.lastSpaceCI then
+        ci = self.lastRightCI
     end
-    local token = self.lexer.tokens[self.lastRightCI]
-    local pos   = self.lexer.poses[self.lastRightCI]
+    local token = self.lexer.tokens[ci - 1]
+    local pos   = self.lexer.poses[ci - 1]
     return pos + #token
 end
 

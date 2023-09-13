@@ -30,11 +30,13 @@ TEST 'a.b'
         start  = 2,
         finish = 3,
         id     = 'b',
+        parent = {},
     },
     last  = {
         start  = 0,
         finish = 1,
         id     = 'a',
+        parent = {},
         next   = {
             __class__ = 'LuaParser.Node.Field',
         },
@@ -49,42 +51,60 @@ TEST 'a.b.c'
         start  = 4,
         finish = 5,
         id     = 'c',
+        parent = {},
     },
     last  = {
         start  = 1,
         finish = 3,
+        parent = {},
         key    = {
             start  = 2,
             finish = 3,
             id     = 'b',
+            parent = {},
+        },
+        next   = {
+            __class__ = 'LuaParser.Node.Field',
         },
         last   = {
             start  = 0,
             finish = 1,
             id     = 'a',
+            parent = {},
             next   = {
                 __class__ = 'LuaParser.Node.Field',
             },
         },
-        next   = {
-            __class__ = 'LuaParser.Node.Field',
-        },
     }
 }
+
 TEST 'func()'
 {
-    type   = "call",
-    start  = 0,
+    start  = 4,
     finish = 6,
-    node   = "<IGNORE>",
+    node   = {
+        start  = 0,
+        finish = 4,
+        id     = 'func',
+        parent = {
+            __class__ = 'LuaParser.Node.Call',
+        },
+    },
+    args   = {},
 }
+
 TEST 'a.b.c()'
 {
-    type   = "call",
-    start  = 0,
+    start  = 5,
     finish = 7,
-    node   = "<IGNORE>",
+    node   = {
+        start  = 3,
+        finish = 5,
+        key    = {},
+        parent = {},
+    }
 }
+
 TEST '1 or 2'
 {
     type   = "binary",
