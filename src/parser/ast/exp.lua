@@ -56,21 +56,53 @@ function Ast:parseExpList(atLeastOne)
 end
 
 ---@alias LuaParser.Node.Term
+---| LuaParser.Node.TermHead
+---| LuaParser.Node.TermChain
+
+---@alias LuaParser.Node.TermHead
 ---| LuaParser.Node.Nil
 ---| LuaParser.Node.Boolean
 ---| LuaParser.Node.Number
 ---| LuaParser.Node.String
 ---| LuaParser.Node.Var
+---| LuaParser.Node.Paren
+
+---@alias LuaParser.Node.TermChain
+---| LuaParser.Node.Field
 
 -- 解析表达式中的一项
 ---@return LuaParser.Node.Term?
 function Ast:parseTerm()
-    -- TODO
-    local term = self:parseNil()
+    ---@type LuaParser.Node.TermHead?
+    local head = self:parseNil()
             or   self:parseBoolean()
             or   self:parseNumber()
             or   self:parseString()
             or   self:parseVar()
 
-    return term
+    if not head then
+        return nil
+    end
+
+    ---@type LuaParser.Node.Term
+    local current = head
+
+    while true do
+        self:skipSpace()
+        local token, tp, pos = self.lexer:peek()
+        if not token then
+            break
+        end
+        local field = self:parseField()
+        if field then
+            current.next = field
+            field.last = current
+            current = field
+            goto continue
+        end
+        break
+        ::continue::
+    end
+
+    return current
 end

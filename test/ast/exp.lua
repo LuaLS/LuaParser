@@ -24,41 +24,52 @@ TEST 'a'
 
 TEST 'a.b'
 {
-    start  = 0,
+    start  = 1,
     finish = 3,
-    node   = "<IGNORE>",
-    dot    = {
-        type   = ".",
-        start  = 1,
-        finish = 2,
-    },
-    field  = {
-        type   = "field",
+    key    = {
         start  = 2,
         finish = 3,
-        parent = "<IGNORE>",
-        [1]    = "b",
+        id     = 'b',
     },
+    last  = {
+        start  = 0,
+        finish = 1,
+        id     = 'a',
+        next   = {
+            __class__ = 'LuaParser.Node.Field',
+        },
+    }
 }
 
 TEST 'a.b.c'
 {
-    type   = "getfield",
-    start  = 0,
+    start  = 3,
     finish = 5,
-    node   = "<IGNORE>",
-    dot    = {
-        type   = ".",
-        start  = 3,
-        finish = 4,
-    },
-    field  = {
-        type   = "field",
+    key    = {
         start  = 4,
         finish = 5,
-        parent = "<IGNORE>",
-        [1]    = "c",
+        id     = 'c',
     },
+    last  = {
+        start  = 1,
+        finish = 3,
+        key    = {
+            start  = 2,
+            finish = 3,
+            id     = 'b',
+        },
+        last   = {
+            start  = 0,
+            finish = 1,
+            id     = 'a',
+            next   = {
+                __class__ = 'LuaParser.Node.Field',
+            },
+        },
+        next   = {
+            __class__ = 'LuaParser.Node.Field',
+        },
+    }
 }
 TEST 'func()'
 {
