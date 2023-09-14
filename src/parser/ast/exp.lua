@@ -1,5 +1,10 @@
 local class = require 'class'
 
+---@class LuaParser.Node.Paren: LuaParser.Node.Base
+---@field exp LuaParser.Node.Exp
+---@field next? LuaParser.Node.Field
+local Paren = class.declare('LuaParser.Node.Paren', 'LuaParser.Node.Base')
+
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
@@ -66,6 +71,7 @@ end
 ---| LuaParser.Node.String
 ---| LuaParser.Node.Var
 ---| LuaParser.Node.Paren
+---| LuaParser.Node.Varargs
 
 ---@alias LuaParser.Node.TermChain
 ---| LuaParser.Node.Field
@@ -79,7 +85,9 @@ function Ast:parseTerm()
             or   self:parseBoolean()
             or   self:parseNumber()
             or   self:parseString()
+            or   self:parseVarargs()
             or   self:parseVar()
+            or   self:parseParen()
 
     if not head then
         return nil
@@ -102,4 +110,25 @@ function Ast:parseTerm()
     end
 
     return current
+end
+
+---@return LuaParser.Node.Paren?
+function Ast:parseParen()
+    local pos = self.lexer:consume '('
+    if not pos then
+        return nil
+    end
+    local exp = self:parseExp(true)
+    if not exp then
+        return nil
+    end
+    local paren = class.new('LuaParser.Node.Paren', {
+        ast    = self,
+        start  = pos,
+        exp    = exp,
+    })
+    exp.parent = paren
+    paren.finish = self:assertSymbol ')' or exp.finish
+
+    return paren
 end

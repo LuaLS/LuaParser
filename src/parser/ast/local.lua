@@ -17,11 +17,10 @@ local Ast = class.declare 'LuaParser.Ast'
 
 ---@return LuaParser.Node.LocalDef?
 function Ast:parseLocal()
-    local token, _, pos = self.lexer:peek()
-    if token ~= 'local' then
+    local pos = self.lexer:consume 'local'
+    if not pos then
         return nil
     end
-    self.lexer:next()
 
     local localdef = class.new('LuaParser.Node.LocalDef', {
         ast    = self,

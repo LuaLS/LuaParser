@@ -115,15 +115,16 @@ function M:next(count)
     return token, tp, pos
 end
 
--- 消耗一个指定的词，返回是否成功
+-- 消耗一个指定的词，返回消耗掉词的位置
 ---@param token string
----@return boolean
+---@return integer?
 function M:consume(token)
-    if self.tokens[self.ci] == token then
-        self.ci = self.ci + 1
-        return true
+    local ci = self.ci
+    if self.tokens[ci] == token then
+        self.ci = ci + 1
+        return self.poses[ci]
     end
-    return false
+    return nil
 end
 
 -- 获取当前词的2侧光标位置

@@ -35,8 +35,11 @@ end
 
 -- 断言下个符号，如果成功则消耗，否则报错
 ---@param symbol string
+---@return integer? pos
 function Ast:assertSymbol(symbol)
-    if not self.lexer:consume(symbol) then
+    local pos = self.lexer:consume(symbol)
+    if not pos then
         self:throwMissSymbol(self:getLastPos(), symbol)
     end
+    return pos
 end

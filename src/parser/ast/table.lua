@@ -8,5 +8,8 @@ local Ast = class.declare 'LuaParser.Ast'
 
 ---@return LuaParser.Ast.Table?
 function Ast:parseTable()
-    
+    local pos = self.lexer:consume '{'
+    if pos then
+        return nil
+    end
 end
