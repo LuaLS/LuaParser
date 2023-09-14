@@ -24,15 +24,17 @@ TEST 'a'
 
 TEST 'a.b'
 {
-    start  = 1,
-    finish = 3,
-    key    = {
+    start     = 0,
+    finish    = 3,
+    symbolPos = 1,
+    subtype   = 'field',
+    key       = {
         start  = 2,
         finish = 3,
         id     = 'b',
         parent = {},
     },
-    last  = {
+    last = {
         start  = 0,
         finish = 1,
         id     = 'a',
@@ -45,28 +47,31 @@ TEST 'a.b'
 
 TEST 'a.b.c'
 {
-    start  = 3,
-    finish = 5,
-    key    = {
+    start     = 0,
+    finish    = 5,
+    symbolPos = 3,
+    subtype   = 'field',
+    key        = {
         start  = 4,
         finish = 5,
         id     = 'c',
         parent = {},
     },
-    last  = {
-        start  = 1,
-        finish = 3,
-        parent = {},
-        key    = {
+    last = {
+        start     = 0,
+        finish    = 3,
+        symbolPos = 1,
+        parent    = {},
+        key       = {
             start  = 2,
             finish = 3,
             id     = 'b',
             parent = {},
         },
-        next   = {
+        next = {
             __class__ = 'LuaParser.Node.Field',
         },
-        last   = {
+        last = {
             start  = 0,
             finish = 1,
             id     = 'a',
@@ -80,8 +85,9 @@ TEST 'a.b.c'
 
 TEST 'func()'
 {
-    start  = 4,
+    start  = 0,
     finish = 6,
+    argPos = 4,
     node   = {
         start  = 0,
         finish = 4,
@@ -90,15 +96,16 @@ TEST 'func()'
             __class__ = 'LuaParser.Node.Call',
         },
     },
-    args   = {},
+    args = {},
 }
 
 TEST 'a.b.c()'
 {
-    start  = 5,
+    start  = 0,
     finish = 7,
+    argPos = 5,
     node   = {
-        start  = 3,
+        start  = 0,
         finish = 5,
         key    = {},
         parent = {},

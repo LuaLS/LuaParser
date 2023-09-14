@@ -8,6 +8,8 @@ local Var = class.declare('LuaParser.Node.Var', 'LuaParser.Node.Base')
 ---@class LuaParser.Node.Field: LuaParser.Node.Base
 ---@field subtype 'field' | 'method' | 'index'
 ---@field key LuaParser.Node.FieldID
+---@field symbolPos integer
+---@field symbolPos2? integer
 ---@field next? LuaParser.Node.Field
 ---@field last? LuaParser.Node.Term
 local Field = class.declare('LuaParser.Node.Field', 'LuaParser.Node.Base')
@@ -46,11 +48,12 @@ function Ast:parseField(last)
         if key then
             local field = class.new('LuaParser.Node.Field', {
                 ast        = self,
-                start      = pos,
+                start      = last.start,
                 finish     = key.finish,
                 subtype    = (token == '.') and 'field' or 'method',
                 key        = key,
                 last       = last,
+                symbolPos  = pos,
             })
             last.next   = field
             last.parent = field
@@ -64,14 +67,16 @@ function Ast:parseField(last)
         local key = self:parseExp(true)
         if key then
             self:skipSpace()
-            self:assertSymbol(']')
+            local hasSymbol = self:assertSymbol(']')
             local field = class.new('LuaParser.Node.Field', {
                 ast        = self,
-                start      = pos,
+                start      = last.start,
                 finish     = self:getLastPos(),
                 subtype    = 'index',
                 key        = key,
                 last       = last,
+                symbolPos  = pos,
+                symbolPos2 = hasSymbol and self:getLastPos() or nil,
             })
             last.parent = field
             last.next   = field
