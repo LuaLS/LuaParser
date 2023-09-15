@@ -15,6 +15,9 @@ require 'parser.ast.local'
 require 'parser.ast.var'
 require 'parser.ast.call'
 require 'parser.ast.table'
+require 'parser.ast.block'
+require 'parser.ast.function'
+require 'parser.ast.field'
 
 ---@class LuaParser.Ast
 ---@overload fun(code: string, version: LuaParser.LuaVersion, options: LuaParser.CompileOptions): LuaParser.Ast

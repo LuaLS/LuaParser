@@ -11,7 +11,9 @@ local class = require 'class'
 ---@field finishRow integer # 结束行号
 ---@field finishCol integer # 结束列号
 ---@field code string # 对应的代码
----@field parent LuaParser.Node.Base
+---@field parent unknown
+---@field parentBlock LuaParser.Node.Block
+---@field parentFunction LuaParser.Node.Function
 local Base = class.declare 'LuaParser.Node.Base'
 
 local rowcolMulti = 10000
@@ -79,4 +81,26 @@ end
 ---@return true
 Base.__getter.parent = function (self)
     error('未设置父节点：' .. class.type(self))
+end
+
+---@param self LuaParser.Node.Base
+---@return LuaParser.Node.Block
+---@return true
+Base.__getter.parentBlock = function (self)
+    local parent = self.parent
+    if class.type(parent) == 'LuaParser.Node.Block' then
+        return parent, true
+    end
+    return parent.parentBlock, true
+end
+
+---@param self LuaParser.Node.Base
+---@return LuaParser.Node.Function
+---@return true
+Base.__getter.parentFunction = function (self)
+    local parent = self.parentFunction
+    if class.type(parent) == 'LuaParser.Node.Function' then
+        return parent, true
+    end
+    return parent.parentFunction, true
 end

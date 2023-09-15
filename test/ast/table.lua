@@ -11,14 +11,12 @@ end
 
 TEST '{}'
 {
-    type   = "table",
     start  = 0,
     finish = 2,
 }
 
 TEST '{...}'
 {
-    type   = "table",
     start  = 0,
     finish = 5,
     [1]    = {
