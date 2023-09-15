@@ -33,6 +33,12 @@ function Ast:throwMissSymbol(start, symbol)
     })
 end
 
+-- 添加错误“缺少表达式”
+---@param start integer
+function Ast:throwMissExp(start)
+    self:throw('MISS_EXP', start, start)
+end
+
 -- 断言下个符号，如果成功则消耗，否则报错
 ---@param symbol string
 ---@return integer? pos

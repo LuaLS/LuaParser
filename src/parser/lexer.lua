@@ -127,6 +127,19 @@ function M:consume(token)
     return nil
 end
 
+-- 消耗一个指定的类型，返回消耗掉词和位置
+---@param tp LuaParser.Lexer.Type
+---@return string?
+---@return integer?
+function M:consumeType(tp)
+    local ci = self.ci
+    if self.types[ci] == tp then
+        self.ci = ci + 1
+        return self.tokens[ci], self.poses[ci]
+    end
+    return nil, nil
+end
+
 -- 获取当前词的2侧光标位置
 ---@param offset? integer # 偏移量，默认为0
 ---@return integer?
@@ -139,28 +152,6 @@ function M:range(offset)
         return nil, nil
     end
     return pos, pos + #token
-end
-
--- 跳过一个指定的词，返回是否成功
----@param token string
----@return boolean
-function M:skipToken(token)
-    if self.tokens[self.ci] == token then
-        self.ci = self.ci + 1
-        return true
-    end
-    return false
-end
-
--- 跳过一个指定的类型，返回是否成功
----@param tp LuaParser.Lexer.Type
----@return boolean
-function M:skipType(tp)
-    if self.types[self.ci] == tp then
-        self.ci = self.ci + 1
-        return true
-    end
-    return false
 end
 
 -- 快进到某个光标位置

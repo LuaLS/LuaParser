@@ -19,12 +19,22 @@ TEST '{...}'
 {
     start  = 0,
     finish = 5,
-    [1]    = {
-        type   = "varargs",
-        start  = 1,
-        finish = 4,
-        parent = "<IGNORE>",
-    },
+    fields = {
+        [1] = {
+            subtype = 'exp',
+            start = 1,
+            finish = 4,
+            key = {
+                dummy = true,
+                asInteger = 1,
+            },
+            value = {
+                type   = 'varargs',
+                start  = 1,
+                finish = 4,
+            },
+        }
+    }
 }
 TEST '{1, 2, 3}'
 {

@@ -2,11 +2,12 @@ local class = require 'class'
 
 ---@class LuaParser.Node.Field: LuaParser.Node.Base
 ---@field subtype 'field' | 'method' | 'index'
----@field key LuaParser.Node.FieldID
+---@field key LuaParser.Node.FieldID | LuaParser.Node.Exp
 ---@field symbolPos integer
 ---@field symbolPos2? integer
 ---@field next? LuaParser.Node.Field
 ---@field last? LuaParser.Node.Term
+---@field value? LuaParser.Node.Exp
 local Field = class.declare('LuaParser.Node.Field', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.FieldID: LuaParser.Node.Base
@@ -15,7 +16,7 @@ local FieldID = class.declare('LuaParser.Node.FieldID', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.TableField: LuaParser.Node.Base
 ---@field subtype 'field' | 'index' | 'exp'
----@field key LuaParser.Node.Exp
+---@field key? LuaParser.Node.Exp
 ---@field value LuaParser.Node.Exp
 ---@field symbolPos? integer
 ---@field symbolPos2? integer

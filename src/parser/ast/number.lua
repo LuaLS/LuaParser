@@ -2,12 +2,12 @@ local class = require 'class'
 
 ---@alias LuaParser.Node.Number LuaParser.Node.Float | LuaParser.Node.Integer
 
----@class LuaParser.Node.Float: LuaParser.Node.Base
+---@class LuaParser.Node.Float: LuaParser.Node.Literal
 ---@field value number
 ---@field valuei? number # 虚数
 ---@field numBase 2 | 10 | 16
 ---@field view string
-local Float = class.declare('LuaParser.Node.Float', 'LuaParser.Node.Base')
+local Float = class.declare('LuaParser.Node.Float', 'LuaParser.Node.Literal')
 
 Float.value = 0.0
 
@@ -28,7 +28,7 @@ end
 ---@param self LuaParser.Node.Float
 ---@return string
 ---@return true
-Float.__getter.view = function (self)
+Float.__getter.toString = function (self)
     local num = self.valuei or self.value
     local view = ('%.10f'):format(num):gsub('0+$', '')
     if view:sub(-1) == '.' then
@@ -40,13 +40,27 @@ Float.__getter.view = function (self)
     return view, true
 end
 
----@class LuaParser.Node.Integer: LuaParser.Node.Base
+---@param self LuaParser.Node.Float
+---@return number
+---@return true
+Float.__getter.asNumber = function (self)
+    return self.value, true
+end
+
+---@param self LuaParser.Node.Float
+---@return integer?
+---@return true
+Float.__getter.asInteger = function (self)
+    return math.tointeger(self), true
+end
+
+---@class LuaParser.Node.Integer: LuaParser.Node.Literal
 ---@field value integer
 ---@field valuei? number # 虚数
 ---@field numBase 2 | 10 | 16
 ---@field intTail? 'LL' | 'ULL'
 ---@field view string
-local Integer = class.declare('LuaParser.Node.Integer', 'LuaParser.Node.Base')
+local Integer = class.declare('LuaParser.Node.Integer', 'LuaParser.Node.Literal')
 
 Integer.value = 0
 
@@ -67,7 +81,7 @@ end
 ---@param self LuaParser.Node.Integer
 ---@return string
 ---@return true
-Integer.__getter.view = function (self)
+Integer.__getter.toString = function (self)
     local view = tostring(self.valuei or self.value)
     if self.intTail then
         view = view .. self.intTail
@@ -76,6 +90,20 @@ Integer.__getter.view = function (self)
         view = ('0+%si'):format(view)
     end
     return view, true
+end
+
+---@param self LuaParser.Node.Integer
+---@return number
+---@return true
+Integer.__getter.asNumber = function (self)
+    return self.value, true
+end
+
+---@param self LuaParser.Node.Integer
+---@return integer?
+---@return true
+Integer.__getter.asInteger = function (self)
+    return self.value, true
 end
 
 ---@class LuaParser.Ast
@@ -98,7 +126,7 @@ function Ast:parseNumber()
     end
 
     local start = self.lexer:range()
-    local neg = self.lexer:skipToken '-'
+    local neg = self.lexer:consume '-'
 
     local node = self:parseNumber16()
             or   self:parseNumber2()

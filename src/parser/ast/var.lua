@@ -4,6 +4,7 @@ local class = require 'class'
 ---@field subtype 'global' | 'local'
 ---@field loc? LuaParser.Node.Local
 ---@field next? LuaParser.Node.Field
+---@field value? LuaParser.Node.Exp
 local Var = class.declare('LuaParser.Node.Var', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.Varargs: LuaParser.Node.Base

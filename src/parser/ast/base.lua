@@ -14,6 +14,15 @@ local class = require 'class'
 ---@field parent unknown
 ---@field parentBlock LuaParser.Node.Block
 ---@field parentFunction LuaParser.Node.Function
+---@field asNumber? number
+---@field asString? string
+---@field asBoolean? boolean
+---@field asInteger? integer
+---@field toNumber? number
+---@field toString? string
+---@field toInteger? integer
+---@field isTruly? boolean
+---@field dummy? boolean
 local Base = class.declare 'LuaParser.Node.Base'
 
 local rowcolMulti = 10000
@@ -103,4 +112,36 @@ Base.__getter.parentFunction = function (self)
         return parent, true
     end
     return parent.parentFunction, true
+end
+
+---@class LuaParser.Node.Literal: LuaParser.Node.Base
+---@field value? nil|boolean|number|string|integer
+local Literal = class.declare('LuaParser.Node.Literal', 'LuaParser.Node.Base')
+
+---@param self LuaParser.Node.Literal
+---@return string
+---@return true
+function Literal.__getter.toString(self)
+    return tostring(self.value), true
+end
+
+---@param self LuaParser.Node.Literal
+---@return number?
+---@return true
+function Literal.__getter.toNumber(self)
+    return tonumber(self.value), true
+end
+
+---@param self LuaParser.Node.Literal
+---@return integer?
+---@return true
+function Literal.__getter.tointeger(self)
+    return math.tointeger(self.value), true
+end
+
+---@param self LuaParser.Node.Literal
+---@return boolean
+---@return true
+function Literal.__getter.isTruly(self)
+    return self.value and true or false, true
 end

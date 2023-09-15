@@ -2,13 +2,13 @@ local class = require 'class'
 
 ---@alias LuaParser.EscMode 'normal' | 'unicode' | 'err' | 'byte'
 
----@class LuaParser.Node.String: LuaParser.Node.Base
+---@class LuaParser.Node.String: LuaParser.Node.Literal
 ---@field value string
 ---@field view string
 ---@field quo string
 ---@field escs? table
 ---@field missQuo? true
-local String = class.declare('LuaParser.Node.String', 'LuaParser.Node.Base')
+local String = class.declare('LuaParser.Node.String', 'LuaParser.Node.Literal')
 
 local escMap = {
     ['a']  = '\a',
@@ -158,7 +158,7 @@ function Ast:parseShortString()
             if escChar == 'z' then
                 pushEsc('normal', offset - 2, offset)
                 self.lexer:fastForward(offset)
-                repeat until not self.lexer:skipType 'NL'
+                repeat until not self.lexer:consumeType 'NL'
                 local _, _, afterPos = self.lexer:peek()
                 curOffset = afterPos and (afterPos + 1) or (#self.code + 1)
                 goto continue

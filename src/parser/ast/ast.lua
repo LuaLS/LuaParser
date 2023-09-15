@@ -66,20 +66,15 @@ end
 ---@private
 ---@return boolean # 是否成功跳过换行符
 function M:skipNL()
-    local _, tp = self.lexer:peek()
-    if tp == 'NL' then
-        self.lexer:next()
-        return true
-    end
-    return false
+    return self.lexer:consumeType 'NL' ~= nil
 end
 
 -- 跳过注释
 ---@private
----@param inState? boolean # 是否是语句
+---@param inExp? boolean # 在表达式中
 ---@return boolean # 是否成功跳过注释
-function M:skipComment(inState)
-    local comment = self:parseComment(inState)
+function M:skipComment(inExp)
+    local comment = self:parseComment(inExp)
     if comment then
         self.comments[#self.comments+1] = comment
         return true
@@ -87,13 +82,31 @@ function M:skipComment(inState)
     return false
 end
 
+-- 跳过未知符号
+---@private
+---@return boolean
+function M:skipUnknown()
+    local token, pos = self.lexer:consumeType 'Unknown'
+    if not token then
+        return false
+    end
+
+    ---@cast pos -?
+    self:throw('UNKNOWN_SYMBOL', pos, pos + #token, {
+        symbol = token,
+    })
+
+    return true
+end
+
 -- 跳过空白符
 ---@private
----@param inState? boolean # 是否是语句
-function M:skipSpace(inState)
+---@param inExp? boolean # 在表达式中
+function M:skipSpace(inExp)
     self.lastRightCI = self.lexer.ci
     repeat until not self:skipNL()
-            and  not self:skipComment(inState)
+            and  not self:skipComment(inExp)
+            and  not self:skipUnknown()
     self.lastSpaceCI = self.lexer.ci
 end
 

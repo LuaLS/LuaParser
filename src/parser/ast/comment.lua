@@ -25,23 +25,23 @@ end
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
----@param inState? boolean
+---@param inExp? boolean
 ---@return LuaParser.Node.Comment?
-function Ast:parseComment(inState)
+function Ast:parseComment(inExp)
     return self:parseLongComment()
-        or self:parseShortComment(inState)
+        or self:parseShortComment(inExp)
 end
 
----@param inState? boolean
+---@param inExp? boolean
 ---@return LuaParser.Node.Comment?
-function Ast:parseShortComment(inState)
+function Ast:parseShortComment(inExp)
     local token, _, pos = self.lexer:peek()
     if not token then
         return nil
     end
     ---@cast pos -?
     if  token == '--'
-    or (token == '//' and (inState or self.nssymbolMap['//'])) then
+    or (token == '//' and (not inExp or self.nssymbolMap['//'])) then
         if token == '//' and not self.nssymbolMap['//'] then
             self:throw('ERR_COMMENT_PREFIX', pos, pos + 2)
         end

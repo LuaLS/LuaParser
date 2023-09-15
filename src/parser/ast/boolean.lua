@@ -1,13 +1,8 @@
 local class = require 'class'
 
----@class LuaParser.Node.Boolean: LuaParser.Node.Base
+---@class LuaParser.Node.Boolean: LuaParser.Node.Literal
 ---@field value boolean
----@field view string
-local Boolean = class.declare('LuaParser.Node.Boolean', 'LuaParser.Node.Base')
-
-Boolean.__getter.view = function (self)
-    return tostring(self.value), true
-end
+local Boolean = class.declare('LuaParser.Node.Boolean', 'LuaParser.Node.Literal')
 
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'

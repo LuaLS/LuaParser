@@ -5,6 +5,38 @@ local class = require 'class'
 ---@field next? LuaParser.Node.Field
 local Paren = class.declare('LuaParser.Node.Paren', 'LuaParser.Node.Base')
 
+function Paren.__getter.asNumber(self)
+    return self.exp.asNumber, true
+end
+
+function Paren.__getter.asString(self)
+    return self.exp.asString, true
+end
+
+function Paren.__getter.asBoolean(self)
+    return self.exp.asBoolean, true
+end
+
+function Paren.__getter.asInteger(self)
+    return self.exp.asInteger, true
+end
+
+function Paren.__getter.toNumber(self)
+    return self.exp.toNumber, true
+end
+
+function Paren.__getter.toString(self)
+    return self.exp.toString, true
+end
+
+function Paren.__getter.toInteger(self)
+    return self.exp.toInteger, true
+end
+
+function Paren.__getter.isTruly(self)
+    return self.exp.isTruly, true
+end
+
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
