@@ -26,7 +26,7 @@ end
 ---@return LuaParser.Node.Varargs?
 function Ast:parseVarargs()
     local pos = self.lexer:consume '...'
-    if pos then
+    if not pos then
         return nil
     end
     return class.new('LuaParser.Node.Varargs', {

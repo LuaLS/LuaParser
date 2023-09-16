@@ -15,7 +15,7 @@ TEST '345'
     right   = 3,
     value   = 345,
     numBase = 10,
-    view    = '345',
+    toString= '345',
 }
 TEST '345.0'
 {
@@ -23,7 +23,7 @@ TEST '345.0'
     right   = 5,
     value   = 0x1.59p+8,
     numBase = 10,
-    view    = '345.0',
+    toString= '345.0',
 }
 TEST '0xff'
 {
@@ -31,7 +31,7 @@ TEST '0xff'
     right   = 4,
     value   = 255,
     numBase = 16,
-    view    = '255',
+    toString= '255',
 }
 TEST '314.16e-2'
 {
@@ -39,7 +39,7 @@ TEST '314.16e-2'
     right   = 9,
     value   = 3.1416,
     numBase = 10,
-    view    = '3.1416',
+    toString= '3.1416',
 }
 TEST '0.31416E1'
 {
@@ -47,7 +47,7 @@ TEST '0.31416E1'
     right   = 9,
     value   = 0x1.921ff2e48e8a7p+1,
     numBase = 10,
-    view    = '3.1416',
+    toString= '3.1416',
 }
 TEST '.31416E1'
 {
@@ -55,7 +55,7 @@ TEST '.31416E1'
     right   = 8,
     value   = 0x1.921ff2e48e8a7p+1,
     numBase = 10,
-    view    = '3.1416',
+    toString= '3.1416',
 }
 TEST '34e1'
 {
@@ -63,7 +63,7 @@ TEST '34e1'
     right   = 4,
     value   = 0x1.54p+8,
     numBase = 10,
-    view    = '340.0',
+    toString= '340.0',
 }
 TEST '0x0.1E'
 {
@@ -71,7 +71,7 @@ TEST '0x0.1E'
     right   = 6,
     value   = 0x1.ep-4,
     numBase = 16,
-    view    = '0.1171875',
+    toString= '0.1171875',
 }
 TEST '0xA23p-4'
 {
@@ -79,7 +79,7 @@ TEST '0xA23p-4'
     right   = 8,
     value   = 0x1.446p+7,
     numBase = 16,
-    view    = '162.1875'
+    toString= '162.1875'
 }
 TEST '0X1.921FB54442D18P+1'
 {
@@ -87,7 +87,7 @@ TEST '0X1.921FB54442D18P+1'
     right   = 20,
     value   = 0x1.921fb54442d18p+1,
     numBase = 16,
-    view    = '3.1415926536'
+    toString= '3.1415926536'
 }
 TEST '-345'
 {
@@ -95,7 +95,7 @@ TEST '-345'
     right   = 4,
     value   = -345,
     numBase = 10,
-    view    = '-345',
+    toString= '-345',
 }
 TEST '0b110110'
 {
@@ -103,7 +103,7 @@ TEST '0b110110'
     right   = 8,
     value   = 54,
     numBase = 2,
-    view    = '54',
+    toString= '54',
 }
 TEST '123ll'
 {
@@ -111,7 +111,7 @@ TEST '123ll'
     right   = 5,
     value   = 123,
     numBase = 10,
-    view    = '123LL',
+    toString= '123LL',
 }
 TEST '123ull'
 {
@@ -119,7 +119,7 @@ TEST '123ull'
     right   = 6,
     value   = 123,
     numBase = 10,
-    view    = '123ULL',
+    toString= '123ULL',
 }
 TEST '123llu'
 {
@@ -127,7 +127,7 @@ TEST '123llu'
     right   = 6,
     value   = 123,
     numBase = 10,
-    view    = '123ULL',
+    toString= '123ULL',
 }
 TEST '123i'
 {
@@ -136,7 +136,7 @@ TEST '123i'
     value   = 0,
     valuei  = 123,
     numBase = 10,
-    view    = '0+123i',
+    toString= '0+123i',
 }
 TEST '123.45i'
 {
@@ -145,5 +145,5 @@ TEST '123.45i'
     value   = 0,
     valuei  = 123.45,
     numBase = 10,
-    view    = '0+123.45i',
+    toString= '0+123.45i',
 }

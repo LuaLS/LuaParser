@@ -26,10 +26,9 @@ TEST '{...}'
             finish = 4,
             key = {
                 dummy = true,
-                asInteger = 1,
+                value = 1,
             },
             value = {
-                type   = 'varargs',
                 start  = 1,
                 finish = 4,
             },
@@ -38,52 +37,45 @@ TEST '{...}'
 }
 TEST '{1, 2, 3}'
 {
-    type   = "table",
     start  = 0,
     finish = 9,
-    [1]    = {
-        type   = "tableexp",
-        start  = 1,
-        finish = 2,
-        tindex = 1,
-        parent = "<IGNORE>",
-        value  = {
-            type   = "integer",
+    fields = {
+        [1]    = {
             start  = 1,
             finish = 2,
-            parent = "<IGNORE>",
-            [1]    = 1,
+            key    = {
+                dummy = true,
+                value = 1,
+            },
+            value  = {
+                value  = 1,
+            },
         },
-    },
-    [2]    = {
-        type   = "tableexp",
-        start  = 4,
-        finish = 5,
-        tindex = 2,
-        parent = "<IGNORE>",
-        value  = {
-            type   = "integer",
+        [2]    = {
             start  = 4,
             finish = 5,
-            parent = "<IGNORE>",
-            [1]    = 2,
+            key    = {
+                dummy = true,
+                value = 2,
+            },
+            value  = {
+                value  = 2,
+            },
         },
-    },
-    [3]    = {
-        type   = "tableexp",
-        start  = 7,
-        finish = 8,
-        tindex = 3,
-        parent = "<IGNORE>",
-        value  = {
-            type   = "integer",
+        [3]    = {
             start  = 7,
             finish = 8,
-            parent = "<IGNORE>",
-            [1]    = 3,
+            key    = {
+                dummy = true,
+                value = 3,
+            },
+            value  = {
+                value  = 3,
+            },
         },
-    },
+    }
 }
+
 TEST '{x = 1, y = 2}'
 {
     type   = "table",

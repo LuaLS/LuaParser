@@ -15,15 +15,34 @@ function Ast:parseTable()
     end
 
     self:skipSpace()
-    self:parseTableFields()
+    local fields = self:parseTableFields()
     self:skipSpace()
 
     self:assertSymbol '}'
+
     local table = class.new('LuaParser.Node.Table', {
         ast     = self,
         start   = pos,
         finish  = self:getLastPos(),
+        fields  = fields,
     })
+
+    local expi = 0
+    for _, field in ipairs(fields) do
+        field.parent = table
+        if field.subtype == 'exp' then
+            expi = expi + 1
+            field.key = class.new('LuaParser.Node.Integer', {
+                ast     = self,
+                dummy   = true,
+                value   = expi,
+                start   = field.start,
+                finish  = field.start,
+                parent  = field,
+            })
+        end
+    end
+
     return table
 end
 
@@ -37,6 +56,7 @@ function Ast:parseTableFields()
             break
         end
         if token == ',' then
+            self.lexer:next()
             if not wantSep then
                 self:throwMissExp(self:getLastPos())
             end
@@ -66,6 +86,8 @@ function Ast:parseTableField()
             ast     = self,
             subtype = 'exp',
             value   = exp,
+            start   = exp.start,
+            finish  = exp.finish,
         })
     end
 end
