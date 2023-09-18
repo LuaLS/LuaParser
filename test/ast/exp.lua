@@ -163,711 +163,316 @@ TEST '- x'
 
 TEST 'not not true'
 {
-    type   = "unary",
     start  = 0,
     finish = 12,
-    op     = {
-        type   = "not",
-        start  = 0,
-        finish = 3,
-    },
-    [1]    = {
-        type   = "unary",
+    op     = 'not',
+    exp    = {
         start  = 4,
         finish = 12,
-        parent = "<IGNORE>",
-        op     = {
-            type   = "not",
-            start  = 4,
-            finish = 7,
-        },
-        [1]    = {
-            type   = "boolean",
-            start  = 8,
-            finish = 12,
-            parent = "<IGNORE>",
-            [1]    = true,
-        },
-    },
+        op     = 'not',
+        exp    = {
+            value = true,
+        }
+    }
 }
 
 TEST '1 ^ 2'
 {
-    type   = "binary",
     start  = 0,
     finish = 5,
-    op     = {
-        type   = "^",
-        start  = 2,
-        finish = 3,
+    op     = '^',
+    exp1   = {
+        value = 1,
     },
-    [1]    = {
-        type   = "integer",
-        start  = 0,
-        finish = 1,
-        parent = "<IGNORE>",
-        [1]    = 1,
-    },
-    [2]    = {
-        type   = "integer",
-        start  = 4,
-        finish = 5,
-        parent = "<IGNORE>",
-        [1]    = 2,
-    },
+    exp2   = {
+        value = 2,
+    }
 }
 TEST '1 ^ -2'
 {
-    type   = "binary",
     start  = 0,
     finish = 6,
-    op     = {
-        type   = "^",
-        start  = 2,
-        finish = 3,
+    op     = '^',
+    exp1   = {
+        value = 1,
     },
-    [1]    = {
-        type   = "integer",
-        start  = 0,
-        finish = 1,
-        parent = "<IGNORE>",
-        [1]    = 1,
-    },
-    [2]    = {
-        type   = "integer",
-        start  = 4,
-        finish = 6,
-        parent = "<IGNORE>",
-        [1]    = -2,
-    },
+    exp2   = {
+        value = -2,
+    }
 }
+
 TEST '-1 ^ 2'
 {
-    type   = "unary",
     start  = 0,
     finish = 6,
-    op     = {
-        type   = "-",
-        start  = 0,
-        finish = 1,
+    op     = '^',
+    exp1   = {
+        value = -1,
     },
-    [1]    = {
-        type   = "binary",
-        start  = 1,
-        finish = 6,
-        parent = "<IGNORE>",
-        op     = {
-            type   = "^",
-            start  = 3,
-            finish = 4,
-        },
-        [1]    = {
-            type   = 'integer',
-            start  = 1,
-            finish = 2,
-            parent = "<IGNORE>",
-            [1]    = 1,
-        },
-        [2]    = {
-            type   = 'integer',
-            start  = 5,
-            finish = 6,
-            parent = "<IGNORE>",
-            [1]    = 2,
-        },
-    },
+    exp2   = {
+        value = 2,
+    }
 }
-TEST '...'
-{
-    type   = "varargs",
-    start  = 0,
-    finish = 3,
-}
+
 TEST '1 + 2 + 3'
 {
-    type   = "binary",
-    start  = 0,
-    finish = 9,
-    op     = {
-        type   = "+",
-        start  = 6,
-        finish = 7,
-    },
-    [1]    = {
-        type   = "binary",
-        start  = 0,
-        finish = 5,
-        parent = "<IGNORE>",
-        op     = {
-            type   = "+",
-            start  = 2,
-            finish = 3,
+    op   = '+',
+    exp1 = {
+        op   = '+',
+        exp1 = {
+            value = 1,
         },
-        [1]    = {
-            type   = "integer",
-            start  = 0,
-            finish = 1,
-            parent = "<IGNORE>",
-            [1]    = 1,
-        },
-        [2]    = {
-            type   = "integer",
-            start  = 4,
-            finish = 5,
-            parent = "<IGNORE>",
-            [1]    = 2,
-        },
+        exp2 = {
+            value = 2,
+        }
     },
-    [2]    = {
-        type   = "integer",
-        start  = 8,
-        finish = 9,
-        parent = "<IGNORE>",
-        [1]    = 3,
-    },
+    exp2 = {
+        value = 3,
+    }
 }
+
 TEST '1 + 2 * 3'
 {
-    type   = "binary",
-    start  = 0,
-    finish = 9,
-    op     = {
-        type   = "+",
-        start  = 2,
-        finish = 3,
+    op   = '+',
+    exp1 = {
+        value = 1,
     },
-    [1]    = {
-        type   = "integer",
-        start  = 0,
-        finish = 1,
-        parent = "<IGNORE>",
-        [1]    = 1,
-    },
-    [2]    = {
-        type   = "binary",
-        start  = 4,
-        finish = 9,
-        parent = "<IGNORE>",
-        op     = {
-            type   = "*",
-            start  = 6,
-            finish = 7,
+    exp2 = {
+        op   = '*',
+        exp1 = {
+            value = 2,
         },
-        [1]    = {
-            type   = "integer",
-            start  = 4,
-            finish = 5,
-            parent = "<IGNORE>",
-            [1]    = 2,
-        },
-        [2]    = {
-            type   = "integer",
-            start  = 8,
-            finish = 9,
-            parent = "<IGNORE>",
-            [1]    = 3,
-        },
-    },
+        exp2 = {
+            value = 3,
+        }
+    }
 }
+
 TEST '- 1 + 2 * 3'
 {
-    type   = "binary",
-    start  = 0,
-    finish = 11,
-    op     = {
-        type   = "+",
-        start  = 4,
-        finish = 5,
+    op   = '+',
+    exp1 = {
+        value = -1,
     },
-    [1]    = {
-        type   = "integer",
-        start  = 0,
-        finish = 3,
-        parent = "<IGNORE>",
-        [1]    = -1,
-    },
-    [2]    = {
-        type   = "binary",
-        start  = 6,
-        finish = 11,
-        parent = "<IGNORE>",
-        op     = {
-            type   = "*",
-            start  = 8,
-            finish = 9,
+    exp2 = {
+        op   = '*',
+        exp1 = {
+            value = 2,
         },
-        [1]    = {
-            type   = "integer",
-            start  = 6,
-            finish = 7,
-            parent = "<IGNORE>",
-            [1]    = 2,
-        },
-        [2]    = {
-            type   = "integer",
-            start  = 10,
-            finish = 11,
-            parent = "<IGNORE>",
-            [1]    = 3,
-        },
-    },
+        exp2 = {
+            value = 3,
+        }
+    }
 }
 TEST '-1 + 2 * 3'
 {
-    type   = "binary",
-    start  = 0,
-    finish = 10,
-    op     = {
-        type   = "+",
-        start  = 3,
-        finish = 4,
+    op   = '+',
+    exp1 = {
+        value = -1,
     },
-    [1]    = {
-        type   = "integer",
-        start  = 0,
-        finish = 2,
-        parent = "<IGNORE>",
-        [1]    = -1,
-    },
-    [2]    = {
-        type   = "binary",
-        start  = 5,
-        finish = 10,
-        parent = "<IGNORE>",
-        op     = {
-            type   = "*",
-            start  = 7,
-            finish = 8,
+    exp2 = {
+        op   = '*',
+        exp1 = {
+            value = 2,
         },
-        [1]    = {
-            type   = "integer",
-            start  = 5,
-            finish = 6,
-            parent = "<IGNORE>",
-            [1]    = 2,
-        },
-        [2]    = {
-            type   = "integer",
-            start  = 9,
-            finish = 10,
-            parent = "<IGNORE>",
-            [1]    = 3,
-        },
-    },
+        exp2 = {
+            value = 3,
+        }
+    }
 }
-CHECK"x and y == 'unary' and z"
+
+TEST "x and y == 'unary' and z"
 {
-    type   = "binary",
     start  = 0,
     finish = 24,
-    op     = {
-        type   = "and",
-        start  = 19,
-        finish = 22,
-    },
-    [1]    = {
-        type   = "binary",
-        start  = 0,
-        finish = 18,
-        parent = "<IGNORE>",
-        op     = {
-            type   = "and",
-            start  = 2,
-            finish = 5,
+    op     = 'and',
+    exp1   = {
+        op   = 'and',
+        exp1 = {
+            id = 'x'
         },
-        [1]    = {
-            type   = "getglobal",
-            start  = 0,
-            finish = 1,
-            parent = "<IGNORE>",
-            [1]    = "x",
-        },
-        [2]    = {
-            type   = "binary",
-            start  = 6,
-            finish = 18,
-            parent = "<IGNORE>",
-            op     = {
-                type   = "==",
-                start  = 8,
-                finish = 10,
+        exp2   = {
+            op   = '==',
+            exp1 = {
+                id = 'y'
             },
-            [1]    = {
-                type   = "getglobal",
-                start  = 6,
-                finish = 7,
-                parent = "<IGNORE>",
-                [1]    = "y",
-            },
-            [2]    = {
-                type   = "string",
-                start  = 11,
-                finish = 18,
-                parent = "<IGNORE>",
-                [1]    = "unary",
-                [2]    = "'",
+            exp2 = {
+                value = 'unary'
             },
         },
     },
-    [2]    = {
-        type   = "getglobal",
-        start  = 23,
-        finish = 24,
-        parent = "<IGNORE>",
-        [1]    = "z",
+    exp2   = {
+        id = 'z'
     },
 }
-CHECK"x and y or '' .. z"
+
+TEST "x and y or '' .. z"
 {
-    type   = "binary",
-    start  = 0,
-    finish = 18,
-    op     = {
-        type   = "or",
-        start  = 8,
-        finish = 10,
-    },
-    [1]    = {
-        type   = "binary",
-        start  = 0,
-        finish = 7,
-        parent = "<IGNORE>",
-        op     = {
-            type   = "and",
-            start  = 2,
-            finish = 5,
+    op   = 'or',
+    exp1 = {
+        op   = 'and',
+        exp1 = {
+            id = 'x',
         },
-        [1]    = {
-            type   = "getglobal",
-            start  = 0,
-            finish = 1,
-            parent = "<IGNORE>",
-            [1]    = "x",
-        },
-        [2]    = {
-            type   = "getglobal",
-            start  = 6,
-            finish = 7,
-            parent = "<IGNORE>",
-            [1]    = "y",
+        exp2 = {
+            id = 'y',
         },
     },
-    [2]    = {
-        type   = "binary",
-        start  = 11,
-        finish = 18,
-        parent = "<IGNORE>",
-        op     = {
-            type   = "..",
-            start  = 14,
-            finish = 16,
+    exp2 = {
+        op   = '..',
+        exp1 = {
+            value = '',
         },
-        [1]    = {
-            type   = "string",
-            start  = 11,
-            finish = 13,
-            parent = "<IGNORE>",
-            [1]    = "",
-            [2]    = "'",
-        },
-        [2]    = {
-            type   = "getglobal",
-            start  = 17,
-            finish = 18,
-            parent = "<IGNORE>",
-            [1]    = "z",
+        exp2 = {
+            id = 'z',
         },
     },
 }
+
 -- 幂运算从右向左连接
 TEST '1 ^ 2 ^ 3'
 {
-    type   = "binary",
-    start  = 0,
-    finish = 9,
-    op     = {
-        type   = "^",
-        start  = 2,
-        finish = 3,
+    op     = '^',
+    exp1   = {
+        value = 1,
     },
-    [1]    = {
-        type   = "integer",
-        start  = 0,
-        finish = 1,
-        parent = "<IGNORE>",
-        [1]    = 1,
-    },
-    [2]    = {
-        type   = "binary",
-        start  = 4,
-        finish = 9,
-        parent = "<IGNORE>",
-        op     = {
-            type   = "^",
-            start  = 6,
-            finish = 7,
+    exp2   = {
+        op     = '^',
+        exp1   = {
+            value = 2,
         },
-        [1]    = {
-            type   = "integer",
-            start  = 4,
-            finish = 5,
-            parent = "<IGNORE>",
-            [1]    = 2,
-        },
-        [2]    = {
-            type   = "integer",
-            start  = 8,
-            finish = 9,
-            parent = "<IGNORE>",
-            [1]    = 3,
+        exp2   = {
+            value = 3,
         },
     },
 }
+
 -- 连接运算从右向左连接
 TEST '1 .. 2 .. 3'
 {
-    type   = "binary",
-    start  = 0,
-    finish = 11,
-    op     = {
-        type   = "..",
-        start  = 2,
-        finish = 4,
+    op     = '..',
+    exp1   = {
+        value = 1,
     },
-    [1]    = {
-        type   = "integer",
-        start  = 0,
-        finish = 1,
-        parent = "<IGNORE>",
-        [1]    = 1,
-    },
-    [2]    = {
-        type   = "binary",
-        start  = 5,
-        finish = 11,
-        parent = "<IGNORE>",
-        op     = {
-            type   = "..",
-            start  = 7,
-            finish = 9,
+    exp2   = {
+        op     = '..',
+        exp1   = {
+            value = 2,
         },
-        [1]    = {
-            type   = "integer",
-            start  = 5,
-            finish = 6,
-            parent = "<IGNORE>",
-            [1]    = 2,
-        },
-        [2]    = {
-            type   = "integer",
-            start  = 10,
-            finish = 11,
-            parent = "<IGNORE>",
-            [1]    = 3,
+        exp2   = {
+            value = 3,
         },
     },
 }
-TEST '1 + - - - - - - - 1'
+
+TEST '1 + - - 1'
 {
-    type   = "binary",
-    start  = 0,
-    finish = 19,
-    op     = {
-        type   = "+",
-        start  = 2,
-        finish = 3,
+    op  = '+',
+    exp1 = {
+        value = 1,
     },
-    [1]    = {
-        type   = "integer",
-        start  = 0,
-        finish = 1,
-        parent = "<IGNORE>",
-        [1]    = 1,
-    },
-    [2]    = {
-        type   = "integer",
-        start  = 4,
-        finish = 19,
-        parent = "<IGNORE>",
-        [1]    = -1,
-    },
+    exp2 = {
+        op  = '-',
+        exp = {
+            value = -1
+        }
+    }
 }
+
 TEST '(1)'
 {
-    type   = "paren",
     start  = 0,
     finish = 3,
     exp    = {
-        type   = "integer",
         start  = 1,
         finish = 2,
-        parent = "<IGNORE>",
-        [1]    = 1,
+        value  = 1,
     },
 }
+
 TEST '(1 + 2)'
 {
-    type   = "paren",
-    start  = 0,
-    finish = 7,
-    exp    = {
-        type   = "binary",
-        start  = 1,
-        finish = 6,
-        parent = "<IGNORE>",
-        op     = {
-            type   = "+",
-            start  = 3,
-            finish = 4,
+    exp = {
+        op   = '+',
+        exp1 = {
+            value = 1,
         },
-        [1]    = {
-            type   = "integer",
-            start  = 1,
-            finish = 2,
-            parent = "<IGNORE>",
-            [1]    = 1,
-        },
-        [2]    = {
-            type   = "integer",
-            start  = 5,
-            finish = 6,
-            parent = "<IGNORE>",
-            [1]    = 2,
-        },
-    },
+        exp2 = {
+            value = 2,
+        }
+    }
 }
+
 TEST 'func(1)'
 {
-    type   = "call",
     start  = 0,
     finish = 7,
-    node   = "<IGNORE>",
+    argPos = 4,
+    node   = {
+        __class__ = 'LuaParser.Node.Var',
+        id = 'func',
+    },
     args   = {
-        type   = "callargs",
-        start  = 4,
-        finish = 7,
-        parent = "<IGNORE>",
-        [1]    = {
-            type   = "integer",
-            start  = 5,
-            finish = 6,
-            parent = "<IGNORE>",
-            [1]    = 1,
+        [1] = {
+            value = 1
         },
     },
 }
+
 TEST 'func(1, 2)'
 {
-    type   = "call",
-    start  = 0,
-    finish = 10,
-    node   = "<IGNORE>",
-    args   = {
-        type   = "callargs",
-        start  = 4,
-        finish = 10,
-        parent = "<IGNORE>",
-        [1]    = {
-            type   = "integer",
-            start  = 5,
-            finish = 6,
-            parent = "<IGNORE>",
-            [1]    = 1,
-        },
-        [2]    = {
-            type   = "integer",
-            start  = 8,
-            finish = 9,
-            parent = "<IGNORE>",
-            [1]    = 2,
-        },
+    node = {
+        id = 'func',
     },
+    args = {
+        [1] = {
+            value = 1,
+        },
+        [2] = {
+            value = 2,
+        },
+    }
 }
+
 TEST 'func(...)'
 {
-    type   = "call",
-    start  = 0,
-    finish = 9,
-    node   = "<IGNORE>",
     args   = {
-        type   = "callargs",
-        start  = 4,
-        finish = 9,
-        parent = "<IGNORE>",
-        [1]    = {
-            type   = "varargs",
-            start  = 5,
-            finish = 8,
-            parent = "<IGNORE>",
+        [1] = {
+            __class__ = 'LuaParser.Node.Varargs',
         },
     },
 }
+
 TEST 'func(1, ...)'
 {
-    type   = "call",
-    start  = 0,
-    finish = 12,
-    node   = "<IGNORE>",
     args   = {
-        type   = "callargs",
-        start  = 4,
-        finish = 12,
-        parent = "<IGNORE>",
-        [1]    = {
-            type   = "integer",
-            start  = 5,
-            finish = 6,
-            parent = "<IGNORE>",
-            [1]    = 1,
+        [1] = {
+            value = 1,
         },
-        [2]    = {
-            type   = "varargs",
-            start  = 8,
-            finish = 11,
-            parent = "<IGNORE>",
+        [2] = {
+            __class__ = 'LuaParser.Node.Varargs',
         },
     },
 }
+
 TEST 'func ""'
 {
-    type   = "call",
-    start  = 0,
-    finish = 7,
-    node   = "<IGNORE>",
-    args   = {
-        type   = "callargs",
-        start  = 5,
-        finish = 7,
-        parent = "<IGNORE>",
-        [1]    = {
-            type   = "string",
-            start  = 5,
-            finish = 7,
-            parent = "<IGNORE>",
-            [1]    = "",
-            [2]    = "\"",
+    args = {
+        [1] = {
+            value = ''
         },
     },
 }
+
 TEST 'func {}'
 {
-    type   = "call",
-    start  = 0,
-    finish = 7,
-    node   = "<IGNORE>",
-    args   = {
-        type   = "callargs",
-        start  = 5,
-        finish = 7,
-        parent = "<IGNORE>",
-        [1]    = {
-            type   = "table",
-            start  = 5,
-            finish = 7,
-            parent = "<IGNORE>",
-        },
+    args = {
+        [1] = {
+            __class__ = 'LuaParser.Node.Table',
+        }
     },
 }
+
 TEST 'table[1]'
 {
     type   = "getindex",

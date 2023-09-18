@@ -1,5 +1,6 @@
 local class = require 'class'
 
+-- 符号的优先级
 ---@enum(key) LuaParser.BinarySymbol
 local BinarySymbol = {
     ['or']  = 1,
@@ -36,6 +37,12 @@ local BinaryAlias = {
     ['!='] = '~=',
 }
 
+-- 这些符号从右向左结合
+local RevertConcat = {
+    ['..'] = true,
+    ['^']  = true,
+}
+
 ---@class LuaParser.Node.Binary: LuaParser.Node.Base
 ---@field op LuaParser.BinarySymbol
 ---@field symbolPos integer
@@ -59,8 +66,13 @@ function Ast:parseBinary(curExp, curLevel)
 
     local op = token
     local myLevel = BinarySymbol[op]
-    if curLevel and myLevel < curLevel then
-        return nil
+    if curLevel then
+        if myLevel < curLevel then
+            return nil
+        end
+        if myLevel == curLevel and not RevertConcat[op] then
+            return nil
+        end
     end
 
     if op == '//' and self.nssymbolMap['//'] then

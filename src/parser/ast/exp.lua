@@ -40,21 +40,6 @@ end
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
-local SymbolForward = {
-    [01]  = true,
-    [02]  = true,
-    [03]  = true,
-    [04]  = true,
-    [05]  = true,
-    [06]  = true,
-    [07]  = true,
-    [08]  = false,
-    [09]  = true,
-    [10]  = true,
-    [11]  = true,
-    [12]  = false,
-}
-
 ---@alias LuaParser.Node.Exp
 ---| LuaParser.Node.Term
 ---| LuaParser.Node.Unary
@@ -62,7 +47,7 @@ local SymbolForward = {
 
 -- 解析表达式
 ---@param required? true
----@param curLevel? integer
+---@param curLevel? integer # 新表达式的符号优先级必须比这个大
 ---@return LuaParser.Node.Exp?
 function Ast:parseExp(required, curLevel)
     local curExp
@@ -82,9 +67,15 @@ function Ast:parseExp(required, curLevel)
         self:skipSpace(true)
     end
 
-    local binary = self:parseBinary(curExp, curLevel)
+    while true do
+        local binary = self:parseBinary(curExp, curLevel)
+        if not binary then
+            break
+        end
+        curExp = binary
+    end
 
-    return binary or curExp
+    return curExp
 end
 
 -- 解析表达式列表，以逗号分隔
@@ -192,7 +183,8 @@ function Ast:parseParen()
         exp    = exp,
     })
     exp.parent = paren
-    paren.finish = self:assertSymbol ')' or exp.finish
+    self:assertSymbol ')'
+    paren.finish = self:getLastPos()
 
     return paren
 end
