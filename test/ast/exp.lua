@@ -114,61 +114,53 @@ TEST 'a.b.c()'
 
 TEST '1 or 2'
 {
-    type   = "binary",
-    start  = 0,
-    finish = 6,
-    op     = {
-        type   = "or",
-        start  = 2,
-        finish = 4,
+    start     = 0,
+    finish    = 6,
+    op        = 'or',
+    symbolPos = 2,
+    exp1      = {
+        value = 1,
     },
-    [1]    = {
-        type   = "integer",
-        start  = 0,
-        finish = 1,
-        parent = "<IGNORE>",
-        [1]    = 1,
-    },
-    [2]    = {
-        type   = "integer",
-        start  = 5,
-        finish = 6,
-        parent = "<IGNORE>",
-        [1]    = 2,
-    },
+    exp2      = {
+        value = 2,
+    }
 }
+
 TEST '1 < 2'
 {
-    type   = "binary",
     start  = 0,
     finish = 5,
-    op     = {
-        type   = "<",
-        start  = 2,
-        finish = 3,
+    op     = '<',
+    exp1   = {
+        value = 1,
     },
-    [1]    = {
-        type   = "integer",
-        start  = 0,
-        finish = 1,
-        parent = "<IGNORE>",
-        [1]    = 1,
-    },
-    [2]    = {
-        type   = "integer",
-        start  = 4,
-        finish = 5,
-        parent = "<IGNORE>",
-        [1]    = 2,
-    },
+    exp2   = {
+        value = 2,
+    }
 }
+
 TEST '- 1'
 {
-    type   = "integer",
+    __class__ = 'LuaParser.Node.Integer',
     start  = 0,
     finish = 3,
-    [1]    = -1,
+    value  = -1,
 }
+
+TEST '- x'
+{
+    __class__ = 'LuaParser.Node.Unary',
+    start  = 0,
+    finish = 3,
+    op     = '-',
+    exp    = {
+        __class__ = 'LuaParser.Node.Var',
+        start  = 2,
+        finish = 3,
+        id     = 'x',
+    }
+}
+
 TEST 'not not true'
 {
     type   = "unary",
@@ -198,6 +190,7 @@ TEST 'not not true'
         },
     },
 }
+
 TEST '1 ^ 2'
 {
     type   = "binary",

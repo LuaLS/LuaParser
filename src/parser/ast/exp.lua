@@ -40,21 +40,51 @@ end
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
+local SymbolForward = {
+    [01]  = true,
+    [02]  = true,
+    [03]  = true,
+    [04]  = true,
+    [05]  = true,
+    [06]  = true,
+    [07]  = true,
+    [08]  = false,
+    [09]  = true,
+    [10]  = true,
+    [11]  = true,
+    [12]  = false,
+}
+
 ---@alias LuaParser.Node.Exp
 ---| LuaParser.Node.Term
+---| LuaParser.Node.Unary
+---| LuaParser.Node.Binary
 
 -- 解析表达式
 ---@param required? true
+---@param curLevel? integer
 ---@return LuaParser.Node.Exp?
-function Ast:parseExp(required)
-    -- TODO
-    local exp = self:parseTerm()
+function Ast:parseExp(required, curLevel)
+    local curExp
 
-    if not exp and required then
-        self:throw('MISS_EXP', self:getLastPos(), self:getLastPos())
+    local unary, unaryLevel = self:parseUnary()
+    if unary then
+        curExp = unary
+        curLevel = unaryLevel
+    else
+        curExp = self:parseTerm()
+        if not curExp then
+            if required then
+                self:throw('MISS_EXP', self:getLastPos(), self:getLastPos())
+            end
+            return nil
+        end
+        self:skipSpace(true)
     end
 
-    return exp
+    local binary = self:parseBinary(curExp, curLevel)
+
+    return binary or curExp
 end
 
 -- 解析表达式列表，以逗号分隔
