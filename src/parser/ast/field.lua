@@ -11,17 +11,23 @@ local class = require 'class'
 local Field = class.declare('LuaParser.Node.Field', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.FieldID: LuaParser.Node.Base
+---@field id string
 ---@field parent LuaParser.Node.Field
 local FieldID = class.declare('LuaParser.Node.FieldID', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.TableField: LuaParser.Node.Base
 ---@field subtype 'field' | 'index' | 'exp'
 ---@field key? LuaParser.Node.Exp
----@field value LuaParser.Node.Exp
+---@field value? LuaParser.Node.Exp
 ---@field symbolPos? integer
 ---@field symbolPos2? integer
 ---@field parent LuaParser.Node.Table
 local TableField = class.declare('LuaParser.Node.TableField', 'LuaParser.Node.Base')
+
+---@class LuaParser.Node.TableFieldID: LuaParser.Node.Base
+---@field id string
+---@field parent LuaParser.Node.TableField
+local TableFieldID = class.declare('LuaParser.Node.TableFieldID', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
@@ -76,4 +82,97 @@ function Ast:parseField(last)
         end
     end
     return nil
+end
+
+---@return LuaParser.Node.TableField?
+function Ast:parseTableField()
+    return self:parseTableFieldAsField()
+        or self:parseTableFieldAsIndex()
+        or self:parseTableFieldAsExp()
+end
+
+---@return LuaParser.Node.TableField?
+function Ast:parseTableFieldAsField()
+    local savePoint = self.lexer:savePoint()
+    local key = self:parseID('LuaParser.Node.TableFieldID')
+    if not key then
+        return nil
+    end
+    self:skipSpace()
+    if not self.lexer:consume '=' then
+        savePoint()
+        return nil
+    end
+    self:skipSpace()
+    local value = self:parseExp(true)
+    local tfield = class.new('LuaParser.Node.TableField', {
+        ast     = self,
+        subtype = 'field',
+        key     = key,
+        value   = value,
+        start   = key.start,
+        finish  = self:getLastPos(),
+    })
+    key.parent = tfield
+    if value then
+        value.parent = tfield
+    end
+    return tfield
+end
+
+---@return LuaParser.Node.TableField?
+function Ast:parseTableFieldAsIndex()
+    local token, _, pos = self.lexer:peek()
+    if token ~= '[' then
+        return nil
+    end
+    local nextChar = self.code:sub(pos + 2, pos + 2)
+    if nextChar == '['
+    or nextChar == '=' then
+        -- 长字符串？
+        return nil
+    end
+    self.lexer:next()
+    self:skipSpace()
+    local key = self:parseExp(true)
+    self:skipSpace()
+    local pos2 = self:assertSymbol ']'
+    self:skipSpace()
+    self:assertSymbol '='
+    self:skipSpace()
+    local value = self:parseExp(true)
+    local tfield = class.new('LuaParser.Node.TableField', {
+        ast     = self,
+        subtype = 'index',
+        key     = key,
+        value   = value,
+        start   = pos,
+        finish  = self:getLastPos(),
+        symbolPos  = pos,
+        symbolPos2 = pos2,
+    })
+    if key then
+        key.parent = tfield
+    end
+    if value then
+        value.parent = tfield
+    end
+    return tfield
+end
+
+---@return LuaParser.Node.TableField?
+function Ast:parseTableFieldAsExp()
+    local exp = self:parseExp()
+    if not exp then
+        return nil
+    end
+    local tfield = class.new('LuaParser.Node.TableField', {
+        ast     = self,
+        subtype = 'exp',
+        value   = exp,
+        start   = exp.start,
+        finish  = exp.finish,
+    })
+    exp.parent = tfield
+    return tfield
 end

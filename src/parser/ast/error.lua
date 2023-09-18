@@ -12,14 +12,14 @@ local Ast = class.declare 'LuaParser.Ast'
 -- 添加错误信息
 ---@param errorCode string
 ---@param start integer
----@param finish integer
+---@param finish integer?
 ---@param extra table?
 function Ast:throw(errorCode, start, finish, extra)
     self.errors[#self.errors+1] = class.new('LuaParser.Node.Error', {
         code   = errorCode,
         ast    = self,
         start  = start,
-        finish = finish,
+        finish = finish or start,
         extra  = extra,
     })
 end

@@ -7,6 +7,7 @@ local Ast = class.declare 'LuaParser.Ast'
 ---| LuaParser.Node.Local
 ---| LuaParser.Node.Var
 ---| LuaParser.Node.FieldID
+---| LuaParser.Node.TableFieldID
 
 ---@generic T: LuaParser.Node.ID
 ---@param nodeType `T`

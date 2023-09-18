@@ -55,7 +55,8 @@ function Ast:parseTableFields()
         if not token or token == '}' then
             break
         end
-        if token == ',' then
+        if token == ','
+        or token == ';' then
             self.lexer:next()
             if not wantSep then
                 self:throwMissExp(self:getLastPos())
@@ -63,7 +64,7 @@ function Ast:parseTableFields()
             wantSep = false
         else
             if wantSep then
-                self:throwMissSymbol(self:getLastPos(), ',')
+                self:throw('MISS_SEP_IN_TABLE', self:getLastPos())
             end
             wantSep = true
             local field = self:parseTableField()
@@ -71,23 +72,10 @@ function Ast:parseTableFields()
                 fields[#fields+1] = field
             else
                 self:throwMissExp(self:getLastPos())
+                break
             end
         end
         self:skipSpace()
     end
     return fields
-end
-
----@return LuaParser.Node.TableField?
-function Ast:parseTableField()
-    local exp = self:parseExp()
-    if exp then
-        return class.new('LuaParser.Node.TableField', {
-            ast     = self,
-            subtype = 'exp',
-            value   = exp,
-            start   = exp.start,
-            finish  = exp.finish,
-        })
-    end
 end

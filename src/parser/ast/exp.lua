@@ -104,6 +104,7 @@ end
 ---| LuaParser.Node.Var
 ---| LuaParser.Node.Paren
 ---| LuaParser.Node.Varargs
+---| LuaParser.Node.Table
 
 ---@alias LuaParser.Node.TermChain
 ---| LuaParser.Node.Field
@@ -120,6 +121,7 @@ function Ast:parseTerm()
             or   self:parseVarargs()
             or   self:parseVar()
             or   self:parseParen()
+            or   self:parseTable()
 
     if not head then
         return nil

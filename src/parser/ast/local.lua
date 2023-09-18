@@ -6,6 +6,7 @@ local class = require 'class'
 local LocalDef = class.declare('LuaParser.Node.LocalDef', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.Local: LuaParser.Node.Base
+---@field id string
 ---@field parent LuaParser.Node.LocalDef
 ---@field index integer
 ---@field value? LuaParser.Node.Exp

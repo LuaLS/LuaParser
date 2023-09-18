@@ -2,6 +2,7 @@ local class = require 'class'
 
 ---@class LuaParser.Node.Var: LuaParser.Node.Base
 ---@field subtype 'global' | 'local'
+---@field id string
 ---@field loc? LuaParser.Node.Local
 ---@field next? LuaParser.Node.Field
 ---@field value? LuaParser.Node.Exp
