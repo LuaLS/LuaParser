@@ -8,6 +8,7 @@ local Ast = class.declare 'LuaParser.Ast'
 ---| LuaParser.Node.Var
 ---| LuaParser.Node.FieldID
 ---| LuaParser.Node.TableFieldID
+---| LuaParser.Node.Param
 
 ---@generic T: LuaParser.Node.ID
 ---@param nodeType `T`
@@ -17,7 +18,7 @@ function Ast:parseID(nodeType, required)
     local token, tp, pos = self.lexer:peek()
     if tp ~= 'Word' then
         if required then
-            self:throw('MISS_NAME', self:getLastPos(), self:getLastPos())
+            self:throw('MISS_NAME', self:getLastPos())
         end
         return nil
     end
@@ -27,7 +28,11 @@ function Ast:parseID(nodeType, required)
         self:throw('UNICODE_NAME', pos, pos + #token)
     end
     if self:isKeyWord(token) then
-        self:throw('KEYWORD', pos, pos + #token)
+        if required then
+            self:throw('KEYWORD', pos, pos + #token)
+        else
+            return nil
+        end
     end
     self.lexer:next()
     return class.new(nodeType, {

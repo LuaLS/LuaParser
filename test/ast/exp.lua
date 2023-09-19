@@ -540,128 +540,44 @@ TEST '(...)[1]'
 
 TEST 'function () end'
 {
-    type    = "function",
-    start   = 0,
-    bstart  = 11,
-    finish  = 15,
-    keyword = {
-        [1] = 0,
-        [2] = 8,
-        [3] = 12,
-        [4] = 15,
-    },
-    args    = {
-        type   = "funcargs",
-        start  = 9,
-        finish = 11,
-        parent = "<IGNORE>",
-    },
+    start      = 0,
+    finish     = 15,
+    symbolPos1 = 9,
+    symbolPos2 = 10,
+    symbolPos3 = 12,
 }
+
 TEST 'function (...) end'
 {
-    type    = "function",
-    start   = 0,
-    bstart  = 14,
-    finish  = 18,
-    keyword = {
-        [1] = 0,
-        [2] = 8,
-        [3] = 15,
-        [4] = 18,
-    },
-    vararg  = "<IGNORE>",
-    args    = {
-        type   = "funcargs",
-        start  = 9,
-        finish = 14,
-        parent = "<IGNORE>",
-        [1]    = {
-            type   = "...",
-            start  = 10,
-            finish = 13,
-            parent = "<IGNORE>",
-            [1]    = "...",
-        },
-    },
+    params = {
+        [1] = {
+            id = '...'
+        }
+    }
 }
+
 TEST 'function (a, ...) end'
 {
-    type    = "function",
-    start   = 0,
-    bstart  = 17,
-    finish  = 21,
-    keyword = {
-        [1] = 0,
-        [2] = 8,
-        [3] = 18,
-        [4] = 21,
-    },
-    vararg  = "<IGNORE>",
-    args    = {
-        type   = "funcargs",
-        start  = 9,
-        finish = 17,
-        parent = "<IGNORE>",
-        [1]    = {
-            type   = "local",
-            start  = 10,
-            finish = 11,
-            effect = 11,
-            parent = "<IGNORE>",
-            [1]    = "a",
+    params = {
+        [1] = {
+            id = 'a'
         },
-        [2]    = {
-            type   = "...",
-            start  = 13,
-            finish = 16,
-            parent = "<IGNORE>",
-            [1]    = "...",
-        },
-    },
-    locals  = "<IGNORE>",
+        [2] = {
+            id = '...'
+        }
+    }
 }
 
-CHECK 'notify'
+TEST 'a ^ - b'
 {
-    type   = "getglobal",
-    start  = 0,
-    finish = 6,
-    [1]    = "notify",
-}
-
-CHECK 'a ^ - b'
-{
-    type   = "binary",
-    start  = 0,
-    finish = 7,
-    op     = {
-        type   = "^",
-        start  = 2,
-        finish = 3,
+    op   = '^',
+    exp1 = {
+        id = 'a'
     },
-    [1]    = {
-        type   = "getglobal",
-        start  = 0,
-        finish = 1,
-        parent = "<IGNORE>",
-        [1]    = "a",
-    },
-    [2]    = {
-        type   = "unary",
-        start  = 4,
-        finish = 7,
-        parent = "<IGNORE>",
-        op     = {
-            type   = "-",
-            start  = 4,
-            finish = 5,
-        },
-        [1]    = {
-            type   = "getglobal",
-            start  = 6,
-            finish = 7,
-            parent = "<IGNORE>",
-            [1]    = "b",
-        },
-    },
+    exp2 = {
+        op  = '-',
+        exp = {
+            id = 'b'
+        }
+    }
 }

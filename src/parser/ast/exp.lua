@@ -126,6 +126,7 @@ end
 ---| LuaParser.Node.Paren
 ---| LuaParser.Node.Varargs
 ---| LuaParser.Node.Table
+---| LuaParser.Node.Function
 
 ---@alias LuaParser.Node.TermChain
 ---| LuaParser.Node.Field
@@ -140,6 +141,7 @@ function Ast:parseTerm()
             or   self:parseNumber()
             or   self:parseString()
             or   self:parseVarargs()
+            or   self:parseFunction()
             or   self:parseVar()
             or   self:parseParen()
             or   self:parseTable()
