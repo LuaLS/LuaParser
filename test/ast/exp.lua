@@ -475,92 +475,69 @@ TEST 'func {}'
 
 TEST 'table[1]'
 {
-    type   = "getindex",
-    start  = 0,
-    finish = 8,
-    node   = "<IGNORE>",
-    index  = {
-        type   = "integer",
-        start  = 6,
-        finish = 7,
-        parent = "<IGNORE>",
-        [1]    = 1,
-    },
+    subtype    = 'index',
+    symbolPos  = 5,
+    symbolPos2 = 7,
+    key        = {
+        value = 1,
+    }
 }
+
 TEST 'table[[1]]'
 {
-    type   = "call",
     start  = 0,
     finish = 10,
-    node   = "<IGNORE>",
+    node   = {
+        id = 'table'
+    },
     args   = {
-        type   = "callargs",
-        start  = 5,
-        finish = 10,
-        parent = "<IGNORE>",
-        [1]    = {
-            type   = "string",
-            start  = 5,
-            finish = 10,
-            parent = "<IGNORE>",
-            [1]    = '1',
-            [2]    = '[['
+        [1] = {
+            value = '1'
         },
     },
 }
+
 TEST 'get_point().x'
 {
-    type   = "getfield",
-    start  = 0,
-    finish = 13,
-    node   = "<IGNORE>",
-    dot    = {
-        type   = ".",
-        start  = 11,
-        finish = 12,
+    subtype = 'field',
+    key     = {
+        id = 'x'
     },
-    field  = {
-        type   = "field",
-        start  = 12,
-        finish = 13,
-        parent = "<IGNORE>",
-        [1]    = "x",
-    },
+    last    = {
+        __class__ = 'LuaParser.Node.Call',
+        node      = {
+            id = 'get_point',
+        },
+    }
 }
+
 TEST 'obj:remove()'
 {
-    type   = "call",
-    start  = 0,
-    finish = 12,
-    node   = "<IGNORE>",
-    args   = {
-        type   = "callargs",
-        start  = 0,
-        finish = 12,
-        parent = "<IGNORE>",
-        [1]    = {
-            type   = "self",
-            start  = 3,
-            finish = 4,
-            parent = "<IGNORE>",
-            [1]    = "self",
+    args = {},
+    node = {
+        subtype = 'method',
+        key     = {
+            id = 'remove'
         },
-    },
+        last    = {
+            id = 'obj'
+        }
+    }
 }
+
 TEST '(...)[1]'
 {
-    type   = "getindex",
-    start  = 0,
-    finish = 8,
-    node   = "<IGNORE>",
-    index  = {
-        type   = "integer",
-        start  = 6,
-        finish = 7,
-        parent = "<IGNORE>",
-        [1]    = 1,
+    subtype = 'index',
+    key     = {
+        value = 1,
     },
+    last    = {
+        exp = {
+            __class__ = 'LuaParser.Node.Varargs',
+        }
+    }
 }
+
 TEST 'function () end'
 {
     type    = "function",

@@ -59,12 +59,18 @@ function Ast:parseField(last)
         return nil
     end
     if token == '[' then
+        local nextChar = self.code:sub(pos + 2, pos + 2)
+        if nextChar == '['
+        or nextChar == '=' then
+            -- 长字符串？
+            return nil
+        end
         self.lexer:next()
         self:skipSpace()
         local key = self:parseExp(true)
         if key then
             self:skipSpace()
-            local hasSymbol = self:assertSymbol(']')
+            local symbolPos2 = self:assertSymbol(']')
             local field = class.new('LuaParser.Node.Field', {
                 ast        = self,
                 start      = last.start,
@@ -73,7 +79,7 @@ function Ast:parseField(last)
                 key        = key,
                 last       = last,
                 symbolPos  = pos,
-                symbolPos2 = hasSymbol and self:getLastPos() or nil,
+                symbolPos2 = symbolPos2,
             })
             last.parent = field
             last.next   = field
