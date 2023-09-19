@@ -62,7 +62,7 @@ function Ast:parseUnary()
     end
 
     local myLevel = UnarySymbol[token]
-    local exp = self:parseExp(true, myLevel)
+    local exp = self:parseExp(true, false, myLevel)
     local unary = class.new('LuaParser.Node.Unary', {
         ast     = self,
         start   = pos,

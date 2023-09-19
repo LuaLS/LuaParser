@@ -55,9 +55,10 @@ local Ast = class.declare 'LuaParser.Ast'
 
 ---@param curExp LuaParser.Node.Exp
 ---@param curLevel? integer
+---@param asState? boolean # 是否作为语句解析
 ---@return LuaParser.Node.Binary?
 ---@return integer? opLevel
-function Ast:parseBinary(curExp, curLevel)
+function Ast:parseBinary(curExp, curLevel, asState)
     local token, _, pos = self.lexer:peek()
     if not BinarySymbol[token] then
         return nil
@@ -80,6 +81,9 @@ function Ast:parseBinary(curExp, curLevel)
         return nil
     end
     if op == '=' then
+        if asState then
+            return nil
+        end
         self:throw('ERR_EQ_AS_ASSIGN', pos, pos + #op)
         op = '=='
     end
@@ -103,7 +107,7 @@ function Ast:parseBinary(curExp, curLevel)
     self.lexer:next()
     self:skipSpace()
 
-    local exp2 = self:parseExp(true, myLevel)
+    local exp2 = self:parseExp(true, false, myLevel)
 
     local binary = class.new('LuaParser.Node.Binary', {
         ast       = self,

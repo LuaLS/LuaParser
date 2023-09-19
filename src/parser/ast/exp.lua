@@ -46,10 +46,11 @@ local Ast = class.declare 'LuaParser.Ast'
 ---| LuaParser.Node.Binary
 
 -- 解析表达式
----@param required? true
+---@param required? boolean
 ---@param curLevel? integer # 新表达式的符号优先级必须比这个大
+---@param asState? boolean # 是否作为语句解析
 ---@return LuaParser.Node.Exp?
-function Ast:parseExp(required, curLevel)
+function Ast:parseExp(required, asState, curLevel)
     local curExp
 
     local unary, unaryLevel = self:parseUnary()
@@ -68,7 +69,7 @@ function Ast:parseExp(required, curLevel)
     end
 
     while true do
-        local binary = self:parseBinary(curExp, curLevel)
+        local binary = self:parseBinary(curExp, curLevel, asState)
         if not binary then
             break
         end
