@@ -196,3 +196,10 @@ end
         },
     }
 }
+
+TEST [[break]]
+{
+    type   = 'Break',
+    start  = 0,
+    finish = 5,
+}

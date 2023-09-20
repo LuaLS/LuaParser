@@ -23,6 +23,7 @@ require 'parser.ast.binary'
 require 'parser.ast.label'
 require 'parser.ast.do'
 require 'parser.ast.if'
+require 'parser.ast.break'
 
 ---@class LuaParser.Ast
 ---@overload fun(code: string, version: LuaParser.LuaVersion, options: LuaParser.CompileOptions): LuaParser.Ast
