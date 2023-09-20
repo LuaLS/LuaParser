@@ -154,3 +154,13 @@ TEST [[goto continue]]
         id     = 'continue',
     }
 }
+
+TEST [[
+do
+end
+]]
+{
+    __class__ = 'LuaParser.Node.Do',
+    left  = 0,
+    right = 10003,
+}

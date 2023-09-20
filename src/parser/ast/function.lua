@@ -10,14 +10,13 @@ local Param = class.declare('LuaParser.Node.Param', 'LuaParser.Node.Base')
 ---@field parent LuaParser.Node.Function
 local FuncName = class.declare('LuaParser.Node.FuncName', 'LuaParser.Node.Base')
 
----@class LuaParser.Node.Function: LuaParser.Node.Base
+---@class LuaParser.Node.Function: LuaParser.Node.Block
 ---@field name? LuaParser.Node.Term
 ---@field params? LuaParser.Node.Local[]
 ---@field symbolPos1? integer # 左括号
 ---@field symbolPos2? integer # 右括号
 ---@field symbolPos3? integer # `end`
----@field block? LuaParser.Node.Block
-local Function = class.declare('LuaParser.Node.Function', 'LuaParser.Node.Base')
+local Function = class.declare('LuaParser.Node.Function', 'LuaParser.Node.Block')
 
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
@@ -49,24 +48,25 @@ function Ast:parseFunction()
     self:skipSpace()
     local symbolPos2 = self:assertSymbol ')'
 
-    local block
+    local func = class.new('LuaParser.Node.Function', {
+        ast        = self,
+        start      = pos,
+        name       = name,
+        params     = params,
+        symbolPos1 = symbolPos1,
+        symbolPos2 = symbolPos2,
+    })
+
     if symbolPos2 then
-        block = self:parseBlock()
+        self:skipSpace()
+        func:parseChilds()
     end
 
     self:skipSpace()
     local symbolPos3 = self:assertSymbol 'end'
 
-    local func = class.new('LuaParser.Node.Function', {
-        ast        = self,
-        start      = pos,
-        finish     = self:getLastPos(),
-        name       = name,
-        params     = params,
-        symbolPos1 = symbolPos1,
-        symbolPos2 = symbolPos2,
-        symbolPos3 = symbolPos3,
-    })
+    func.symbolPos3 = symbolPos3
+    func.finish     = self:getLastPos()
 
     if name then
         name.parent = func
@@ -78,10 +78,6 @@ function Ast:parseFunction()
             param.parent = func
             param.index  = i
         end
-    end
-
-    if block then
-        block.parent = func
     end
 
     return func
