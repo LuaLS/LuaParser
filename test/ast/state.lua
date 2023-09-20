@@ -330,3 +330,47 @@ until false
         value = false,
     },
 }
+
+TEST [[
+function f(x, y)
+end
+]]
+{
+    type   = 'Function',
+    name   = {
+        id = 'f'
+    },
+    params = {
+        [1] = {
+            id = 'x'
+        },
+        [2] = {
+            id = 'y'
+        }
+    }
+}
+
+TEST [[
+function f.n(x, y)
+end
+]]
+{
+    type   = 'Function',
+    name   = {
+        type = 'Field',
+        last = {
+            id = 'f'
+        },
+        key  = {
+            id = 'n',
+        },
+    },
+    params = {
+        [1] = {
+            id = 'x'
+        },
+        [2] = {
+            id = 'y'
+        }
+    }
+}

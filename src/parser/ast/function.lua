@@ -6,12 +6,12 @@ local class = require 'class'
 ---@field id string
 local Param = class.declare('LuaParser.Node.Param', 'LuaParser.Node.Base')
 
----@class LuaParser.Node.FuncName: LuaParser.Node.Base
----@field parent LuaParser.Node.Function
-local FuncName = class.declare('LuaParser.Node.FuncName', 'LuaParser.Node.Base')
+---@alias LuaParser.Node.FuncName
+---| LuaParser.Node.Var
+---| LuaParser.Node.Field
 
 ---@class LuaParser.Node.Function: LuaParser.Node.Block
----@field name? LuaParser.Node.Term
+---@field name? LuaParser.Node.FuncName
 ---@field params? LuaParser.Node.Local[]
 ---@field symbolPos1? integer # 左括号
 ---@field symbolPos2? integer # 右括号
@@ -85,7 +85,28 @@ end
 
 ---@return LuaParser.Node.FuncName?
 function Ast:parseFunctionName()
-    
+    local head = self:parseVar()
+
+    if not head then
+        return nil
+    end
+
+    ---@type LuaParser.Node.FuncName
+    local current = head
+
+    while true do
+        self:skipSpace()
+
+        local chain = self:parseField(current)
+
+        if chain then
+            current = chain
+        else
+            break
+        end
+    end
+
+    return current
 end
 
 ---@return LuaParser.Node.Param[]

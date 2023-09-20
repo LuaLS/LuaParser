@@ -26,6 +26,7 @@ local Ast = class.declare 'LuaParser.Ast'
 ---| LuaParser.Node.For
 ---| LuaParser.Node.While
 ---| LuaParser.Node.Repeat
+---| LuaParser.Node.Function
 
 ---@return LuaParser.Node.State?
 function Ast:parseState()
@@ -59,6 +60,10 @@ function Ast:parseState()
 
     if token == 'while' then
         return self:parseWhile()
+    end
+
+    if token == 'function' then
+        return self:parseFunction()
     end
 
     if token == 'continue' then
