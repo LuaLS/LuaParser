@@ -1,6 +1,7 @@
 local class = require 'class'
 
 ---@class LuaParser.Node.Assign: LuaParser.Node.Base
+---@field symbolPos? integer # 等号的位置
 ---@field exps LuaParser.Node.Exp[]
 ---@field values LuaParser.Node.Var[]
 local Assign = class.declare('LuaParser.Node.Assign', 'LuaParser.Node.Base')
@@ -22,6 +23,7 @@ local Ast = class.declare 'LuaParser.Ast'
 ---| LuaParser.Node.Break
 ---| LuaParser.Node.Continue
 ---| LuaParser.Node.Return
+---| LuaParser.Node.For
 
 ---@return LuaParser.Node.State?
 function Ast:parseState()
@@ -47,6 +49,10 @@ function Ast:parseState()
 
     if token == 'return' then
         return self:parseReturn()
+    end
+
+    if token == 'for' then
+        return self:parseFor()
     end
 
     if token == 'continue' then
@@ -133,6 +139,7 @@ function Ast:parseAssign(first)
     local eqPos = self:assertSymbol '='
 
     if eqPos then
+        assign.symbolPos = eqPos
         self:skipSpace()
         local values = self:parseExpList(true)
         assign.values = values

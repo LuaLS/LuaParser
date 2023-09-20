@@ -2,12 +2,13 @@ local class = require 'class'
 
 ---@class LuaParser.Node.LocalDef: LuaParser.Node.Base
 ---@field vars LuaParser.Node.Local[]
+---@field symbolPos? integer # 等号的位置
 ---@field values? LuaParser.Node.Exp[]
 local LocalDef = class.declare('LuaParser.Node.LocalDef', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.Local: LuaParser.Node.Base
 ---@field id string
----@field parent LuaParser.Node.LocalDef
+---@field parent LuaParser.Node.LocalDef | LuaParser.Node.For
 ---@field index integer
 ---@field value? LuaParser.Node.Exp
 ---@field refs? LuaParser.Node.Var[]
@@ -39,7 +40,9 @@ function Ast:parseLocal()
     end
 
     self:skipSpace()
-    if self.lexer:consume '=' then
+    local symbolPos = self:assertSymbol '='
+    if symbolPos then
+        localdef.symbolPos = symbolPos
         self:skipSpace()
         local values = self:parseExpList(true)
         localdef.values = values

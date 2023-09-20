@@ -14,6 +14,7 @@ TEST [[local x, y = 1, 2, 3]]
     type    = 'LocalDef',
     start   = 0,
     finish  = 20,
+    symbolPos = 11,
     vars    = {
         [1] = {
             id      = 'x',
@@ -46,6 +47,7 @@ TEST [[x = 1]]
     type    = 'Assign',
     start   = 0,
     finish  = 5,
+    symbolPos = 2,
     exps    = {
         [1] = {
             start   = 0,
@@ -66,6 +68,7 @@ TEST [[x = 1]]
 TEST [[x.x, y.y = 1, 2, 3]]
 {
     type = 'Assign',
+    symbolPos = 9,
     exps = {
         [1] = {
             subtype = 'field',
@@ -110,6 +113,7 @@ TEST [[x.y()]]
 TEST [[x.y().z = 1]]
 {
     type = 'Assign',
+    symbolPos = 8,
     exps = {
         [1] = {
             subtype = 'field',
@@ -233,4 +237,67 @@ TEST [[return 1, 2, 3]]
             value  = 3,
         }
     }
+}
+
+TEST [[
+for i = 1, 10, 1 do
+end
+]]
+{
+    type   = 'For',
+    subtype= 'loop',
+    left   = 0,
+    right  = 10003,
+    vars    = {
+        [1] = {
+            id = 'i',
+        },
+    },
+    exps   = {
+        [1] = {
+            value = 1,
+        },
+        [2] = {
+            value = 10,
+        },
+        [3] = {
+            value = 1,
+        }
+    },
+    symbolPos1 = 6,
+    symbolPos2 = 17,
+    symbolPos3 = 20,
+}
+
+TEST [[
+for k, v in next, t, nil do
+end
+]]
+{
+    type   = 'For',
+    subtype= 'in',
+    left   = 0,
+    right  = 10003,
+    vars   = {
+        [1] = {
+            id = 'k',
+        },
+        [2] = {
+            id = 'v',
+        },
+    },
+    exps   = {
+        [1] = {
+            id = 'next',
+        },
+        [2] = {
+            id = 't',
+        },
+        [3] = {
+            type = 'Nil',
+        }
+    },
+    symbolPos1 = 9,
+    symbolPos2 = 25,
+    symbolPos3 = 28,
 }
