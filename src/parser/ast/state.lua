@@ -61,13 +61,13 @@ function Ast:parseStateStartWithExp()
         return nil
     end
 
-    if class.type(exp) == 'LuaParser.Node.Call' then
+    if exp.type == 'Call' then
         ---@cast exp LuaParser.Node.Call
         return exp
     end
 
-    if class.type(exp) == 'LuaParser.Node.Var'
-    or class.type(exp) == 'LuaParser.Node.Field' then
+    if exp.type == 'Var'
+    or exp.type == 'Field' then
         ---@cast exp LuaParser.Node.Field
         self:skipSpace()
         local assign = self:parseAssign(exp)

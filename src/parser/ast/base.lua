@@ -1,6 +1,7 @@
 local class = require 'class'
 
 ---@class LuaParser.Node.Base: Class.Base
+---@field type string
 ---@field ast LuaParser.Ast
 ---@field start integer # 开始位置（偏移）
 ---@field finish integer # 结束位置（偏移）
@@ -26,6 +27,13 @@ local class = require 'class'
 local Base = class.declare 'LuaParser.Node.Base'
 
 local rowcolMulti = 10000
+
+---@param self LuaParser.Node.Base
+---@return string
+---@return true
+Base.__getter.type = function (self)
+    return class.type(self):match '[^.]+$', true
+end
 
 ---@param self LuaParser.Node.Base
 ---@return integer
@@ -89,7 +97,7 @@ end
 ---@return string
 ---@return true
 Base.__getter.parent = function (self)
-    error('未设置父节点：' .. class.type(self))
+    error('未设置父节点：' .. self.type)
 end
 
 ---@param self LuaParser.Node.Base
@@ -97,7 +105,7 @@ end
 ---@return true
 Base.__getter.parentBlock = function (self)
     local parent = self.parent
-    if class.type(parent) == 'LuaParser.Node.Block' then
+    if parent.isBlock then
         return parent, true
     end
     return parent.parentBlock, true
@@ -108,7 +116,7 @@ end
 ---@return true
 Base.__getter.parentFunction = function (self)
     local parent = self.parentFunction
-    if class.type(parent) == 'LuaParser.Node.Function' then
+    if parent.type == 'function' then
         return parent, true
     end
     return parent.parentFunction, true

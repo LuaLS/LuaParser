@@ -59,7 +59,7 @@ function Ast:parseFunction()
 
     if symbolPos2 then
         self:skipSpace()
-        func:parseChilds()
+        self:parseBlockChilds(func)
     end
 
     self:skipSpace()

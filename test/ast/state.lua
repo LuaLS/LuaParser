@@ -11,7 +11,7 @@ end
 
 TEST [[local x, y = 1, 2, 3]]
 {
-    __class__ = 'LuaParser.Node.LocalDef',
+    type    = 'LocalDef',
     start   = 0,
     finish  = 20,
     vars    = {
@@ -43,7 +43,7 @@ TEST [[local x, y = 1, 2, 3]]
 
 TEST [[x = 1]]
 {
-    __class__ = 'LuaParser.Node.Assign',
+    type    = 'Assign',
     start   = 0,
     finish  = 5,
     exps    = {
@@ -65,7 +65,7 @@ TEST [[x = 1]]
 
 TEST [[x.x, y.y = 1, 2, 3]]
 {
-    __class__ = 'LuaParser.Node.Assign',
+    type = 'Assign',
     exps = {
         [1] = {
             subtype = 'field',
@@ -104,17 +104,17 @@ TEST [[x.x, y.y = 1, 2, 3]]
 
 TEST [[x.y()]]
 {
-    __class__ = 'LuaParser.Node.Call',
+    type = 'Call',
 }
 
 TEST [[x.y().z = 1]]
 {
-    __class__ = 'LuaParser.Node.Assign',
+    type = 'Assign',
     exps = {
         [1] = {
             subtype = 'field',
             last    = {
-                __class__ = 'LuaParser.Node.Call',
+                type   = 'Call',
             },
             key     = {
                 id = 'z',
@@ -133,7 +133,7 @@ TEST [[x.y().z = 1]]
 
 TEST [[:: continue ::]]
 {
-    __class__ = 'LuaParser.Node.Label',
+    type   = 'Label',
     start  = 0,
     finish = 14,
     label  = {
@@ -145,7 +145,7 @@ TEST [[:: continue ::]]
 
 TEST [[goto continue]]
 {
-    __class__ = 'LuaParser.Node.Goto',
+    type   = 'Goto',
     start  = 0,
     finish = 13,
     label  = {
@@ -160,7 +160,39 @@ do
 end
 ]]
 {
-    __class__ = 'LuaParser.Node.Do',
+    type  = 'Do',
     left  = 0,
     right = 10003,
+}
+
+TEST [[
+if x then
+elseif y then
+else
+end
+]]
+{
+    type   = 'If',
+    left   = 0,
+    right  = 30003,
+    childs = {
+        [1] = {
+            type    = 'IfChild',
+            subtype = 'if',
+            condition = {
+                id = 'x',
+            },
+        },
+        [2] = {
+            type    = 'IfChild',
+            subtype = 'elseif',
+            condition = {
+                id = 'y',
+            },
+        },
+        [3] = {
+            type    = 'IfChild',
+            subtype = 'else',
+        },
+    }
 }

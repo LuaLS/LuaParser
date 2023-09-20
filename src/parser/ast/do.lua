@@ -19,7 +19,7 @@ function Ast:parseDo()
     })
 
     self:skipSpace()
-    doNode:parseChilds()
+    self:parseBlockChilds(doNode)
 
     self:skipSpace()
     self:assertSymbol 'end'
