@@ -24,6 +24,7 @@ local class = require 'class'
 ---@field toInteger? integer
 ---@field isTruly? boolean
 ---@field dummy? boolean
+---@field index? integer
 local Base = class.declare 'LuaParser.Node.Base'
 
 local rowcolMulti = 10000

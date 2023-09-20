@@ -21,6 +21,7 @@ local Ast = class.declare 'LuaParser.Ast'
 ---| LuaParser.Node.Do
 ---| LuaParser.Node.Break
 ---| LuaParser.Node.Continue
+---| LuaParser.Node.Return
 
 ---@return LuaParser.Node.State?
 function Ast:parseState()
@@ -42,6 +43,10 @@ function Ast:parseState()
 
     if token == 'break' then
         return self:parseBreak()
+    end
+
+    if token == 'return' then
+        return self:parseReturn()
     end
 
     if token == 'continue' then

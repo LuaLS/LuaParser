@@ -203,3 +203,34 @@ TEST [[break]]
     start  = 0,
     finish = 5,
 }
+
+TEST [[return]]
+{
+    type   = 'Return',
+    start  = 0,
+    finish = 6,
+}
+
+TEST [[return 1, 2, 3]]
+{
+    type   = 'Return',
+    start  = 0,
+    finish = 14,
+    exps   = {
+        [1] = {
+            start  = 7,
+            finish = 8,
+            value  = 1,
+        },
+        [2] = {
+            start  = 10,
+            finish = 11,
+            value  = 2,
+        },
+        [3] = {
+            start  = 13,
+            finish = 14,
+            value  = 3,
+        }
+    }
+}

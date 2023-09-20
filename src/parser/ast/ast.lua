@@ -24,6 +24,7 @@ require 'parser.ast.label'
 require 'parser.ast.do'
 require 'parser.ast.if'
 require 'parser.ast.break'
+require 'parser.ast.return'
 
 ---@class LuaParser.Ast
 ---@overload fun(code: string, version: LuaParser.LuaVersion, options: LuaParser.CompileOptions): LuaParser.Ast
