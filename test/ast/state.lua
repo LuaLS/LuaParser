@@ -316,3 +316,17 @@ end
     symbolPos1 = 11,
     symbolPos2 = 14,
 }
+
+TEST [[
+repeat
+until false
+]]
+{
+    type   = 'Repeat',
+    left   = 0,
+    right  = 10011,
+    symbolPos = 7,
+    condition = {
+        value = false,
+    },
+}

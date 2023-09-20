@@ -27,6 +27,7 @@ require 'parser.ast.break'
 require 'parser.ast.return'
 require 'parser.ast.for'
 require 'parser.ast.while'
+require 'parser.ast.repeat'
 
 ---@class LuaParser.Ast
 ---@overload fun(code: string, version: LuaParser.LuaVersion, options: LuaParser.CompileOptions): LuaParser.Ast
@@ -112,7 +113,9 @@ end
 ---@private
 ---@param inExp? boolean # 在表达式中
 function M:skipSpace(inExp)
-    self.lastRightCI = self.lexer.ci
+    if self.lexer.ci ~= self.lastSpaceCI then
+        self.lastRightCI = self.lexer.ci
+    end
     repeat until not self:skipNL()
             and  not self:skipComment(inExp)
             and  not self:skipUnknown()

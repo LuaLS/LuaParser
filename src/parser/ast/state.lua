@@ -25,6 +25,7 @@ local Ast = class.declare 'LuaParser.Ast'
 ---| LuaParser.Node.Return
 ---| LuaParser.Node.For
 ---| LuaParser.Node.While
+---| LuaParser.Node.Repeat
 
 ---@return LuaParser.Node.State?
 function Ast:parseState()
@@ -70,6 +71,10 @@ function Ast:parseState()
 
     if token == 'goto' then
         return self:parseGoto()
+    end
+
+    if token == 'repeat' then
+        return self:parseRepeat()
     end
 
     return self:parseStateStartWithExp()
