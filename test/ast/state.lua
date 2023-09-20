@@ -301,3 +301,18 @@ end
     symbolPos2 = 25,
     symbolPos3 = 28,
 }
+
+TEST [[
+while true do
+end
+]]
+{
+    type   = 'While',
+    left   = 0,
+    right  = 10003,
+    condition = {
+        value = true,
+    },
+    symbolPos1 = 11,
+    symbolPos2 = 14,
+}
