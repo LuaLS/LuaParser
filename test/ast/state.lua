@@ -130,3 +130,27 @@ TEST [[x.y().z = 1]]
         }
     }
 }
+
+TEST [[:: continue ::]]
+{
+    __class__ = 'LuaParser.Node.Label',
+    start  = 0,
+    finish = 14,
+    label  = {
+        start  = 3,
+        finish = 11,
+        id     = 'continue',
+    }
+}
+
+TEST [[goto continue]]
+{
+    __class__ = 'LuaParser.Node.Goto',
+    start  = 0,
+    finish = 13,
+    label  = {
+        start  = 5,
+        finish = 13,
+        id     = 'continue',
+    }
+}

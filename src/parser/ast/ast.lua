@@ -20,6 +20,7 @@ require 'parser.ast.function'
 require 'parser.ast.field'
 require 'parser.ast.unary'
 require 'parser.ast.binary'
+require 'parser.ast.label'
 
 ---@class LuaParser.Ast
 ---@overload fun(code: string, version: LuaParser.LuaVersion, options: LuaParser.CompileOptions): LuaParser.Ast

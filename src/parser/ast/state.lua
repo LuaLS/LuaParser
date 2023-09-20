@@ -14,20 +14,35 @@ local Ast = class.declare 'LuaParser.Ast'
 
 ---@alias LuaParser.Node.State
 ---| LuaParser.Node.LocalDef
----| LuaParser.Node.ExpAsState
+---| LuaParser.Node.StateStartWithExp
+---| LuaParser.Node.Label
+---| LuaParser.Node.Goto
 
 ---@return LuaParser.Node.State?
 function Ast:parseState()
-    return self:parseLocal()
-        or self:parseStateStartWithExp()
+    local token = self.lexer:peek()
+
+    if token == 'local' then
+        return self:parseLocal()
+    end
+
+    if token == '::' then
+        return self:parseLabel()
+    end
+
+    if token == 'goto' then
+        return self:parseGoto()
+    end
+
+    return self:parseStateStartWithExp()
 end
 
----@alias LuaParser.Node.ExpAsState
+---@alias LuaParser.Node.StateStartWithExp
 ---| LuaParser.Node.Call
 ---| LuaParser.Node.Assign
 ---| LuaParser.Node.SingleExp
 
----@return LuaParser.Node.ExpAsState?
+---@return LuaParser.Node.StateStartWithExp?
 function Ast:parseStateStartWithExp()
     local exp = self:parseExp(false, true)
     if not exp then
