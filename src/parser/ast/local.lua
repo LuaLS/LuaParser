@@ -12,7 +12,18 @@ local LocalDef = class.declare('LuaParser.Node.LocalDef', 'LuaParser.Node.Base')
 ---@field index integer
 ---@field value? LuaParser.Node.Exp
 ---@field refs? LuaParser.Node.Var[]
+---@field attr? LuaParser.Node.Attr
 local Local = class.declare('LuaParser.Node.Local', 'LuaParser.Node.Base')
+
+---@class LuaParser.Node.Attr: LuaParser.Node.Base
+---@field name LuaParser.Node.AttrName
+---@field symbolPos? integer # > 的位置
+local Attr = class.declare('LuaParser.Node.Attr', 'LuaParser.Node.Base')
+
+---@class LuaParser.Node.AttrName: LuaParser.Node.Base
+---@field parent LuaParser.Node.Attr
+---@field id string
+local AttrName = class.declare('LuaParser.Node.AttrName', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
@@ -34,7 +45,7 @@ function Ast:parseLocal()
         refs   = {},
     })
 
-    local vars = self:parseIDList('LuaParser.Node.Local', true)
+    local vars = self:parseLocalList(true)
     localdef.vars = vars
     for i = 1, #vars do
         local var = vars[i]
@@ -63,4 +74,90 @@ function Ast:parseLocal()
     localdef.finish = self:getLastPos()
 
     return localdef
+end
+
+---@param parseAttr? boolean
+---@return LuaParser.Node.Local[]
+function Ast:parseLocalList(parseAttr)
+    ---@type LuaParser.Node.ID[]
+    local list = {}
+    local first = self:parseID('LuaParser.Node.Local', true)
+    list[#list+1] = first
+    if parseAttr then
+        self:skipSpace()
+        local attr = self:parseLocalAttr()
+        if attr then
+            first.attr = attr
+            first.finish = attr.finish
+        end
+    end
+    while true do
+        self:skipSpace()
+        local token, tp = self.lexer:peek()
+        if not token then
+            break
+        end
+        if tp == 'Symbol' then
+            if token == ',' then
+                self.lexer:next()
+                self:skipSpace()
+            else
+                break
+            end
+        else
+            break
+        end
+        local loc = self:parseID('LuaParser.Node.Local', true)
+        if loc then
+            list[#list+1] = loc
+            if parseAttr then
+                self:skipSpace()
+                local attr = self:parseLocalAttr()
+                if attr then
+                    loc.attr = attr
+                    loc.finish = attr.finish
+                end
+            end
+        end
+    end
+    return list
+end
+
+---@return LuaParser.Node.Attr?
+function Ast:parseLocalAttr()
+    local pos = self.lexer:consume '<'
+    if not pos then
+        return nil
+    end
+
+    self:skipSpace()
+    local attrName = self:parseID('LuaParser.Node.AttrName', true)
+    if not attrName then
+        return nil
+    end
+
+    local attrNode = self:createNode('LuaParser.Node.Attr', {
+        start = pos,
+        name  = attrName,
+    })
+    attrName.parent = attrNode
+
+    if  attrName.id ~= 'const'
+    and attrName.id ~= 'close' then
+        self:throw('UNKNOWN_ATTRIBUTE', attrName.start, attrName.finish)
+    end
+
+    self:skipSpace()
+    local symbolPos = self.lexer:consume '>'
+    attrNode.symbolPos = symbolPos
+
+    attrNode.finish = self:getLastPos()
+
+    if not symbolPos and self.lexer:peek() == '>=' then
+        local _, _, ltPos = self.lexer:peek()
+        ---@cast ltPos integer
+        self:throw('MISS_SPACE_BETWEEN', ltPos, ltPos + 2)
+    end
+
+    return attrNode
 end

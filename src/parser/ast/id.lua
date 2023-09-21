@@ -10,6 +10,7 @@ local Ast = class.declare 'LuaParser.Ast'
 ---| LuaParser.Node.TableFieldID
 ---| LuaParser.Node.Param
 ---| LuaParser.Node.LabelName
+---| LuaParser.Node.AttrName
 
 ---@generic T: LuaParser.Node.ID
 ---@param nodeType `T`
@@ -45,9 +46,10 @@ end
 
 ---@generic T: LuaParser.Node.ID
 ---@param nodeType `T`
----@param atLeastOne? true
+---@param atLeastOne? boolean
+---@param greedy? boolean
 ---@return T[]
-function Ast:parseIDList(nodeType, atLeastOne)
+function Ast:parseIDList(nodeType, atLeastOne, greedy)
     ---@type LuaParser.Node.ID[]
     local list = {}
     local first = self:parseID(nodeType, atLeastOne)
@@ -66,6 +68,9 @@ function Ast:parseIDList(nodeType, atLeastOne)
                 break
             end
         else
+            if not greedy then
+                break
+            end
             if tp == 'Word' and self:isKeyWord(token) then
                 break
             end

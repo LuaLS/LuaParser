@@ -22,6 +22,19 @@ local FinishMap = {
 }
 
 ---@param block LuaParser.Node.Block
+function Ast:blockStart(block)
+    self.blocks[#self.blocks+1] = block
+    self.curBlock = block
+end
+
+---@param block LuaParser.Node.Block
+function Ast:blockFinish(block)
+    assert(self.curBlock == block)
+    self.blocks[#self.blocks] = nil
+    self.curBlock = self.blocks[#self.blocks]
+end
+
+---@param block LuaParser.Node.Block
 function Ast:parseBlockChilds(block)
     while true do
         local token = self.lexer:peek()

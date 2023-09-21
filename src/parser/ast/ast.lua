@@ -54,6 +54,12 @@ function M:__init(code, version, options)
     -- 注释
     ---@type LuaParser.Node.Comment[]
     self.comments    = {}
+    -- 代码块
+    ---@type LuaParser.Node.Block[]
+    self.blocks      = {}
+    -- 当前代码块
+    ---@type LuaParser.Node.Block
+    self.curBlock    = nil
 
     local major, minor = self.version:match 'Lua (%d+)%.(%d+)'
     ---@type integer

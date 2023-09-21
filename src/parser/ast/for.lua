@@ -28,7 +28,7 @@ function Ast:parseFor()
     })
 
     self:skipSpace()
-    local vars = self:parseIDList('LuaParser.Node.Local', true)
+    local vars = self:parseLocalList()
     forNode.vars = vars
     for i = 1, #vars do
         local var = vars[i]

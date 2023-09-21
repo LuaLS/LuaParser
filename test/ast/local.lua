@@ -118,3 +118,35 @@ TEST [[local x, y = 1, 2, 3]]
         },
     }
 }
+
+TEST [[local x <const>, y < close > = 1, 2]]
+{
+    vars    = {
+        [1] = {
+            id   = 'x',
+            attr = {
+                start     = 8,
+                finish    = 15,
+                symbolPos = 14,
+                name      = {
+                    start  = 9,
+                    finish = 14,
+                    id     = 'const',
+                }
+            }
+        },
+        [2] = {
+            id = 'y',
+            attr = {
+                start     = 19,
+                finish    = 28,
+                symbolPos = 27,
+                name      = {
+                    start  = 21,
+                    finish = 26,
+                    id     = 'close',
+                }
+            }
+        },
+    },
+}
