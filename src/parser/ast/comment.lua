@@ -25,6 +25,7 @@ end
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
+---@private
 ---@param inExp? boolean
 ---@return LuaParser.Node.Comment?
 function Ast:parseComment(inExp)
@@ -32,6 +33,7 @@ function Ast:parseComment(inExp)
         or self:parseShortComment(inExp)
 end
 
+---@private
 ---@param inExp? boolean
 ---@return LuaParser.Node.Comment?
 function Ast:parseShortComment(inExp)
@@ -56,6 +58,7 @@ function Ast:parseShortComment(inExp)
     return nil
 end
 
+---@private
 ---@return LuaParser.Node.Comment?
 function Ast:parseLongComment()
     local token, _, pos = self.lexer:peek()

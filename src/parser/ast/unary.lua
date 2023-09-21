@@ -22,6 +22,7 @@ local Unary = class.declare('LuaParser.Node.Unary', 'LuaParser.Node.Base')
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
+---@private
 ---@return LuaParser.Node.Unary?
 ---@return integer? opLevel
 function Ast:parseUnary()

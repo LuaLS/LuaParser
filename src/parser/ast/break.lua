@@ -9,6 +9,7 @@ local Continue = class.declare('LuaParser.Node.Continue', 'LuaParser.Node.Base')
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
+---@private
 ---@return LuaParser.Node.Break?
 function Ast:parseBreak()
     local pos = self.lexer:consume 'break'
@@ -22,6 +23,7 @@ function Ast:parseBreak()
     })
 end
 
+---@private
 ---@return LuaParser.Node.Continue?
 function Ast:parseContinue()
     if not self.nssymbolMap['continue'] then

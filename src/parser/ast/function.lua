@@ -22,6 +22,7 @@ local Function = class.declare('LuaParser.Node.Function', 'LuaParser.Node.Block'
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
+---@private
 ---@param isLocal? boolean
 ---@return LuaParser.Node.Function?
 function Ast:parseFunction(isLocal)
@@ -90,6 +91,7 @@ function Ast:parseFunction(isLocal)
     return func
 end
 
+---@private
 ---@return LuaParser.Node.FuncName?
 function Ast:parseFunctionName()
     local head = self:parseVar()
@@ -116,6 +118,7 @@ function Ast:parseFunctionName()
     return current
 end
 
+---@private
 ---@return LuaParser.Node.Param[]
 function Ast:parseParamList()
     ---@type LuaParser.Node.Param[]
@@ -148,6 +151,7 @@ function Ast:parseParamList()
     return list
 end
 
+---@private
 ---@return LuaParser.Node.Param?
 function Ast:parseParam()
     local param = self:parseID('LuaParser.Node.Param')

@@ -17,6 +17,7 @@ local Goto = class.declare('LuaParser.Node.Goto', 'LuaParser.Node.Base')
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
+---@private
 ---@return LuaParser.Node.Label?
 function Ast:parseLabel()
     local pos = self.lexer:consume '::'
@@ -45,6 +46,7 @@ function Ast:parseLabel()
     return label
 end
 
+---@private
 ---@return LuaParser.Node.Goto?
 function Ast:parseGoto()
     if not self:isKeyWord 'goto' then

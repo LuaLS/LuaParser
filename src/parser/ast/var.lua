@@ -14,6 +14,7 @@ local Varargs = class.declare('LuaParser.Node.Varargs', 'LuaParser.Node.Base')
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
+---@private
 ---@return LuaParser.Node.Var?
 function Ast:parseVar()
     local var = self:parseID('LuaParser.Node.Var')
@@ -24,6 +25,7 @@ function Ast:parseVar()
     return var
 end
 
+---@private
 ---@return LuaParser.Node.Varargs?
 function Ast:parseVarargs()
     local pos = self.lexer:consume '...'

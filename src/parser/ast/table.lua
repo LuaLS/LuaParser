@@ -7,6 +7,7 @@ local Table = class.declare('LuaParser.Node.Table', 'LuaParser.Node.Base')
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
+---@private
 ---@return LuaParser.Node.Table?
 function Ast:parseTable()
     local pos = self.lexer:consume '{'
@@ -44,6 +45,7 @@ function Ast:parseTable()
     return table
 end
 
+---@private
 ---@return LuaParser.Node.TableField[]
 function Ast:parseTableFields()
     local fields = {}

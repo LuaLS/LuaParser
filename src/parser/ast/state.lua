@@ -28,6 +28,7 @@ local Ast = class.declare 'LuaParser.Ast'
 ---| LuaParser.Node.Repeat
 ---| LuaParser.Node.Function
 
+---@private
 ---@return LuaParser.Node.State?
 function Ast:parseState()
     local token = self.lexer:peek()
@@ -90,6 +91,7 @@ end
 ---| LuaParser.Node.Assign
 ---| LuaParser.Node.SingleExp
 
+---@private
 ---@return LuaParser.Node.StateStartWithExp?
 function Ast:parseStateStartWithExp()
     local exp = self:parseExp(false, true)
@@ -122,6 +124,7 @@ function Ast:parseStateStartWithExp()
     return state
 end
 
+---@private
 ---@param first LuaParser.Node.Field
 ---@return LuaParser.Node.Assign?
 function Ast:parseAssign(first)

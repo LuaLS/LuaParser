@@ -8,6 +8,7 @@ local Repeat = class.declare('LuaParser.Node.Repeat', 'LuaParser.Node.Block')
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
+---@private
 ---@return LuaParser.Node.Repeat?
 function Ast:parseRepeat()
     local pos = self.lexer:consume 'repeat'

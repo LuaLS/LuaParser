@@ -16,6 +16,7 @@ For.exps = {}
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
+---@private
 ---@return LuaParser.Node.For?
 function Ast:parseFor()
     local pos = self.lexer:consume 'for'

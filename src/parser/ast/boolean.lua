@@ -8,6 +8,7 @@ local Boolean = class.declare('LuaParser.Node.Boolean', 'LuaParser.Node.Literal'
 local Ast = class.declare 'LuaParser.Ast'
 
 -- 解析布尔值
+---@private
 ---@return LuaParser.Node.Boolean?
 function Ast:parseBoolean()
     local token = self.lexer:peek()

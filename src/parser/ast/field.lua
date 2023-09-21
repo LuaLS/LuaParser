@@ -32,6 +32,7 @@ local TableFieldID = class.declare('LuaParser.Node.TableFieldID', 'LuaParser.Nod
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
+---@private
 ---@param last LuaParser.Node.Term
 ---@return LuaParser.Node.Field?
 function Ast:parseField(last)
@@ -88,6 +89,7 @@ function Ast:parseField(last)
     return nil
 end
 
+---@private
 ---@return LuaParser.Node.TableField?
 function Ast:parseTableField()
     return self:parseTableFieldAsField()
@@ -95,6 +97,7 @@ function Ast:parseTableField()
         or self:parseTableFieldAsExp()
 end
 
+---@private
 ---@return LuaParser.Node.TableField?
 function Ast:parseTableFieldAsField()
     local savePoint = self.lexer:savePoint()
@@ -123,6 +126,7 @@ function Ast:parseTableFieldAsField()
     return tfield
 end
 
+---@private
 ---@return LuaParser.Node.TableField?
 function Ast:parseTableFieldAsIndex()
     local token, _, pos = self.lexer:peek()
@@ -162,6 +166,7 @@ function Ast:parseTableFieldAsIndex()
     return tfield
 end
 
+---@private
 ---@return LuaParser.Node.TableField?
 function Ast:parseTableFieldAsExp()
     local exp = self:parseExp()

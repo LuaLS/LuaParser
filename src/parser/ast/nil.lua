@@ -10,6 +10,7 @@ Nil.isTruly = false
 local Ast = class.declare 'LuaParser.Ast'
 
 -- 解析 nil
+---@private
 ---@return LuaParser.Node.Nil?
 function Ast:parseNil()
     local token = self.lexer:peek()

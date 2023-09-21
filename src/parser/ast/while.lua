@@ -9,6 +9,7 @@ local While = class.declare('LuaParser.Node.While', 'LuaParser.Node.Block')
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
+---@private
 ---@return LuaParser.Node.While?
 function Ast:parseWhile()
     local pos = self.lexer:consume 'while'

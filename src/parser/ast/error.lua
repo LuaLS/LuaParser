@@ -39,6 +39,7 @@ function Ast:throwMissExp(start)
 end
 
 -- 断言下个符号，如果成功则消耗，否则报错
+---@private
 ---@param symbol string
 ---@return integer? pos
 function Ast:assertSymbol(symbol)

@@ -53,6 +53,7 @@ local Binary = class.declare('LuaParser.Node.Binary', 'LuaParser.Node.Base')
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
+---@private
 ---@param curExp LuaParser.Node.Exp
 ---@param curLevel? integer
 ---@param asState? boolean # 是否作为语句解析

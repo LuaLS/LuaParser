@@ -37,6 +37,7 @@ local AttrName = class.declare('LuaParser.Node.AttrName', 'LuaParser.Node.Base')
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
+---@private
 ---@return (LuaParser.Node.LocalDef | LuaParser.Node.Function)?
 function Ast:parseLocal()
     local pos = self.lexer:consume 'local'
@@ -86,6 +87,7 @@ function Ast:parseLocal()
     return localdef
 end
 
+---@private
 ---@param loc LuaParser.Node.Local
 function Ast:initLocal(loc)
     local block = self.curBlock
@@ -99,10 +101,12 @@ function Ast:initLocal(loc)
     block.localMap[name] = loc
 end
 
+---@private
 function Ast:getLocal()
     
 end
 
+---@private
 ---@param parseAttr? boolean
 ---@return LuaParser.Node.Local[]
 function Ast:parseLocalList(parseAttr)
@@ -150,6 +154,7 @@ function Ast:parseLocalList(parseAttr)
     return list
 end
 
+---@private
 ---@return LuaParser.Node.Attr?
 function Ast:parseLocalAttr()
     local pos = self.lexer:consume '<'

@@ -31,12 +31,14 @@ local FinishMap = {
     [')']      = true,
 }
 
+---@private
 ---@param block LuaParser.Node.Block
 function Ast:blockStart(block)
     self.blocks[#self.blocks+1] = block
     self.curBlock = block
 end
 
+---@private
 ---@param block LuaParser.Node.Block
 function Ast:blockFinish(block)
     assert(self.curBlock == block)
@@ -44,6 +46,7 @@ function Ast:blockFinish(block)
     self.curBlock = self.blocks[#self.blocks]
 end
 
+---@private
 ---@param block LuaParser.Node.Block
 function Ast:blockParseChilds(block)
     while true do

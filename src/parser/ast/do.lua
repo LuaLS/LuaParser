@@ -7,6 +7,7 @@ local Do = class.declare('LuaParser.Node.Do', 'LuaParser.Node.Block')
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
+---@private
 ---@return LuaParser.Node.Do?
 function Ast:parseDo()
     local pos = self.lexer:consume 'do'

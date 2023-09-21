@@ -56,6 +56,7 @@ end
 local Ast = class.declare 'LuaParser.Ast'
 
 -- 解析字符串
+---@private
 ---@return LuaParser.Node.String?
 function Ast:parseString()
     local token = self.lexer:peek()
@@ -71,6 +72,7 @@ function Ast:parseString()
 end
 
 -- 解析短字符串
+---@private
 ---@return LuaParser.Node.String?
 function Ast:parseShortString()
     local quo, _, pos = self.lexer:peek()
@@ -255,6 +257,7 @@ function Ast:parseShortString()
 end
 
 -- 解析长字符串
+---@private
 ---@return LuaParser.Node.String?
 function Ast:parseLongString()
     local _, _, pos = self.lexer:peek()

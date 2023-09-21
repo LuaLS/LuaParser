@@ -110,6 +110,7 @@ end
 local Ast = class.declare 'LuaParser.Ast'
 
 -- 解析数字（可以带负号）
+---@private
 ---@return LuaParser.Node.Float | LuaParser.Node.Integer | nil
 function Ast:parseNumber()
     -- 快速判断是否为数字
@@ -227,6 +228,7 @@ function Ast:buildInteger(value, startPos, curOffset)
 end
 
 -- 解析十六进制数字（不支持负号）
+---@private
 ---@return LuaParser.Node.Float | LuaParser.Node.Integer | nil
 function Ast:parseNumber16()
     local token, _, pos = self.lexer:peek()
@@ -278,6 +280,7 @@ function Ast:parseNumber16()
 end
 
 -- 解析二进制数字（不支持负号）
+---@private
 ---@return LuaParser.Node.Integer | nil
 function Ast:parseNumber2()
     local token, _, pos = self.lexer:peek()
@@ -305,6 +308,7 @@ function Ast:parseNumber2()
 end
 
 -- 解析十进制数字（不支持负号）
+---@private
 ---@return LuaParser.Node.Float | LuaParser.Node.Integer | nil
 function Ast:parseNumber10()
     local token, tp, pos = self.lexer:peek()

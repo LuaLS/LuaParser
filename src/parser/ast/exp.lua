@@ -46,6 +46,7 @@ local Ast = class.declare 'LuaParser.Ast'
 ---| LuaParser.Node.Binary
 
 -- 解析表达式
+---@private
 ---@param required? boolean
 ---@param curLevel? integer # 新表达式的符号优先级必须比这个大
 ---@param asState? boolean # 是否作为语句解析
@@ -80,6 +81,7 @@ function Ast:parseExp(required, asState, curLevel)
 end
 
 -- 解析表达式列表，以逗号分隔
+---@private
 ---@param atLeastOne? boolean
 ---@param greedy? boolean
 ---@return LuaParser.Node.Exp[]
@@ -138,6 +140,7 @@ end
 ---| LuaParser.Node.Call
 
 -- 解析表达式中的一项
+---@private
 ---@return LuaParser.Node.Term?
 function Ast:parseTerm()
     ---@type LuaParser.Node.TermHead?
@@ -174,6 +177,7 @@ function Ast:parseTerm()
     return current
 end
 
+---@private
 ---@return LuaParser.Node.Paren?
 function Ast:parseParen()
     local pos = self.lexer:consume '('

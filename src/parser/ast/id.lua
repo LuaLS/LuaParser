@@ -12,6 +12,7 @@ local Ast = class.declare 'LuaParser.Ast'
 ---| LuaParser.Node.LabelName
 ---| LuaParser.Node.AttrName
 
+---@private
 ---@generic T: LuaParser.Node.ID
 ---@param nodeType `T`
 ---@param required? true
@@ -44,6 +45,7 @@ function Ast:parseID(nodeType, required)
     })
 end
 
+---@private
 ---@generic T: LuaParser.Node.ID
 ---@param nodeType `T`
 ---@param atLeastOne? boolean
@@ -109,6 +111,7 @@ Ast.keyWordMap = {
     ['while']    = true,
 }
 
+---@private
 ---@param word string
 ---@return boolean
 function Ast:isKeyWord(word)

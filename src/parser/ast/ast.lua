@@ -129,6 +129,7 @@ function M:skipSpace(inExp)
 end
 
 -- 获取上个词的右侧位置（不包括换行符和注释）
+---@private
 ---@return integer
 function M:getLastPos()
     local ci = self.lexer.ci
@@ -141,6 +142,7 @@ function M:getLastPos()
 end
 
 -- 创建一个节点
+---@private
 ---@generic T: string
 ---@param type `T`
 ---@param data table

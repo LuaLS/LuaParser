@@ -9,6 +9,7 @@ local Call = class.declare('LuaParser.Node.Call', 'LuaParser.Node.Base')
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
+---@private
 ---@param last LuaParser.Node.Term
 ---@return LuaParser.Node.Call?
 function Ast:parseCall(last)

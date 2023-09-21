@@ -13,6 +13,7 @@ local IfChild = class.declare('LuaParser.Node.IfChild', 'LuaParser.Node.Block')
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
+---@private
 ---@return LuaParser.Node.If?
 function Ast:parseIf()
     local token, _, pos = self.lexer:peek()
@@ -42,6 +43,7 @@ function Ast:parseIf()
     return ifNode
 end
 
+---@private
 ---@return LuaParser.Node.IfChild?
 function Ast:parseIfChild()
     return self:parseIfChildIf()
@@ -49,6 +51,7 @@ function Ast:parseIfChild()
         or self:parseIfChildElse()
 end
 
+---@private
 ---@return LuaParser.Node.IfChild?
 function Ast:parseIfChildIf()
     local pos = self.lexer:consume 'if'
@@ -78,6 +81,7 @@ function Ast:parseIfChildIf()
     return node
 end
 
+---@private
 ---@return LuaParser.Node.IfChild?
 function Ast:parseIfChildElseIf()
     local pos = self.lexer:consume 'elseif'
@@ -107,6 +111,7 @@ function Ast:parseIfChildElseIf()
     return node
 end
 
+---@private
 ---@return LuaParser.Node.IfChild?
 function Ast:parseIfChildElse()
     local pos = self.lexer:consume 'else'

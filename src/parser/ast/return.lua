@@ -7,6 +7,7 @@ local Return = class.declare('LuaParser.Node.Return', 'LuaParser.Node.Base')
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
+---@private
 ---@return LuaParser.Node.Return?
 function Ast:parseReturn()
     local pos = self.lexer:consume 'return'
