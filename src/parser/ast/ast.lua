@@ -58,7 +58,7 @@ function M:__init(code, version, options)
     ---@type LuaParser.Node.Block[]
     self.blocks      = {}
     -- 当前代码块
-    ---@type LuaParser.Node.Block
+    ---@type LuaParser.Node.Block?
     self.curBlock    = nil
 
     local major, minor = self.version:match 'Lua (%d+)%.(%d+)'

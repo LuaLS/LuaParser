@@ -32,3 +32,58 @@ end
         },
     }
 }
+do return end
+TEST [[
+do
+    local x = x
+    x = 1
+    print(x)
+end
+]]
+{
+    childs = {
+        [1] = {
+            type   = 'LocalDef',
+            vars   = {
+                [1] = {
+                    id   = 'x',
+                    sets = {
+                        [1] = {
+                            left = 20004,
+                        }
+                    },
+                    gets = {
+                        [1] = {
+                            left = 30010,
+                        }
+                    },
+                    value = {
+                        loc = NIL,
+                    }
+                },
+            },
+        },
+        [2] = {
+            type = 'Assign',
+            exps = {
+                [1] = {
+                    id  = 'x',
+                    loc = {
+                        left = 10004,
+                    }
+                }
+            }
+        },
+        [3] = {
+            type = 'Call',
+            args = {
+                [1] = {
+                    id  = 'x',
+                    loc = {
+                        left = 10004,
+                    }
+                }
+            }
+        },
+    }
+}

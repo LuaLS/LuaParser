@@ -20,7 +20,7 @@ function Ast:parseRepeat()
     })
 
     self:skipSpace()
-    self:parseBlockChilds(repeatNode)
+    self:blockParseChilds(repeatNode)
 
     self:skipSpace()
     local symbolPos = self:assertSymbol 'until'

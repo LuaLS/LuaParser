@@ -1,6 +1,6 @@
 local class = require 'class'
 
----@class LuaParser.Node.Param: LuaParser.Node.Base
+---@class LuaParser.Node.Param: LuaParser.Node.Local
 ---@field parent LuaParser.Node.Function
 ---@field index integer
 ---@field id string
@@ -65,7 +65,7 @@ function Ast:parseFunction(isLocal)
 
     if symbolPos2 then
         self:skipSpace()
-        self:parseBlockChilds(func)
+        self:blockParseChilds(func)
     end
 
     self:skipSpace()

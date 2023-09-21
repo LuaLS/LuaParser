@@ -2,10 +2,20 @@ local class = require 'class'
 
 ---@class LuaParser.Node.Block: LuaParser.Node.Base
 ---@field childs LuaParser.Node.State[]
+---@field locals LuaParser.Node.Local[]
+---@field localMap table<string, LuaParser.Node.Local>
 local Block = class.declare('LuaParser.Node.Block', 'LuaParser.Node.Base')
 Block.isBlock = true
 
 Block.__getter.childs = function ()
+    return {}, true
+end
+
+Block.__getter.locals = function ()
+    return {}, true
+end
+
+Block.__getter.localMap = function ()
     return {}, true
 end
 
@@ -35,7 +45,7 @@ function Ast:blockFinish(block)
 end
 
 ---@param block LuaParser.Node.Block
-function Ast:parseBlockChilds(block)
+function Ast:blockParseChilds(block)
     while true do
         local token = self.lexer:peek()
         if FinishMap[token] then

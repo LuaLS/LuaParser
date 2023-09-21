@@ -1,7 +1,12 @@
+NIL = {'<NIL>'}
+
 ---@param result any
 ---@param expect any
 function Match(result, expect)
     for k, v in pairs(expect) do
+        if v == NIL then
+            assert(result[k] == nil)
+        end
         if type(v) == 'table' then
             Match(result[k], v)
         else

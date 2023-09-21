@@ -19,7 +19,9 @@ function Ast:parseDo()
     })
 
     self:skipSpace()
-    self:parseBlockChilds(doNode)
+    self:blockStart(doNode)
+    self:blockParseChilds(doNode)
+    self:blockFinish(doNode)
 
     self:skipSpace()
     doNode.symbolPos = self:assertSymbol 'end'

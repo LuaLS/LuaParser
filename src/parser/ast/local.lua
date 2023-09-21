@@ -11,9 +11,18 @@ local LocalDef = class.declare('LuaParser.Node.LocalDef', 'LuaParser.Node.Base')
 ---@field parent LuaParser.Node.LocalDef | LuaParser.Node.For | LuaParser.Node.Function
 ---@field index integer
 ---@field value? LuaParser.Node.Exp
----@field refs? LuaParser.Node.Var[]
+---@field gets? LuaParser.Node.Var[]
+---@field sets? LuaParser.Node.Var[]
 ---@field attr? LuaParser.Node.Attr
 local Local = class.declare('LuaParser.Node.Local', 'LuaParser.Node.Base')
+
+Local.__getter.sets = function ()
+    return {}, true
+end
+
+Local.__getter.gets = function ()
+    return {}, true
+end
 
 ---@class LuaParser.Node.Attr: LuaParser.Node.Base
 ---@field name LuaParser.Node.AttrName
@@ -42,16 +51,10 @@ function Ast:parseLocal()
 
     local localdef = self:createNode('LuaParser.Node.LocalDef', {
         start  = pos,
-        refs   = {},
     })
 
     local vars = self:parseLocalList(true)
     localdef.vars = vars
-    for i = 1, #vars do
-        local var = vars[i]
-        var.parent = localdef
-        var.index  = i
-    end
 
     self:skipSpace()
     local symbolPos = self:assertSymbol '='
@@ -73,7 +76,31 @@ function Ast:parseLocal()
 
     localdef.finish = self:getLastPos()
 
+    for i = 1, #vars do
+        local var = vars[i]
+        var.parent = localdef
+        var.index  = i
+        self:initLocal(var)
+    end
+
     return localdef
+end
+
+---@param loc LuaParser.Node.Local
+function Ast:initLocal(loc)
+    local block = self.curBlock
+    if not block then
+        return
+    end
+
+    block.locals[#block.locals+1] = loc
+
+    local name = loc.id
+    block.localMap[name] = loc
+end
+
+function Ast:getLocal()
+    
 end
 
 ---@param parseAttr? boolean
