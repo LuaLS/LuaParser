@@ -15,9 +15,8 @@ local Ast = class.declare 'LuaParser.Ast'
 ---@param finish integer?
 ---@param extra table?
 function Ast:throw(errorCode, start, finish, extra)
-    self.errors[#self.errors+1] = class.new('LuaParser.Node.Error', {
+    self.errors[#self.errors+1] = self:createNode('LuaParser.Node.Error', {
         code   = errorCode,
-        ast    = self,
         start  = start,
         finish = finish or start,
         extra  = extra,

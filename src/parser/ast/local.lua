@@ -29,8 +29,7 @@ function Ast:parseLocal()
         return self:parseFunction(true)
     end
 
-    local localdef = class.new('LuaParser.Node.LocalDef', {
-        ast    = self,
+    local localdef = self:createNode('LuaParser.Node.LocalDef', {
         start  = pos,
         refs   = {},
     })

@@ -80,9 +80,10 @@ function Ast:parseExp(required, asState, curLevel)
 end
 
 -- 解析表达式列表，以逗号分隔
----@param atLeastOne? true
+---@param atLeastOne? boolean
+---@param greedy? boolean
 ---@return LuaParser.Node.Exp[]
-function Ast:parseExpList(atLeastOne)
+function Ast:parseExpList(atLeastOne, greedy)
     ---@type LuaParser.Node.Exp[]
     local list = {}
     local first = self:parseExp(atLeastOne)
@@ -101,6 +102,9 @@ function Ast:parseExpList(atLeastOne)
                 break
             end
         else
+            if not greedy then
+                break
+            end
             if tp == 'Word' and self:isKeyWord(token) then
                 break
             end
@@ -180,8 +184,7 @@ function Ast:parseParen()
     if not exp then
         return nil
     end
-    local paren = class.new('LuaParser.Node.Paren', {
-        ast    = self,
+    local paren = self:createNode('LuaParser.Node.Paren', {
         start  = pos,
         exp    = exp,
     })

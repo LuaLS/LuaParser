@@ -42,8 +42,7 @@ function Ast:parseField(last)
         self:skipSpace()
         local key = self:parseID('LuaParser.Node.FieldID', true)
         if key then
-            local field = class.new('LuaParser.Node.Field', {
-                ast        = self,
+            local field = self:createNode('LuaParser.Node.Field', {
                 start      = last.start,
                 finish     = key.finish,
                 subtype    = (token == '.') and 'field' or 'method',
@@ -71,8 +70,7 @@ function Ast:parseField(last)
         if key then
             self:skipSpace()
             local symbolPos2 = self:assertSymbol(']')
-            local field = class.new('LuaParser.Node.Field', {
-                ast        = self,
+            local field = self:createNode('LuaParser.Node.Field', {
                 start      = last.start,
                 finish     = self:getLastPos(),
                 subtype    = 'index',
@@ -111,8 +109,7 @@ function Ast:parseTableFieldAsField()
     end
     self:skipSpace()
     local value = self:parseExp(true)
-    local tfield = class.new('LuaParser.Node.TableField', {
-        ast     = self,
+    local tfield = self:createNode('LuaParser.Node.TableField', {
         subtype = 'field',
         key     = key,
         value   = value,
@@ -147,8 +144,7 @@ function Ast:parseTableFieldAsIndex()
     self:assertSymbol '='
     self:skipSpace()
     local value = self:parseExp(true)
-    local tfield = class.new('LuaParser.Node.TableField', {
-        ast     = self,
+    local tfield = self:createNode('LuaParser.Node.TableField', {
         subtype = 'index',
         key     = key,
         value   = value,
@@ -172,8 +168,7 @@ function Ast:parseTableFieldAsExp()
     if not exp then
         return nil
     end
-    local tfield = class.new('LuaParser.Node.TableField', {
-        ast     = self,
+    local tfield = self:createNode('LuaParser.Node.TableField', {
         subtype = 'exp',
         value   = exp,
         start   = exp.start,

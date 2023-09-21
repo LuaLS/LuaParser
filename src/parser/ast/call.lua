@@ -14,10 +14,9 @@ local Ast = class.declare 'LuaParser.Ast'
 function Ast:parseCall(last)
     local pos = self.lexer:consume '('
     if pos then
-        local exps = self:parseExpList()
+        local exps = self:parseExpList(false, true)
         self:assertSymbol ')'
-        local call = class.new('LuaParser.Node.Call', {
-            ast     = self,
+        local call = self:createNode('LuaParser.Node.Call', {
             start   = last.start,
             finish  = self:getLastPos(),
             node    = last,
@@ -34,8 +33,7 @@ function Ast:parseCall(last)
     local literalArg = self:parseString()
                     or self:parseTable()
     if literalArg then
-        local call = class.new('LuaParser.Node.Call', {
-            ast     = self,
+        local call = self:createNode('LuaParser.Node.Call', {
             start   = last.start,
             finish  = self:getLastPos(),
             node    = last,

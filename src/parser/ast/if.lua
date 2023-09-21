@@ -20,8 +20,7 @@ function Ast:parseIf()
         return nil
     end
 
-    local ifNode = class.new('LuaParser.Node.If', {
-        ast    = self,
+    local ifNode = self:createNode('LuaParser.Node.If', {
         start  = pos,
         childs = {},
     })
@@ -60,8 +59,7 @@ function Ast:parseIfChildIf()
     self:skipSpace()
     local condition = self:parseExp()
 
-    local node = class.new('LuaParser.Node.IfChild', {
-        ast       = self,
+    local node = self:createNode('LuaParser.Node.IfChild', {
         subtype   = 'if',
         start     = pos,
         condition = condition,
@@ -90,8 +88,7 @@ function Ast:parseIfChildElseIf()
     self:skipSpace()
     local condition = self:parseExp()
 
-    local node = class.new('LuaParser.Node.IfChild', {
-        ast       = self,
+    local node = self:createNode('LuaParser.Node.IfChild', {
         subtype   = 'elseif',
         start     = pos,
         condition = condition,
@@ -119,8 +116,7 @@ function Ast:parseIfChildElse()
 
     self:skipSpace()
 
-    local node = class.new('LuaParser.Node.IfChild', {
-        ast       = self,
+    local node = self:createNode('LuaParser.Node.IfChild', {
         subtype   = 'else',
         start     = pos,
     })

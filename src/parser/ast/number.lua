@@ -188,8 +188,7 @@ function Ast:buildFloat(value, startPos, curOffset)
         valuei = value
     end
     self:fastForwardNumber(curOffset)
-    return class.new('LuaParser.Node.Float', {
-        ast     = self,
+    return self:createNode('LuaParser.Node.Float', {
         start   = startPos,
         finish  = curOffset - 1,
         value   = valuei and 0.0 or value,
@@ -218,8 +217,7 @@ function Ast:buildInteger(value, startPos, curOffset)
         end
     end
     self:fastForwardNumber(curOffset)
-    return class.new('LuaParser.Node.Integer', {
-        ast     = self,
+    return self:createNode('LuaParser.Node.Integer', {
         start   = startPos,
         finish  = curOffset - 1,
         value   = valuei and 0 or value,

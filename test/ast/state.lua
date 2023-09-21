@@ -167,6 +167,7 @@ end
     type  = 'Do',
     left  = 0,
     right = 10003,
+    symbolPos = 3,
 }
 
 TEST [[

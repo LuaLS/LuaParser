@@ -134,6 +134,16 @@ function M:getLastPos()
     return pos + #token
 end
 
+-- 创建一个节点
+---@generic T: string
+---@param type `T`
+---@param data table
+---@return T
+function M:createNode(type, data)
+    data.ast = self
+    return class.new(type, data)
+end
+
 -- 编译Lua代码
 function M:parseMain()
     self:skipSpace()

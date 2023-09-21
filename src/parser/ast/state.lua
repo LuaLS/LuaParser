@@ -112,7 +112,7 @@ function Ast:parseStateStartWithExp()
         end
     end
 
-    local state = class.new('LuaParser.Node.SingleExp', {
+    local state = self:createNode('LuaParser.Node.SingleExp', {
         start  = exp.start,
         finish = exp.finish,
         exp    = exp,
@@ -130,7 +130,7 @@ function Ast:parseAssign(first)
         return nil
     end
 
-    local assign = class.new('LuaParser.Node.Assign', {
+    local assign = self:createNode('LuaParser.Node.Assign', {
         start  = first.start,
         exps   = {},
     })

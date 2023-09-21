@@ -18,8 +18,7 @@ function Ast:parseNil()
     end
     local start, finish = self.lexer:range()
     self.lexer:next()
-    return class.new('LuaParser.Node.Nil', {
-        ast     = self,
+    return self:createNode('LuaParser.Node.Nil', {
         start   = start,
         finish  = finish,
     })

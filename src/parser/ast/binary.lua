@@ -109,8 +109,7 @@ function Ast:parseBinary(curExp, curLevel, asState)
 
     local exp2 = self:parseExp(true, false, myLevel)
 
-    local binary = class.new('LuaParser.Node.Binary', {
-        ast       = self,
+    local binary = self:createNode('LuaParser.Node.Binary', {
         start     = curExp.start,
         finish    = self:getLastPos(),
         op        = op,

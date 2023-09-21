@@ -15,8 +15,7 @@ function Ast:parseRepeat()
         return nil
     end
 
-    local repeatNode = class.new('LuaParser.Node.Repeat', {
-        ast       = self,
+    local repeatNode = self:createNode('LuaParser.Node.Repeat', {
         start     = pos,
     })
 

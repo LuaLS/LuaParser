@@ -245,8 +245,7 @@ function Ast:parseShortString()
         quo = '"'
     end
 
-    return class.new('LuaParser.Node.String', {
-        ast     = self,
+    return self:createNode('LuaParser.Node.String', {
         start   = pos,
         finish  = finishPos,
         quo     = quo,
@@ -285,8 +284,7 @@ function Ast:parseLongString()
 
     self.lexer:fastForward(finishPos)
 
-    return class.new('LuaParser.Node.String', {
-        ast     = self,
+    return self:createNode('LuaParser.Node.String', {
         start   = pos,
         finish  = finishPos,
         quo     = quo,

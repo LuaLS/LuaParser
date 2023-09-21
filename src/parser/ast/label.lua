@@ -33,8 +33,7 @@ function Ast:parseLabel()
     self:skipSpace()
     local symbolPos = self:assertSymbol '::'
 
-    local label = class.new('LuaParser.Node.Label', {
-        ast        = self,
+    local label = self:createNode('LuaParser.Node.Label', {
         start      = pos,
         finish     = self:getLastPos(),
         symbolPos  = symbolPos,
@@ -62,8 +61,7 @@ function Ast:parseGoto()
         return nil
     end
 
-    local gotoNode = class.new('LuaParser.Node.Goto', {
-        ast        = self,
+    local gotoNode = self:createNode('LuaParser.Node.Goto', {
         start      = pos,
         finish     = self:getLastPos(),
     })

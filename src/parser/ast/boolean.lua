@@ -14,8 +14,7 @@ function Ast:parseBoolean()
     if token == 'true' then
         local start, finish = self.lexer:range()
         self.lexer:next()
-        return class.new('LuaParser.Node.Boolean', {
-            ast     = self,
+        return self:createNode('LuaParser.Node.Boolean', {
             start   = start,
             finish  = finish,
             value   = true,
@@ -24,8 +23,7 @@ function Ast:parseBoolean()
     if token == 'false' then
         local start, finish = self.lexer:range()
         self.lexer:next()
-        return class.new('LuaParser.Node.Boolean', {
-            ast     = self,
+        return self:createNode('LuaParser.Node.Boolean', {
             start   = start,
             finish  = finish,
             value   = false,

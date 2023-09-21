@@ -16,7 +16,7 @@ function Ast:parseReturn()
 
     local exps = self:parseExpList()
 
-    local ret = class.new('LuaParser.Node.Return', {
+    local ret = self:createNode('LuaParser.Node.Return', {
         start  = pos,
         finish = self:getLastPos(),
         exps   = exps,

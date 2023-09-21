@@ -30,8 +30,7 @@ function Ast:parseVarargs()
     if not pos then
         return nil
     end
-    return class.new('LuaParser.Node.Varargs', {
-        ast    = self,
+    return self:createNode('LuaParser.Node.Varargs', {
         start  = pos,
         finish = pos + 3,
     })

@@ -20,8 +20,7 @@ function Ast:parseTable()
 
     self:assertSymbol '}'
 
-    local table = class.new('LuaParser.Node.Table', {
-        ast     = self,
+    local table = self:createNode('LuaParser.Node.Table', {
         start   = pos,
         finish  = self:getLastPos(),
         fields  = fields,
@@ -32,8 +31,7 @@ function Ast:parseTable()
         field.parent = table
         if field.subtype == 'exp' then
             expi = expi + 1
-            field.key = class.new('LuaParser.Node.Integer', {
-                ast     = self,
+            field.key = self:createNode('LuaParser.Node.Integer', {
                 dummy   = true,
                 value   = expi,
                 start   = field.start,

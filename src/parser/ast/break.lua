@@ -16,8 +16,7 @@ function Ast:parseBreak()
         return
     end
 
-    return class.new('LuaParser.Node.Break', {
-        ast    = self,
+    return self:createNode('LuaParser.Node.Break', {
         start  = pos,
         finish = self:getLastPos(),
     })
@@ -33,8 +32,7 @@ function Ast:parseContinue()
         return
     end
 
-    return class.new('LuaParser.Node.Continue', {
-        ast    = self,
+    return self:createNode('LuaParser.Node.Continue', {
         start  = pos,
         finish = self:getLastPos(),
     })

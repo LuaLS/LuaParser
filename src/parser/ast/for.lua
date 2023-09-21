@@ -23,8 +23,7 @@ function Ast:parseFor()
         return nil
     end
 
-    local forNode = class.new('LuaParser.Node.For', {
-        ast    = self,
+    local forNode = self:createNode('LuaParser.Node.For', {
         start  = pos,
     })
 
@@ -51,7 +50,7 @@ function Ast:parseFor()
     self.lexer:next()
 
     self:skipSpace()
-    local exps = self:parseExpList(true)
+    local exps = self:parseExpList(true, true)
     forNode.exps = exps
     for i = 1, #exps do
         local exp = exps[i]

@@ -1,6 +1,7 @@
 local class = require 'class'
 
 ---@class LuaParser.Node.Do: LuaParser.Node.Block
+---@field symbolPos? integer # end 的位置
 local Do = class.declare('LuaParser.Node.Do', 'LuaParser.Node.Block')
 
 ---@class LuaParser.Ast
@@ -13,8 +14,7 @@ function Ast:parseDo()
         return nil
     end
 
-    local doNode = class.new('LuaParser.Node.Do', {
-        ast    = self,
+    local doNode = self:createNode('LuaParser.Node.Do', {
         start  = pos,
     })
 
@@ -22,7 +22,7 @@ function Ast:parseDo()
     self:parseBlockChilds(doNode)
 
     self:skipSpace()
-    self:assertSymbol 'end'
+    doNode.symbolPos = self:assertSymbol 'end'
 
     doNode.finish = self:getLastPos()
 

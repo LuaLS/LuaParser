@@ -22,8 +22,7 @@ function Ast:parseWhile()
         return nil
     end
 
-    local whileNode = class.new('LuaParser.Node.While', {
-        ast       = self,
+    local whileNode = self:createNode('LuaParser.Node.While', {
         start     = pos,
         condition = condition,
     })

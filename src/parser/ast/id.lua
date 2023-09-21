@@ -36,7 +36,7 @@ function Ast:parseID(nodeType, required)
         end
     end
     self.lexer:next()
-    return class.new(nodeType, {
+    return self:createNode(nodeType, {
         id     = token,
         start  = pos,
         finish = pos + #token,
