@@ -8,7 +8,7 @@ local LocalDef = class.declare('LuaParser.Node.LocalDef', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.Local: LuaParser.Node.Base
 ---@field id string
----@field parent LuaParser.Node.LocalDef | LuaParser.Node.For
+---@field parent LuaParser.Node.LocalDef | LuaParser.Node.For | LuaParser.Node.Function
 ---@field index integer
 ---@field value? LuaParser.Node.Exp
 ---@field refs? LuaParser.Node.Var[]
@@ -17,11 +17,16 @@ local Local = class.declare('LuaParser.Node.Local', 'LuaParser.Node.Base')
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
----@return LuaParser.Node.LocalDef?
+---@return (LuaParser.Node.LocalDef | LuaParser.Node.Function)?
 function Ast:parseLocal()
     local pos = self.lexer:consume 'local'
     if not pos then
         return nil
+    end
+    self:skipSpace()
+
+    if self.lexer:peek() == 'function' then
+        return self:parseFunction(true)
     end
 
     local localdef = class.new('LuaParser.Node.LocalDef', {
@@ -30,7 +35,6 @@ function Ast:parseLocal()
         refs   = {},
     })
 
-    self:skipSpace()
     local vars = self:parseIDList('LuaParser.Node.Local', true)
     localdef.vars = vars
     for i = 1, #vars do

@@ -9,6 +9,7 @@ local Param = class.declare('LuaParser.Node.Param', 'LuaParser.Node.Base')
 ---@alias LuaParser.Node.FuncName
 ---| LuaParser.Node.Var
 ---| LuaParser.Node.Field
+---| LuaParser.Node.Local
 
 ---@class LuaParser.Node.Function: LuaParser.Node.Block
 ---@field name? LuaParser.Node.FuncName
@@ -21,15 +22,21 @@ local Function = class.declare('LuaParser.Node.Function', 'LuaParser.Node.Block'
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
+---@param isLocal? boolean
 ---@return LuaParser.Node.Function?
-function Ast:parseFunction()
+function Ast:parseFunction(isLocal)
     local pos = self.lexer:consume 'function'
     if not pos then
         return nil
     end
 
     self:skipSpace()
-    local name = self:parseFunctionName()
+    local name
+    if isLocal then
+        name = self:parseID('LuaParser.Node.Local', true)
+    else
+        name = self:parseFunctionName()
+    end
 
     self:skipSpace()
     local symbolPos1 = self.lexer:consume '('
@@ -70,6 +77,7 @@ function Ast:parseFunction()
 
     if name then
         name.parent = func
+        name.value  = func
     end
 
     if params then
@@ -91,7 +99,7 @@ function Ast:parseFunctionName()
         return nil
     end
 
-    ---@type LuaParser.Node.FuncName
+    ---@type LuaParser.Node.Var|LuaParser.Node.Field
     local current = head
 
     while true do

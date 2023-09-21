@@ -48,6 +48,9 @@ end
 
 ---@return LuaParser.Node.Goto?
 function Ast:parseGoto()
+    if not self:isKeyWord 'goto' then
+        return nil
+    end
     local pos = self.lexer:consume 'goto'
     if not pos then
         return nil

@@ -338,7 +338,8 @@ end
 {
     type   = 'Function',
     name   = {
-        id = 'f'
+        type = 'Var',
+        id   = 'f'
     },
     params = {
         [1] = {
@@ -364,6 +365,52 @@ end
         key  = {
             id = 'n',
         },
+    },
+    params = {
+        [1] = {
+            id = 'x'
+        },
+        [2] = {
+            id = 'y'
+        }
+    }
+}
+
+TEST [[
+local f = function (x, y)
+end
+]]
+{
+    type   = 'LocalDef',
+    vars   = {
+        [1] = {
+            id = 'f',
+        }
+    },
+    values = {
+        [1] = {
+            type   = 'Function',
+            params = {
+                [1] = {
+                    id = 'x'
+                },
+                [2] = {
+                    id = 'y'
+                }
+            }
+        }
+    }
+}
+
+TEST [[
+local function f(x, y)
+end
+]]
+{
+    type   = 'Function',
+    name   = {
+        type = 'Local',
+        id   = 'f',
     },
     params = {
         [1] = {
