@@ -1,41 +1,62 @@
-CHECK''
+local function TEST(code)
+    return function (expect)
+        local parser = require 'parser'
+        local ast = parser.compile(code)
+        assert(ast)
+        Match(ast, expect)
+    end
+end
+
+TEST ''
 {
-    type   = "main",
-    start  = 0,
-    finish = 0,
-    locals = "<IGNORE>",
+    main = {
+        type   = 'Main',
+        start  = 0,
+        finish = 0,
+    }
 }
 
-CHECK';;;'
+TEST ';;;'
 {
-    type   = "main",
-    start  = 0,
-    finish = 3,
-    locals = "<IGNORE>",
+    main = {
+        start  = 0,
+        finish = 3,
+    }
 }
 
-CHECK';;;x = 1'
+TEST ';;;x = 1'
 {
-    type   = "main",
-    start  = 0,
-    finish = 8,
-    locals = "<IGNORE>",
-    [1]    = {
-        type   = "setglobal",
-        start  = 3,
-        finish = 4,
-        range  = 8,
-        parent = "<IGNORE>",
-        node   = "<IGNORE>",
-        value  = {
-            type   = "integer",
-            start  = 7,
-            finish = 8,
-            parent = "<IGNORE>",
-            [1]    = 1,
+    main = {
+        locals = {
+            [1] = {
+                id = '...',
+                dummy = true,
+            },
+            [2] = {
+                id = '_ENV',
+                dummy = true,
+                envRefs  = {
+                    [1] = {
+                        start = 3
+                    }
+                }
+            }
         },
-        [1]    = "x",
-    },
+        childs = {
+            [1] = {
+                type = 'Assign',
+                exps = {
+                    [1] = {
+                        id = 'x',
+                        env = {
+                            id    = '_ENV',
+                            start = 0,
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 CHECK'x, y, z = 1, 2, 3'
 {

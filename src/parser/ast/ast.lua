@@ -28,8 +28,11 @@ require 'parser.ast.return'
 require 'parser.ast.for'
 require 'parser.ast.while'
 require 'parser.ast.repeat'
+require 'parser.ast.main'
 
 ---@class LuaParser.Ast
+---@field envMode 'fenv' | '_ENV'
+---@field main LuaParser.Node.Main
 ---@overload fun(code: string, version: LuaParser.LuaVersion, options: LuaParser.CompileOptions): LuaParser.Ast
 local M = class.declare 'LuaParser.Ast'
 
@@ -65,6 +68,7 @@ function M:__init(code, version, options)
     ---@type integer
     self.versionNum = major * 10 + minor
 
+    local envMode = 'auto'
     if options then
         if options.nonestandardSymbols then
             for _, s in ipairs(options.nonestandardSymbols) do
@@ -75,6 +79,20 @@ function M:__init(code, version, options)
         self.jit = options.jit
         -- 是否支持Unicode标识符
         self.unicodeName = options.unicodeName
+
+        envMode = options.envMode
+    end
+
+    if envMode == '_ENV'
+    or envMode == 'fenv' then
+        ---@cast envMode '_ENV' | 'fenv'
+        self.envMode = envMode
+    else
+        if self.versionNum >= 52 then
+            self.envMode = '_ENV'
+        else
+            self.envMode = 'fenv'
+        end
     end
 end
 
@@ -150,11 +168,6 @@ end
 function M:createNode(type, data)
     data.ast = self
     return class.new(type, data)
-end
-
--- 编译Lua代码
-function M:parseMain()
-    self:skipSpace()
 end
 
 return M

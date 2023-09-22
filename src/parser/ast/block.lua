@@ -71,6 +71,7 @@ function Ast:blockParseChilds(block)
         if FinishMap[token] then
             break
         end
+        while self.lexer:consume ';' do end
         local state = self:parseState()
         if not state then
             break

@@ -14,6 +14,7 @@ local LocalDef = class.declare('LuaParser.Node.LocalDef', 'LuaParser.Node.Base')
 ---@field refs? LuaParser.Node.Var[]
 ---@field gets? LuaParser.Node.Var[]
 ---@field sets? LuaParser.Node.Var[]
+---@field envRefs? LuaParser.Node.Var[]
 ---@field attr? LuaParser.Node.Attr
 local Local = class.declare('LuaParser.Node.Local', 'LuaParser.Node.Base')
 
@@ -50,6 +51,11 @@ Local.__getter.gets = function (self)
         end
     end
     return gets, true
+end
+
+-- _ENV的隐式引用
+Local.__getter.envRefs = function ()
+    return {}, true
 end
 
 ---@class LuaParser.Node.Attr: LuaParser.Node.Base
