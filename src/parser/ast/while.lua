@@ -35,7 +35,9 @@ function Ast:parseWhile()
         whileNode.symbolPos1 = symbolPos1
 
         self:skipSpace()
+        self:blockStart(whileNode)
         self:blockParseChilds(whileNode)
+        self:blockFinish(whileNode)
 
         self:skipSpace()
         local symbolPos2 = self:assertSymbol 'end'

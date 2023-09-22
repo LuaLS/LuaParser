@@ -66,7 +66,10 @@ function Ast:parseFor()
         forNode.symbolPos2 = symbolPos2
 
         self:skipSpace()
+        self:blockStart(forNode)
+        self:initLocals(vars)
         self:blockParseChilds(forNode)
+        self:blockFinish(forNode)
 
         self:skipSpace()
         local symbolPos3 = self:assertSymbol 'end'

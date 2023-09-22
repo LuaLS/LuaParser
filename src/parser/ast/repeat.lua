@@ -17,10 +17,11 @@ function Ast:parseRepeat()
     end
 
     local repeatNode = self:createNode('LuaParser.Node.Repeat', {
-        start     = pos,
+        start = pos,
     })
 
     self:skipSpace()
+    self:blockStart(repeatNode)
     self:blockParseChilds(repeatNode)
 
     self:skipSpace()
@@ -35,6 +36,7 @@ function Ast:parseRepeat()
             condition.parent = repeatNode
         end
     end
+    self:blockFinish(repeatNode)
 
     repeatNode.finish = self:getLastPos()
 

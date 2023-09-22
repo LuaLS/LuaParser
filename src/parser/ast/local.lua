@@ -131,6 +131,24 @@ function Ast:initLocal(loc)
 end
 
 ---@private
+---@param locs LuaParser.Node.Local[]
+function Ast:initLocals(locs)
+    ---@class LuaParser.Node.Block
+    local block = self.curBlock
+    if not block then
+        return
+    end
+
+    for i = 1, #locs do
+        local loc = locs[i]
+        block.locals[#block.locals+1] = loc
+
+        local name = loc.id
+        block.localMap[name] = loc
+    end
+end
+
+---@private
 ---@param name string
 ---@return LuaParser.Node.Local?
 function Ast:getLocal(name)

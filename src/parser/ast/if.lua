@@ -73,7 +73,9 @@ function Ast:parseIfChildIf()
         node.symbolPos = self:assertSymbol 'then'
 
         self:skipSpace()
+        self:blockStart(node)
         self:blockParseChilds(node)
+        self:blockFinish(node)
     end
 
     node.finish = self:getLastPos()
@@ -103,7 +105,9 @@ function Ast:parseIfChildElseIf()
         node.symbolPos = self:assertSymbol 'then'
 
         self:skipSpace()
+        self:blockStart(node)
         self:blockParseChilds(node)
+        self:blockFinish(node)
     end
 
     node.finish = self:getLastPos()
@@ -126,7 +130,9 @@ function Ast:parseIfChildElse()
         start     = pos,
     })
 
+    self:blockStart(node)
     self:blockParseChilds(node)
+    self:blockFinish(node)
 
     node.finish = self:getLastPos()
 
