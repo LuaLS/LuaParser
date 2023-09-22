@@ -22,6 +22,12 @@ function Ast:parseVar()
         return nil
     end
 
+    local loc = self:getLocal(var.id)
+    if loc then
+        var.loc = loc
+        loc.refs[#loc.refs+1] = var
+    end
+
     return var
 end
 

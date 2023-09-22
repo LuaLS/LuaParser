@@ -6,6 +6,7 @@ function Match(result, expect)
     for k, v in pairs(expect) do
         if v == NIL then
             assert(result[k] == nil)
+            return
         end
         if type(v) == 'table' then
             Match(result[k], v)

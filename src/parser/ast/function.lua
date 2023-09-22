@@ -19,6 +19,8 @@ local Param = class.declare('LuaParser.Node.Param', 'LuaParser.Node.Base')
 ---@field symbolPos3? integer # `end`
 local Function = class.declare('LuaParser.Node.Function', 'LuaParser.Node.Block')
 
+Function.isFunction = true
+
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 

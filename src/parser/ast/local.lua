@@ -11,17 +11,45 @@ local LocalDef = class.declare('LuaParser.Node.LocalDef', 'LuaParser.Node.Base')
 ---@field parent LuaParser.Node.LocalDef | LuaParser.Node.For | LuaParser.Node.Function
 ---@field index integer
 ---@field value? LuaParser.Node.Exp
+---@field refs? LuaParser.Node.Var[]
 ---@field gets? LuaParser.Node.Var[]
 ---@field sets? LuaParser.Node.Var[]
 ---@field attr? LuaParser.Node.Attr
 local Local = class.declare('LuaParser.Node.Local', 'LuaParser.Node.Base')
 
-Local.__getter.sets = function ()
+-- 所有的引用对象
+Local.__getter.refs = function ()
     return {}, true
 end
 
-Local.__getter.gets = function ()
-    return {}, true
+-- 所有的赋值对象
+---@param self LuaParser.Node.Local
+---@return LuaParser.Node.Var[]
+---@return true
+Local.__getter.sets = function (self)
+    local sets = {}
+    for _, ref in ipairs(self.refs) do
+        local parent = ref.parent
+        if parent.type == 'Assign' then
+            sets[#sets+1] = ref
+        end
+    end
+    return sets, true
+end
+
+-- 所有的获取对象
+---@param self LuaParser.Node.Local
+---@return LuaParser.Node.Var[]
+---@return true
+Local.__getter.gets = function (self)
+    local gets = {}
+    for _, ref in ipairs(self.refs) do
+        local parent = ref.parent
+        if parent.type ~= 'Assign' then
+            gets[#gets+1] = ref
+        end
+    end
+    return gets, true
 end
 
 ---@class LuaParser.Node.Attr: LuaParser.Node.Base
@@ -90,6 +118,7 @@ end
 ---@private
 ---@param loc LuaParser.Node.Local
 function Ast:initLocal(loc)
+    ---@class LuaParser.Node.Block
     local block = self.curBlock
     if not block then
         return
@@ -105,14 +134,12 @@ end
 ---@param name string
 ---@return LuaParser.Node.Local?
 function Ast:getLocal(name)
-    for i = #self.blocks, 1, -1 do
-        local block = self.blocks[i]
-        local loc = block.localMap[name]
-        if loc then
-            return loc
-        end
+    ---@class LuaParser.Node.Block
+    local block = self.curBlock
+    if not block then
+        return nil
     end
-    return nil
+    return block.localMap[name] or nil
 end
 
 ---@private

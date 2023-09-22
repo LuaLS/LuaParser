@@ -116,8 +116,8 @@ end
 ---@return LuaParser.Node.Function
 ---@return true
 Base.__getter.parentFunction = function (self)
-    local parent = self.parentFunction
-    if parent.type == 'function' then
+    local parent = self.parent
+    if parent.isFunction then
         return parent, true
     end
     return parent.parentFunction, true

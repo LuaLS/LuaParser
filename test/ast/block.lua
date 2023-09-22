@@ -33,7 +33,7 @@ end
         },
     }
 }
-do return end
+
 TEST [[
 do
     local x = x
@@ -70,7 +70,7 @@ end
                 [1] = {
                     id  = 'x',
                     loc = {
-                        left = 10004,
+                        left = 10010,
                     }
                 }
             }
@@ -81,7 +81,7 @@ end
                 [1] = {
                     id  = 'x',
                     loc = {
-                        left = 10004,
+                        left = 10010,
                     }
                 }
             }

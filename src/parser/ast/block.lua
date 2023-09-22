@@ -3,8 +3,9 @@ local class = require 'class'
 ---@class LuaParser.Node.Block: LuaParser.Node.Base
 ---@field childs LuaParser.Node.State[]
 ---@field locals LuaParser.Node.Local[]
----@field localMap table<string, LuaParser.Node.Local>
+---@field private localMap table<string, LuaParser.Node.Local>
 local Block = class.declare('LuaParser.Node.Block', 'LuaParser.Node.Base')
+
 Block.isBlock = true
 
 Block.__getter.childs = function ()
@@ -15,8 +16,24 @@ Block.__getter.locals = function ()
     return {}, true
 end
 
-Block.__getter.localMap = function ()
-    return {}, true
+---@param self LuaParser.Node.Block
+---@return table<string, LuaParser.Node.Local|false>
+---@return true
+Block.__getter.localMap = function (self)
+    local blocks = self.ast.blocks
+    ---@class LuaParser.Node.Block
+    local parentBlock = blocks[#blocks - 1]
+    if not parentBlock then
+        return {}, true
+    end
+    local parentLocalMap = parentBlock.localMap
+    return setmetatable({}, {
+        __index = function (t, k)
+            local v = parentLocalMap[k] or false
+            t[k] = v
+            return v
+        end
+    }), true
 end
 
 ---@class LuaParser.Ast
