@@ -4,7 +4,7 @@ local class = require 'class'
 ---@field parent LuaParser.Node.Function
 ---@field index integer
 ---@field id string
-local Param = class.declare('LuaParser.Node.Param', 'LuaParser.Node.Base')
+local Param = class.declare('LuaParser.Node.Param', 'LuaParser.Node.Local')
 
 ---@alias LuaParser.Node.FuncName
 ---| LuaParser.Node.Var
@@ -68,7 +68,16 @@ function Ast:parseFunction(isLocal)
 
     if symbolPos2 then
         self:skipSpace()
+        self:blockStart(func)
+        if isLocal and name then
+            ---@cast name LuaParser.Node.Local
+            self:initLocal(name)
+        end
+        if params then
+            self:initLocals(params)
+        end
         self:blockParseChilds(func)
+        self:blockFinish(func)
     end
 
     self:skipSpace()

@@ -403,3 +403,59 @@ end
         }
     }
 }
+
+TEST [[
+function (x, y)
+    print(x, y)
+end
+]]
+{
+    params = {
+        [1] = {
+            id = 'x'
+        },
+        [2] = {
+            id = 'y'
+        }
+    },
+    childs = {
+        [1] = {
+            type = 'Call',
+            args = {
+                [1] = {
+                    id = 'x',
+                    loc = {
+                        left = 10,
+                    }
+                },
+                [2] = {
+                    id = 'y',
+                    loc = {
+                        left = 13,
+                    }
+                }
+            }
+        }
+    }
+}
+
+TEST [[
+local function f()
+    print(f)
+end
+]]
+{
+    childs = {
+        [1] = {
+            type = 'Call',
+            args = {
+                [1] = {
+                    id = 'f',
+                    loc = {
+                        left = 15,
+                    }
+                },
+            }
+        }
+    }
+}
