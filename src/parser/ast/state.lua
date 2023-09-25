@@ -10,6 +10,10 @@ local Assign = class.declare('LuaParser.Node.Assign', 'LuaParser.Node.Base')
 ---@field exp LuaParser.Node.Exp
 local SingleExp = class.declare('LuaParser.Node.SingleExp', 'LuaParser.Node.Base')
 
+---@class LuaParser.Node.Select
+---@field index integer
+local Select = class.declare('LuaParser.Node.Select', 'LuaParser.Node.Base')
+
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
@@ -133,12 +137,13 @@ function Ast:parseAssign(first)
         return nil
     end
 
+    local exps = {}
     local assign = self:createNode('LuaParser.Node.Assign', {
         start  = first.start,
-        exps   = {},
+        exps   = exps,
     })
 
-    assign.exps[1] = first
+    exps[1] = first
     first.parent = assign
     while true do
         local comma = self.lexer:consume ','
@@ -150,7 +155,7 @@ function Ast:parseAssign(first)
         if not exp then
             break
         end
-        assign.exps[#assign.exps+1] = exp
+        exps[#exps+1] = exp
         self:skipSpace()
     end
 
@@ -160,13 +165,15 @@ function Ast:parseAssign(first)
         assign.symbolPos = eqPos
         self:skipSpace()
         local values = self:parseExpList(true)
+        self:extendsAssignValues(values, #exps)
         assign.values = values
 
         for i = 1, #values do
             local value = values[i]
             value.parent = assign
+            value.index  = i
 
-            local exp = assign.exps[i]
+            local exp = exps[i]
             if exp then
                 exp.value = value
             end
@@ -176,4 +183,24 @@ function Ast:parseAssign(first)
     assign.finish = self:getLastPos()
 
     return assign
+end
+
+---@param values LuaParser.Node.Exp[]
+---@param varCount integer
+function Ast:extendsAssignValues(values, varCount)
+    if #values >= varCount then
+        return
+    end
+    local lastValue = values[#values]
+    if lastValue.type ~= 'Call' and lastValue.type ~= 'Varargs' then
+        return
+    end
+    for i = #values + 1, varCount do
+        local sel = self:createNode('LuaParser.Node.Select', {
+            start  = lastValue.start,
+            finish = lastValue.finish,
+            value  = lastValue,
+        })
+        values[i] = sel
+    end
 end

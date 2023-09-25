@@ -44,6 +44,7 @@ local Ast = class.declare 'LuaParser.Ast'
 ---| LuaParser.Node.Term
 ---| LuaParser.Node.Unary
 ---| LuaParser.Node.Binary
+---| LuaParser.Node.Select
 
 -- 解析表达式
 ---@private

@@ -97,10 +97,12 @@ function Ast:parseLocal()
         localdef.symbolPos = symbolPos
         self:skipSpace()
         local values = self:parseExpList(true)
+        self:extendsAssignValues(values, #vars)
         localdef.values = values
         for i = 1, #values do
             local value = values[i]
             value.parent = localdef
+            value.index  = i
 
             local var = vars[i]
             if var then

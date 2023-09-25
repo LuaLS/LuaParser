@@ -136,6 +136,38 @@ TEST [[x.y().z = 1]]
     }
 }
 
+TEST [[local x, y = call()]]
+{
+    values = {
+        [1] = {
+            type = 'Call',
+        },
+        [2] = {
+            type  = 'Select',
+            index = 2,
+            value = {
+                type = 'Call',
+            },
+        },
+    }
+}
+
+TEST [[x, y = call()]]
+{
+    values = {
+        [1] = {
+            type = 'Call',
+        },
+        [2] = {
+            type  = 'Select',
+            index = 2,
+            value = {
+                type = 'Call',
+            },
+        },
+    }
+}
+
 TEST [[:: continue ::]]
 {
     type   = 'Label',
