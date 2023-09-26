@@ -168,6 +168,69 @@ TEST [[x, y = call()]]
     }
 }
 
+TEST [[x, y = (call())]]
+{
+    values = {
+        [1] = {
+            type = 'Paren'
+        },
+        [2] = NIL,
+    }
+}
+
+TEST [[x, y, z = call(), nil]]
+{
+    values = {
+        [1] = {
+            type = 'Call'
+        },
+        [2] = {
+            type = 'Nil'
+        }
+    }
+}
+
+TEST [[x, y = ...]]
+{
+    values = {
+        [1] = {
+            type = 'Varargs'
+        },
+        [2] = {
+            type = 'Select',
+            index = 2,
+            value = {
+                type = 'Varargs',
+            }
+        }
+    }
+}
+
+TEST [[x, y = ..., nil]]
+{
+    values = {
+        [1] = {
+            type = 'Varargs'
+        },
+        [2] = {
+            type = 'Nil',
+        }
+    }
+}
+
+TEST [[x, y = (...)]]
+{
+    values = {
+        [1] = {
+            type = 'Paren',
+            exp = {
+                type = 'Varargs',
+            },
+        },
+        [2] = NIL,
+    }
+}
+
 TEST [[:: continue ::]]
 {
     type   = 'Label',
