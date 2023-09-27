@@ -50,3 +50,27 @@ function Ast:assertSymbol(symbol)
     end
     return pos
 end
+
+-- 断言下个符号是 `end`，如果成功则消耗，否则报错
+---@private
+---@param relatedStart integer
+---@param relatedFinish integer
+---@return integer? pos
+function Ast:assertSymbolEnd(relatedStart, relatedFinish)
+    local pos = self.lexer:consume 'end'
+    if not pos then
+        local lastPos = self:getLastPos()
+        self:throw('MISS_SYMBOL', lastPos, lastPos, {
+            symbol = 'end',
+            related = {
+                start = relatedStart,
+                finish = relatedFinish,
+            }
+        })
+        self:throw('MISS_END', relatedStart, relatedFinish, {
+            start = lastPos,
+            finish = lastPos,
+        })
+    end
+    return pos
+end

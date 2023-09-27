@@ -318,7 +318,7 @@ f(1,<!!>)
 }
 
 TEST[[
-f(1<! !>1)
+f(1<!!> 1)
 ]]
 {
     type = 'MISS_SYMBOL',
@@ -348,14 +348,14 @@ TEST[[
 x.<!!>()
 ]]
 {
-    type = 'MISS_FIELD',
+    type = 'MISS_NAME',
 }
 
 TEST[[
 x:<!!>()
 ]]
 {
-    type = 'MISS_METHOD',
+    type = 'MISS_NAME',
 }
 
 TEST[[
@@ -516,10 +516,8 @@ function f()<!!>
     extra = {
         symbol = 'end',
         related = {
-            {
-                start  = 0,
-                finish = 8,
-            }
+            start  = 0,
+            finish = 8,
         },
     }
 }
@@ -530,13 +528,17 @@ TEST[[
 {
     multi = 2,
     type = 'MISS_END',
+    extra = {
+        start  = 12,
+        finish = 12,
+    }
 }
 
 TEST[[
 function f:<!!>() end
 ]]
 {
-    type = 'MISS_METHOD',
+    type = 'MISS_NAME',
 }
 
 TEST[[
@@ -629,10 +631,8 @@ for k, v in next do<!!>
     extra = {
         symbol = 'end',
         related = {
-            {
-                start  = 0,
-                finish = 3,
-            },
+            start  = 0,
+            finish = 3,
         }
     }
 }
@@ -738,10 +738,8 @@ for i = 1, 2 do<!!>
     extra = {
         symbol = 'end',
         related = {
-            {
-                start  = 0,
-                finish = 3,
-            },
+            start  = 0,
+            finish = 3,
         }
     }
 }
@@ -782,10 +780,8 @@ while true do<!!>
     extra = {
         symbol = 'end',
         related = {
-            {
-                start  = 0,
-                finish = 5,
-            },
+            start  = 0,
+            finish = 5,
         }
     }
 }
@@ -844,10 +840,8 @@ if true then<!!>
     extra = {
         symbol = 'end',
         related = {
-            {
-                start  = 0,
-                finish = 2,
-            },
+            start  = 0,
+            finish = 2,
         }
     }
 }
@@ -870,10 +864,8 @@ else<!!>
     extra = {
         symbol = 'end',
         related = {
-            {
-                start  = 0,
-                finish = 2,
-            },
+            start  = 0,
+            finish = 2,
         }
     }
 }
@@ -1179,10 +1171,8 @@ local test = function ( a , b , c , ... )<!!>
     extra = {
         symbol = 'end',
         related = {
-            {
-                start  = 13,
-                finish = 21,
-            },
+            start  = 13,
+            finish = 21,
         }
     }
 }
@@ -1313,10 +1303,8 @@ if a then<!!>
     extra = {
         symbol = 'end',
         related = {
-            {
-                start  = 0,
-                finish = 2,
-            },
+            start  = 0,
+            finish = 2,
         }
     }
 }
@@ -1338,10 +1326,8 @@ if a then else<!!>
     extra = {
         symbol = 'end',
         related = {
-            {
-                start  = 0,
-                finish = 2,
-            },
+            start  = 0,
+            finish = 2,
         }
     }
 }
@@ -1847,10 +1833,8 @@ TEST[[
 {
     type = 'REDEFINED_LABEL',
     related = {
-        {
-            start  = 3,
-            finish = 7,
-        },
+        start  = 3,
+        finish = 7,
     }
 }
 
@@ -1865,10 +1849,8 @@ end
 {
     type = 'REDEFINED_LABEL',
     related = {
-        {
-            start  = 3,
-            finish = 7,
-        },
+        start  = 3,
+        finish = 7,
     }
 }
 

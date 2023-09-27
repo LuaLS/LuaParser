@@ -43,20 +43,16 @@ function Ast:parseFunction(isLocal)
 
     self:skipSpace()
     local symbolPos1 = self.lexer:consume '('
-    if not name and not symbolPos1 then
-        return nil
-    end
 
-    local params
+    local params, symbolPos2
     if symbolPos1 then
         self:skipSpace()
         params = self:parseParamList()
+        self:skipSpace()
+        symbolPos2 = self:assertSymbol ')'
     else
         self:throwMissSymbol(self:getLastPos(), '(')
     end
-
-    self:skipSpace()
-    local symbolPos2 = self:assertSymbol ')'
 
     local func = self:createNode('LuaParser.Node.Function', {
         start      = pos,
@@ -81,7 +77,7 @@ function Ast:parseFunction(isLocal)
     end
 
     self:skipSpace()
-    local symbolPos3 = self:assertSymbol 'end'
+    local symbolPos3 = self:assertSymbolEnd(pos, pos + #'function')
 
     func.symbolPos3 = symbolPos3
     func.finish     = self:getLastPos()

@@ -51,20 +51,21 @@ function Ast:parseTableFields()
     local fields = {}
     local wantSep = false
     while true do
-        local token = self.lexer:peek()
+        local token, _, pos = self.lexer:peek()
         if not token or token == '}' then
             break
         end
         if token == ','
         or token == ';' then
-            self.lexer:next()
             if not wantSep then
                 self:throwMissExp(self:getLastPos())
             end
             wantSep = false
+            self.lexer:next()
         else
             if wantSep then
-                self:throw('MISS_SEP_IN_TABLE', self:getLastPos())
+                local lastField = fields[#fields]
+                self:throw('MISS_SEP_IN_TABLE', lastField.finish, pos)
             end
             wantSep = true
             local field = self:parseTableField()

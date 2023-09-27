@@ -35,7 +35,7 @@ local Ast = class.declare 'LuaParser.Ast'
 ---@private
 ---@return LuaParser.Node.State?
 function Ast:parseState()
-    local token = self.lexer:peek()
+    local token, _, pos = self.lexer:peek()
 
     if token == 'local' then
         return self:parseLocal()
@@ -68,7 +68,15 @@ function Ast:parseState()
     end
 
     if token == 'function' then
-        return self:parseFunction()
+        local func = self:parseFunction()
+        if not func then
+            self:throw('MISS_NAME', pos + #token)
+            return nil
+        end
+        if not func.name then
+            self:throw('MISS_NAME', func.symbolPos1)
+        end
+        return func
     end
 
     if token == 'continue' then
@@ -192,6 +200,9 @@ function Ast:extendsAssignValues(values, varCount)
         return
     end
     local lastValue = values[#values]
+    if not lastValue then
+        return
+    end
     if lastValue.type ~= 'Call' and lastValue.type ~= 'Varargs' then
         return
     end

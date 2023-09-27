@@ -91,16 +91,24 @@ function Ast:parseExpList(atLeastOne, greedy)
     local list = {}
     local first = self:parseExp(atLeastOne)
     list[#list+1] = first
+    local wantSep = first ~= nil
     while true do
         self:skipSpace()
-        local token, tp = self.lexer:peek()
+        local token, tp, pos = self.lexer:peek()
         if not token then
             break
         end
+        ---@cast pos -?
         if tp == 'Symbol' then
             if token == ',' then
+                if not wantSep then
+                    self:throw('UNEXPECT_SYMBOL', pos, pos + 1, {
+                        symbol = ',',
+                    })
+                end
                 self.lexer:next()
                 self:skipSpace()
+                wantSep = false
             else
                 break
             end
@@ -117,6 +125,7 @@ function Ast:parseExpList(atLeastOne, greedy)
         if exp then
             list[#list+1] = exp
         end
+        wantSep = true
     end
     return list
 end
@@ -159,6 +168,12 @@ function Ast:parseTerm()
         return nil
     end
 
+    if head.type == 'Function' then
+        if head.name then
+            self:throw('UNEXPECT_EFUNC_NAME', head.name.start, head.name.finish)
+        end
+    end
+
     ---@type LuaParser.Node.Term
     local current = head
 
@@ -167,6 +182,13 @@ function Ast:parseTerm()
 
         local chain = self:parseField(current)
                 or    self:parseCall(current)
+
+        if  current.type == 'Field'
+        and current.subtype == 'method' then
+            if not chain or chain.type ~= 'Call' then
+                self:throwMissSymbol(current.finish, '(')
+            end
+        end
 
         if chain then
             current = chain
