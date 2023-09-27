@@ -294,7 +294,7 @@ until 1]],
 end]],
 }
 
-check 'Lua'
+check 'Main'
 {
 '',
 [[

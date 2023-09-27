@@ -70,7 +70,9 @@ function Ast:parseUnary()
         op      = token,
         exp     = exp,
     })
-    exp.parent = unary
+    if exp then
+        exp.parent = unary
+    end
 
     return unary
 end

@@ -19,8 +19,8 @@ local Ast = class.declare 'LuaParser.Ast'
 
 ---@private
 function Ast:skipShebang()
-    if self.code:sub(1, 2) == '#!' then
-        local pos = self.code:find('\n', 3, true)
+    if self.code:sub(1, 1) == '#' then
+        local pos = self.code:find('\n', 2, true)
         if pos then
             self.lexer:fastForward(pos + 1)
         else

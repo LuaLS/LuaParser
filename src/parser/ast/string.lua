@@ -173,9 +173,9 @@ function Ast:parseShortString()
                     local num = tonumber(code, 16)
                     pieces[#pieces+1] = string.char(num)
                 else
-                    pushEsc('err', offset - 2, offset - 1)
+                    pushEsc('err', offset - 2, offset)
+                    self:throw('MISS_ESC_X', offset, offset)
                     curOffset = offset + 1
-                    self:throw('ERR_ESC_X', curPos, curPos + 1)
                 end
                 if self.versionNum <= 51 then
                     self:throw('ERR_ESC', curPos, curPos + 3)
@@ -185,8 +185,8 @@ function Ast:parseShortString()
             if escChar == 'u' then
                 local leftP, word, rightP, tailOffset = self.code:match('^({)(%w*)(}?)()', offset + 1)
                 if not leftP then
-                    pushEsc('err', offset - 2, offset - 1)
-                    self:throwMissSymbol(offset - 1, '{')
+                    pushEsc('err', offset - 2, offset)
+                    self:throwMissSymbol(offset, '{')
                     curOffset = offset
                     goto continue
                 end
@@ -198,13 +198,13 @@ function Ast:parseShortString()
                     if num then
                         if self.versionNum >= 54 then
                             if num < 0 or num > 0x7FFFFFFF then
-                                self:throw('UTF8_MAX', offset + 1, offset + #word, {
+                                self:throw('UTF8_MAX', offset + 1, offset + #word + 1, {
                                     min = '00000000',
                                     max = '7FFFFFFF',
                                 })
                             end
                         else
-                            self:throw('UTF8_MAX', offset + 1, offset + #word, {
+                            self:throw('UTF8_MAX', offset + 1, offset + #word + 1, {
                                 min     = '000000',
                                 max     = '10FFFF',
                                 needVer = num <= 0x7FFFFFFF and 'Lua 5.4' or nil,
@@ -214,7 +214,7 @@ function Ast:parseShortString()
                             pieces[#pieces+1] = utf8.char(num)
                         end
                     else
-                        self:throw('MUST_X16', offset + 1, offset + #word)
+                        self:throw('MUST_X16', offset + 1, offset + #word + 1)
                     end
                 end
                 if rightP == '' then

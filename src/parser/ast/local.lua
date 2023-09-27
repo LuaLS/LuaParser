@@ -92,7 +92,7 @@ function Ast:parseLocal()
     localdef.vars = vars
 
     self:skipSpace()
-    local symbolPos = self:assertSymbol '='
+    local symbolPos = self.lexer:consume '='
     if symbolPos then
         localdef.symbolPos = symbolPos
         self:skipSpace()

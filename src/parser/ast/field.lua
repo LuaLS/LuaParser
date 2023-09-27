@@ -145,9 +145,12 @@ function Ast:parseTableFieldAsIndex()
     self:skipSpace()
     local pos2 = self:assertSymbol ']'
     self:skipSpace()
-    self:assertSymbol '='
-    self:skipSpace()
-    local value = self:parseExp(true)
+    local eqPos = self:assertSymbol '='
+    local value
+    if eqPos then
+        self:skipSpace()
+        value = self:parseExp(true)
+    end
     local tfield = self:createNode('LuaParser.Node.TableField', {
         subtype = 'index',
         key     = key,

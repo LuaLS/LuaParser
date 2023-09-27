@@ -1,6 +1,7 @@
 local class = require 'class'
 
 ---@class LuaParser.Node.Error: LuaParser.Node.Base
+---@field extra? table
 local Error = class.declare('LuaParser.Node.Error', 'LuaParser.Node.Base')
 
 Error.code = 'UNKNOWN'

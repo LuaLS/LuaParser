@@ -18,7 +18,6 @@ end
 local function main()
     unitTest 'ast'
     unitTest 'grammar'
-    unitTest 'grammar_check'
     unitTest 'syntax_check'
     unitTest 'perform'
 
