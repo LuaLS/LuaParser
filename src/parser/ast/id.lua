@@ -38,7 +38,7 @@ function Ast:parseID(nodeType, required)
         end
     end
     self.lexer:next()
-    return self:createNode(nodeType, {
+    return self:createNode(nodeType or 'LuaParser.Node.Var', {
         id     = token,
         start  = pos,
         finish = pos + #token,

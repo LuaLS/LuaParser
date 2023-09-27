@@ -1,9 +1,15 @@
-local parser = require 'parser'
+local class = require 'class'
 
-local function check_str(str, name, mode)
-    local ast = parser.compile(str, mode, 'Lua 5.3')
-    assert(ast)
-    if #ast.errs > 0 and mode ~= 'Dirty' then
+local function check_str(code, name, mode)
+    ---@class LuaParser.Ast
+    local ast = class.new 'LuaParser.Ast' (code)
+    local parser = 'parse' .. mode
+    if mode == 'Dirty' then
+        parser = 'parseMain'
+    end
+    local node = ast[parser](ast)
+    assert(node)
+    if #ast.errors > 0 and mode ~= 'Dirty' then
         error(([[
 [%s]测试失败:
 %s
@@ -12,7 +18,7 @@ local function check_str(str, name, mode)
 ]]):format(
     name,
     ('='):rep(30),
-    str,
+    code,
     ('='):rep(30)
 ))
     end
@@ -38,20 +44,6 @@ check 'Comment'
 123
 123]]]===],
 [===[-- [[Abc]]a]===],
-}
-
-check 'Sp'
-{
-'',
-' ',
-'  ',
-'\t',
-'--',
-'--123',
-' \t',
-[===[--[[123
-123
-123]]]===],
 }
 
 check 'Nil'
@@ -127,7 +119,7 @@ check 'Number'
 '9.'
 }
 
-check 'Name'
+check 'ID'
 {
 '_',
 'And',
@@ -211,7 +203,7 @@ check 'Exp'
 '{1, 2, 3,}',
 }
 
-check 'Action'
+check 'State'
 {
 'x = 1',
 'x, y, z = 1, 2, 3',

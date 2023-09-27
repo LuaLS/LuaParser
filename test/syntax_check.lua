@@ -1,98 +1,16 @@
 local parser = require 'parser'
-
-local EXISTS = {}
-
-local function eq(a, b)
-    if a == EXISTS and b ~= nil then
-        return true
-    end
-    local tp1, tp2 = type(a), type(b)
-    if tp1 ~= tp2 then
-        return false
-    end
-    if tp1 == 'table' then
-        local mark = {}
-        for k in pairs(a) do
-            if not eq(a[k], b[k]) then
-                return false
-            end
-            mark[k] = true
-        end
-        for k in pairs(b) do
-            if not mark[k] then
-                return false
-            end
-        end
-        return true
-    end
-    return a == b
-end
-
-local function getLine(offset, lns)
-    for i = 0, #lns do
-        if  offset >= lns[i]
-        and offset < lns[i+1] then
-            return i
-        end
-    end
-end
-
-local function getPosition(offset, lns)
-    for i = 0, #lns do
-        if  offset >= lns[i]
-        and offset < lns[i+1] then
-            return 10000 * i + offset - lns[i]
-        end
-    end
-end
+local catch  = require 'test.catch'
 
 ---@param script string
----@param sep string
-local function catchTarget(script, sep)
-    local pattern = ('()<%%%s.-%%%s>()'):format(sep, sep)
-    local lns = {}
-    lns[0] = 0
-    for pos in script:gmatch '()\n' do
-        lns[#lns+1] = pos
-    end
-    lns[#lns+1] = math.maxinteger
-    local codes = {}
-    local pos   = 1
-    local list = {}
-    local cuted = 0
-    local lastLine = 0
-    for a, b in script:gmatch(pattern) do
-        codes[#codes+1] = script:sub(pos, a - 1)
-        codes[#codes+1] = script:sub(a + 2, b - 3)
-        pos = b
-        local line1 = getLine(a + 1, lns)
-        if line1 ~= lastLine then
-            cuted = 0
-            lastLine = line1
-        end
-        cuted = cuted + 2
-        local left = getPosition(a + 1, lns) - cuted
-        local line2 = getLine(b - 3, lns)
-        if line2 ~= lastLine then
-            cuted = 0
-            lastLine = line2
-        end
-        local right = getPosition(b - 3, lns) - cuted
-        cuted = cuted + 2
-        list[#list+1] = { left, right }
-    end
-    codes[#codes+1] = script:sub(pos)
-    return table.concat(codes), list
-end
-
-local Version
-
-local function TEST(script)
+---@param version? LuaParser.LuaVersion
+---@param optional? LuaParser.CompileOptions
+---@return fun(expect: table|nil)
+local function TEST(script, version, optional)
     return function (expect)
-        local newScript, list = catchTarget(script, '!')
-        local ast = parser.compile(newScript, 'Lua', Version)
+        local newScript, list = catch(script, '!')
+        local ast = parser.compile(newScript, version, optional)
         assert(ast)
-        local errs = ast.errs
+        local errs = ast.errors
         local first = errs[1]
         local target = list[1]
         if not expect then
@@ -109,18 +27,6 @@ local function TEST(script)
         assert(first.type == expect.type)
         assert(first.start == target[1])
         assert(first.finish == target[2])
-        assert(eq(first.version, expect.version))
-        assert(eq(first.info, expect.info))
-    end
-end
-
-function TestWith(version)
-    return function (script)
-        return function (expect)
-            Version = version
-            TEST(script)(expect)
-            Version = 'Lua 5.4'
-        end
     end
 end
 
@@ -785,27 +691,27 @@ local t = [[]]
 ]=]
 (nil)
 
-TestWith 'LuaJIT' [[
+TEST ([[
 goto LABEL
 ::LABEL::
-]]
+]], 'Lua 5.1', { jit = true })
 (nil)
 
-TestWith 'LuaJIT' [[
+TEST ([[
 local goto = 1
-]]
+]], 'Lua 5.1', { jit = true })
 (nil)
 
-TestWith 'LuaJIT' [[
-local goto]]
+TEST ([[
+local goto]], 'Lua 5.1', { jit = true })
 (nil)
 
-TestWith 'LuaJIT' [[
+TEST ([[
 f(1, goto, 2)
-]]
+]], 'Lua 5.1', { jit = true })
 (nil)
 
-TestWith 'LuaJIT' [[
+TEST ([[
 local function f(x, goto, y) end
-]]
+]], 'Lua 5.1', { jit = true })
 (nil)
