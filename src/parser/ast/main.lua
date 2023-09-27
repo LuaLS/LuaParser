@@ -6,9 +6,18 @@ local Main = class.declare('LuaParser.Node.Main', 'LuaParser.Node.Function')
 
 Main.isMain = true
 
+function Main.__getter.parent()
+    return false, true
+end
+
+function Main.__getter.parentBlock()
+    return false, true
+end
+
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
+---@private
 function Ast:skipShebang()
     if self.code:sub(1, 2) == '#!' then
         local pos = self.code:find('\n', 3, true)

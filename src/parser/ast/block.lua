@@ -16,26 +16,6 @@ Block.__getter.locals = function ()
     return {}, true
 end
 
----@param self LuaParser.Node.Block
----@return table<string, LuaParser.Node.Local|false>
----@return true
-Block.__getter.localMap = function (self)
-    local blocks = self.ast.blocks
-    ---@class LuaParser.Node.Block
-    local parentBlock = blocks[#blocks - 1]
-    if not parentBlock then
-        return {}, true
-    end
-    local parentLocalMap = parentBlock.localMap
-    return setmetatable({}, {
-        __index = function (t, k)
-            local v = parentLocalMap[k] or false
-            t[k] = v
-            return v
-        end
-    }), true
-end
-
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
@@ -51,8 +31,24 @@ local FinishMap = {
 ---@private
 ---@param block LuaParser.Node.Block
 function Ast:blockStart(block)
+    local parentBlock = self.blocks[#self.blocks]
     self.blocks[#self.blocks+1] = block
     self.curBlock = block
+
+    ---@diagnostic disable: invisible
+    if parentBlock then
+        local parentLocalMap = parentBlock.localMap
+        block.localMap = setmetatable({}, {
+            __index = function (t, k)
+                local v = parentLocalMap[k] or false
+                t[k] = v
+                return v
+            end
+        })
+    else
+        block.localMap = {}
+    end
+    ---@diagnostic enable: invisible
 end
 
 ---@private

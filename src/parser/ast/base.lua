@@ -13,7 +13,7 @@ local class = require 'class'
 ---@field finishCol integer # 结束列号
 ---@field code string # 对应的代码
 ---@field parent unknown
----@field parentBlock LuaParser.Node.Block
+---@field parentBlock LuaParser.Node.Block | false
 ---@field parentFunction LuaParser.Node.Function
 ---@field asNumber? number
 ---@field asString? string
@@ -95,17 +95,23 @@ Base.__getter.code = function (self)
 end
 
 ---@param self LuaParser.Node.Base
----@return string
+---@return any
 ---@return true
 Base.__getter.parent = function (self)
+    if self.start == 0 then
+        return false, true
+    end
     error('未设置父节点：' .. self.type)
 end
 
 ---@param self LuaParser.Node.Base
----@return LuaParser.Node.Block
+---@return LuaParser.Node.Block | false
 ---@return true
 Base.__getter.parentBlock = function (self)
     local parent = self.parent
+    if not parent then
+        return false, true
+    end
     if parent.isBlock then
         return parent, true
     end

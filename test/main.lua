@@ -16,14 +16,13 @@ local function unitTest(name)
 end
 
 local function main()
-    --collectgarbage 'stop'
     unitTest 'ast'
     --unitTest 'grammar'
     --unitTest 'lines'
     --unitTest 'grammar_check'
     --unitTest 'syntax_check'
     --unitTest 'guide'
-    --unitTest 'perform'
+    unitTest 'perform'
 
     print('测试完成')
 end

@@ -33,6 +33,7 @@ require 'parser.ast.main'
 ---@class LuaParser.Ast
 ---@field envMode 'fenv' | '_ENV'
 ---@field main LuaParser.Node.Main
+---@field fullCompile? boolean # 是否是完整编译
 ---@overload fun(code: string, version: LuaParser.LuaVersion, options: LuaParser.CompileOptions): LuaParser.Ast
 local M = class.declare 'LuaParser.Ast'
 
