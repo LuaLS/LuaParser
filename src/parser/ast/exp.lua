@@ -163,7 +163,7 @@ function Ast:parseTerm()
     local current = head
 
     while true do
-        self:skipSpace()
+        self:skipSpace(true)
 
         local chain = self:parseField(current)
                 or    self:parseCall(current)

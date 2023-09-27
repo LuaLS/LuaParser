@@ -53,5 +53,5 @@ function Ast:parseMain()
     self:blockParseChilds(main)
     self:blockFinish(main)
 
-    self.main = main
+    return main
 end
