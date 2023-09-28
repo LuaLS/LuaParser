@@ -1125,9 +1125,6 @@ local a = function (<!1!>) end
 ]]
 {
     type = 'UNKNOWN_SYMBOL',
-    extra = {
-        symbol = '1',
-    },
 }
 
 TEST[[
@@ -1151,6 +1148,10 @@ local test = <!function!> ( a , b , c , ... )
 {
     multi = 2,
     type = 'MISS_END',
+    extra = {
+        start = 41,
+        finish = 41,
+    }
 }
 
 TEST[[

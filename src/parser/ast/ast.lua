@@ -127,9 +127,7 @@ function M:skipUnknown()
     end
 
     ---@cast pos -?
-    self:throw('UNKNOWN_SYMBOL', pos, pos + #token, {
-        symbol = token,
-    })
+    self:throw('UNKNOWN_SYMBOL', pos, pos + #token)
 
     return true
 end

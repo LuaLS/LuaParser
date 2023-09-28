@@ -138,34 +138,44 @@ function Ast:parseParamList()
     ---@type LuaParser.Node.Param[]
     local list = {}
 
-    local first = self:parseParam()
-    list[#list+1] = first
-    local wantSep = first ~= nil
+    local wantExp = true
     while true do
         self:skipSpace()
-        local token, tp = self.lexer:peek()
+
+        local param = self:parseParam()
+        if param then
+            list[#list+1] = param
+            if not wantExp then
+                self:throwMissSymbol(self:getLastPos(), ',')
+            end
+            wantExp = false
+            goto continue
+        end
+
+        local token, tp, pos = self.lexer:peek()
         if not token then
             break
         end
+        ---@cast pos -?
         if tp == 'Symbol' then
             if token == ',' then
-                if not wantSep then
+                if wantExp then
                     self:throw('MISS_NAME', self:getLastPos())
                 end
                 self.lexer:next()
-                self:skipSpace()
-                wantSep = false
+                wantExp = true
             else
                 break
             end
         else
-            self:throwMissSymbol(self:getLastPos(), ',')
+            self:throw('UNKNOWN_SYMBOL', pos, pos + #token)
+            self.lexer:next()
         end
-        local param = self:parseParam(true)
-        if param then
-            list[#list+1] = param
-        end
-        wantSep = true
+        ::continue::
+    end
+
+    if wantExp and #list > 0 then
+        self:throw('MISS_NAME', self:getLastPos())
     end
 
     for i = 1, #list do
@@ -183,9 +193,8 @@ function Ast:parseParamList()
 end
 
 ---@private
----@param required? boolean
 ---@return LuaParser.Node.Param?
-function Ast:parseParam(required)
+function Ast:parseParam()
     local param = self:parseID('LuaParser.Node.Param')
     if param then
         return param
@@ -197,9 +206,6 @@ function Ast:parseParam(required)
             finish = pos,
             id     = '...',
         })
-    end
-    if required then
-        self:throw('MISS_NAME', self:getLastPos())
     end
     return nil
 end
