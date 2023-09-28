@@ -68,23 +68,24 @@ function Ast:parseField(last)
         self.lexer:next()
         self:skipSpace()
         local key = self:parseExp(true)
+
+        self:skipSpace()
+        local symbolPos2 = self:assertSymbol(']')
+        local field = self:createNode('LuaParser.Node.Field', {
+            start      = last.start,
+            finish     = self:getLastPos(),
+            subtype    = 'index',
+            key        = key,
+            last       = last,
+            symbolPos  = pos,
+            symbolPos2 = symbolPos2,
+        })
+        last.parent = field
+        last.next   = field
         if key then
-            self:skipSpace()
-            local symbolPos2 = self:assertSymbol(']')
-            local field = self:createNode('LuaParser.Node.Field', {
-                start      = last.start,
-                finish     = self:getLastPos(),
-                subtype    = 'index',
-                key        = key,
-                last       = last,
-                symbolPos  = pos,
-                symbolPos2 = symbolPos2,
-            })
-            last.parent = field
-            last.next   = field
             key.parent  = field
-            return field
         end
+        return field
     end
     return nil
 end

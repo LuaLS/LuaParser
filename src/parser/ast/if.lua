@@ -21,6 +21,8 @@ function Ast:parseIf()
         return nil
     end
 
+    ---@cast pos -?
+
     local ifNode = self:createNode('LuaParser.Node.If', {
         start  = pos,
         childs = {},
@@ -36,7 +38,7 @@ function Ast:parseIf()
     end
 
     self:skipSpace()
-    self:assertSymbol 'end'
+    self:assertSymbolEnd(pos, pos + #'if')
 
     ifNode.finish = self:getLastPos()
 
@@ -60,7 +62,7 @@ function Ast:parseIfChildIf()
     end
 
     self:skipSpace()
-    local condition = self:parseExp()
+    local condition = self:parseExp(true)
 
     local node = self:createNode('LuaParser.Node.IfChild', {
         subtype   = 'if',
@@ -68,16 +70,17 @@ function Ast:parseIfChildIf()
         condition = condition,
     })
 
+    self:skipSpace()
     if condition then
-        self:skipSpace()
         node.symbolPos = self:assertSymbol 'then'
-
-        self:skipSpace()
-        self:blockStart(node)
-        self:blockParseChilds(node)
-        self:blockFinish(node)
+    else
+        node.symbolPos = self.lexer:consume 'then'
     end
 
+    self:skipSpace()
+    self:blockStart(node)
+    self:blockParseChilds(node)
+    self:blockFinish(node)
     node.finish = self:getLastPos()
 
     return node
@@ -92,7 +95,7 @@ function Ast:parseIfChildElseIf()
     end
 
     self:skipSpace()
-    local condition = self:parseExp()
+    local condition = self:parseExp(true)
 
     local node = self:createNode('LuaParser.Node.IfChild', {
         subtype   = 'elseif',
@@ -100,16 +103,17 @@ function Ast:parseIfChildElseIf()
         condition = condition,
     })
 
+    self:skipSpace()
     if condition then
-        self:skipSpace()
         node.symbolPos = self:assertSymbol 'then'
-
-        self:skipSpace()
-        self:blockStart(node)
-        self:blockParseChilds(node)
-        self:blockFinish(node)
+    else
+        node.symbolPos = self.lexer:consume 'then'
     end
 
+    self:skipSpace()
+    self:blockStart(node)
+    self:blockParseChilds(node)
+    self:blockFinish(node)
     node.finish = self:getLastPos()
 
     return node

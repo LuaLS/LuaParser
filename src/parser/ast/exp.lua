@@ -1,7 +1,7 @@
 local class = require 'class'
 
 ---@class LuaParser.Node.Paren: LuaParser.Node.Base
----@field exp LuaParser.Node.Exp
+---@field exp? LuaParser.Node.Exp
 ---@field next? LuaParser.Node.Field
 local Paren = class.declare('LuaParser.Node.Paren', 'LuaParser.Node.Base')
 
@@ -208,14 +208,14 @@ function Ast:parseParen()
         return nil
     end
     local exp = self:parseExp(true)
-    if not exp then
-        return nil
-    end
     local paren = self:createNode('LuaParser.Node.Paren', {
         start  = pos,
         exp    = exp,
     })
-    exp.parent = paren
+    if exp then
+        exp.parent = paren
+    end
+    self:skipSpace()
     self:assertSymbol ')'
     paren.finish = self:getLastPos()
 

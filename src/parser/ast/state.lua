@@ -6,7 +6,7 @@ local class = require 'class'
 ---@field values LuaParser.Node.Var[]
 local Assign = class.declare('LuaParser.Node.Assign', 'LuaParser.Node.Base')
 
----@class LuaParser.Node.SingleExp
+---@class LuaParser.Node.SingleExp: LuaParser.Node.Base
 ---@field exp LuaParser.Node.Exp
 local SingleExp = class.declare('LuaParser.Node.SingleExp', 'LuaParser.Node.Base')
 
@@ -41,9 +41,7 @@ function Ast:parseState()
         return self:parseLocal()
     end
 
-    if token == 'if'
-    or token == 'elseif'
-    or token == 'else' then
+    if token == 'if' then
         return self:parseIf()
     end
 
@@ -132,6 +130,12 @@ function Ast:parseStateStartWithExp()
         exp    = exp,
     })
     exp.parent = state
+
+    if exp.type == 'Field' and exp.subtype == 'method' then
+        -- 已经throw过"缺少 `(`""
+    else
+        self:throw('EXP_IN_ACTION', state.start, state.finish)
+    end
 
     return state
 end

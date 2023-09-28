@@ -22,9 +22,9 @@ function Ast:skipShebang()
     if self.code:sub(1, 1) == '#' then
         local pos = self.code:find('\n', 2, true)
         if pos then
-            self.lexer:fastForward(pos + 1)
+            self.lexer:fastForward(pos)
         else
-            self.lexer:fastForward(#self.code + 1)
+            self.lexer:fastForward(#self.code)
         end
     end
 end

@@ -16,8 +16,9 @@ local Ast = class.declare 'LuaParser.Ast'
 ---@generic T: LuaParser.Node.ID
 ---@param nodeType `T`
 ---@param required? true
+---@param canBeKeyword? true
 ---@return T?
-function Ast:parseID(nodeType, required)
+function Ast:parseID(nodeType, required, canBeKeyword)
     local token, tp, pos = self.lexer:peek()
     if tp ~= 'Word' then
         if required then
@@ -27,15 +28,18 @@ function Ast:parseID(nodeType, required)
     end
     ---@cast token -?
     ---@cast pos -?
-    if not self.unicodeName and token:find '[\x80-\xff]' then
-        self:throw('UNICODE_NAME', pos, pos + #token)
-    end
     if self:isKeyWord(token) then
-        if required then
+        if canBeKeyword then
             self:throw('KEYWORD', pos, pos + #token)
         else
+            if required then
+                self:throw('MISS_NAME', self:getLastPos())
+            end
             return nil
         end
+    end
+    if not self.unicodeName and token:find '[\x80-\xff]' then
+        self:throw('UNICODE_NAME', pos, pos + #token)
     end
     self.lexer:next()
     return self:createNode(nodeType or 'LuaParser.Node.Var', {

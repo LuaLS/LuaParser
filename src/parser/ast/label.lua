@@ -1,7 +1,7 @@
 local class = require 'class'
 
 ---@class LuaParser.Node.Label: LuaParser.Node.Base
----@field label LuaParser.Node.LabelName
+---@field label? LuaParser.Node.LabelName
 ---@field symbolPos? integer # 右边标签符号的位置
 local Label = class.declare('LuaParser.Node.Label', 'LuaParser.Node.Base')
 
@@ -11,7 +11,7 @@ local Label = class.declare('LuaParser.Node.Label', 'LuaParser.Node.Base')
 local LabelName = class.declare('LuaParser.Node.LabelName', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.Goto: LuaParser.Node.Base
----@field label LuaParser.Node.LabelName
+---@field label? LuaParser.Node.LabelName
 local Goto = class.declare('LuaParser.Node.Goto', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
@@ -27,12 +27,12 @@ function Ast:parseLabel()
 
     self:skipSpace()
     local labelName = self:parseID('LuaParser.Node.LabelName', true)
-    if not labelName then
-        return nil
-    end
 
-    self:skipSpace()
-    local symbolPos = self:assertSymbol '::'
+    local symbolPos
+    if labelName then
+        self:skipSpace()
+        symbolPos = self:assertSymbol '::'
+    end
 
     local label = self:createNode('LuaParser.Node.Label', {
         start      = pos,
@@ -40,8 +40,10 @@ function Ast:parseLabel()
         symbolPos  = symbolPos,
     })
 
-    label.label = labelName
-    labelName.parent = label
+    if labelName then
+        label.label = labelName
+        labelName.parent = label
+    end
 
     return label
 end
@@ -59,17 +61,16 @@ function Ast:parseGoto()
 
     self:skipSpace()
     local labelName = self:parseID('LuaParser.Node.LabelName', true)
-    if not labelName then
-        return nil
-    end
 
     local gotoNode = self:createNode('LuaParser.Node.Goto', {
         start      = pos,
         finish     = self:getLastPos(),
     })
 
-    gotoNode.label = labelName
-    labelName.parent = gotoNode
+    if labelName then
+        gotoNode.label = labelName
+        labelName.parent = gotoNode
+    end
 
     return gotoNode
 end

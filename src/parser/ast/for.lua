@@ -46,6 +46,7 @@ function Ast:parseFor()
     elseif token == 'in' then
         forNode.subtype = 'in'
     else
+        self:throwMissSymbol(self:getLastPos(), 'in')
         return forNode
     end
     self.lexer:next()
@@ -57,6 +58,12 @@ function Ast:parseFor()
         local exp = exps[i]
         exp.parent = forNode
         exp.index  = i
+    end
+
+    if forNode.subtype == 'loop' then
+        if #exps == 1 then
+            self:throw('MISS_LOOP_MAX', self:getLastPos())
+        end
     end
 
     self:skipSpace()
@@ -71,10 +78,11 @@ function Ast:parseFor()
         self:blockParseChilds(forNode)
         self:blockFinish(forNode)
 
-        self:skipSpace()
-        local symbolPos3 = self:assertSymbol 'end'
-        forNode.symbolPos3 = symbolPos3
     end
+
+    self:skipSpace()
+    local symbolPos3 = self:assertSymbolEnd(pos, pos + #'for')
+    forNode.symbolPos3 = symbolPos3
 
     forNode.finish = self:getLastPos()
 

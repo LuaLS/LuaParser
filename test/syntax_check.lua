@@ -26,8 +26,8 @@ local function TEST(script)
         end
         assert(first)
         assert(first.code == expect.type)
-        assert(first.start == target[1])
-        assert(first.finish == target[2])
+        assert(first.left == target[1])
+        assert(first.right == target[2])
         assert(util.equal(first.extra, expect.extra))
     end
 end
@@ -41,7 +41,7 @@ local<!!>
 }
 
 TEST[[
-<!？？？!>
+local <!？？？!>
 ]]
 {
     type = 'UNICODE_NAME',
@@ -643,18 +643,19 @@ TEST[[
 {
     multi = 2,
     type = 'MISS_END',
+    extra = {
+        start  = 19,
+        finish = 19,
+    }
 }
 
 TEST[[
-for i =<!,!> 2 do
+for i =<!!>, 2 do
 end
 ]]
 {
     multi = 1,
-    type = 'UNEXPECT_SYMBOL',
-    extra = {
-        symbol = ',',
-    }
+    type = 'MISS_EXP',
 }
 
 TEST[[
@@ -678,7 +679,7 @@ for i = 1,<!!> do
 end
 ]]
 {
-    --multi = 2,
+    multi = 1,
     type = 'MISS_EXP'
 }
 
@@ -687,16 +688,7 @@ for i =<!!> do
 end
 ]]
 {
-    type = 'MISS_LOOP_MIN'
-}
-
-TEST[[
-for i = 1,<!!> do
-end
-]]
-{
-    --multi = 1,
-    type = 'MISS_EXP',
+    type = 'MISS_EXP'
 }
 
 TEST[[
@@ -708,7 +700,7 @@ end
 }
 
 TEST[[
-for i = 1, 2<! !>3 do
+for i = 1, 2<!!> 3 do
 end
 ]]
 {
@@ -750,6 +742,10 @@ TEST[[
 {
     multi = 2,
     type = 'MISS_END',
+    extra = {
+        start = 15,
+        finish = 15,
+    }
 }
 
 TEST[[
@@ -792,6 +788,10 @@ TEST[[
 {
     multi = 2,
     type = 'MISS_END',
+    extra = {
+        start = 13,
+        finish = 13,
+    }
 }
 
 TEST[[
@@ -852,6 +852,10 @@ TEST[[
 {
     multi = 2,
     type = 'MISS_END',
+    extra = {
+        start = 12,
+        finish = 12,
+    }
 }
 
 TEST[[
@@ -917,28 +921,6 @@ TEST[[
 ]]
 {
     type = 'EXP_IN_ACTION',
-}
-
-TEST[[
-<!!>else
-end
-]]
-{
-    type = 'MISS_SYMBOL',
-    extra = {
-        symbol = 'if',
-    }
-}
-
-TEST[[
-<!!>elseif true then
-end
-]]
-{
-    type = 'MISS_SYMBOL',
-    extra = {
-        symbol = 'if',
-    }
 }
 
 TEST[[

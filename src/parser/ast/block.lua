@@ -3,10 +3,12 @@ local class = require 'class'
 ---@class LuaParser.Node.Block: LuaParser.Node.Base
 ---@field childs LuaParser.Node.State[]
 ---@field locals LuaParser.Node.Local[]
+---@field isMain boolean
 ---@field private localMap table<string, LuaParser.Node.Local>
 local Block = class.declare('LuaParser.Node.Block', 'LuaParser.Node.Base')
 
 Block.isBlock = true
+Block.isMain = false
 
 Block.__getter.childs = function ()
     return {}, true
@@ -63,17 +65,29 @@ end
 ---@param block LuaParser.Node.Block
 function Ast:blockParseChilds(block)
     while true do
-        local token = self.lexer:peek()
-        if FinishMap[token] then
+        while self.lexer:consume ';' do
+            self:skipSpace()
+        end
+        local token, _, pos = self.lexer:peek()
+        if not token then
             break
         end
-        while self.lexer:consume ';' do end
+        ---@cast pos -?
+        if FinishMap[token] and not block.isMain then
+            break
+        end
         local state = self:parseState()
-        if not state then
-            break
+        if state then
+            state.parent = block
+            block.childs[#block.childs+1] = state
+            self:skipSpace()
+        else
+            if block.isMain then
+                self.lexer:next()
+                self:throw('UNKNOWN_SYMBOL', pos, pos + #token)
+            else
+                break
+            end
         end
-        state.parent = block
-        block.childs[#block.childs+1] = state
-        self:skipSpace()
     end
 end
