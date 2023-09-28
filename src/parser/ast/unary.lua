@@ -51,7 +51,9 @@ function Ast:parseUnary()
     local op = token
     if UnaryAlias[op] then
         if not self.nssymbolMap[op] then
-            self:throw('ERR_NONSTANDARD_SYMBOL', pos, pos + #op)
+            self:throw('ERR_NONSTANDARD_SYMBOL', pos, pos + #op, {
+                symbol = UnaryAlias[op]
+            })
         end
         op = UnaryAlias[op]
     end

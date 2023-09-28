@@ -19,18 +19,17 @@ function Ast:parseWhile()
 
     self:skipSpace()
     local condition = self:parseExp(true)
-    if not condition then
-        return nil
-    end
 
     local whileNode = self:createNode('LuaParser.Node.While', {
         start     = pos,
         condition = condition,
     })
-    condition.parent = whileNode
+    if condition then
+        condition.parent = whileNode
+    end
 
     self:skipSpace()
-    local symbolPos1 = self:assertSymbol 'do'
+    local symbolPos1 = self:assertSymbolDo(true)
     if symbolPos1 then
         whileNode.symbolPos1 = symbolPos1
 

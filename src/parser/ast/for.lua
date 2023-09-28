@@ -67,7 +67,7 @@ function Ast:parseFor()
     end
 
     self:skipSpace()
-    local symbolPos2 = self:assertSymbol 'do'
+    local symbolPos2 = self:assertSymbolDo(true)
 
     if symbolPos2 then
         forNode.symbolPos2 = symbolPos2

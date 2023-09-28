@@ -90,7 +90,9 @@ function Ast:parseBinary(curExp, curLevel, asState)
     end
     if BinaryAlias[op] then
         if not self.nssymbolMap[op] then
-            self:throw('ERR_NONSTANDARD_SYMBOL', pos, pos + #op)
+            self:throw('ERR_NONSTANDARD_SYMBOL', pos, pos + #op, {
+                symbol = BinaryAlias[op]
+            })
         end
         op = BinaryAlias[op]
     end

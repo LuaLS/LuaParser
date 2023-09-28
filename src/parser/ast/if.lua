@@ -28,6 +28,7 @@ function Ast:parseIf()
         childs = {},
     })
 
+    local hasElse
     while true do
         local child = self:parseIfChild()
         if not child then
@@ -35,6 +36,13 @@ function Ast:parseIf()
         end
         child.parent = ifNode
         ifNode.childs[#ifNode.childs+1] = child
+
+        if hasElse then
+            self:throw('BLOCK_AFTER_ELSE', child.start, child.start + #child.subtype)
+        end
+        if child.subtype == 'else' then
+            hasElse = true
+        end
     end
 
     self:skipSpace()
@@ -71,11 +79,7 @@ function Ast:parseIfChildIf()
     })
 
     self:skipSpace()
-    if condition then
-        node.symbolPos = self:assertSymbol 'then'
-    else
-        node.symbolPos = self.lexer:consume 'then'
-    end
+    node.symbolPos = self:assertSymbolThen(condition ~= nil)
 
     self:skipSpace()
     self:blockStart(node)
@@ -104,11 +108,7 @@ function Ast:parseIfChildElseIf()
     })
 
     self:skipSpace()
-    if condition then
-        node.symbolPos = self:assertSymbol 'then'
-    else
-        node.symbolPos = self.lexer:consume 'then'
-    end
+    node.symbolPos = self:assertSymbolThen(condition ~= nil)
 
     self:skipSpace()
     self:blockStart(node)

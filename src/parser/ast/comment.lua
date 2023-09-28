@@ -76,7 +76,7 @@ function Ast:parseLongComment()
     elseif token == '/*' then
         finishQuo = '*/'
         if not self.nssymbolMap['/**/'] then
-            self:throw('ERR_C_LONG_COMMENT', pos, pos + 1)
+            self:throw('ERR_C_LONG_COMMENT', pos, pos + 2)
         end
     else
         return nil
@@ -88,9 +88,12 @@ function Ast:parseLongComment()
         self:throwMissSymbol(#self.code, finishQuo)
         self.lexer:fastForward(#self.code)
     end
+
+    local finish = offset and (offset + #finishQuo - 1) or #self.code
+
     return self:createNode('LuaParser.Node.Comment', {
         subtype = 'long',
         start   = pos,
-        finish  = offset and (offset + #finishQuo - 1) or #self.code,
+        finish  = finish,
     })
 end

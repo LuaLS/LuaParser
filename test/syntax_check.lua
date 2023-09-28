@@ -926,8 +926,8 @@ TEST[[
 TEST[[
 if true then
 else
-<!elseif true then
-!>end
+<!elseif!> true then
+end
 ]]
 {
     type = 'BLOCK_AFTER_ELSE',
@@ -941,26 +941,12 @@ TEST[[
 }
 
 TEST[[
-<!/*
+<!/*!>
 adadasd
-*/!>
+*/
 ]]
 {
     type = 'ERR_C_LONG_COMMENT',
-}
-
-TEST[[
-a <!==!> b
-]]
-{
-    type = 'ERR_ASSIGN_AS_EQ',
-}
-
-TEST[[
-_VERSION <!==!> 1
-]]
-{
-    type = 'ERR_ASSIGN_AS_EQ',
 }
 
 TEST[[

@@ -83,7 +83,9 @@ function Ast:parseShortString()
     ---@cast pos -?
 
     if quo == '`' and not self.nssymbolMap['`'] then
-        self:throw('ERR_NONSTANDARD_SYMBOL', pos, pos + 1)
+        self:throw('ERR_NONSTANDARD_SYMBOL', pos, pos + 1, {
+            symbol = '"'
+        })
     end
 
     local pieces = {}

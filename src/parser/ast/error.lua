@@ -74,3 +74,41 @@ function Ast:assertSymbolEnd(relatedStart, relatedFinish)
     end
     return pos
 end
+
+---@private
+---@param needThrowMissSymbol? boolean
+---@return integer? pos
+function Ast:assertSymbolThen(needThrowMissSymbol)
+    local pos = self.lexer:consume 'then'
+    if pos then
+        return pos
+    end
+    pos = self.lexer:consume 'do'
+    if pos then
+        self:throw('ERR_THEN_AS_DO', pos, pos + #'do')
+        return pos
+    end
+    if needThrowMissSymbol then
+        self:throwMissSymbol(self:getLastPos(), 'then')
+    end
+    return nil
+end
+
+---@private
+---@param needThrowMissSymbol? boolean
+---@return integer? pos
+function Ast:assertSymbolDo(needThrowMissSymbol)
+    local pos = self.lexer:consume 'do'
+    if pos then
+        return pos
+    end
+    pos = self.lexer:consume 'then'
+    if pos then
+        self:throw('ERR_DO_AS_THEN', pos, pos + #'then')
+        return pos
+    end
+    if needThrowMissSymbol then
+        self:throwMissSymbol(self:getLastPos(), 'do')
+    end
+    return nil
+end
