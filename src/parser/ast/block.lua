@@ -64,6 +64,7 @@ end
 ---@private
 ---@param block LuaParser.Node.Block
 function Ast:blockParseChilds(block)
+    local lastState
     while true do
         while self.lexer:consume ';' do
             self:skipSpace()
@@ -80,6 +81,11 @@ function Ast:blockParseChilds(block)
         if state then
             state.parent = block
             block.childs[#block.childs+1] = state
+            if lastState and lastState.type == 'Return' then
+                ---@cast lastState LuaParser.Node.Return
+                self:throw('ACTION_AFTER_RETURN', lastState.start, lastState.start + #'return')
+            end
+            lastState = state
             self:skipSpace()
         else
             if block.isMain then
