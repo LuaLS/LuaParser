@@ -37,6 +37,13 @@ function Ast:parseFunction(isLocal)
     local name
     if isLocal then
         name = self:parseID('LuaParser.Node.Local', true)
+        local nextToken, _, nextPos = self.lexer:peek()
+        if nextToken == '.' or nextToken == ':' then
+            ---@cast nextPos -?
+            local endPos = self.code:match('[%s%w_%.%:]+()', pos + 1)
+            self.lexer:fastForward(endPos - 1)
+            self:throw('UNEXPECT_LFUNC_NAME', nextPos, endPos - 1)
+        end
     else
         name = self:parseFunctionName()
     end

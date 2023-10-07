@@ -26,7 +26,7 @@ function Ast:parseLabel()
     end
 
     self:skipSpace()
-    local labelName = self:parseID('LuaParser.Node.LabelName', true)
+    local labelName = self:parseID('LuaParser.Node.LabelName', true, true)
 
     local symbolPos
     if labelName then
