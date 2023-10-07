@@ -10,6 +10,7 @@ local class = require 'class'
 local Var = class.declare('LuaParser.Node.Var', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.Varargs: LuaParser.Node.Base
+---@field loc? LuaParser.Node.Local
 local Varargs = class.declare('LuaParser.Node.Varargs', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
@@ -39,14 +40,37 @@ function Ast:parseVar()
 end
 
 ---@private
+---@return LuaParser.Node.Local?
+function Ast:bindVarargs()
+    local loc = self:getLocal('...')
+
+    if not loc then
+        return nil
+    end
+
+    if loc.parentFunction ~= self:getCurrentFunction() then
+        return nil
+    end
+
+    return loc
+end
+
+---@private
 ---@return LuaParser.Node.Varargs?
 function Ast:parseVarargs()
     local pos = self.lexer:consume '...'
     if not pos then
         return nil
     end
+
+    local loc = self:bindVarargs()
+    if not loc then
+        self:throw('UNEXPECT_DOTS', pos, pos + #'...')
+    end
+
     return self:createNode('LuaParser.Node.Varargs', {
         start  = pos,
         finish = pos + 3,
+        loc    = loc,
     })
 end

@@ -166,12 +166,6 @@ end
 ---@return boolean
 function Ast:parseNumberI(curOffset)
     if self.code:find('^[iI]', curOffset) then
-        if not self.jit then
-            self:throw('UNSUPPORT_SYMBOL', curOffset, curOffset, {
-                version = self.version,
-                needVer = 'LuaJIT',
-            })
-        end
         return true
     end
     return false
@@ -188,6 +182,13 @@ function Ast:buildFloat(value, startPos, curOffset)
         curOffset = curOffset + 1
         valuei = value
     end
+
+    if not self.jit then
+        if valuei then
+            self:throw('UNSUPPORT_SYMBOL', curOffset - 2, curOffset - 1)
+        end
+    end
+
     self:fastForwardNumber(curOffset)
     return self:createNode('LuaParser.Node.Float', {
         start   = startPos,
@@ -217,6 +218,16 @@ function Ast:buildInteger(value, startPos, curOffset)
             intTail = 'LL'
         end
     end
+
+    if not self.jit then
+        if valuei then
+            self:throw('UNSUPPORT_SYMBOL', curOffset - 2, curOffset - 1)
+        end
+        if intTail then
+            self:throw('UNSUPPORT_SYMBOL', curOffset - #intTail - 1, curOffset - 1)
+        end
+    end
+
     self:fastForwardNumber(curOffset)
     return self:createNode('LuaParser.Node.Integer', {
         start   = startPos,
@@ -298,10 +309,7 @@ function Ast:parseNumber2()
     local value = tonumber(bins, 2)
 
     if not self.jit then
-        self:throw('UNSUPPORT_SYMBOL', pos + 2, curOffset - 1, {
-            version = self.version,
-            needVer = 'LuaJIT',
-        })
+        self:throw('UNSUPPORT_SYMBOL', pos, curOffset - 1)
     end
 
     return self:buildInteger(value, pos, curOffset)

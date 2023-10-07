@@ -119,10 +119,13 @@ Base.__getter.parentBlock = function (self)
 end
 
 ---@param self LuaParser.Node.Base
----@return LuaParser.Node.Function
+---@return LuaParser.Node.Function | false
 ---@return true
 Base.__getter.parentFunction = function (self)
     local parent = self.parent
+    if not parent then
+        return false, true
+    end
     if parent.isFunction then
         return parent, true
     end

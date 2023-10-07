@@ -253,5 +253,9 @@ function Ast:parseLocalAttr()
         self:throw('MISS_SPACE_BETWEEN', ltPos, ltPos + 2)
     end
 
+    if self.versionNum <= 53 then
+        self:throw('UNSUPPORT_SYMBOL', attrNode.start, attrNode.finish)
+    end
+
     return attrNode
 end

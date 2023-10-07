@@ -180,7 +180,7 @@ function Ast:parseShortString()
                     curOffset = offset + 1
                 end
                 if self.versionNum <= 51 then
-                    self:throw('ERR_ESC', curPos, curPos + 3)
+                    self:throw('ERR_ESC', curPos - 1, curPos + 3)
                 end
                 goto continue
             end
@@ -193,30 +193,34 @@ function Ast:parseShortString()
                     goto continue
                 end
                 pushEsc('unicode', offset - 2, tailOffset - 1)
-                if #word == 0 then
-                    self:throw('UTF8_SMALL', offset + 1, offset + 1)
+                if self.versionNum <= 52 then
+                    self:throw('ERR_ESC', offset - 2, tailOffset - 1)
                 else
-                    local num = tonumber(word, 16)
-                    if num then
-                        if self.versionNum >= 54 then
-                            if num < 0 or num > 0x7FFFFFFF then
+                    if #word == 0 then
+                        self:throw('UTF8_SMALL', offset + 1, offset + 1)
+                    else
+                        local num = tonumber(word, 16)
+                        if num then
+                            if self.versionNum >= 54 then
+                                if num < 0 or num > 0x7FFFFFFF then
+                                    self:throw('UTF8_MAX', offset + 1, offset + #word + 1, {
+                                        min = '00000000',
+                                        max = '7FFFFFFF',
+                                    })
+                                end
+                            else
                                 self:throw('UTF8_MAX', offset + 1, offset + #word + 1, {
-                                    min = '00000000',
-                                    max = '7FFFFFFF',
+                                    min     = '000000',
+                                    max     = '10FFFF',
+                                    needVer = num <= 0x7FFFFFFF and 'Lua 5.4' or nil,
                                 })
                             end
+                            if num >= 0 and num <= 0x7FFFFFFF then
+                                pieces[#pieces+1] = utf8.char(num)
+                            end
                         else
-                            self:throw('UTF8_MAX', offset + 1, offset + #word + 1, {
-                                min     = '000000',
-                                max     = '10FFFF',
-                                needVer = num <= 0x7FFFFFFF and 'Lua 5.4' or nil,
-                            })
+                            self:throw('MUST_X16', offset + 1, offset + #word + 1)
                         end
-                        if num >= 0 and num <= 0x7FFFFFFF then
-                            pieces[#pieces+1] = utf8.char(num)
-                        end
-                    else
-                        self:throw('MUST_X16', offset + 1, offset + #word + 1)
                     end
                 end
                 if rightP == '' then

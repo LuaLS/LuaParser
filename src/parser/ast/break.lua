@@ -1,6 +1,7 @@
 local class = require 'class'
 
 ---@class LuaParser.Node.Break: LuaParser.Node.Base
+---@field breeakBlock? LuaParser.Node.Block
 local Break = class.declare('LuaParser.Node.Break', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.Continue: LuaParser.Node.Base
@@ -8,6 +9,24 @@ local Continue = class.declare('LuaParser.Node.Continue', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
+
+---@return LuaParser.Node.Block?
+function Ast:findBreakBlock()
+    local blocks = self.blocks
+    for i = #blocks, 1, -1 do
+        local block = blocks[i]
+        if block.type == 'For'
+        or block.type == 'While'
+        or block.type == 'Repeat' then
+            return block
+        end
+        if block.type == 'Function'
+        or block.type == 'Main' then
+            return nil
+        end
+    end
+    return nil
+end
 
 ---@private
 ---@return LuaParser.Node.Break?
@@ -17,9 +36,15 @@ function Ast:parseBreak()
         return
     end
 
+    local block = self:findBreakBlock()
+    if not block then
+        self:throw('BREAK_OUTSIDE', pos, pos + #'break')
+    end
+
     return self:createNode('LuaParser.Node.Break', {
         start  = pos,
         finish = self:getLastPos(),
+        breakBlock = block,
     })
 end
 
@@ -34,8 +59,14 @@ function Ast:parseContinue()
         return
     end
 
+    local block = self:findBreakBlock()
+    if not block then
+        self:throw('BREAK_OUTSIDE', pos, pos + #'break')
+    end
+
     return self:createNode('LuaParser.Node.Continue', {
         start  = pos,
         finish = self:getLastPos(),
+        breakBlock = block,
     })
 end

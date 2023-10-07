@@ -45,19 +45,32 @@ function Ast:parseLabel()
         labelName.parent = label
     end
 
+    if self.versionNum <= 51 then
+        self:throw('UNSUPPORT_SYMBOL', pos, pos + 2)
+    end
+
     return label
 end
 
 ---@private
 ---@return LuaParser.Node.Goto?
 function Ast:parseGoto()
-    if not self:isKeyWord 'goto' then
+    local token, _, pos = self.lexer:peek()
+    if token ~= 'goto' then
         return nil
     end
-    local pos = self.lexer:consume 'goto'
-    if not pos then
-        return nil
+    ---@cast pos -?
+    if self:isKeyWord 'goto' then
+        -- OK
+    else
+        local _, nextType = self.lexer:peek(1)
+        if nextType == 'Word' then
+            -- OK
+        else
+            return nil
+        end
     end
+    self.lexer:next()
 
     self:skipSpace()
     local labelName = self:parseID('LuaParser.Node.LabelName', true)
@@ -70,6 +83,10 @@ function Ast:parseGoto()
     if labelName then
         gotoNode.label = labelName
         labelName.parent = gotoNode
+    end
+
+    if self.versionNum <= 51 then
+        self:throw('UNSUPPORT_SYMBOL', pos, pos + #'goto')
     end
 
     return gotoNode

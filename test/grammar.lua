@@ -1,6 +1,14 @@
 local class = require 'class'
 
-local function check_str(code, name, mode)
+local function removeErrors(errors, code)
+    for i = #errors, 1, -1 do
+        if errors[i].code == code then
+            table.remove(errors, i)
+        end
+    end
+end
+
+local function checkStr(code, name, mode)
     ---@class LuaParser.Ast
     local ast = class.new 'LuaParser.Ast' (code)
     local parser = 'parse' .. mode
@@ -9,6 +17,7 @@ local function check_str(code, name, mode)
     end
     local node = ast[parser](ast)
     assert(node)
+    removeErrors(ast.errors, 'UNEXPECT_DOTS')
     if #ast.errors > 0 and mode ~= 'Dirty' then
         error(([[
 [%s]测试失败:
@@ -27,7 +36,7 @@ end
 local function check(mode)
     return function (list)
         for i, str in ipairs(list) do
-            check_str(str, mode .. '-' .. i, mode)
+            checkStr(str, mode .. '-' .. i, mode)
         end
     end
 end

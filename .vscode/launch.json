@@ -20,6 +20,7 @@
                 "print"
             ],
             "internalConsoleOptions": "openOnSessionStart",
+            "console": "internalConsole",
             "sourceCoding": "utf8",
             "luaVersion": "5.4",
             "luaArch": "x86_64",

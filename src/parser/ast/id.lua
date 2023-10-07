@@ -15,8 +15,8 @@ local Ast = class.declare 'LuaParser.Ast'
 ---@private
 ---@generic T: LuaParser.Node.ID
 ---@param nodeType `T`
----@param required? true
----@param canBeKeyword? true
+---@param required? boolean
+---@param canBeKeyword? boolean
 ---@return T?
 function Ast:parseID(nodeType, required, canBeKeyword)
     local token, tp, pos = self.lexer:peek()

@@ -169,4 +169,19 @@ function M:createNode(type, data)
     return class.new(type, data)
 end
 
+-- 获取当前函数
+---@return LuaParser.Node.Function | LuaParser.Node.Main | nil
+function M:getCurrentFunction()
+    local blocks = self.blocks
+    for i = #blocks, 1, -1 do
+        local block = blocks[i]
+        if block.type == 'Function'
+        or block.type == 'Main' then
+            ---@cast block LuaParser.Node.Function | LuaParser.Node.Main
+            return block
+        end
+    end
+    return nil
+end
+
 return M

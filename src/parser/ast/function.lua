@@ -69,6 +69,19 @@ function Ast:parseFunction(isLocal)
         symbolPos2 = symbolPos2,
     })
 
+    if name then
+        name.parent = func
+        name.value  = func
+    end
+
+    if params then
+        for i = 1, #params do
+            local param = params[i]
+            param.parent = func
+            param.index  = i
+        end
+    end
+
     if symbolPos2 then
         self:skipSpace()
         self:blockStart(func)
@@ -88,19 +101,6 @@ function Ast:parseFunction(isLocal)
 
     func.symbolPos3 = symbolPos3
     func.finish     = self:getLastPos()
-
-    if name then
-        name.parent = func
-        name.value  = func
-    end
-
-    if params then
-        for i = 1, #params do
-            local param = params[i]
-            param.parent = func
-            param.index  = i
-        end
-    end
 
     return func
 end
@@ -202,7 +202,7 @@ end
 ---@private
 ---@return LuaParser.Node.Param?
 function Ast:parseParam()
-    local param = self:parseID('LuaParser.Node.Param')
+    local param = self:parseID('LuaParser.Node.Param', false, true)
     if param then
         return param
     end

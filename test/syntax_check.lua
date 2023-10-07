@@ -3,7 +3,7 @@ local catch  = require 'test.catch'
 local util   = require 'utility'
 
 ---@param script string
----@return fun(expect: table|nil)
+---@return fun(expect: table)
 local function TEST(script)
     return function (expect)
         local version = expect and expect.version
@@ -14,7 +14,7 @@ local function TEST(script)
         local errs = ast.errors
         local first = errs[1]
         local target = list['!'][1]
-        if not expect then
+        if not expect.type then
             assert(#errs == 0)
             return
         end
@@ -985,14 +985,14 @@ return {
     _VERSION = '',
 }
 ]]
-(nil)
+{}
 
 TEST[[
 return {
     _VERSION == '',
 }
 ]]
-(nil)
+{}
 
 -- 以下测试来自 https://github.com/andremm/lua-parser/blob/master/test.lua
 TEST[[
@@ -1353,37 +1353,37 @@ f() <!=!> 1
 {
     multi = 1,
     type = 'UNKNOWN_SYMBOL',
-    extra = {
-        symbol = '=',
-    }
 }
 
-Version = 'Lua 5.1'
 TEST[[
-<!::xx::!>
+<!::!>xx::
 ]]
 {
     type = 'UNSUPPORT_SYMBOL',
-    version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
-    extra = {
-        version = 'Lua 5.1',
-    }
+    version = 'Lua 5.1',
+}
+
+TEST [[
+<!goto!> X
+]]
+{
+    type = 'UNSUPPORT_SYMBOL',
+    version = 'Lua 5.1',
 }
 
 TEST[[
 local goto = 1
 ]]
-(nil)
+{
+    version = 'Lua 5.1',
+}
 
 TEST[[
 local x = '<!\u{1000}!>'
 ]]
 {
     type = 'ERR_ESC',
-    version = {'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
-    extra = {
-        version ='Lua 5.1',
-    }
+    version ='Lua 5.1',
 }
 
 TEST[[
@@ -1391,33 +1391,23 @@ local x = '<!\xff!>'
 ]]
 {
     type = 'ERR_ESC',
-    version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
-    extra = {
-        version = 'Lua 5.1',
-    }
+    version = 'Lua 5.1',
 }
 
-Version = 'Lua 5.2'
 TEST[[
 local x = 1 <!//!> 2
 ]]
 {
     type = 'UNSUPPORT_SYMBOL',
-    version = {'Lua 5.3', 'Lua 5.4'},
-    extra = {
-        version = 'Lua 5.2',
-    }
+    version = 'Lua 5.2',
 }
 
 TEST[[
-local x = 1 <!<<!> 2
+local x = 1 <!>>!> 2
 ]]
 {
     type = 'UNSUPPORT_SYMBOL',
-    version = {'Lua 5.3', 'Lua 5.4'},
-    extra = {
-        version = 'Lua 5.2',
-    }
+    version = 'Lua 5.2',
 }
 
 TEST[[
@@ -1425,10 +1415,7 @@ local x = '<!\u{1000}!>'
 ]]
 {
     type = 'ERR_ESC',
-    version = {'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
-    extra = {
-        version = 'Lua 5.2',
-    }
+    version = 'Lua 5.2',
 }
 
 TEST[[
@@ -1437,37 +1424,30 @@ while true do
     x = 1
 end
 ]]
-(nil)
-
-Version = 'Lua 5.3'
+{
+    version = 'Lua 5.1',
+}
 
 TEST[[
 local x <!<close>!> = 1
 ]]
 {
     type = 'UNSUPPORT_SYMBOL',
-    version = 'Lua 5.4',
-    extra = {
-        version = 'Lua 5.3',
-    }
+    version = 'Lua 5.3'
 }
 
-
-Version = 'Lua 5.4'
-
 TEST[[
-local x <<!close!>> = 1
+local x <close> = 1
 ]]
-(nil)
+{}
 
 TEST[[
-s = '<!\u{1FFFFF}!>'
+s = '\u{1FFFFF}'
 ]]
-(nil)
-
+{}
 
 TEST[[
-s = '\u<!{111111111}!>'
+s = '\u{<!111111111!>}'
 ]]
 {
     type = 'UTF8_MAX',
@@ -1482,10 +1462,6 @@ x = 42<!LL!>
 ]]
 {
     type = 'UNSUPPORT_SYMBOL',
-    version = 'LuaJIT',
-    extra = {
-        version = 'Lua 5.4',
-    }
 }
 
 TEST[[
@@ -1493,10 +1469,6 @@ x = <!0b11011!>
 ]]
 {
     type = 'UNSUPPORT_SYMBOL',
-    version = 'LuaJIT',
-    extra = {
-        version = 'Lua 5.4',
-    }
 }
 
 TEST[[
@@ -1504,10 +1476,6 @@ x = 12.5<!i!>
 ]]
 {
     type = 'UNSUPPORT_SYMBOL',
-    version = 'LuaJIT',
-    extra = {
-        version = 'Lua 5.4',
-    }
 }
 
 TEST[[
@@ -1516,8 +1484,6 @@ x = 1.23<!LL!>
 {
     type = 'MALFORMED_NUMBER',
 }
-
-Version = 'LuaJIT'
 
 TEST[[
 x = 42LL
@@ -1529,7 +1495,11 @@ x = 1I
 x = 18446744073709551615ULL
 x = 0b11011
 ]]
-(nil)
+{
+    optional = {
+        jit = true,
+    }
+}
 
 TEST[[
 x = 1.23<!LL!>
@@ -1543,13 +1513,9 @@ x = 0b1<!2!>
 ]]
 {
     type = 'MALFORMED_NUMBER',
-}
-
-TEST [[
-local <!true!> = 1
-]]
-{
-    type = 'KEYWORD'
+    optional = {
+        jit = true,
+    }
 }
 
 TEST [[
@@ -1585,35 +1551,35 @@ function f(...)
     return ...
 end
 ]]
-(nil)
+{}
 
 TEST[[
 for i = 1, 10 do
     break
 end
 ]]
-(nil)
+{}
 
 TEST[[
 for k, v in pairs(t) do
     break
 end
 ]]
-(nil)
+{}
 
 TEST[[
 while true do
     break
 end
 ]]
-(nil)
+{}
 
 TEST[[
 repeat
     break
 until true
 ]]
-(nil)
+{}
 
 TEST[[
 <!break!>
