@@ -12,6 +12,9 @@ local Block = class.declare('LuaParser.Node.Block', 'LuaParser.Node.Base')
 Block.isBlock = true
 Block.isMain = false
 
+-- 局部变量和上值的数量
+Block.localCount = 0
+
 Block.__getter.childs = function ()
     return {}, true
 end
@@ -95,7 +98,7 @@ function Ast:blockFinish(block)
     self.blocks[#self.blocks] = nil
     self.curBlock = self.blocks[#self.blocks]
 
-    self.localCount = self.localCount - #block.locals
+    self.localCount = self.localCount - block.localCount
 end
 
 ---@private

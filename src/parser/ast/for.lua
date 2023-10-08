@@ -41,14 +41,31 @@ function Ast:parseFor()
     local token, _, symbolPos = self.lexer:peek()
 
     forNode.symbolPos1 = symbolPos
+
+    local extraLocalCount
     if token == '=' then
         forNode.subtype = 'loop'
+        extraLocalCount = 3
     elseif token == 'in' then
         forNode.subtype = 'in'
+        if self.versionNum >= 54 then
+            extraLocalCount = 4
+        else
+            extraLocalCount = 3
+        end
     else
         self:throwMissSymbol(self:getLastPos(), 'in')
         return forNode
     end
+
+    -- 循环要使用额外的局部变量
+    local block = self.curBlock
+    self.localCount = self.localCount + extraLocalCount
+    if block then
+        block.localCount  = block.localCount + extraLocalCount
+    end
+
+
     self.lexer:next()
 
     self:skipSpace()

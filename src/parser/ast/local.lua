@@ -127,6 +127,9 @@ function Ast:parseLocal()
     return localdef
 end
 
+---@package
+Ast.hasThrowedLocalLimit = false
+
 ---@private
 ---@param loc LuaParser.Node.Local
 function Ast:initLocal(loc)
@@ -141,10 +144,14 @@ function Ast:initLocal(loc)
     local name = loc.id
     block.localMap[name] = loc
 
-    if self.localCount == 200 then
-        self:throw('LOCAL_LIMIT', loc.start, loc.finish)
+    if name ~= '...' then
+        if self.localCount >= 200 and not self.hasThrowedLocalLimit then
+            self.hasThrowedLocalLimit = true
+            self:throw('LOCAL_LIMIT', loc.start, loc.finish)
+        end
+        self.localCount = self.localCount + 1
+        block.localCount = block.localCount + 1
     end
-    self.localCount = self.localCount + 1
 end
 
 ---@private
