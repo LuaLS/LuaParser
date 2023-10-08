@@ -1655,32 +1655,6 @@ end
 {}
 
 TEST[[
-goto label
-local x = 1
-x = 2
-::label::
-]]
-{}
-
-TEST[[
-local x = 1
-goto label
-x = 2
-::label::
-print(x)
-]]
-{}
-
-TEST[[
-local x = 1
-::label::
-print(x)
-local x
-goto label
-]]
-{}
-
-TEST[[
 goto <!label!>
 ]]
 {
@@ -1709,47 +1683,32 @@ TEST[[
 goto <!label!>
 local x = 1
 ::label::
-x = 2
 ]]
 {
     type = 'JUMP_LOCAL_SCOPE',
     extra = {
         loc = 'x',
+        start = 17,
+        finish = 18,
     },
-    relative = {
-        {
-            start = 26,
-            finish = 30,
-        },
-        {
-            start = 18,
-            finish = 18,
-        },
-    }
 }
 
 TEST[[
-goto <!label!>
-local x = 1
+local x
+goto label
 ::label::
-return x
+print(x)
 ]]
-{
-    type = 'JUMP_LOCAL_SCOPE',
-    extra = {
-        loc = 'x',
-    },
-    relative = {
-        {
-            start = 26,
-            finish = 30,
-        },
-        {
-            start = 18,
-            finish = 18,
-        },
-    }
-}
+{}
+
+TEST[[
+local x
+::label::
+print(x)
+local x
+goto label
+]]
+{}
 
 TEST[[
 ::label::
@@ -1758,13 +1717,12 @@ TEST[[
 ]]
 {
     type = 'REDEFINED_LABEL',
-    related = {
+    extra = {
         start  = 3,
         finish = 7,
     }
 }
 
-Version = 'Lua 5.4'
 TEST[[
 ::label::
 ::other_label::
@@ -1774,7 +1732,7 @@ end
 ]]
 {
     type = 'REDEFINED_LABEL',
-    related = {
+    extra = {
         start  = 3,
         finish = 7,
     }
@@ -1786,9 +1744,8 @@ if true then
 end
 ::label::
 ]]
-(nil)
+{}
 
-Version = 'Lua 5.3'
 TEST[[
 ::label::
 ::other_label::
@@ -1796,7 +1753,9 @@ if true then
     ::label::
 end
 ]]
-(nil)
+{
+    version = 'Lua 5.3',
+}
 
 TEST[[
 if true then
@@ -1804,9 +1763,10 @@ if true then
 end
 ::label::
 ]]
-(nil)
+{
+    version = 'Lua 5.3',
+}
 
-Version = 'Lua 5.4'
 TEST[[
 local x <const> = 1
 <!x!> = 2

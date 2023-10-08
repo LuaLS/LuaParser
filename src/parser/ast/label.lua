@@ -131,6 +131,22 @@ function Ast:resolveGoto(gotoNode)
 
     gotoNode.label = labelNode
     labelNode.gotos[#labelNode.gotos+1] = gotoNode
+
+    -- 检查是否进入局部变量的作用域
+    local labelBlock = labelNode.parentBlock
+    if labelBlock then
+        for _, loc in ipairs(labelBlock.locals) do
+            if  loc.start > gotoNode.start
+            and loc.start < labelNode.start then
+                self:throw('JUMP_LOCAL_SCOPE', gotoNode.name.start, gotoNode.name.finish, {
+                    loc    = loc.id,
+                    start  = loc.start,
+                    finish = loc.finish,
+                })
+                break
+            end
+        end
+    end
 end
 
 -- 获取在指定位置可见的所有标签
