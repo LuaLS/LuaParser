@@ -36,6 +36,8 @@ function LuaParser.compile(code, version, options)
 
     ---@diagnostic disable-next-line: invisible
     ast:resolveAllGoto()
+    ---@diagnostic disable-next-line: invisible
+    ast:checkAssignConst()
 
     return ast
 end

@@ -30,9 +30,13 @@ end
 Local.__getter.sets = function (self)
     local sets = {}
     for _, ref in ipairs(self.refs) do
-        local parent = ref.parent
-        if parent and parent.type == 'Assign' then
+        if ref.value then
             sets[#sets+1] = ref
+        else
+            local parent = ref.parent
+            if parent and parent.type == 'Assign' then
+                sets[#sets+1] = ref
+            end
         end
     end
     return sets, true
@@ -258,4 +262,17 @@ function Ast:parseLocalAttr()
     end
 
     return attrNode
+end
+
+---@private
+function Ast:checkAssignConst()
+    for _, loc in ipairs(self.nodesMap['Local']) do
+        ---@cast loc LuaParser.Node.Local
+        local attr = loc.attr and loc.attr.name and loc.attr.name.id
+        if attr == 'const' or attr == 'close' then
+            for _, set in ipairs(loc.sets) do
+                self:throw('SET_CONST', set.start, set.finish)
+            end
+        end
+    end
 end
