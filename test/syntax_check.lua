@@ -1367,6 +1367,7 @@ TEST [[
 <!goto!> X
 ]]
 {
+    multi = 1,
     type = 'UNSUPPORT_SYMBOL',
     version = 'Lua 5.1',
 }
@@ -1684,9 +1685,6 @@ goto <!label!>
 ]]
 {
     type = 'NO_VISIBLE_LABEL',
-    extra = {
-        label = 'label',
-    }
 }
 
 TEST[[
@@ -1695,9 +1693,6 @@ do do do goto <!label!> end end end
 ]]
 {
     type = 'NO_VISIBLE_LABEL',
-    extra = {
-        label = 'label',
-    }
 }
 
 TEST[[
@@ -1708,9 +1703,6 @@ end
 ]]
 {
     type = 'NO_VISIBLE_LABEL',
-    extra = {
-        label = 'label',
-    }
 }
 
 TEST[[

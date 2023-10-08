@@ -32,7 +32,10 @@ local LuaParser = class.get 'LuaParser'
 ---@return LuaParser.Ast
 function LuaParser.compile(code, version, options)
     local ast = class.new 'LuaParser.Ast' (code, version, options)
-    ast.fullCompile = true
     ast.main = ast:parseMain()
+
+    ---@diagnostic disable-next-line: invisible
+    ast:resolveAllGoto()
+
     return ast
 end

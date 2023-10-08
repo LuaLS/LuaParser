@@ -13,8 +13,10 @@ local class = require 'class'
 ---@field finishCol integer # 结束列号
 ---@field code string # 对应的代码
 ---@field parent unknown
----@field parentBlock LuaParser.Node.Block | false
----@field parentFunction LuaParser.Node.Function
+---@field parentBlock LuaParser.Node.Block | false # 向上搜索一个block
+---@field parentFunction LuaParser.Node.Function | false # 向上搜索一个function
+---@field referBlock LuaParser.Node.Block | false # 如果自己是block，则是自己；否则向上搜索一个block
+---@field referFunction LuaParser.Node.Function | false # 如果自己是function，则是自己；否则向上搜索一个function
 ---@field asNumber? number
 ---@field asString? string
 ---@field asBoolean? boolean
@@ -26,6 +28,9 @@ local class = require 'class'
 ---@field dummy? boolean
 ---@field index? integer
 local Base = class.declare 'LuaParser.Node.Base'
+
+---@type boolean
+Base.isBlock = false
 
 local rowcolMulti = 10000
 
@@ -119,6 +124,13 @@ Base.__getter.parentBlock = function (self)
 end
 
 ---@param self LuaParser.Node.Base
+---@return LuaParser.Node.Block | false
+---@return true
+Base.__getter.referBlock = function (self)
+    return self.parentBlock, true
+end
+
+---@param self LuaParser.Node.Base
 ---@return LuaParser.Node.Function | false
 ---@return true
 Base.__getter.parentFunction = function (self)
@@ -130,6 +142,13 @@ Base.__getter.parentFunction = function (self)
         return parent, true
     end
     return parent.parentFunction, true
+end
+
+---@param self LuaParser.Node.Base
+---@return LuaParser.Node.Function | false
+---@return true
+function Base.__getter.referFunction(self)
+    return self.parentFunction, true
 end
 
 ---@class LuaParser.Node.Literal: LuaParser.Node.Base

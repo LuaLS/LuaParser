@@ -21,6 +21,11 @@ local Function = class.declare('LuaParser.Node.Function', 'LuaParser.Node.Block'
 
 Function.isFunction = true
 
+function Function.__getter.referFunction(self)
+    return self, true
+end
+
+
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 

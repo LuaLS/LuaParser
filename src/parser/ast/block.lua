@@ -18,6 +18,10 @@ Block.__getter.locals = function ()
     return {}, true
 end
 
+Block.__getter.referBlock = function (self)
+    return self, true
+end
+
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
 
@@ -96,4 +100,39 @@ function Ast:blockParseChilds(block)
             end
         end
     end
+end
+
+---@package
+Ast.needSortBlock = true
+
+-- 获取最近的block
+---@public
+---@param pos integer
+---@return LuaParser.Node.Block?
+function Ast:getRecentBlock(pos)
+    if self.needSortBlock then
+        self.needSortBlock = false
+        table.sort(self.blocks, function (a, b)
+            return a.start < b.start
+        end)
+    end
+
+    local blocks = self.blockList
+    -- 使用二分法找到最近的block
+    local low = 1
+    local high = #blocks
+    while low <= high do
+        local mid = (low + high) // 2
+        if pos < blocks[mid].start then
+            high = mid - 1
+        elseif not blocks[mid+1] then
+            return blocks[mid]
+        elseif pos >= blocks[mid+1].start then
+            low = mid + 1
+        else
+            return blocks[mid]
+        end
+    end
+
+    return nil
 end

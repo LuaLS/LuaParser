@@ -1,9 +1,14 @@
 local class = require 'class'
 
 ---@class LuaParser.Node.Label: LuaParser.Node.Base
----@field label? LuaParser.Node.LabelName
+---@field name? LuaParser.Node.LabelName
 ---@field symbolPos? integer # 右边标签符号的位置
+---@field gotos LuaParser.Node.Goto[] # 关联的Goto
 local Label = class.declare('LuaParser.Node.Label', 'LuaParser.Node.Base')
+
+Label.__getter.gotos = function (self)
+    return {}, true
+end
 
 ---@class LuaParser.Node.LabelName: LuaParser.Node.Base
 ---@field parent LuaParser.Node.Label | LuaParser.Node.Goto
@@ -11,7 +16,8 @@ local Label = class.declare('LuaParser.Node.Label', 'LuaParser.Node.Base')
 local LabelName = class.declare('LuaParser.Node.LabelName', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.Goto: LuaParser.Node.Base
----@field label? LuaParser.Node.LabelName
+---@field name? LuaParser.Node.LabelName
+---@field label? LuaParser.Node.Label # 关联的Label
 local Goto = class.declare('LuaParser.Node.Goto', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
@@ -41,7 +47,7 @@ function Ast:parseLabel()
     })
 
     if labelName then
-        label.label = labelName
+        label.name = labelName
         labelName.parent = label
     end
 
@@ -81,7 +87,7 @@ function Ast:parseGoto()
     })
 
     if labelName then
-        gotoNode.label = labelName
+        gotoNode.name = labelName
         labelName.parent = gotoNode
     end
 
@@ -90,4 +96,67 @@ function Ast:parseGoto()
     end
 
     return gotoNode
+end
+
+---@private
+function Ast:resolveAllGoto()
+    for _, gotoNode in ipairs(self.nodesMap['Goto']) do
+        ---@cast gotoNode LuaParser.Node.Goto
+        self:resolveGoto(gotoNode)
+    end
+end
+
+---@private
+---@param gotoNode LuaParser.Node.Goto
+function Ast:resolveGoto(gotoNode)
+    if not gotoNode.name then
+        return
+    end
+    local myName = gotoNode.name.id
+
+    ---@type LuaParser.Node.Label?
+    local labelNode
+    local labels = self:findVisibleLabels(gotoNode.start)
+    for _, label in ipairs(labels) do
+        if label.name.id == myName then
+            labelNode = label
+            break
+        end
+    end
+
+    if not labelNode then
+        self:throw('NO_VISIBLE_LABEL', gotoNode.name.start, gotoNode.name.finish)
+        return
+    end
+
+    gotoNode.label = labelNode
+    labelNode.gotos[#labelNode.gotos+1] = gotoNode
+end
+
+-- 获取在指定位置可见的所有标签
+---@public
+---@param pos integer
+---@return LuaParser.Node.Label[]
+function Ast:findVisibleLabels(pos)
+    local results = {}
+    local myBlock = self:getRecentBlock(pos)
+    if not myBlock then
+        return results
+    end
+    local myFunction = myBlock.referFunction
+    if not myFunction then
+        return results
+    end
+    for _, labelNode in ipairs(self.nodesMap['Label']) do
+        ---@cast labelNode LuaParser.Node.Label
+        local block = labelNode.parentBlock
+        if  block
+        and labelNode.name
+        and block.start <= myBlock.start
+        and block.finish >= myBlock.finish
+        and block.start >= myFunction.start then
+            results[#results+1] = labelNode
+        end
+    end
+    return results
 end

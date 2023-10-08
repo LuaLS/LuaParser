@@ -1,5 +1,6 @@
 local class = require 'class'
 local lexer = require 'parser.lexer'
+local util  = require 'utility'
 
 require 'parser.ast.base'
 require 'parser.ast.error'
@@ -33,7 +34,6 @@ require 'parser.ast.main'
 ---@class LuaParser.Ast
 ---@field envMode 'fenv' | '_ENV'
 ---@field main LuaParser.Node.Main
----@field fullCompile? boolean # 是否是完整编译
 ---@overload fun(code: string, version: LuaParser.LuaVersion, options: LuaParser.CompileOptions): LuaParser.Ast
 local M = class.declare 'LuaParser.Ast'
 
@@ -59,11 +59,21 @@ function M:__init(code, version, options)
     ---@type LuaParser.Node.Comment[]
     self.comments    = {}
     -- 代码块
+    ---@private
     ---@type LuaParser.Node.Block[]
     self.blocks      = {}
     -- 当前代码块
+    ---@private
     ---@type LuaParser.Node.Block?
     self.curBlock    = nil
+    -- 按类型存放的节点
+    ---@private
+    ---@type table<string, LuaParser.Node.Base[]>
+    self.nodesMap = util.multiTable(2)
+    -- 存放所有的block
+    ---@private
+    ---@type LuaParser.Node.Block[]
+    self.blockList = {}
 
     local major, minor = self.version:match 'Lua (%d+)%.(%d+)'
     ---@type integer
@@ -166,10 +176,20 @@ end
 ---@return T
 function M:createNode(type, data)
     data.ast = self
-    return class.new(type, data)
+    local node = class.new(type, data)
+
+    local nodeMap = self.nodesMap[node.type]
+    nodeMap[#nodeMap+1] = node
+
+    if node.isBlock then
+        self.blockList[#self.blockList+1] = node
+    end
+
+    return node
 end
 
 -- 获取当前函数
+---@private
 ---@return LuaParser.Node.Function | LuaParser.Node.Main | nil
 function M:getCurrentFunction()
     local blocks = self.blocks
