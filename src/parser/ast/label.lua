@@ -49,6 +49,23 @@ function Ast:parseLabel()
     if labelName then
         label.name = labelName
         labelName.parent = label
+        local curBlock = self.curBlock
+        if curBlock then
+            curBlock.labels[#curBlock.labels+1] = label
+
+            local existLabel = curBlock.labelMap[labelName.id]
+            if existLabel then
+                if self.versionNum >= 54
+                or curBlock == existLabel.parentBlock then
+                    self:throw('REDEFINED_LABEL', labelName.start, labelName.finish, {
+                        start = existLabel.name.start,
+                        finish = existLabel.name.finish,
+                    })
+                end
+            end
+
+            curBlock.labelMap[labelName.id] = label
+        end
     end
 
     if self.versionNum <= 51 then
@@ -114,15 +131,8 @@ function Ast:resolveGoto(gotoNode)
     end
     local myName = gotoNode.name.id
 
-    ---@type LuaParser.Node.Label?
-    local labelNode
-    local labels = self:findVisibleLabels(gotoNode.start)
-    for _, label in ipairs(labels) do
-        if label.name.id == myName then
-            labelNode = label
-            break
-        end
-    end
+    local labelMap = self:findVisibleLabels(gotoNode.start)
+    local labelNode = labelMap[myName]
 
     if not labelNode then
         self:throw('NO_VISIBLE_LABEL', gotoNode.name.start, gotoNode.name.finish)
@@ -152,27 +162,12 @@ end
 -- 获取在指定位置可见的所有标签
 ---@public
 ---@param pos integer
----@return LuaParser.Node.Label[]
+---@return table<string, LuaParser.Node.Label>
 function Ast:findVisibleLabels(pos)
     local results = {}
     local myBlock = self:getRecentBlock(pos)
     if not myBlock then
         return results
     end
-    local myFunction = myBlock.referFunction
-    if not myFunction then
-        return results
-    end
-    for _, labelNode in ipairs(self.nodesMap['Label']) do
-        ---@cast labelNode LuaParser.Node.Label
-        local block = labelNode.parentBlock
-        if  block
-        and labelNode.name
-        and block.start <= myBlock.start
-        and block.finish >= myBlock.finish
-        and block.start >= myFunction.start then
-            results[#results+1] = labelNode
-        end
-    end
-    return results
+    return myBlock.labelMap
 end

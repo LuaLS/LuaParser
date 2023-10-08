@@ -31,7 +31,7 @@ Local.__getter.sets = function (self)
     local sets = {}
     for _, ref in ipairs(self.refs) do
         local parent = ref.parent
-        if parent.type == 'Assign' then
+        if parent and parent.type == 'Assign' then
             sets[#sets+1] = ref
         end
     end
@@ -46,7 +46,7 @@ Local.__getter.gets = function (self)
     local gets = {}
     for _, ref in ipairs(self.refs) do
         local parent = ref.parent
-        if parent.type ~= 'Assign' then
+        if parent and parent.type ~= 'Assign' then
             gets[#gets+1] = ref
         end
     end

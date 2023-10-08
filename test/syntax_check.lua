@@ -1718,7 +1718,7 @@ TEST[[
 {
     type = 'REDEFINED_LABEL',
     extra = {
-        start  = 3,
+        start  = 2,
         finish = 7,
     }
 }
@@ -1733,7 +1733,7 @@ end
 {
     type = 'REDEFINED_LABEL',
     extra = {
-        start  = 3,
+        start  = 2,
         finish = 7,
     }
 }

@@ -12,7 +12,7 @@ local class = require 'class'
 ---@field finishRow integer # 结束行号
 ---@field finishCol integer # 结束列号
 ---@field code string # 对应的代码
----@field parent unknown
+---@field parent? unknown
 ---@field parentBlock LuaParser.Node.Block | false # 向上搜索一个block
 ---@field parentFunction LuaParser.Node.Function | false # 向上搜索一个function
 ---@field referBlock LuaParser.Node.Block | false # 如果自己是block，则是自己；否则向上搜索一个block
@@ -31,6 +31,9 @@ local Base = class.declare 'LuaParser.Node.Base'
 
 ---@type boolean
 Base.isBlock = false
+
+---@type boolean
+Base.isFunction = false
 
 local rowcolMulti = 10000
 
@@ -97,16 +100,6 @@ end
 Base.__getter.code = function (self)
     local code = self.ast.code:sub(self.start + 1, self.finish)
     return code, true
-end
-
----@param self LuaParser.Node.Base
----@return any
----@return true
-Base.__getter.parent = function (self)
-    if self.start == 0 then
-        return false, true
-    end
-    error('未设置父节点：' .. self.type)
 end
 
 ---@param self LuaParser.Node.Base

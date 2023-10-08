@@ -3,8 +3,10 @@ local class = require 'class'
 ---@class LuaParser.Node.Block: LuaParser.Node.Base
 ---@field childs LuaParser.Node.State[]
 ---@field locals LuaParser.Node.Local[]
+---@field labels LuaParser.Node.Label[]
 ---@field isMain boolean
----@field private localMap table<string, LuaParser.Node.Local>
+---@field localMap table<string, LuaParser.Node.Local>
+---@field labelMap table<string, LuaParser.Node.Label>
 local Block = class.declare('LuaParser.Node.Block', 'LuaParser.Node.Base')
 
 Block.isBlock = true
@@ -16,6 +18,49 @@ end
 
 Block.__getter.locals = function ()
     return {}, true
+end
+
+---@param self LuaParser.Node.Block
+---@return table
+---@return true
+Block.__getter.localMap = function (self)
+    local parentBlock = self.parentBlock
+    if not parentBlock then
+        return {}, true
+    end
+    local parentLocalMap = parentBlock.localMap
+    return setmetatable({}, {
+        __index = function (t, k)
+            local v = parentLocalMap[k] or false
+            t[k] = v
+            return v
+        end
+    }), true
+end
+
+Block.__getter.labels = function ()
+    return {}, true
+end
+
+---@param self LuaParser.Node.Block
+---@return table
+---@return true
+Block.__getter.labelMap = function (self)
+    if self.isFunction then
+        return {}, true
+    end
+    local parentBlock = self.parentBlock
+    if not parentBlock then
+        return {}, true
+    end
+    local parentLabelMap = parentBlock.labelMap
+    return setmetatable({}, {
+        __index = function (t, k)
+            local v = parentLabelMap[k] or false
+            t[k] = v
+            return v
+        end
+    }), true
 end
 
 Block.__getter.referBlock = function (self)
@@ -40,21 +85,7 @@ function Ast:blockStart(block)
     local parentBlock = self.blocks[#self.blocks]
     self.blocks[#self.blocks+1] = block
     self.curBlock = block
-
-    ---@diagnostic disable: invisible
-    if parentBlock then
-        local parentLocalMap = parentBlock.localMap
-        block.localMap = setmetatable({}, {
-            __index = function (t, k)
-                local v = parentLocalMap[k] or false
-                t[k] = v
-                return v
-            end
-        })
-    else
-        block.localMap = {}
-    end
-    ---@diagnostic enable: invisible
+    block.parentBlock = parentBlock
 end
 
 ---@private
