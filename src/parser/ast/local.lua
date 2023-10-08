@@ -140,24 +140,11 @@ function Ast:initLocal(loc)
 
     local name = loc.id
     block.localMap[name] = loc
-end
 
----@private
----@param locs LuaParser.Node.Local[]
-function Ast:initLocals(locs)
-    ---@class LuaParser.Node.Block
-    local block = self.curBlock
-    if not block then
-        return
+    if self.localCount == 200 then
+        self:throw('LOCAL_LIMIT', loc.start, loc.finish)
     end
-
-    for i = 1, #locs do
-        local loc = locs[i]
-        block.locals[#block.locals+1] = loc
-
-        local name = loc.id
-        block.localMap[name] = loc
-    end
+    self.localCount = self.localCount + 1
 end
 
 ---@private

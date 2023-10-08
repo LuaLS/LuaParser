@@ -56,6 +56,8 @@ function Ast:parseMain()
             parent = main,
         })
         self:initLocal(env)
+        -- 虽然 _ENV 是上值，但是不计入200个的数量限制
+        self.localCount = 0
     end
 
     self:skipSpace()

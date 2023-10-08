@@ -94,6 +94,8 @@ function Ast:blockFinish(block)
     assert(self.curBlock == block)
     self.blocks[#self.blocks] = nil
     self.curBlock = self.blocks[#self.blocks]
+
+    self.localCount = self.localCount - #block.locals
 end
 
 ---@private

@@ -217,3 +217,85 @@ x = 1
         }
     }
 }
+
+TEST [[
+local function f()
+    print(f)
+end
+]]
+{
+    childs = {
+        [1] = {
+            childs = {
+                [1] = {
+                    type = 'Call',
+                    args = {
+                        [1] = {
+                            id = 'f',
+                            loc = {
+                                left = 15,
+                            }
+                        },
+                    }
+                }
+            }
+        }
+    }
+}
+
+TEST [[
+local function a()
+    return
+end]]
+{
+    childs = {
+        [1] = {
+            type = 'Function',
+            childs = {
+                [1] = {
+                    type = 'Return',
+                    exps = {
+                        [1] = NIL
+                    }
+                }
+            }
+        }
+    }
+}
+
+TEST [[
+local function f()
+    return f
+end
+]]
+{
+    locals = {
+        [3] = {
+            id = 'f',
+            gets = {
+                [1] = {
+                    left = 10011,
+                }
+            }
+        }
+    },
+    childs = {
+        [1] = {
+            type = 'Function',
+            childs = {
+                [1] = {
+                    type = 'Return',
+                    exps = {
+                        [1] = {
+                            type = 'Var',
+                            id   = 'f',
+                            loc  = {
+                                left = 15,
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

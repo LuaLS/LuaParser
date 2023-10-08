@@ -51,7 +51,6 @@ function M:__init(code, version, options)
     self.nssymbolMap = {}
     -- 词法分析结果
     self.lexer       = lexer.parseLua(code)
-    self.index       = 1
     -- 错误信息
     ---@type LuaParser.Node.Error[]
     self.errors      = {}
@@ -74,6 +73,8 @@ function M:__init(code, version, options)
     ---@private
     ---@type LuaParser.Node.Block[]
     self.blockList = {}
+    -- 当前的局部变量计数（最大只能存在200个局部变量）
+    self.localCount = 0
 
     local major, minor = self.version:match 'Lua (%d+)%.(%d+)'
     ---@type integer

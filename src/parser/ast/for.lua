@@ -74,7 +74,9 @@ function Ast:parseFor()
 
         self:skipSpace()
         self:blockStart(forNode)
-        self:initLocals(vars)
+        for i = 1, #vars do
+            self:initLocal(vars[i])
+        end
         self:blockParseChilds(forNode)
         self:blockFinish(forNode)
 
