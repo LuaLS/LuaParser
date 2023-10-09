@@ -9,6 +9,7 @@ local class = require 'class'
 ---@field view string
 local Float = class.declare('LuaParser.Node.Float', 'LuaParser.Node.Literal')
 
+Float.isLiteral = true
 Float.value = 0.0
 
 ---@param self LuaParser.Node.Float
@@ -62,6 +63,7 @@ end
 ---@field view string
 local Integer = class.declare('LuaParser.Node.Integer', 'LuaParser.Node.Literal')
 
+Integer.isLiteral = true
 Integer.value = 0
 
 ---@param self LuaParser.Node.Integer

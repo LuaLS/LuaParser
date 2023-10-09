@@ -191,6 +191,16 @@ function Ast:parseTerm()
         end
 
         if chain then
+            if chain.type == 'Call' and self.versionNum <= 51 then
+                if current.finishRow ~= self.lexer:rowcol(chain.argPos) then
+                    self:throw('AMBIGUOUS_SYNTAX', chain.argPos, chain.finish)
+                end
+            end
+
+            if current.isLiteral then
+                self:throw('NEED_PAREN', current.start, current.finish)
+            end
+
             current = chain
         else
             break

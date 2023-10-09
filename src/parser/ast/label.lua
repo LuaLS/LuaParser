@@ -68,7 +68,7 @@ function Ast:parseLabel()
         end
     end
 
-    if self.versionNum <= 51 then
+    if self.versionNum <= 51 and not self.jit then
         self:throw('UNSUPPORT_SYMBOL', pos, pos + 2)
     end
 
@@ -108,7 +108,7 @@ function Ast:parseGoto()
         labelName.parent = gotoNode
     end
 
-    if self.versionNum <= 51 then
+    if self.versionNum <= 51 and not self.jit then
         self:throw('UNSUPPORT_SYMBOL', pos, pos + #'goto')
     end
 

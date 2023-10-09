@@ -19,6 +19,7 @@ local Param = class.declare('LuaParser.Node.Param', 'LuaParser.Node.Local')
 ---@field symbolPos3? integer # `end`
 local Function = class.declare('LuaParser.Node.Function', 'LuaParser.Node.Block')
 
+Function.isLiteral = true
 Function.isFunction = true
 
 function Function.__getter.referFunction(self)
@@ -129,14 +130,16 @@ function Ast:parseFunctionName()
 
         local chain = self:parseField(current)
 
-        if  current.type == 'Field'
-        and current.subtype == 'method' then
-            if chain then
+        if chain then
+            if  current.type == 'Field'
+            and current.subtype == 'method' then
                 self:throwMissSymbol(current.finish, '(')
             end
-        end
 
-        if chain then
+            if chain.subtype == 'index' then
+                self:throw('INDEX_IN_FUNC_NAME', chain.symbolPos, chain.finish)
+            end
+
             current = chain
         else
             break

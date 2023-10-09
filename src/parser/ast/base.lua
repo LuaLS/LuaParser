@@ -35,6 +35,9 @@ Base.isBlock = false
 ---@type boolean
 Base.isFunction = false
 
+---@type boolean
+Base.isLiteral = false
+
 local rowcolMulti = 10000
 
 ---@param self LuaParser.Node.Base

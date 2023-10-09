@@ -3,8 +3,10 @@ local class = require 'class'
 ---@class LuaParser.Node.Nil: LuaParser.Node.Literal
 local Nil = class.declare('LuaParser.Node.Nil', 'LuaParser.Node.Literal')
 
+Nil.isLiteral = true
 Nil.toString = 'nil'
 Nil.isTruly = false
+
 
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'

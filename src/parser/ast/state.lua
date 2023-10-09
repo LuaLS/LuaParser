@@ -86,7 +86,10 @@ function Ast:parseState()
     end
 
     if token == 'goto' then
-        return self:parseGoto()
+        local state = self:parseGoto()
+        if state then
+            return state
+        end
     end
 
     if token == 'repeat' then

@@ -123,7 +123,7 @@ function Ast:blockParseChilds(block)
             block.childs[#block.childs+1] = state
             if lastState and lastState.type == 'Return' then
                 ---@cast lastState LuaParser.Node.Return
-                self:throw('ACTION_AFTER_RETURN', lastState.start, lastState.start + #'return')
+                self:throw('ACTION_AFTER_RETURN', lastState.start, lastState.finish)
             end
             lastState = state
             self:skipSpace()

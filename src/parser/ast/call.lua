@@ -13,8 +13,12 @@ local Ast = class.declare 'LuaParser.Ast'
 ---@param last LuaParser.Node.Term
 ---@return LuaParser.Node.Call?
 function Ast:parseCall(last)
-    local pos = self.lexer:consume '('
-    if pos then
+    local token, _, pos = self.lexer:peek()
+    if token == '(' then
+        if last.isLiteral then
+            return nil
+        end
+        self.lexer:next()
         local exps = self:parseExpList(false, true)
         self:assertSymbol ')'
         local call = self:createNode('LuaParser.Node.Call', {
