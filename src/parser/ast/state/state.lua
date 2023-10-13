@@ -1,5 +1,16 @@
 local class = require 'class'
 
+require 'parser.ast.state.local'
+require 'parser.ast.state.function'
+require 'parser.ast.state.label'
+require 'parser.ast.state.do'
+require 'parser.ast.state.if'
+require 'parser.ast.state.return'
+require 'parser.ast.state.for'
+require 'parser.ast.state.while'
+require 'parser.ast.state.repeat'
+require 'parser.ast.state.break'
+
 ---@class LuaParser.Node.Assign: LuaParser.Node.Base
 ---@field symbolPos? integer # 等号的位置
 ---@field exps LuaParser.Node.Exp[]
