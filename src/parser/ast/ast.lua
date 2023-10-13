@@ -20,7 +20,7 @@ require 'parser.ast.unary'
 require 'parser.ast.binary'
 require 'parser.ast.state.state'
 require 'parser.ast.main'
-require 'parser.ast.cats.cats'
+require 'parser.ast.cats.cat'
 
 ---@class LuaParser.Ast
 ---@field envMode 'fenv' | '_ENV'
@@ -158,7 +158,7 @@ function M:skipSpace(inExp)
         self.lastRightCI = self.lexer.ci
     end
     repeat until not self:skipNL()
-            and  not self:skipCats()
+            and  not self:skipCat()
             and  not self:skipComment(inExp)
             and  not self:skipUnknown()
     self.lastSpaceCI = self.lexer.ci
