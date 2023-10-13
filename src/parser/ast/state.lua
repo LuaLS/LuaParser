@@ -33,67 +33,60 @@ local Ast = class.declare 'LuaParser.Ast'
 ---| LuaParser.Node.Function
 
 ---@private
+Ast.stateParserMap = {}
+
+-- 注册语句解析
+---@private
+---@param token string
+---@param parser fun(self: LuaParser.Ast): LuaParser.Node.State?, boolean?
+function Ast:registerStateParser(token, parser)
+    self.stateParserMap[token] = parser
+end
+
+Ast:registerStateParser('local'   , Ast.parseLocal)
+Ast:registerStateParser('if'      , Ast.parseIf)
+Ast:registerStateParser('do'      , Ast.parseDo)
+Ast:registerStateParser('break'   , Ast.parseBreak)
+Ast:registerStateParser('return'  , Ast.parseReturn)
+Ast:registerStateParser('for'     , Ast.parseFor)
+Ast:registerStateParser('while'   , Ast.parseWhile)
+Ast:registerStateParser('repeat'  , Ast.parseRepeat)
+Ast:registerStateParser('continue', Ast.parseContinue)
+Ast:registerStateParser('::'      , Ast.parseLabel)
+Ast:registerStateParser('goto'    , function (ast)
+    ---@class LuaParser.Ast
+    local self = ast
+    local state = self:parseGoto()
+    if state then
+        return state
+    end
+    return nil, true
+end)
+Ast:registerStateParser('function', function (ast)
+    ---@class LuaParser.Ast
+    local self = ast
+    local func = self:parseFunction()
+    if not func then
+        self:throw('MISS_NAME', self:getLastPos())
+        return nil
+    end
+    if not func.name then
+        self:throw('MISS_NAME', func.symbolPos1)
+    end
+    return func
+end)
+
+---@private
 ---@return LuaParser.Node.State?
 function Ast:parseState()
-    local token, _, pos = self.lexer:peek()
+    local token = self.lexer:peek()
 
-    if token == 'local' then
-        return self:parseLocal()
-    end
-
-    if token == 'if' then
-        return self:parseIf()
-    end
-
-    if token == 'do' then
-        return self:parseDo()
-    end
-
-    if token == 'break' then
-        return self:parseBreak()
-    end
-
-    if token == 'return' then
-        return self:parseReturn()
-    end
-
-    if token == 'for' then
-        return self:parseFor()
-    end
-
-    if token == 'while' then
-        return self:parseWhile()
-    end
-
-    if token == 'function' then
-        local func = self:parseFunction()
-        if not func then
-            self:throw('MISS_NAME', pos + #token)
-            return nil
-        end
-        if not func.name then
-            self:throw('MISS_NAME', func.symbolPos1)
-        end
-        return func
-    end
-
-    if token == 'continue' then
-        return self:parseContinue()
-    end
-
-    if token == '::' then
-        return self:parseLabel()
-    end
-
-    if token == 'goto' then
-        local state = self:parseGoto()
-        if state then
+    local parser = self.stateParserMap[token]
+    if parser then
+        local state, dontConsumeToken = parser(self)
+        if not dontConsumeToken then
             return state
         end
-    end
-
-    if token == 'repeat' then
-        return self:parseRepeat()
     end
 
     return self:parseStateStartWithExp()

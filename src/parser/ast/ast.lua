@@ -10,7 +10,6 @@ require 'parser.ast.number'
 require 'parser.ast.string'
 require 'parser.ast.comment'
 require 'parser.ast.exp'
-require 'parser.ast.state'
 require 'parser.ast.id'
 require 'parser.ast.local'
 require 'parser.ast.var'
@@ -29,13 +28,23 @@ require 'parser.ast.return'
 require 'parser.ast.for'
 require 'parser.ast.while'
 require 'parser.ast.repeat'
+require 'parser.ast.state'
 require 'parser.ast.main'
+require 'parser.ast.cats.base'
 
 ---@class LuaParser.Ast
 ---@field envMode 'fenv' | '_ENV'
 ---@field main LuaParser.Node.Main
 ---@overload fun(code: string, version: LuaParser.LuaVersion, options: LuaParser.CompileOptions): LuaParser.Ast
 local M = class.declare 'LuaParser.Ast'
+
+---@alias LuaParser.Status
+---| 'Lua' # Lua代码
+---| 'ShortCats' # 单行的注解
+---| 'LongCats' # 多行的注解
+---| 'InLineCats' # 内联的注解
+---| 'ShortLua' # 单行注解内的Lua代码
+---| 'LongLua' # 多行注释内的Lua代码
 
 ---@param code string # lua代码
 ---@param version? LuaParser.LuaVersion
@@ -74,7 +83,15 @@ function M:__init(code, version, options)
     ---@type LuaParser.Node.Block[]
     self.blockList = {}
     -- 当前的局部变量计数（最大只能存在200个局部变量）
+    ---@private
     self.localCount = 0
+    -- 当前解析状态
+    ---@private
+    ---@type LuaParser.Status
+    self.status = 'Lua'
+    -- 未绑定的注解
+    ---@private
+    self.cats = {}
 
     local major, minor = self.version:match 'Lua (%d+)%.(%d+)'
     ---@type integer
@@ -151,6 +168,7 @@ function M:skipSpace(inExp)
         self.lastRightCI = self.lexer.ci
     end
     repeat until not self:skipNL()
+            and  not self:skipCats()
             and  not self:skipComment(inExp)
             and  not self:skipUnknown()
     self.lastSpaceCI = self.lexer.ci
