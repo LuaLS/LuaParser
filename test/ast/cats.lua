@@ -90,3 +90,61 @@ TEST [[
         }
     }
 }
+
+TEST [[
+---@type string
+]]
+{
+    subtype = 'type',
+    start   = 0,
+    finish  = 15,
+    value   = {
+        type   = 'CatID',
+        id     = 'string',
+        start  = 9,
+        finish = 15,
+    }
+}
+
+TEST [[
+---@type (string)
+]]
+{
+    subtype = 'type',
+    start   = 0,
+    finish  = 17,
+    value   = {
+        type   = 'CatParen',
+        symbolPos = 16,
+        start  = 9,
+        finish = 17,
+        value   = {
+            type   = 'CatID',
+            id     = 'string',
+            start  = 10,
+            finish = 16,
+        }
+    }
+}
+
+TEST [[
+---@type string[]
+]]
+{
+    subtype = 'type',
+    start   = 0,
+    finish  = 17,
+    value   = {
+        type   = 'CatArray',
+        start  = 9,
+        finish = 17,
+        symbolPos1 = 15,
+        symbolPos2 = 16,
+        node   = {
+            type   = 'CatID',
+            id     = 'string',
+            start  = 9,
+            finish = 15,
+        }
+    }
+}

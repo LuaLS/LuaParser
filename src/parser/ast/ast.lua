@@ -119,7 +119,14 @@ end
 ---@private
 ---@return boolean # 是否成功跳过换行符
 function M:skipNL()
-    return self.lexer:consumeType 'NL' ~= nil
+    local status = self.status
+    if status == 'Lua'
+    or status == 'LongCats'
+    or status == 'LongLua' then
+        return self.lexer:consumeType 'NL' ~= nil
+    else
+        return false
+    end
 end
 
 -- 跳过注释

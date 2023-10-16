@@ -17,6 +17,7 @@ local Cat = class.declare('LuaParser.Node.Cat', 'LuaParser.Node.Base')
 
 ---@alias LuaParser.Node.CatValue
 ---| LuaParser.Node.CatClass
+---| LuaParser.Node.CatType
 
 ---@class LuaParser.Node.CatAttr: LuaParser.Node.Base
 ---@field id string
@@ -30,12 +31,16 @@ Ast.catParserMap = {}
 
 ---@private
 ---@param catType string
----@param parser fun(self: LuaParser.Ast, cat: LuaParser.Node.Cat)
+---@param parser fun(self: LuaParser.Ast)
 function Ast:registerCatParser(catType, parser)
     Ast.catParserMap[catType] = parser
 end
 
 Ast:registerCatParser('class', Ast.parseCatClass)
+Ast:registerCatParser('type',  function (self)
+    ---@diagnostic disable-next-line: invisible
+    return self:parseCatType(true)
+end)
 
 ---@private
 ---@return boolean
@@ -64,7 +69,17 @@ function Ast:parseCat()
         return nil
     end
 
-    self.lexer:fastForward(symbolPos + #subtype)
+    ---@type LuaParser.Status
+    local oldStatus = self.status
+    if oldStatus == 'Lua' then
+        self.status = 'ShortCats'
+    elseif oldStatus == 'LongCats' then
+    else
+        return nil
+    end
+
+    local nextPos = symbolPos + #subtype
+    self.lexer:fastForward(nextPos)
 
     local cat = self:createNode('LuaParser.Node.Cat', {
         start = pos,
@@ -72,9 +87,9 @@ function Ast:parseCat()
         symbolPos = symbolPos - 1,
     })
 
-    local attrPos1 = self.lexer:consume '('
-    if attrPos1 then
-        cat.attrPos1 = attrPos1
+    if self.code:sub(nextPos + 1, nextPos + 1) == '(' then
+        cat.attrPos1 = nextPos
+        self.lexer:fastForward(nextPos + 1)
         cat.attrs = self:parseIDList('LuaParser.Node.CatAttr', true, false)
         for _, attr in ipairs(cat.attrs) do
             attr.parent = cat
@@ -84,7 +99,7 @@ function Ast:parseCat()
 
     local parser = Ast.catParserMap[cat.subtype]
     if parser then
-        local value = parser(self, cat)
+        local value = parser(self)
         if value then
             cat.value = value
             value.parent = cat
@@ -94,6 +109,8 @@ function Ast:parseCat()
     cat.finish = self:getLastPos()
 
     cat.tail = self:parseTail()
+
+    self.status = oldStatus
 
     return cat
 end
