@@ -148,3 +148,30 @@ TEST [[
         }
     }
 }
+
+TEST [[
+---@type A<boolean, string>
+]]
+{
+    subtype = 'type',
+    start   = 0,
+    finish  = 27,
+    value   = {
+        type   = 'CatCall',
+        start  = 9,
+        finish = 27,
+        symbolPos1 = 10,
+        symbolPos2 = 26,
+        node   = {
+            id = 'A',
+        },
+        args   = {
+            [1] = {
+                id = 'boolean',
+            },
+            [2] = {
+                id = 'string',
+            }
+        },
+    }
+}
