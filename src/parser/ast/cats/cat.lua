@@ -1,19 +1,26 @@
 local class = require 'class'
 
 require 'parser.ast.cats.id'
-require 'parser.ast.cats.attr'
 require 'parser.ast.cats.class'
+require 'parser.ast.cats.type'
 
 ---@class LuaParser.Node.Cat: LuaParser.Node.Base
 ---@field subtype string
 ---@field symbolPos integer # @的位置
+---@field attrPos1? integer # 左括号的位置
+---@field attrPos2? integer # 右括号的位置
 ---@field attrs? LuaParser.Node.CatAttr[]
 ---@field value? LuaParser.Node.CatValue
+---@field extends? LuaParser.Node.CatType
 ---@field tail? string
 local Cat = class.declare('LuaParser.Node.Cat', 'LuaParser.Node.Base')
 
 ---@alias LuaParser.Node.CatValue
 ---| LuaParser.Node.CatClass
+
+---@class LuaParser.Node.CatAttr: LuaParser.Node.Base
+---@field id string
+local CatAttr = class.declare('LuaParser.Node.CatAttr', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
@@ -65,12 +72,14 @@ function Ast:parseCat()
         symbolPos = symbolPos - 1,
     })
 
-    local attrs = self:parseCatAttrs()
-    if attrs then
-        cat.attrs = attrs
-        for _, attr in ipairs(attrs) do
+    local attrPos1 = self.lexer:consume '('
+    if attrPos1 then
+        cat.attrPos1 = attrPos1
+        cat.attrs = self:parseIDList('LuaParser.Node.CatAttr', true, false)
+        for _, attr in ipairs(cat.attrs) do
             attr.parent = cat
         end
+        cat.attrPos2 = self.lexer:consume ')'
     end
 
     local parser = Ast.catParserMap[cat.subtype]

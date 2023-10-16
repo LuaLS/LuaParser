@@ -11,6 +11,7 @@ local Ast = class.declare 'LuaParser.Ast'
 ---| LuaParser.Node.Param
 ---| LuaParser.Node.LabelName
 ---| LuaParser.Node.AttrName
+---| LuaParser.Node.CatAttr
 
 ---@private
 ---@generic T: LuaParser.Node.ID
