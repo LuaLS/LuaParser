@@ -6,10 +6,10 @@ local class = require 'class'
 ---| LuaParser.Node.CatArray
 ---| LuaParser.Node.CatCall
 
----@class LuaParser.Node.CatParen: LuaParser.Node.Base
+---@class LuaParser.Node.CatParen: LuaParser.Node.ParenBase
 ---@field value? LuaParser.Node.CatType
 ---@field symbolPos? integer # 右括号的位置
-local CatParen = class.declare('LuaParser.Node.CatParen', 'LuaParser.Node.Base')
+local CatParen = class.declare('LuaParser.Node.CatParen', 'LuaParser.Node.ParenBase')
 
 ---@class LuaParser.Node.CatArray: LuaParser.Node.Base
 ---@field node LuaParser.Node.CatType
@@ -31,6 +31,14 @@ local Ast = class.declare('LuaParser.Ast')
 ---@param required? boolean
 ---@return LuaParser.Node.CatType?
 function Ast:parseCatType(required)
+    local first = self:parseCatTerm(required)
+    return first
+end
+
+---@private
+---@param required? boolean
+---@return LuaParser.Node.CatType?
+function Ast:parseCatTerm(required)
     local head = self:parseCatParen()
             or   self:parseCatID()
 

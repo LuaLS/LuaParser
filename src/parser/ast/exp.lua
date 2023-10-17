@@ -1,41 +1,44 @@
 local class = require 'class'
 
----@class LuaParser.Node.Paren: LuaParser.Node.Base
----@field exp? LuaParser.Node.Exp
----@field next? LuaParser.Node.Field
-local Paren = class.declare('LuaParser.Node.Paren', 'LuaParser.Node.Base')
+---@class LuaParser.Node.ParenBase: LuaParser.Node.Base
+local ParenBase = class.declare('LuaParser.Node.ParenBase', 'LuaParser.Node.Base')
 
-function Paren.__getter.asNumber(self)
+function ParenBase.__getter.asNumber(self)
     return self.exp.asNumber, true
 end
 
-function Paren.__getter.asString(self)
+function ParenBase.__getter.asString(self)
     return self.exp.asString, true
 end
 
-function Paren.__getter.asBoolean(self)
+function ParenBase.__getter.asBoolean(self)
     return self.exp.asBoolean, true
 end
 
-function Paren.__getter.asInteger(self)
+function ParenBase.__getter.asInteger(self)
     return self.exp.asInteger, true
 end
 
-function Paren.__getter.toNumber(self)
+function ParenBase.__getter.toNumber(self)
     return self.exp.toNumber, true
 end
 
-function Paren.__getter.toString(self)
+function ParenBase.__getter.toString(self)
     return self.exp.toString, true
 end
 
-function Paren.__getter.toInteger(self)
+function ParenBase.__getter.toInteger(self)
     return self.exp.toInteger, true
 end
 
-function Paren.__getter.isTruly(self)
+function ParenBase.__getter.isTruly(self)
     return self.exp.isTruly, true
 end
+
+---@class LuaParser.Node.Paren: LuaParser.Node.ParenBase
+---@field exp? LuaParser.Node.Exp
+---@field next? LuaParser.Node.Field
+local Paren = class.declare('LuaParser.Node.Paren', 'LuaParser.Node.ParenBase')
 
 ---@class LuaParser.Ast
 local Ast = class.declare 'LuaParser.Ast'
