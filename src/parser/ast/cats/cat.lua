@@ -3,6 +3,7 @@ local class = require 'class'
 require 'parser.ast.cats.id'
 require 'parser.ast.cats.class'
 require 'parser.ast.cats.type'
+require 'parser.ast.cats.union'
 
 ---@class LuaParser.Node.Cat: LuaParser.Node.Base
 ---@field subtype string

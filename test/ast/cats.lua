@@ -175,3 +175,29 @@ TEST [[
         },
     }
 }
+
+TEST [[
+---@type A | B | C
+]]
+{
+    subtype = 'type',
+    start   = 0,
+    finish  = 18,
+    value   = {
+        type   = 'CatUnion',
+        start  = 9,
+        finish = 18,
+        poses  = {11, 15},
+        exps   = {
+            [1] = {
+                id = 'A',
+            },
+            [2] = {
+                id = 'B',
+            },
+            [3] = {
+                id = 'C',
+            }
+        }
+    }
+}
