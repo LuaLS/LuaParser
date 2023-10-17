@@ -201,3 +201,44 @@ TEST [[
         }
     }
 }
+
+TEST [[
+---@type A & B | C & D & E | F
+]]
+{
+    subtype = 'type',
+    value   = {
+        type   = 'CatUnion',
+        exps   = {
+            [1] = {
+                type = 'CatCross',
+                exps = {
+                    [1] = {
+                        id = 'A',
+                    },
+                    [2] = {
+                        id = 'B',
+                    }
+                }
+            },
+            [2] = {
+                type = 'CatCross',
+                exps = {
+                    [1] = {
+                        id = 'C',
+                    },
+                    [2] = {
+                        id = 'D',
+                    },
+                    [3] = {
+                        id = 'E',
+                    },
+                }
+            },
+            [3] = {
+                type = 'CatID',
+                id   = 'F',
+            }
+        }
+    }
+}

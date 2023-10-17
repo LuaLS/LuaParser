@@ -6,6 +6,7 @@ local class = require 'class'
 ---| LuaParser.Node.CatArray
 ---| LuaParser.Node.CatCall
 ---| LuaParser.Node.CatUnion
+---| LuaParser.Node.CatCross
 
 ---@class LuaParser.Node.CatParen: LuaParser.Node.ParenBase
 ---@field value? LuaParser.Node.CatType
@@ -32,21 +33,8 @@ local Ast = class.declare('LuaParser.Ast')
 ---@param required? boolean
 ---@return LuaParser.Node.CatType?
 function Ast:parseCatType(required)
-    local curExp = self:parseCatTerm(required)
-    if not curExp then
-        return nil
-    end
-    self:skipSpace()
-
-    while true do
-        local union = self:parseCatUnion(curExp)
-        if not union then
-            break
-        end
-        self:skipSpace()
-        curExp = union
-    end
-    return curExp
+    local catType = self:parseCatUnion(required)
+    return catType
 end
 
 ---@private

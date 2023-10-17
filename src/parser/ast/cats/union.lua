@@ -9,31 +9,40 @@ local Union = class.declare('LuaParser.Node.CatUnion', 'LuaParser.Node.Base')
 local Ast = class.declare 'LuaParser.Ast'
 
 ---@private
----@param exp LuaParser.Node.CatType
----@return LuaParser.Node.CatUnion?
-function Ast:parseCatUnion(exp)
-    local pos = self.lexer:consume '|'
-    if not pos then
+---@param required? boolean
+---@return LuaParser.Node.CatType?
+function Ast:parseCatUnion(required)
+    local first = self:parseCatCross(required)
+    if not first then
         return nil
     end
 
-    ---@type LuaParser.Node.CatUnion
-    local union
-
-    if exp.type == 'CatUnion' then
-        ---@cast exp LuaParser.Node.CatUnion
-        union = exp
-        union.poses[#union.poses+1] = pos
-    else
-        union = self:createNode('LuaParser.Node.CatUnion', {
-            start = exp.start,
-            poses = { pos },
-            exps  = { exp },
-        })
+    local pos = self.lexer:consume '|'
+    if not pos then
+        return first
     end
 
-    local nextNode = self:parseCatTerm(true)
-    union.exps[#union.exps+1] = nextNode
+    ---@type LuaParser.Node.CatUnion
+    local union = self:createNode('LuaParser.Node.CatUnion', {
+        start = first.start,
+        poses = { pos },
+        exps  = { first },
+    })
+
+
+    while true do
+        self:skipSpace()
+        local nextNode = self:parseCatCross(true)
+        union.exps[#union.exps+1] = nextNode
+
+        self:skipSpace()
+        local nextPos = self.lexer:consume '|'
+        if not nextPos then
+            break
+        end
+
+        union.poses[#union.poses+1] = nextPos
+    end
 
     union.finish = self:getLastPos()
 
