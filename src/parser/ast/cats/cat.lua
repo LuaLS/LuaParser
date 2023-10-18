@@ -5,6 +5,7 @@ require 'parser.ast.cats.class'
 require 'parser.ast.cats.type'
 require 'parser.ast.cats.union'
 require 'parser.ast.cats.cross'
+require 'parser.ast.cats.function'
 
 ---@class LuaParser.Node.Cat: LuaParser.Node.Base
 ---@field subtype string

@@ -90,47 +90,7 @@ end
 ---@param greedy? boolean
 ---@return LuaParser.Node.Exp[]
 function Ast:parseExpList(atLeastOne, greedy)
-    ---@type LuaParser.Node.Exp[]
-    local list = {}
-    local first = self:parseExp(atLeastOne)
-    list[#list+1] = first
-    local wantSep = first ~= nil
-    while true do
-        self:skipSpace()
-        local token, tp, pos = self.lexer:peek()
-        if not token then
-            break
-        end
-        ---@cast pos -?
-        if tp == 'Symbol' then
-            if token == ',' then
-                if not wantSep then
-                    self:throw('UNEXPECT_SYMBOL', pos, pos + 1, {
-                        symbol = ',',
-                    })
-                end
-                self.lexer:next()
-                self:skipSpace()
-                wantSep = false
-            else
-                break
-            end
-        else
-            if not greedy then
-                break
-            end
-            if tp == 'Word' and self:isKeyWord(token) then
-                break
-            end
-            self:throwMissSymbol(self:getLastPos(), ',')
-        end
-        local exp = self:parseExp(true)
-        if exp then
-            list[#list+1] = exp
-        end
-        wantSep = true
-    end
-    return list
+    return self:parseList(atLeastOne, greedy, self.parseExp)
 end
 
 ---@alias LuaParser.Node.Term

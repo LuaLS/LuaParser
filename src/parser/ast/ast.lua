@@ -4,6 +4,7 @@ local util  = require 'utility'
 
 require 'parser.ast.base'
 require 'parser.ast.error'
+require 'parser.ast.list'
 require 'parser.ast.nil'
 require 'parser.ast.boolean'
 require 'parser.ast.number'

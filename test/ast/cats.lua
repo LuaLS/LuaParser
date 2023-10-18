@@ -242,3 +242,14 @@ TEST [[
         }
     }
 }
+
+TEST [[
+---@type fun()
+]]
+{
+    value = {
+        type   = 'CatFunction',
+        start  = 9,
+        finish = 14,
+    }
+}

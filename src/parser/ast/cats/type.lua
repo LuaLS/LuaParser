@@ -7,6 +7,7 @@ local class = require 'class'
 ---| LuaParser.Node.CatCall
 ---| LuaParser.Node.CatUnion
 ---| LuaParser.Node.CatCross
+---| LuaParser.Node.CatFunction
 
 ---@class LuaParser.Node.CatParen: LuaParser.Node.ParenBase
 ---@field value? LuaParser.Node.CatType
@@ -42,6 +43,7 @@ end
 ---@return LuaParser.Node.CatType?
 function Ast:parseCatTerm(required)
     local head = self:parseCatParen()
+            or   self:parseCatFunction()
             or   self:parseCatID()
 
     if not head then
@@ -73,41 +75,7 @@ end
 ---@param atLeastOne? boolean
 ---@return LuaParser.Node.CatType[]
 function Ast:parseCatTypeList(atLeastOne)
-    ---@type LuaParser.Node.CatType[]
-    local list = {}
-    local first = self:parseCatType(atLeastOne)
-    list[#list+1] = first
-    local wantSep = first ~= nil
-    while true do
-        self:skipSpace()
-        local token, tp, pos = self.lexer:peek()
-        if not token then
-            break
-        end
-        ---@cast pos -?
-        if tp == 'Symbol' then
-            if token == ',' then
-                if not wantSep then
-                    self:throw('UNEXPECT_SYMBOL', pos, pos + 1, {
-                        symbol = ',',
-                    })
-                end
-                self.lexer:next()
-                self:skipSpace()
-                wantSep = false
-            else
-                break
-            end
-        else
-            break
-        end
-        local catType = self:parseCatType(true)
-        if catType then
-            list[#list+1] = catType
-        end
-        wantSep = true
-    end
-    return list
+    return self:parseList(atLeastOne, false, self.parseCatType)
 end
 
 ---@private

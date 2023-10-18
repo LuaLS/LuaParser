@@ -12,6 +12,7 @@ local Ast = class.declare 'LuaParser.Ast'
 ---| LuaParser.Node.LabelName
 ---| LuaParser.Node.AttrName
 ---| LuaParser.Node.CatAttr
+---| LuaParser.Node.CatParamName
 
 ---@private
 ---@generic T: LuaParser.Node.ID
@@ -57,38 +58,9 @@ end
 ---@param greedy? boolean
 ---@return T[]
 function Ast:parseIDList(nodeType, atLeastOne, greedy)
-    ---@type LuaParser.Node.ID[]
-    local list = {}
-    local first = self:parseID(nodeType, atLeastOne)
-    list[#list+1] = first
-    while true do
-        self:skipSpace()
-        local token, tp = self.lexer:peek()
-        if not token then
-            break
-        end
-        if tp == 'Symbol' then
-            if token == ',' then
-                self.lexer:next()
-                self:skipSpace()
-            else
-                break
-            end
-        else
-            if not greedy then
-                break
-            end
-            if tp == 'Word' and self:isKeyWord(token) then
-                break
-            end
-            self:throwMissSymbol(self:getLastPos(), ',')
-        end
-        local id = self:parseID(nodeType, true)
-        if id then
-            list[#list+1] = id
-        end
-    end
-    return list
+    return self:parseList(atLeastOne, greedy, function (_, required)
+        return self:parseID(nodeType, required)
+    end)
 end
 
 -- goto 单独处理
