@@ -152,48 +152,7 @@ end
 ---@private
 ---@return LuaParser.Node.Param[]
 function Ast:parseParamList()
-    ---@type LuaParser.Node.Param[]
-    local list = {}
-
-    local wantExp = true
-    while true do
-        self:skipSpace()
-
-        local param = self:parseParam()
-        if param then
-            list[#list+1] = param
-            if not wantExp then
-                self:throwMissSymbol(self:getLastPos(), ',')
-            end
-            wantExp = false
-            goto continue
-        end
-
-        local token, tp, pos = self.lexer:peek()
-        if not token then
-            break
-        end
-        ---@cast pos -?
-        if tp == 'Symbol' then
-            if token == ',' then
-                if wantExp then
-                    self:throw('MISS_NAME', self:getLastPos())
-                end
-                self.lexer:next()
-                wantExp = true
-            else
-                break
-            end
-        else
-            self:throw('UNKNOWN_SYMBOL', pos, pos + #token)
-            self.lexer:next()
-        end
-        ::continue::
-    end
-
-    if wantExp and #list > 0 then
-        self:throw('MISS_NAME', self:getLastPos())
-    end
+    local list = self:parseList(false, true, self.parseParam)
 
     for i = 1, #list do
         local param = list[i]
@@ -210,19 +169,30 @@ function Ast:parseParamList()
 end
 
 ---@private
+---@param required? boolean
 ---@return LuaParser.Node.Param?
-function Ast:parseParam()
-    local param = self:parseID('LuaParser.Node.Param', false, true)
-    if param then
-        return param
-    end
+function Ast:parseParam(required)
     local pos = self.lexer:consume '...'
     if pos then
         return self:createNode('LuaParser.Node.Param', {
             start  = pos,
-            finish = pos,
+            finish = pos + #'...',
             id     = '...',
         })
     end
+    local param = self:parseID('LuaParser.Node.Param', required, true)
+    if param then
+        return param
+    end
+
+    local token, tokenType, nextPos = self.lexer:peek()
+    if token then
+        ---@cast nextPos -?
+        if tokenType ~= 'Symbol' then
+            self.lexer:next()
+            self:throw('UNKNOWN_SYMBOL', nextPos, nextPos + #token)
+        end
+    end
+
     return nil
 end

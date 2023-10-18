@@ -253,3 +253,16 @@ TEST [[
         finish = 14,
     }
 }
+
+TEST [[
+---@type async fun()
+]]
+{
+    value = {
+        type   = 'CatFunction',
+        start  = 9,
+        finish = 20,
+        async  = true,
+        funPos = 15,
+    }
+}

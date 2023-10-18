@@ -3,6 +3,7 @@ local class = require 'class'
 ---@class LuaParser.Node.CatFunction: LuaParser.Node.Base
 ---@field params LuaParser.Node.CatParam[]
 ---@field returns LuaParser.Node.CatType[]
+---@field funPos      integer # `fun` 的位置
 ---@field symbolPos1? integer # 左括号的位置
 ---@field symbolPos2? integer # 右括号的位置
 ---@field symbolPos3? integer # 冒号的位置
@@ -46,6 +47,8 @@ function Ast:parseCatFunction()
 
     local funNode = self:createNode('LuaParser.Node.CatFunction', {
         start   = syncPos or funPos,
+        async   = syncPos and true or false,
+        funPos  = funPos,
     })
 
     self:skipSpace()
@@ -78,9 +81,22 @@ function Ast:parseCatFunction()
     return funNode
 end
 
+---@param required? boolean
 ---@return LuaParser.Node.CatParam?
-function Ast:parseCatFunParam()
-    local name = self:parseID('LuaParser.Node.CatParamName', false, true)
+function Ast:parseCatParam(required)
+    local name
+
+    local pos = self.lexer:consume '...'
+    if pos then
+        name = self:createNode('LuaParser.Node.CatParamName', {
+            start  = pos,
+            finish = pos + #'...',
+            id     = '...',
+        })
+    else
+        name = self:parseID('LuaParser.Node.CatParamName', required, true)
+    end
+
     if not name then
         return nil
     end
@@ -109,8 +125,7 @@ end
 
 ---@return LuaParser.Node.CatParam[]
 function Ast:parseCatFunParamList()
-    ---@type LuaParser.Node.CatParam[]
-    local list = {}
+    local list = self:parseList(false, false, self.parseCatParam)
 
     return list
 end

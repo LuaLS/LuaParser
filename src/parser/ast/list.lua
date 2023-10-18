@@ -23,9 +23,7 @@ function Ast:parseList(atLeastOne, greedy, parser)
         if tp == 'Symbol' then
             if token == ',' then
                 if not wantSep then
-                    self:throw('UNEXPECT_SYMBOL', pos, pos + 1, {
-                        symbol = ',',
-                    })
+                    self:throw('UNEXPECT_SYMBOL', pos, pos + 1)
                 end
                 self.lexer:next()
                 self:skipSpace()
@@ -45,6 +43,8 @@ function Ast:parseList(atLeastOne, greedy, parser)
         local unit = parser(self, true)
         if unit then
             list[#list+1] = unit
+        else
+            break
         end
         wantSep = true
     end

@@ -305,9 +305,6 @@ f(<!,!>1)
 ]]
 {
     type = 'UNEXPECT_SYMBOL',
-    extra = {
-        symbol = ',',
-    }
 }
 
 TEST[[
@@ -559,10 +556,10 @@ function f(a,<!!>) end
 }
 
 TEST[[
-function f(<!!>,a) end
+function f(<!,!>a) end
 ]]
 {
-    type = 'MISS_NAME',
+    type = 'UNEXPECT_SYMBOL',
 }
 
 TEST[[
