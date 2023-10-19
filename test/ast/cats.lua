@@ -266,3 +266,143 @@ TEST [[
         funPos = 15,
     }
 }
+
+TEST [[
+---@type fun(x, y, ...)
+]]
+{
+    value = {
+        type   = 'CatFunction',
+        finish = 23,
+        symbolPos1 = 12,
+        symbolPos2 = 22,
+        params     = {
+            [1] = {
+                name = {
+                    id = 'x'
+                }
+            },
+            [2] = {
+                name = {
+                    id = 'y'
+                }
+            },
+            [3] = {
+                name = {
+                    id = '...'
+                }
+            }
+        },
+    }
+}
+
+TEST [[
+---@type fun(x: number, y: number)
+]]
+{
+    value = {
+        params = {
+            [1] = {
+                name = { id = 'x' },
+                value = { id = 'number' },
+            },
+            [2] = {
+                name = { id = 'y' },
+                value = { id = 'number' },
+            }
+        }
+    }
+}
+
+TEST [[
+---@type fun(): number, boolean, ...
+]]
+{
+    value = {
+        returns = {
+            [1] = {
+                value = {
+                    id = 'number'
+                }
+            },
+            [2] = {
+                value = {
+                    id = 'boolean',
+                }
+            },
+            [3] = {
+                name = {
+                    id = '...'
+                }
+            }
+        }
+    }
+}
+
+TEST [[
+---@type fun(): r1: number, r2: boolean, ...: string
+]]
+{
+    value = {
+        returns = {
+            [1] = {
+                name = {
+                    id = 'r1'
+                },
+                value = {
+                    id = 'number'
+                }
+            },
+            [2] = {
+                name = {
+                    id = 'r2'
+                },
+                value = {
+                    id = 'boolean',
+                }
+            },
+            [3] = {
+                name = {
+                    id = '...'
+                },
+                value = {
+                    id ='string'
+                }
+            }
+        }
+    }
+}
+
+TEST [[
+---@type fun(): (r1: number, r2: boolean, ...: string)
+]]
+{
+    value = {
+        returns = {
+            [1] = {
+                name = {
+                    id = 'r1'
+                },
+                value = {
+                    id = 'number'
+                }
+            },
+            [2] = {
+                name = {
+                    id = 'r2'
+                },
+                value = {
+                    id = 'boolean',
+                }
+            },
+            [3] = {
+                name = {
+                    id = '...'
+                },
+                value = {
+                    id ='string'
+                }
+            }
+        }
+    }
+}
