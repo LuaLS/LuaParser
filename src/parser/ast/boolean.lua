@@ -4,8 +4,6 @@ local class = require 'class'
 ---@field value boolean
 local Boolean = class.declare('LuaParser.Node.Boolean', 'LuaParser.Node.Literal')
 
-Boolean.isLiteral = true
-
 ---@class LuaParser.Ast
 local Ast = class.get 'LuaParser.Ast'
 

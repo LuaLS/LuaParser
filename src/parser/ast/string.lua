@@ -4,13 +4,10 @@ local class = require 'class'
 
 ---@class LuaParser.Node.String: LuaParser.Node.Literal
 ---@field value string
----@field view string
 ---@field quo string
 ---@field escs? table
 ---@field missQuo? true
 local String = class.declare('LuaParser.Node.String', 'LuaParser.Node.Literal')
-
-String.isLiteral = true
 
 local escMap = {
     ['a']  = '\a',
@@ -45,13 +42,6 @@ String.__getter.value = function (self)
             : gsub('^\n', '')
         return value, true
     end
-end
-
----@param self LuaParser.Node.String
----@return string
----@return true
-String.__getter.view = function (self)
-    return self.value, true
 end
 
 ---@class LuaParser.Ast

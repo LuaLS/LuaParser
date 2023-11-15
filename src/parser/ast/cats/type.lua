@@ -49,6 +49,7 @@ function Ast:parseCatTerm(required)
     local head = self:parseCatParen()
             or   self:parseCatFunction()
             or   self:parseCatTable()
+            or   self:parseCatBoolean()
             or   self:parseCatID()
 
     if not head then

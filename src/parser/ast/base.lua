@@ -151,6 +151,8 @@ end
 ---@field value? nil|boolean|number|string|integer
 local Literal = class.declare('LuaParser.Node.Literal', 'LuaParser.Node.Base')
 
+Literal.isLiteral = true
+
 ---@param self LuaParser.Node.Literal
 ---@return string
 ---@return true

@@ -7,6 +7,7 @@ require 'parser.ast.cats.union'
 require 'parser.ast.cats.cross'
 require 'parser.ast.cats.function'
 require 'parser.ast.cats.table'
+require 'parser.ast.cats.boolean'
 
 ---@class LuaParser.Node.Cat: LuaParser.Node.Base
 ---@field subtype string
