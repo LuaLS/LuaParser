@@ -15,6 +15,8 @@ function Ast:parseCatBoolean()
         return nil
     end
 
+    self.lexer:next()
+
     local value = self:createNode('LuaParser.Node.CatBoolean', {
         value  = token == 'true' and true or false,
         start  = pos,

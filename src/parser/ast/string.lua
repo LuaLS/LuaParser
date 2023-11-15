@@ -55,7 +55,7 @@ function Ast:parseString()
     if token == '"'
     or token == "'"
     or token == '`' then
-        return self:parseShortString()
+        return self:parseShortString('LuaParser.Node.String')
     end
     if token == '[' then
         return self:parseLongString()
@@ -65,8 +65,10 @@ end
 
 -- 解析短字符串
 ---@private
----@return LuaParser.Node.String?
-function Ast:parseShortString()
+---@generic T
+---@param stringType `T`
+---@return T?
+function Ast:parseShortString(stringType)
     local quo, _, pos = self.lexer:peek()
     if quo ~= '"' and quo ~= "'" and quo ~= '`' then
         return nil
@@ -245,7 +247,7 @@ function Ast:parseShortString()
         quo = '"'
     end
 
-    return self:createNode('LuaParser.Node.String', {
+    return self:createNode(stringType, {
         start   = pos,
         finish  = finishPos,
         quo     = quo,

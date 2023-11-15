@@ -468,8 +468,32 @@ TEST [[
 }
 
 TEST [[
----@type true
+---@type true | false | 1 | -1 | 'abc' | "abc"
 ]]
+{
+    value = {
+        exps = {
+            [1] = {
+                value = true
+            },
+            [2] = {
+                value = false
+            },
+            [3] = {
+                value = 1
+            },
+            [4] = {
+                value = -1
+            },
+            [5] = {
+                value = 'abc'
+            },
+            [6] = {
+                value = "abc"
+            },
+        }
+    }
+}
 
 TEST [[
 ---@unknown

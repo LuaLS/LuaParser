@@ -8,6 +8,8 @@ require 'parser.ast.cats.cross'
 require 'parser.ast.cats.function'
 require 'parser.ast.cats.table'
 require 'parser.ast.cats.boolean'
+require 'parser.ast.cats.integer'
+require 'parser.ast.cats.string'
 
 ---@class LuaParser.Node.Cat: LuaParser.Node.Base
 ---@field subtype string

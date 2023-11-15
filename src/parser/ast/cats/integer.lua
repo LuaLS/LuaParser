@@ -15,9 +15,23 @@ function Ast:parseCatInteger()
         return nil
     end
 
-    local value
+    self.lexer:next()
+    local int = self:createNode('LuaParser.Node.CatInteger', {
+        start = pos,
+    })
+
     if token == '-' then
         self:skipSpace()
-        local num, numPos = self.lexer:consumeType 'Num'
+        token, pos = self.lexer:consumeType 'Num'
+        if token then
+            int.value = - tonumber(token) --[[@as integer]]
+        else
+            int.value = 0
+        end
+    else
+        int.value = tonumber(token) --[[@as integer]]
     end
+
+    int.finish = pos + #token
+    return int
 end

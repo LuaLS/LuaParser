@@ -50,6 +50,8 @@ function Ast:parseCatTerm(required)
             or   self:parseCatFunction()
             or   self:parseCatTable()
             or   self:parseCatBoolean()
+            or   self:parseCatInteger()
+            or   self:parseCatString()
             or   self:parseCatID()
 
     if not head then
