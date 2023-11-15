@@ -406,3 +406,26 @@ TEST [[
         }
     }
 }
+
+TEST [[
+---@type fun()
+---: number
+]]
+{
+    value = {
+        returns = {
+            [1] = {
+                value = {
+                    id = 'number'
+                },
+            }
+        }
+    },
+}
+
+TEST [[
+---@unknown
+]]
+{
+    subtype = 'unknown',
+}
