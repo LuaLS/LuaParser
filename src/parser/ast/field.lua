@@ -17,7 +17,7 @@ local FieldID = class.declare('LuaParser.Node.FieldID', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.TableField: LuaParser.Node.Base
 ---@field subtype 'field' | 'index' | 'exp'
----@field key? LuaParser.Node.Exp
+---@field key? LuaParser.Node.TableFieldID | LuaParser.Node.Exp
 ---@field value? LuaParser.Node.Exp
 ---@field symbolPos? integer
 ---@field symbolPos2? integer

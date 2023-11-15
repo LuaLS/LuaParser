@@ -12,14 +12,6 @@ local class = require 'class'
 ---@field async? boolean # 是否异步
 local CatFunction = class.declare('LuaParser.Node.CatFunction', 'LuaParser.Node.Base')
 
-CatFunction.__getter.params = function ()
-    return {}
-end
-
-CatFunction.__getter.returns = function ()
-    return {}
-end
-
 ---@class LuaParser.Node.CatParam: LuaParser.Node.Base
 ---@field parent LuaParser.Node.CatFunction
 ---@field name LuaParser.Node.CatParamName
@@ -65,6 +57,8 @@ function Ast:parseCatFunction()
         start   = syncPos or funPos,
         async   = syncPos and true or false,
         funPos  = funPos,
+        params  = {},
+        returns = {},
     })
 
     self:skipSpace()

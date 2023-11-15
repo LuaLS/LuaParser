@@ -424,6 +424,50 @@ TEST [[
 }
 
 TEST [[
+---@type { x: number, y, [integer]: boolean, ...: number }
+]]
+{
+    value = {
+        fields = {
+            [1] = {
+                subtype = 'field',
+                key     = {
+                    id = 'x',
+                },
+                value   = {
+                    id = 'number',
+                }
+            },
+            [2] = {
+                subtype = 'field',
+                key     = {
+                    id = 'y',
+                },
+                value   = NIL,
+            },
+            [3] = {
+                subtype = 'index',
+                key     = {
+                    id = 'integer',
+                },
+                value   = {
+                    id = 'boolean',
+                }
+            },
+            [4] = {
+                subtype = 'field',
+                key     = {
+                    id = '...',
+                },
+                value   = {
+                    id = 'number',
+                }
+            }
+        }
+    },
+}
+
+TEST [[
 ---@unknown
 ]]
 {

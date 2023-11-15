@@ -8,6 +8,7 @@ local class = require 'class'
 ---| LuaParser.Node.CatUnion
 ---| LuaParser.Node.CatCross
 ---| LuaParser.Node.CatFunction
+---| LuaParser.Node.CatTable
 
 ---@class LuaParser.Node.CatParen: LuaParser.Node.ParenBase
 ---@field value? LuaParser.Node.CatType
@@ -44,6 +45,7 @@ end
 function Ast:parseCatTerm(required)
     local head = self:parseCatParen()
             or   self:parseCatFunction()
+            or   self:parseCatTable()
             or   self:parseCatID()
 
     if not head then
