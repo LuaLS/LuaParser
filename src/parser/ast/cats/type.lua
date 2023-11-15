@@ -9,6 +9,9 @@ local class = require 'class'
 ---| LuaParser.Node.CatCross
 ---| LuaParser.Node.CatFunction
 ---| LuaParser.Node.CatTable
+---| LuaParser.Node.CatBoolean
+---| LuaParser.Node.CatInteger
+---| LuaParser.Node.CatString
 
 ---@class LuaParser.Node.CatParen: LuaParser.Node.ParenBase
 ---@field value? LuaParser.Node.CatType
@@ -29,7 +32,7 @@ local CatArray = class.declare('LuaParser.Node.CatArray', 'LuaParser.Node.Base')
 local CatCall = class.declare('LuaParser.Node.CatCall', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.declare('LuaParser.Ast')
+local Ast = class.get 'LuaParser.Ast'
 
 ---@private
 ---@param required? boolean

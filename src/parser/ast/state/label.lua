@@ -21,7 +21,7 @@ local LabelName = class.declare('LuaParser.Node.LabelName', 'LuaParser.Node.Base
 local Goto = class.declare('LuaParser.Node.Goto', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.Label?

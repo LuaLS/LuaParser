@@ -7,7 +7,7 @@ local Table = class.declare('LuaParser.Node.Table', 'LuaParser.Node.Base')
 Table.isLiteral = true
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.Table?

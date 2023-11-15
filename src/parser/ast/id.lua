@@ -1,7 +1,7 @@
 local class = require 'class'
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 ---@alias LuaParser.Node.ID
 ---| LuaParser.Node.Local

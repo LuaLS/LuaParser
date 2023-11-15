@@ -5,7 +5,7 @@ local class = require 'class'
 local CatID = class.declare('LuaParser.Node.CatID', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.declare('LuaParser.Ast')
+local Ast = class.get 'LuaParser.Ast'
 
 ---@return LuaParser.Node.CatID?
 function Ast:parseCatID()

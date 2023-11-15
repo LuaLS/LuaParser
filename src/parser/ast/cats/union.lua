@@ -6,7 +6,7 @@ local class = require'class'
 local Union = class.declare('LuaParser.Node.CatUnion', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 ---@private
 ---@param required? boolean

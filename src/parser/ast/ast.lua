@@ -27,7 +27,7 @@ require 'parser.ast.cats.cat'
 ---@field envMode 'fenv' | '_ENV'
 ---@field main LuaParser.Node.Main
 ---@overload fun(code: string, version: LuaParser.LuaVersion, options: LuaParser.CompileOptions): LuaParser.Ast
-local M = class.declare 'LuaParser.Ast'
+local M = class.get 'LuaParser.Ast'
 
 ---@alias LuaParser.Status
 ---| 'Lua' # Lua代码

@@ -7,7 +7,7 @@ local class = require 'class'
 local Call = class.declare('LuaParser.Node.Call', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 ---@private
 ---@param last LuaParser.Node.Term

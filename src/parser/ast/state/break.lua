@@ -8,7 +8,7 @@ local Break = class.declare('LuaParser.Node.Break', 'LuaParser.Node.Base')
 local Continue = class.declare('LuaParser.Node.Continue', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 ---@return LuaParser.Node.Block?
 function Ast:findBreakBlock()

@@ -55,7 +55,7 @@ String.__getter.view = function (self)
 end
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 -- 解析字符串
 ---@private

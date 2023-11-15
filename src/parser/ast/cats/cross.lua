@@ -6,7 +6,7 @@ local class = require'class'
 local Cross = class.declare('LuaParser.Node.CatCross', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 ---@private
 ---@param required? boolean

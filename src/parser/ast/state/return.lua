@@ -5,7 +5,7 @@ local class = require 'class'
 local Return = class.declare('LuaParser.Node.Return', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.Return?

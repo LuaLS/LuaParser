@@ -14,7 +14,7 @@ local Var = class.declare('LuaParser.Node.Var', 'LuaParser.Node.Base')
 local Varargs = class.declare('LuaParser.Node.Varargs', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.Var?

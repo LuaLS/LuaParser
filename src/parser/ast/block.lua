@@ -71,7 +71,7 @@ Block.__getter.referBlock = function (self)
 end
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 local FinishMap = {
     ['end']    = true,

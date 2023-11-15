@@ -9,7 +9,7 @@ Nil.isTruly = false
 
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 -- 解析 nil
 ---@private

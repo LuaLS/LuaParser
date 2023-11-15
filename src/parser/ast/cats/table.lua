@@ -19,7 +19,7 @@ local CatTableField = class.declare('LuaParser.Node.CatTableField', 'LuaParser.N
 local CatTableFieldID = class.declare('LuaParser.Node.CatTableFieldID', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.declare('LuaParser.Ast')
+local Ast = class.get 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.CatTable?

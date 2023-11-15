@@ -28,7 +28,7 @@ local Cat = class.declare('LuaParser.Node.Cat', 'LuaParser.Node.Base')
 local CatAttr = class.declare('LuaParser.Node.CatAttr', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 ---@private
 Ast.catParserMap = {}

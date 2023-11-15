@@ -73,7 +73,7 @@ local Attr = class.declare('LuaParser.Node.Attr', 'LuaParser.Node.Base')
 local AttrName = class.declare('LuaParser.Node.AttrName', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 ---@private
 ---@return (LuaParser.Node.LocalDef | LuaParser.Node.Function)?

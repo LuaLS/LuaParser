@@ -30,7 +30,7 @@ local TableField = class.declare('LuaParser.Node.TableField', 'LuaParser.Node.Ba
 local TableFieldID = class.declare('LuaParser.Node.TableFieldID', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 ---@private
 ---@param last LuaParser.Node.Term

@@ -109,7 +109,7 @@ Integer.__getter.asInteger = function (self)
 end
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 -- 解析数字（可以带负号）
 ---@private

@@ -26,7 +26,7 @@ local SingleExp = class.declare('LuaParser.Node.SingleExp', 'LuaParser.Node.Base
 local Select = class.declare('LuaParser.Node.Select', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 ---@alias LuaParser.Node.State
 ---| LuaParser.Node.LocalDef

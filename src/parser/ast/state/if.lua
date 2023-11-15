@@ -11,7 +11,7 @@ local If = class.declare('LuaParser.Node.If', 'LuaParser.Node.Base')
 local IfChild = class.declare('LuaParser.Node.IfChild', 'LuaParser.Node.Block')
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.If?

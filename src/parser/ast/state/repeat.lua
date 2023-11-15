@@ -6,7 +6,7 @@ local class = require 'class'
 local Repeat = class.declare('LuaParser.Node.Repeat', 'LuaParser.Node.Block')
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.Repeat?

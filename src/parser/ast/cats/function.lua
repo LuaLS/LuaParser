@@ -39,7 +39,7 @@ local CatReturn = class.declare('LuaParser.Node.CatReturn', 'LuaParser.Node.Base
 local CatReturnName = class.declare('LuaParser.Node.CatReturnName', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.declare('LuaParser.Ast')
+local Ast = class.get 'LuaParser.Ast'
 
 ---@private
 function Ast:parseCatFunction()

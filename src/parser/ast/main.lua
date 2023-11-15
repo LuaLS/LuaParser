@@ -15,7 +15,7 @@ function Main.__getter.parentBlock()
 end
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 ---@private
 function Ast:skipShebang()

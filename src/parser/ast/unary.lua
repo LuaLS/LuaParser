@@ -20,7 +20,7 @@ local UnaryAlias = {
 local Unary = class.declare('LuaParser.Node.Unary', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.Unary?

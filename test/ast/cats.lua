@@ -468,6 +468,10 @@ TEST [[
 }
 
 TEST [[
+---@type true
+]]
+
+TEST [[
 ---@unknown
 ]]
 {

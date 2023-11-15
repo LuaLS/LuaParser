@@ -7,7 +7,7 @@ local class = require 'class'
 local While = class.declare('LuaParser.Node.While', 'LuaParser.Node.Block')
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.While?

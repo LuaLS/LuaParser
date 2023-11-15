@@ -41,7 +41,7 @@ end
 local Paren = class.declare('LuaParser.Node.Paren', 'LuaParser.Node.ParenBase')
 
 ---@class LuaParser.Ast
-local Ast = class.declare 'LuaParser.Ast'
+local Ast = class.get 'LuaParser.Ast'
 
 ---@alias LuaParser.Node.Exp
 ---| LuaParser.Node.Term
