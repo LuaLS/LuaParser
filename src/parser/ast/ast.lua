@@ -50,7 +50,7 @@ function M:__init(code, version, options)
     ---@type table<string, true>
     self.nssymbolMap = {}
     -- 词法分析结果
-    self.lexer       = lexer.parseLua(code)
+    self.lexer       = lexer.new():parse(code)
     -- 错误信息
     ---@type LuaParser.Node.Error[]
     self.errors      = {}
