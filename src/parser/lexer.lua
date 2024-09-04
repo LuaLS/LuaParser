@@ -58,7 +58,7 @@ function Lexer:parse(code)
         )
         self.Parser  = l.Ct((self.Sp^1 + self.Token)^0)
     end
-    local result = class.new 'Lexer.Process' (code, self.Parser)
+    local result = class.new 'Lexer.Result' (code, self.Parser)
     return result
 end
 
