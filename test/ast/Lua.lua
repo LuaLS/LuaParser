@@ -1,26 +1,32 @@
 CHECK''
 {
-    type   = "main",
-    start  = 0,
-    finish = 0,
-    locals = "<IGNORE>",
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 0,
+    locals  = "<IGNORE>",
+    bfinish = 0,
 }
 
 CHECK';;;'
 {
-    type   = "main",
-    start  = 0,
-    finish = 3,
-    locals = "<IGNORE>",
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 3,
+    locals  = "<IGNORE>",
+    bfinish = 3,
 }
 
 CHECK';;;x = 1'
 {
-    type   = "main",
-    start  = 0,
-    finish = 8,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 8,
+    locals  = "<IGNORE>",
+    bfinish = 8,
+    [1]     = {
         type   = "setglobal",
         start  = 3,
         finish = 4,
@@ -39,11 +45,13 @@ CHECK';;;x = 1'
 }
 CHECK'x, y, z = 1, 2, 3'
 {
-    type   = "main",
-    start  = 0,
-    finish = 17,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 17,
+    locals  = "<IGNORE>",
+    bfinish = 17,
+    [1]     = {
         type   = "setglobal",
         start  = 0,
         finish = 1,
@@ -59,7 +67,7 @@ CHECK'x, y, z = 1, 2, 3'
         },
         [1]    = "x",
     },
-    [2]    = {
+    [2]     = {
         type   = "setglobal",
         start  = 3,
         finish = 4,
@@ -75,7 +83,7 @@ CHECK'x, y, z = 1, 2, 3'
         },
         [1]    = "y",
     },
-    [3]    = {
+    [3]     = {
         type   = "setglobal",
         start  = 6,
         finish = 7,
@@ -94,11 +102,13 @@ CHECK'x, y, z = 1, 2, 3'
 }
 CHECK'local x, y, z'
 {
-    type   = "main",
-    start  = 0,
-    finish = 13,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 13,
+    locals  = "<IGNORE>",
+    bfinish = 13,
+    [1]     = {
         type   = "local",
         start  = 6,
         finish = 7,
@@ -107,7 +117,7 @@ CHECK'local x, y, z'
         locPos = 0,
         [1]    = "x",
     },
-    [2]    = {
+    [2]     = {
         type   = "local",
         start  = 9,
         finish = 10,
@@ -115,7 +125,7 @@ CHECK'local x, y, z'
         parent = "<IGNORE>",
         [1]    = "y",
     },
-    [3]    = {
+    [3]     = {
         type   = "local",
         start  = 12,
         finish = 13,
@@ -126,11 +136,13 @@ CHECK'local x, y, z'
 }
 CHECK'local x, y, z = 1, 2, 3'
 {
-    type   = "main",
-    start  = 0,
-    finish = 23,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 23,
+    locals  = "<IGNORE>",
+    bfinish = 23,
+    [1]     = {
         type   = "local",
         start  = 6,
         finish = 7,
@@ -147,7 +159,7 @@ CHECK'local x, y, z = 1, 2, 3'
         },
         [1]    = "x",
     },
-    [2]    = {
+    [2]     = {
         type   = "local",
         start  = 9,
         finish = 10,
@@ -163,7 +175,7 @@ CHECK'local x, y, z = 1, 2, 3'
         },
         [1]    = "y",
     },
-    [3]    = {
+    [3]     = {
         type   = "local",
         start  = 12,
         finish = 13,
@@ -182,11 +194,13 @@ CHECK'local x, y, z = 1, 2, 3'
 }
 CHECK'local x, y = y, x'
 {
-    type   = "main",
-    start  = 0,
-    finish = 17,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 17,
+    locals  = "<IGNORE>",
+    bfinish = 17,
+    [1]     = {
         type   = "local",
         start  = 6,
         finish = 7,
@@ -204,7 +218,7 @@ CHECK'local x, y = y, x'
         },
         [1]    = "x",
     },
-    [2]    = {
+    [2]     = {
         type   = "local",
         start  = 9,
         finish = 10,
@@ -224,11 +238,13 @@ CHECK'local x, y = y, x'
 }
 CHECK'local x, y = f()'
 {
-    type   = "main",
-    start  = 0,
-    finish = 16,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 16,
+    locals  = "<IGNORE>",
+    bfinish = 16,
+    [1]     = {
         type   = "local",
         start  = 6,
         finish = 7,
@@ -246,7 +262,7 @@ CHECK'local x, y = f()'
         },
         [1]    = "x",
     },
-    [2]    = {
+    [2]     = {
         type   = "local",
         start  = 9,
         finish = 10,
@@ -266,11 +282,13 @@ CHECK'local x, y = f()'
 }
 CHECK'local x, y = (f())'
 {
-    type   = "main",
-    start  = 0,
-    finish = 18,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 18,
+    locals  = "<IGNORE>",
+    bfinish = 18,
+    [1]     = {
         type   = "local",
         start  = 6,
         finish = 7,
@@ -293,7 +311,7 @@ CHECK'local x, y = (f())'
         },
         [1]    = "x",
     },
-    [2]    = {
+    [2]     = {
         type   = "local",
         start  = 9,
         finish = 10,
@@ -304,11 +322,13 @@ CHECK'local x, y = (f())'
 }
 CHECK'local x, y = f(), nil'
 {
-    type   = "main",
-    start  = 0,
-    finish = 21,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 21,
+    locals  = "<IGNORE>",
+    bfinish = 21,
+    [1]     = {
         type   = "local",
         start  = 6,
         finish = 7,
@@ -326,7 +346,7 @@ CHECK'local x, y = f(), nil'
         },
         [1]    = "x",
     },
-    [2]    = {
+    [2]     = {
         type   = "local",
         start  = 9,
         finish = 10,
@@ -344,11 +364,13 @@ CHECK'local x, y = f(), nil'
 }
 CHECK'local x, y = ...'
 {
-    type   = "main",
-    start  = 0,
-    finish = 16,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 16,
+    locals  = "<IGNORE>",
+    bfinish = 16,
+    [1]     = {
         type   = "local",
         start  = 6,
         finish = 7,
@@ -366,7 +388,7 @@ CHECK'local x, y = ...'
         },
         [1]    = "x",
     },
-    [2]    = {
+    [2]     = {
         type   = "local",
         start  = 9,
         finish = 10,
@@ -386,11 +408,13 @@ CHECK'local x, y = ...'
 }
 CHECK'local x, y = (...)'
 {
-    type   = "main",
-    start  = 0,
-    finish = 18,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 18,
+    locals  = "<IGNORE>",
+    bfinish = 18,
+    [1]     = {
         type   = "local",
         start  = 6,
         finish = 7,
@@ -412,7 +436,7 @@ CHECK'local x, y = (...)'
         },
         [1]    = "x",
     },
-    [2]    = {
+    [2]     = {
         type   = "local",
         start  = 9,
         finish = 10,
@@ -423,11 +447,13 @@ CHECK'local x, y = (...)'
 }
 CHECK'local x, y = ..., nil'
 {
-    type   = "main",
-    start  = 0,
-    finish = 21,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 21,
+    locals  = "<IGNORE>",
+    bfinish = 21,
+    [1]     = {
         type   = "local",
         start  = 6,
         finish = 7,
@@ -445,7 +471,7 @@ CHECK'local x, y = ..., nil'
         },
         [1]    = "x",
     },
-    [2]    = {
+    [2]     = {
         type   = "local",
         start  = 9,
         finish = 10,
@@ -463,11 +489,13 @@ CHECK'local x, y = ..., nil'
 }
 CHECK'local x <const>, y <close> = 1'
 {
-    type   = "main",
-    start  = 0,
-    finish = 30,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 30,
+    locals  = "<IGNORE>",
+    bfinish = 30,
+    [1]     = {
         type   = "local",
         start  = 6,
         finish = 7,
@@ -495,7 +523,7 @@ CHECK'local x <const>, y <close> = 1'
         },
         [1]    = "x",
     },
-    [2]    = {
+    [2]     = {
         type   = "local",
         start  = 17,
         finish = 18,
@@ -520,11 +548,13 @@ x = 1
 y = 2
 ]]
 {
-    type   = "main",
-    start  = 0,
-    finish = 20000,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 20000,
+    locals  = "<IGNORE>",
+    bfinish = 20000,
+    [1]     = {
         type   = "setglobal",
         start  = 0,
         finish = 1,
@@ -540,7 +570,7 @@ y = 2
         },
         [1]    = "x",
     },
-    [2]    = {
+    [2]     = {
         type   = "setglobal",
         start  = 10000,
         finish = 10001,
@@ -562,11 +592,13 @@ CHECK[[
 x, y = 1, 2
 ]]
 {
-    type   = "main",
-    start  = 0,
-    finish = 10000,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 10000,
+    locals  = "<IGNORE>",
+    bfinish = 10000,
+    [1]     = {
         type   = "setglobal",
         start  = 0,
         finish = 1,
@@ -582,7 +614,7 @@ x, y = 1, 2
         },
         [1]    = "x",
     },
-    [2]    = {
+    [2]     = {
         type   = "setglobal",
         start  = 3,
         finish = 4,
@@ -604,11 +636,13 @@ local function a()
     return
 end]]
 {
-    type   = "main",
-    start  = 0,
-    finish = 20003,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 20003,
+    locals  = "<IGNORE>",
+    bfinish = 20003,
+    [1]     = {
         type   = "local",
         start  = 15,
         vstart = 6,
@@ -636,6 +670,7 @@ end]]
                 parent = "<IGNORE>",
             },
             returns   = "<IGNORE>",
+            bfinish   = 20000,
             hasReturn = true,
             [1]       = {
                 type   = "return",
@@ -652,11 +687,13 @@ local function f()
     return f()
 end]]
 {
-    type   = "main",
-    start  = 0,
-    finish = 20003,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 20003,
+    locals  = "<IGNORE>",
+    bfinish = 20003,
+    [1]     = {
         type   = "local",
         start  = 15,
         vstart = 6,
@@ -684,6 +721,7 @@ end]]
                 parent = "<IGNORE>",
             },
             returns   = "<IGNORE>",
+            bfinish   = 20000,
             hasReturn = true,
             [1]       = {
                 type   = "return",
@@ -708,11 +746,13 @@ local function a(b, c)
     return
 end]]
 {
-    type   = "main",
-    start  = 0,
-    finish = 20003,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 20003,
+    locals  = "<IGNORE>",
+    bfinish = 20003,
+    [1]     = {
         type   = "local",
         start  = 15,
         vstart = 6,
@@ -757,6 +797,7 @@ end]]
             },
             locals    = "<IGNORE>",
             returns   = "<IGNORE>",
+            bfinish   = 20000,
             hasReturn = true,
             [1]       = {
                 type   = "return",
@@ -776,11 +817,13 @@ end
 y, z = 3, 4
 ]]
 {
-    type   = "main",
-    start  = 0,
-    finish = 40000,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 40000,
+    locals  = "<IGNORE>",
+    bfinish = 40000,
+    [1]     = {
         type   = "local",
         start  = 6,
         finish = 7,
@@ -797,7 +840,7 @@ y, z = 3, 4
         },
         [1]    = "x",
     },
-    [2]    = {
+    [2]     = {
         type   = "local",
         start  = 9,
         finish = 10,
@@ -814,7 +857,7 @@ y, z = 3, 4
         ref    = "<IGNORE>",
         [1]    = "y",
     },
-    [3]    = {
+    [3]     = {
         type   = "local",
         start  = 12,
         finish = 13,
@@ -823,7 +866,7 @@ y, z = 3, 4
         ref    = "<IGNORE>",
         [1]    = "z",
     },
-    [4]    = {
+    [4]     = {
         type   = "local",
         start  = 10015,
         vstart = 10006,
@@ -850,10 +893,11 @@ y, z = 3, 4
                 finish = 10018,
                 parent = "<IGNORE>",
             },
+            bfinish = 20000,
         },
         [1]    = "f",
     },
-    [5]    = {
+    [5]     = {
         type   = "setlocal",
         start  = 30000,
         finish = 30001,
@@ -869,7 +913,7 @@ y, z = 3, 4
         },
         [1]    = "y",
     },
-    [6]    = {
+    [6]     = {
         type   = "setlocal",
         start  = 30003,
         finish = 30004,
@@ -892,11 +936,13 @@ local z = f
 z'xxx'
 ]]
 {
-    type   = "main",
-    start  = 0,
-    finish = 30000,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 30000,
+    locals  = "<IGNORE>",
+    bfinish = 30000,
+    [1]     = {
         type    = "local",
         start   = 6,
         finish  = 7,
@@ -917,7 +963,7 @@ z'xxx'
         ref     = "<IGNORE>",
         [1]     = "f",
     },
-    [2]    = {
+    [2]     = {
         type    = "local",
         start   = 10006,
         finish  = 10007,
@@ -938,7 +984,7 @@ z'xxx'
         ref     = "<IGNORE>",
         [1]     = "z",
     },
-    [3]    = {
+    [3]     = {
         type   = "call",
         start  = 20000,
         finish = 20006,
@@ -964,11 +1010,13 @@ CHECK[[
 A:B(1):C(2)
 ]]
 {
-    type   = "main",
-    start  = 0,
-    finish = 10000,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 10000,
+    locals  = "<IGNORE>",
+    bfinish = 10000,
+    [1]     = {
         type   = "call",
         start  = 0,
         finish = 11,
@@ -1002,11 +1050,13 @@ CHECK [[
 local s = [ [=[111]=] ]
 ]]
 {
-    type   = "main",
-    start  = 0,
-    finish = 20000,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 20000,
+    locals  = "<IGNORE>",
+    bfinish = 20000,
+    [1]     = {
         type   = "local",
         start  = 10006,
         finish = 10007,
@@ -1015,7 +1065,7 @@ local s = [ [=[111]=] ]
         locPos = 10000,
         [1]    = "s",
     },
-    [2]    = {
+    [2]     = {
         type   = "string",
         start  = 10012,
         finish = 10021,
@@ -1030,11 +1080,13 @@ local x = 1 // 2
     nonstandardSymbol = { ['//'] = true }
 })
 {
-    type   = "main",
-    start  = 0,
-    finish = 10000,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 10000,
+    locals  = "<IGNORE>",
+    bfinish = 10000,
+    [1]     = {
         type   = "local",
         start  = 6,
         finish = 7,
@@ -1063,11 +1115,13 @@ local x = {
     nonstandardSymbol = { ['//'] = true }
 })
 {
-    type   = "main",
-    start  = 0,
-    finish = 50000,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 50000,
+    locals  = "<IGNORE>",
+    bfinish = 50000,
+    [1]     = {
         type   = "local",
         start  = 6,
         finish = 7,
@@ -1076,11 +1130,13 @@ local x = {
         parent = "<IGNORE>",
         locPos = 0,
         value  = {
-            type   = "table",
-            start  = 10,
-            finish = 40001,
-            parent = "<IGNORE>",
-            [1]    = {
+            type    = "table",
+            start   = 10,
+            bstart  = 11,
+            finish  = 40001,
+            parent  = "<IGNORE>",
+            bfinish = 40000,
+            [1]     = {
                 type   = "tableexp",
                 start  = 10004,
                 finish = 10005,
@@ -1094,7 +1150,7 @@ local x = {
                     [1]    = 1,
                 },
             },
-            [2]    = {
+            [2]     = {
                 type   = "tableexp",
                 start  = 20004,
                 finish = 20005,
@@ -1108,7 +1164,7 @@ local x = {
                     [1]    = 2,
                 },
             },
-            [3]    = {
+            [3]     = {
                 type   = "tableexp",
                 start  = 30004,
                 finish = 30005,
@@ -1136,9 +1192,11 @@ return {
 {
     type    = "main",
     start   = 0,
+    bstart  = 0,
     finish  = 40000,
     locals  = "<IGNORE>",
     returns = "<IGNORE>",
+    bfinish = 40000,
     [1]     = {
         type   = "local",
         start  = 6,
@@ -1154,11 +1212,13 @@ return {
         finish = 30001,
         parent = "<IGNORE>",
         [1]    = {
-            type   = "table",
-            start  = 10007,
-            finish = 30001,
-            parent = "<IGNORE>",
-            [1]    = {
+            type    = "table",
+            start   = 10007,
+            bstart  = 10008,
+            finish  = 30001,
+            parent  = "<IGNORE>",
+            bfinish = 30000,
+            [1]     = {
                 type   = "tablefield",
                 start  = 20004,
                 finish = 20005,
@@ -1191,11 +1251,13 @@ a = {
 }
 ]]
 {
-    type   = "main",
-    start  = 0,
-    finish = 40000,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 40000,
+    locals  = "<IGNORE>",
+    bfinish = 40000,
+    [1]     = {
         type   = "local",
         start  = 6,
         finish = 7,
@@ -1205,7 +1267,7 @@ a = {
         ref    = "<IGNORE>",
         [1]    = "x",
     },
-    [2]    = {
+    [2]     = {
         type   = "setglobal",
         start  = 10000,
         finish = 10001,
@@ -1213,11 +1275,13 @@ a = {
         parent = "<IGNORE>",
         node   = "<IGNORE>",
         value  = {
-            type   = "table",
-            start  = 10004,
-            finish = 30001,
-            parent = "<IGNORE>",
-            [1]    = {
+            type    = "table",
+            start   = 10004,
+            bstart  = 10005,
+            finish  = 30001,
+            parent  = "<IGNORE>",
+            bfinish = 30000,
+            [1]     = {
                 type   = "tableexp",
                 start  = 20004,
                 finish = 20005,
@@ -1241,11 +1305,13 @@ CHECK [[
 x, y, z = 1, func()
 ]]
 {
-    type   = "main",
-    start  = 0,
-    finish = 10000,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 10000,
+    locals  = "<IGNORE>",
+    bfinish = 10000,
+    [1]     = {
         type   = "setglobal",
         start  = 0,
         finish = 1,
@@ -1261,7 +1327,7 @@ x, y, z = 1, func()
         },
         [1]    = "x",
     },
-    [2]    = {
+    [2]     = {
         type   = "setglobal",
         start  = 3,
         finish = 4,
@@ -1278,7 +1344,7 @@ x, y, z = 1, func()
         },
         [1]    = "y",
     },
-    [3]    = {
+    [3]     = {
         type   = "setglobal",
         start  = 6,
         finish = 7,
@@ -1302,11 +1368,13 @@ local x, y
 -- comments
 ]]
 {
-    type   = "main",
-    start  = 0,
-    finish = 20000,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 20000,
+    locals  = "<IGNORE>",
+    bfinish = 20000,
+    [1]     = {
         type   = "local",
         start  = 6,
         finish = 7,
@@ -1315,7 +1383,7 @@ local x, y
         locPos = 0,
         [1]    = "x",
     },
-    [2]    = {
+    [2]     = {
         type   = "local",
         start  = 9,
         finish = 10,
@@ -1329,11 +1397,13 @@ CHECK [[
 local _ENV = nil
 ]]
 {
-    type   = "main",
-    start  = 0,
-    finish = 10000,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 10000,
+    locals  = "<IGNORE>",
+    bfinish = 10000,
+    [1]     = {
         type   = "local",
         start  = 6,
         finish = 10,
@@ -1355,11 +1425,13 @@ CHECK [[
 _ENV = nil
 ]]
 {
-    type   = "main",
-    start  = 0,
-    finish = 10000,
-    locals = "<IGNORE>",
-    [1]    = {
+    type    = "main",
+    start   = 0,
+    bstart  = 0,
+    finish  = 10000,
+    locals  = "<IGNORE>",
+    bfinish = 10000,
+    [1]     = {
         type   = "local",
         start  = 0,
         finish = 4,

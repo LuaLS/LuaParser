@@ -192,6 +192,7 @@ CHECK'x = function () end'
             finish = 15,
             parent = "<IGNORE>",
         },
+        bfinish = 16,
     },
     [1]    = "x",
 }
@@ -232,6 +233,7 @@ CHECK'x.y = function () end'
             finish = 17,
             parent = "<IGNORE>",
         },
+        bfinish = 18,
     },
 }
 CHECK'require "xxx"'
@@ -355,6 +357,7 @@ CHECK'do end'
         [3] = 3,
         [4] = 6,
     },
+    bfinish = 3,
 }
 CHECK'do x = 1 end'
 {
@@ -368,6 +371,7 @@ CHECK'do x = 1 end'
         [3] = 9,
         [4] = 12,
     },
+    bfinish = 9,
     [1]     = {
         type   = "setglobal",
         start  = 3,
@@ -463,6 +467,7 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        bfinish = 10000,
     },
 }
 CHECK[[if 1 then
@@ -491,6 +496,7 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        bfinish   = 20000,
         hasReturn = true,
         [1]       = {
             type   = "return",
@@ -528,6 +534,7 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        bfinish   = 20000,
         hasReturn = true,
         [1]       = {
             type   = "return",
@@ -546,6 +553,7 @@ end]]
             [2] = 20004,
         },
         parent    = "<IGNORE>",
+        bfinish   = 40000,
         hasReturn = true,
         [1]       = {
             type   = "return",
@@ -583,6 +591,7 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        bfinish   = 20000,
         hasReturn = true,
         [1]       = {
             type   = "return",
@@ -610,6 +619,7 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        bfinish   = 40000,
         hasReturn = true,
         [1]       = {
             type   = "return",
@@ -649,6 +659,7 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        bfinish   = 20000,
         hasReturn = true,
         [1]       = {
             type   = "return",
@@ -676,6 +687,7 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        bfinish   = 40000,
         hasReturn = true,
         [1]       = {
             type   = "return",
@@ -694,6 +706,7 @@ end]]
             [2] = 40004,
         },
         parent    = "<IGNORE>",
+        bfinish   = 60000,
         hasReturn = true,
         [1]       = {
             type   = "return",
@@ -732,6 +745,7 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        bfinish = 10000,
     },
     [2]    = {
         type    = "elseifblock",
@@ -752,6 +766,7 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        bfinish = 20000,
     },
     [3]    = {
         type    = "elseifblock",
@@ -772,6 +787,7 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        bfinish = 30000,
     },
     [4]    = {
         type    = "elseifblock",
@@ -792,6 +808,7 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        bfinish = 40000,
     },
 }
 CHECK[[
@@ -822,6 +839,7 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        bfinish = 30000,
         [1]     = {
             type   = "if",
             start  = 10004,
@@ -846,6 +864,7 @@ end]]
                     parent = "<IGNORE>",
                     [1]    = 2,
                 },
+                bfinish = 20004,
             },
         },
     },
@@ -878,6 +897,7 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        bfinish = 10000,
     },
     [2]    = {
         type    = "elseifblock",
@@ -898,6 +918,7 @@ end]]
             parent = "<IGNORE>",
             [1]    = 1,
         },
+        bfinish = 20000,
     },
     [3]    = {
         type    = "elseblock",
@@ -909,6 +930,7 @@ end]]
             [2] = 20004,
         },
         parent  = "<IGNORE>",
+        bfinish = 30000,
     },
 }
 CHECK[[
@@ -918,7 +940,7 @@ end]]
 {
     type    = "loop",
     start   = 0,
-    bstart  = 13,
+    bstart  = 15,
     finish  = 20003,
     keyword = {
         [1] = 0,
@@ -951,6 +973,7 @@ end]]
         [1]    = "i",
     },
     locals  = "<IGNORE>",
+    bfinish = 20000,
     [1]     = {
         type   = "return",
         start  = 10004,
@@ -965,7 +988,7 @@ end]]
 {
     type    = "loop",
     start   = 0,
-    bstart  = 17,
+    bstart  = 19,
     finish  = 20003,
     keyword = {
         [1] = 0,
@@ -1005,6 +1028,7 @@ end]]
         [1]    = "i",
     },
     locals  = "<IGNORE>",
+    bfinish = 20000,
     [1]     = {
         type   = "return",
         start  = 10004,
@@ -1019,7 +1043,7 @@ end]]
 {
     type    = "in",
     start   = 0,
-    bstart  = 11,
+    bstart  = 13,
     finish  = 20003,
     keyword = {
         [1] = 0,
@@ -1060,6 +1084,7 @@ end]]
         },
     },
     locals  = "<IGNORE>",
+    bfinish = 20000,
     [1]     = {
         type   = "return",
         start  = 10004,
@@ -1074,7 +1099,7 @@ end]]
 {
     type    = "in",
     start   = 0,
-    bstart  = 23,
+    bstart  = 25,
     finish  = 20003,
     keyword = {
         [1] = 0,
@@ -1145,6 +1170,7 @@ end]]
         },
     },
     locals  = "<IGNORE>",
+    bfinish = 20000,
     [1]     = {
         type   = "return",
         start  = 10004,
@@ -1159,7 +1185,7 @@ end]]
 {
     type    = "while",
     start   = 0,
-    bstart  = 11,
+    bstart  = 13,
     finish  = 20003,
     keyword = {
         [1] = 0,
@@ -1176,6 +1202,7 @@ end]]
         parent = "<IGNORE>",
         [1]    = true,
     },
+    bfinish = 20000,
     [1]     = {
         type   = "return",
         start  = 10004,
@@ -1213,6 +1240,7 @@ until 1]]
             parent = "<IGNORE>",
         },
     },
+    bfinish = 20000,
     [1]     = {
         type   = "break",
         start  = 10004,
@@ -1249,6 +1277,7 @@ end]]
             parent = "<IGNORE>",
         },
         returns   = "<IGNORE>",
+        bfinish   = 20000,
         hasReturn = true,
         [1]       = {
             type   = "return",
@@ -1297,6 +1326,7 @@ end]]
         },
         locals    = "<IGNORE>",
         returns   = "<IGNORE>",
+        bfinish   = 20000,
         hasReturn = true,
         [1]       = {
             type   = "return",
@@ -1382,6 +1412,7 @@ end]]
         },
         locals    = "<IGNORE>",
         returns   = "<IGNORE>",
+        bfinish   = 20000,
         hasReturn = true,
         [1]       = {
             type   = "return",
@@ -1443,6 +1474,7 @@ end]]
         },
         locals    = "<IGNORE>",
         returns   = "<IGNORE>",
+        bfinish   = 20000,
         hasReturn = true,
         [1]       = {
             type   = "return",
@@ -1489,6 +1521,7 @@ end
             parent = "<IGNORE>",
             [1]    = true,
         },
+        bfinish = 20000,
         [1]     = {
             type   = "setglobal",
             start  = 10004,

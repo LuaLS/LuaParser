@@ -819,10 +819,12 @@ CHECK'func {}'
         finish = 7,
         parent = "<IGNORE>",
         [1]    = {
-            type   = "table",
-            start  = 5,
-            finish = 7,
-            parent = "<IGNORE>",
+            type    = "table",
+            start   = 5,
+            bstart  = 6,
+            finish  = 7,
+            parent  = "<IGNORE>",
+            bfinish = 6,
         },
     },
 }
@@ -932,6 +934,7 @@ CHECK'function () end'
         finish = 11,
         parent = "<IGNORE>",
     },
+    bfinish = 12,
 }
 CHECK'function (...) end'
 {
@@ -959,6 +962,7 @@ CHECK'function (...) end'
             [1]    = "...",
         },
     },
+    bfinish = 15,
 }
 CHECK'function (a, ...) end'
 {
@@ -995,19 +999,24 @@ CHECK'function (a, ...) end'
         },
     },
     locals  = "<IGNORE>",
+    bfinish = 18,
 }
 CHECK'{}'
 {
-    type   = "table",
-    start  = 0,
-    finish = 2,
+    type    = "table",
+    start   = 0,
+    bstart  = 1,
+    finish  = 2,
+    bfinish = 1,
 }
 CHECK'{...}'
 {
-    type   = "table",
-    start  = 0,
-    finish = 5,
-    [1]    = {
+    type    = "table",
+    start   = 0,
+    bstart  = 1,
+    finish  = 5,
+    bfinish = 4,
+    [1]     = {
         type   = "varargs",
         start  = 1,
         finish = 4,
@@ -1016,10 +1025,12 @@ CHECK'{...}'
 }
 CHECK'{1, 2, 3}'
 {
-    type   = "table",
-    start  = 0,
-    finish = 9,
-    [1]    = {
+    type    = "table",
+    start   = 0,
+    bstart  = 1,
+    finish  = 9,
+    bfinish = 8,
+    [1]     = {
         type   = "tableexp",
         start  = 1,
         finish = 2,
@@ -1033,7 +1044,7 @@ CHECK'{1, 2, 3}'
             [1]    = 1,
         },
     },
-    [2]    = {
+    [2]     = {
         type   = "tableexp",
         start  = 4,
         finish = 5,
@@ -1047,7 +1058,7 @@ CHECK'{1, 2, 3}'
             [1]    = 2,
         },
     },
-    [3]    = {
+    [3]     = {
         type   = "tableexp",
         start  = 7,
         finish = 8,
@@ -1064,10 +1075,12 @@ CHECK'{1, 2, 3}'
 }
 CHECK'{x = 1, y = 2}'
 {
-    type   = "table",
-    start  = 0,
-    finish = 14,
-    [1]    = {
+    type    = "table",
+    start   = 0,
+    bstart  = 1,
+    finish  = 14,
+    bfinish = 13,
+    [1]     = {
         type   = "tablefield",
         start  = 1,
         finish = 2,
@@ -1089,7 +1102,7 @@ CHECK'{x = 1, y = 2}'
             [1]    = 1,
         },
     },
-    [2]    = {
+    [2]     = {
         type   = "tablefield",
         start  = 8,
         finish = 9,
@@ -1114,10 +1127,12 @@ CHECK'{x = 1, y = 2}'
 }
 CHECK'{["x"] = 1, ["y"] = 2}'
 {
-    type   = "table",
-    start  = 0,
-    finish = 22,
-    [1]    = {
+    type    = "table",
+    start   = 0,
+    bstart  = 1,
+    finish  = 22,
+    bfinish = 21,
+    [1]     = {
         type   = "tableindex",
         start  = 1,
         finish = 6,
@@ -1140,7 +1155,7 @@ CHECK'{["x"] = 1, ["y"] = 2}'
             [1]    = 1,
         },
     },
-    [2]    = {
+    [2]     = {
         type   = "tableindex",
         start  = 12,
         finish = 17,
@@ -1166,10 +1181,12 @@ CHECK'{["x"] = 1, ["y"] = 2}'
 }
 CHECK'{[x] = 1, [y] = 2}'
 {
-    type   = "table",
-    start  = 0,
-    finish = 18,
-    [1]    = {
+    type    = "table",
+    start   = 0,
+    bstart  = 1,
+    finish  = 18,
+    bfinish = 17,
+    [1]     = {
         type   = "tableindex",
         start  = 1,
         finish = 4,
@@ -1191,7 +1208,7 @@ CHECK'{[x] = 1, [y] = 2}'
             [1]    = 1,
         },
     },
-    [2]    = {
+    [2]     = {
         type   = "tableindex",
         start  = 10,
         finish = 13,
@@ -1216,10 +1233,12 @@ CHECK'{[x] = 1, [y] = 2}'
 }
 CHECK'{x = 1, y = 2, 3}'
 {
-    type   = "table",
-    start  = 0,
-    finish = 17,
-    [1]    = {
+    type    = "table",
+    start   = 0,
+    bstart  = 1,
+    finish  = 17,
+    bfinish = 16,
+    [1]     = {
         type   = "tablefield",
         start  = 1,
         finish = 2,
@@ -1241,7 +1260,7 @@ CHECK'{x = 1, y = 2, 3}'
             [1]    = 1,
         },
     },
-    [2]    = {
+    [2]     = {
         type   = "tablefield",
         start  = 8,
         finish = 9,
@@ -1263,7 +1282,7 @@ CHECK'{x = 1, y = 2, 3}'
             [1]    = 2,
         },
     },
-    [3]    = {
+    [3]     = {
         type   = "tableexp",
         start  = 15,
         finish = 16,
@@ -1280,29 +1299,35 @@ CHECK'{x = 1, y = 2, 3}'
 }
 CHECK'{{}}'
 {
-    type   = "table",
-    start  = 0,
-    finish = 4,
-    [1]    = {
+    type    = "table",
+    start   = 0,
+    bstart  = 1,
+    finish  = 4,
+    bfinish = 3,
+    [1]     = {
         type   = "tableexp",
         start  = 1,
         finish = 3,
         tindex = 1,
         parent = "<IGNORE>",
         value  = {
-            type   = "table",
-            start  = 1,
-            finish = 3,
-            parent = "<IGNORE>",
+            type    = "table",
+            start   = 1,
+            bstart  = 2,
+            finish  = 3,
+            parent  = "<IGNORE>",
+            bfinish = 2,
         },
     },
 }
 CHECK'{ a = { b = { c = {} } } }'
 {
-    type   = "table",
-    start  = 0,
-    finish = 26,
-    [1]    = {
+    type    = "table",
+    start   = 0,
+    bstart  = 1,
+    finish  = 26,
+    bfinish = 25,
+    [1]     = {
         type   = "tablefield",
         start  = 2,
         finish = 3,
@@ -1317,11 +1342,13 @@ CHECK'{ a = { b = { c = {} } } }'
             [1]    = "a",
         },
         value  = {
-            type   = "table",
-            start  = 6,
-            finish = 24,
-            parent = "<IGNORE>",
-            [1]    = {
+            type    = "table",
+            start   = 6,
+            bstart  = 7,
+            finish  = 24,
+            parent  = "<IGNORE>",
+            bfinish = 23,
+            [1]     = {
                 type   = "tablefield",
                 start  = 8,
                 finish = 9,
@@ -1336,11 +1363,13 @@ CHECK'{ a = { b = { c = {} } } }'
                     [1]    = "b",
                 },
                 value  = {
-                    type   = "table",
-                    start  = 12,
-                    finish = 22,
-                    parent = "<IGNORE>",
-                    [1]    = {
+                    type    = "table",
+                    start   = 12,
+                    bstart  = 13,
+                    finish  = 22,
+                    parent  = "<IGNORE>",
+                    bfinish = 21,
+                    [1]     = {
                         type   = "tablefield",
                         start  = 14,
                         finish = 15,
@@ -1355,10 +1384,12 @@ CHECK'{ a = { b = { c = {} } } }'
                             [1]    = "c",
                         },
                         value  = {
-                            type   = "table",
-                            start  = 18,
-                            finish = 20,
-                            parent = "<IGNORE>",
+                            type    = "table",
+                            start   = 18,
+                            bstart  = 19,
+                            finish  = 20,
+                            parent  = "<IGNORE>",
+                            bfinish = 19,
                         },
                     },
                 },
@@ -1368,70 +1399,82 @@ CHECK'{ a = { b = { c = {} } } }'
 }
 CHECK'{{}, {}, {{}, {}}}'
 {
-    type   = "table",
-    start  = 0,
-    finish = 18,
-    [1]    = {
+    type    = "table",
+    start   = 0,
+    bstart  = 1,
+    finish  = 18,
+    bfinish = 17,
+    [1]     = {
         type   = "tableexp",
         start  = 1,
         finish = 3,
         tindex = 1,
         parent = "<IGNORE>",
         value  = {
-            type   = "table",
-            start  = 1,
-            finish = 3,
-            parent = "<IGNORE>",
+            type    = "table",
+            start   = 1,
+            bstart  = 2,
+            finish  = 3,
+            parent  = "<IGNORE>",
+            bfinish = 2,
         },
     },
-    [2]    = {
+    [2]     = {
         type   = "tableexp",
         start  = 5,
         finish = 7,
         tindex = 2,
         parent = "<IGNORE>",
         value  = {
-            type   = "table",
-            start  = 5,
-            finish = 7,
-            parent = "<IGNORE>",
+            type    = "table",
+            start   = 5,
+            bstart  = 6,
+            finish  = 7,
+            parent  = "<IGNORE>",
+            bfinish = 6,
         },
     },
-    [3]    = {
+    [3]     = {
         type   = "tableexp",
         start  = 9,
         finish = 17,
         tindex = 3,
         parent = "<IGNORE>",
         value  = {
-            type   = "table",
-            start  = 9,
-            finish = 17,
-            parent = "<IGNORE>",
-            [1]    = {
+            type    = "table",
+            start   = 9,
+            bstart  = 10,
+            finish  = 17,
+            parent  = "<IGNORE>",
+            bfinish = 16,
+            [1]     = {
                 type   = "tableexp",
                 start  = 10,
                 finish = 12,
                 tindex = 1,
                 parent = "<IGNORE>",
                 value  = {
-                    type   = "table",
-                    start  = 10,
-                    finish = 12,
-                    parent = "<IGNORE>",
+                    type    = "table",
+                    start   = 10,
+                    bstart  = 11,
+                    finish  = 12,
+                    parent  = "<IGNORE>",
+                    bfinish = 11,
                 },
             },
-            [2]    = {
+            [2]     = {
                 type   = "tableexp",
                 start  = 14,
                 finish = 16,
                 tindex = 2,
                 parent = "<IGNORE>",
                 value  = {
-                    type   = "table",
-                    start  = 14,
-                    finish = 16,
-                    parent = "<IGNORE>",
+                    type    = "table",
+                    start   = 14,
+                    bstart  = 15,
+                    finish  = 16,
+                    parent  = "<IGNORE>",
+                    bfinish = 15,
                 },
             },
         },
@@ -1439,10 +1482,12 @@ CHECK'{{}, {}, {{}, {}}}'
 }
 CHECK'{1, 2, 3,}'
 {
-    type   = "table",
-    start  = 0,
-    finish = 10,
-    [1]    = {
+    type    = "table",
+    start   = 0,
+    bstart  = 1,
+    finish  = 10,
+    bfinish = 9,
+    [1]     = {
         type   = "tableexp",
         start  = 1,
         finish = 2,
@@ -1456,7 +1501,7 @@ CHECK'{1, 2, 3,}'
             [1]    = 1,
         },
     },
-    [2]    = {
+    [2]     = {
         type   = "tableexp",
         start  = 4,
         finish = 5,
@@ -1470,7 +1515,7 @@ CHECK'{1, 2, 3,}'
             [1]    = 2,
         },
     },
-    [3]    = {
+    [3]     = {
         type   = "tableexp",
         start  = 7,
         finish = 8,
@@ -1536,10 +1581,12 @@ CHECK [=[
 [[]]
 }]=]
 {
-    type   = "table",
-    start  = 0,
-    finish = 20001,
-    [1]    = {
+    type    = "table",
+    start   = 0,
+    bstart  = 1,
+    finish  = 20001,
+    bfinish = 20000,
+    [1]     = {
         type   = "tableexp",
         start  = 10000,
         finish = 10004,
@@ -1562,10 +1609,12 @@ CHECK [[
 }
 ]]
 {
-    type   = "table",
-    start  = 0,
-    finish = 20001,
-    [1]    = {
+    type    = "table",
+    start   = 0,
+    bstart  = 1,
+    finish  = 20001,
+    bfinish = 20000,
+    [1]     = {
         type   = "tableindex",
         start  = 10004,
         finish = 10009,

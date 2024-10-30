@@ -45,7 +45,7 @@ local function performTest()
         if not state then
             error(('文件解析失败：%s'):format(path:string()))
         end
-        parser.luadoc(state)
+        parser.luadoc.luadoc(state)
         --local dump = utility.unpack(state.root)
         --utility.pack(dump)
 

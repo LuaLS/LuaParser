@@ -239,6 +239,16 @@ local LocalLimit = 200
 
 local parseExp, parseAction
 
+---@class parser.state.err
+---@field type string
+---@field start? parser.position
+---@field finish? parser.position
+---@field info? table
+---@field fix? table
+---@field version? string[]|string
+---@field level? string | 'Error' | 'Warning'
+
+---@type fun(err:parser.state.err):parser.state.err|nil
 local pushError
 
 local function addSpecial(name, obj)
@@ -360,7 +370,7 @@ local function unknownSymbol(start, finish, word)
     return true
 end
 
-local function skipUnknownSymbol(stopSymbol)
+local function skipUnknownSymbol()
     if unknownSymbol() then
         Index = Index + 2
         return true
@@ -470,7 +480,7 @@ end
 
 local function parseLongString()
     local start, finish, mark = sfind(Lua, '^(%[%=*%[)', Tokens[Index])
-    if not mark then
+    if not start then
         return nil
     end
     fastForwardToken(finish + 1)
@@ -711,6 +721,7 @@ local function parseLocalAttrs()
     return attrs
 end
 
+---@param obj table
 local function createLocal(obj, attrs)
     obj.type   = 'local'
     obj.effect = obj.finish
@@ -1112,7 +1123,6 @@ local function parseShortString()
                 stringPool[stringIndex] = '\n'
                 currentOffset = Tokens[Index] + #nextToken
                 skipNL()
-                local right = getPosition(currentOffset + 1, 'right')
                 escs[#escs+1] = escLeft
                 escs[#escs+1] = escLeft + 1
                 escs[#escs+1] = 'normal'
@@ -1574,6 +1584,7 @@ local function parseTable()
         start  = getPosition(Tokens[Index], 'left'),
         finish = getPosition(Tokens[Index], 'right'),
     }
+    tbl.bstart = tbl.finish
     Index = Index + 2
     local index = 0
     local tindex = 0
@@ -1582,6 +1593,7 @@ local function parseTable()
         skipSpace(true)
         local token = Tokens[Index + 1]
         if token == '}' then
+            tbl.bfinish = getPosition(Tokens[Index], 'left')
             Index = Index + 2
             break
         end
@@ -1701,6 +1713,8 @@ local function parseTable()
         end
 
         missSymbol '}'
+        skipSpace()
+        tbl.bfinish = getPosition(Tokens[Index], 'left')
         break
         ::CONTINUE::
     end
@@ -1709,6 +1723,9 @@ local function parseTable()
 end
 
 local function addDummySelf(node, call)
+    if not node then
+        return
+    end
     if node.type ~= 'getmethod' then
         return
     end
@@ -1736,6 +1753,9 @@ local function checkAmbiguityCall(call, parenPos)
         return
     end
     local node = call.node
+    if not node then
+        return
+    end
     local nodeRow = guide.rowColOf(node.finish)
     local callRow = guide.rowColOf(parenPos)
     if nodeRow == callRow then
@@ -2171,13 +2191,14 @@ local function parseActions()
     end
 end
 
-local function parseParams(params)
+local function parseParams(params, isLambda)
     local lastSep
     local hasDots
+    local endToken = isLambda and '|' or ')'
     while true do
         skipSpace()
         local token = Tokens[Index + 1]
-        if not token or token == ')' then
+        if not token or token == endToken then
             if lastSep then
                 missName()
             end
@@ -2252,7 +2273,7 @@ local function parseParams(params)
             Index = Index + 2
             goto CONTINUE
         end
-        skipUnknownSymbol '%,%)%.'
+        skipUnknownSymbol()
         ::CONTINUE::
     end
     return params
@@ -2313,7 +2334,12 @@ local function parseFunction(isLocal, isAction)
     local params
     if func.name and func.name.type == 'getmethod' then
         if func.name.type == 'getmethod' then
-            params = {}
+            params = {
+                type   = 'funcargs',
+                start  = funcRight,
+                finish = funcRight,
+                parent = func
+            }
             params[1] = createLocal {
                 start  = funcRight,
                 finish = funcRight,
@@ -2356,6 +2382,7 @@ local function parseFunction(isLocal, isAction)
     end
     parseActions()
     popChunk()
+    func.bfinish = getPosition(Tokens[Index], 'left')
     if Tokens[Index + 1] == 'end' then
         local endLeft   = getPosition(Tokens[Index], 'left')
         local endRight  = getPosition(Tokens[Index] + 2, 'right')
@@ -2369,6 +2396,93 @@ local function parseFunction(isLocal, isAction)
     end
     LocalCount = LastLocalCount
     return func
+end
+
+local function parseLambda(isDoublePipe)
+    local lambdaLeft = getPosition(Tokens[Index], 'left')
+    local lambdaRight = getPosition(Tokens[Index], 'right')
+    local lambda = {
+        type   = 'function',
+        start  = lambdaLeft,
+        finish = lambdaRight,
+        bstart = lambdaRight,
+        keyword = {
+            [1] = lambdaLeft,
+            [2] = lambdaRight,
+        },
+        hasReturn = true
+    }
+    Index = Index + 2
+    local pipeLeft = getPosition(Tokens[Index], 'left')
+    local pipeRight = getPosition(Tokens[Index], 'right')
+    skipSpace(true)
+    local params
+    local LastLocalCount = LocalCount
+    -- if nonstandardSymbol for '||' is true it is possible for token to be || when there are no params
+    if isDoublePipe then
+        params = {
+            start = pipeLeft,
+            finish = pipeRight,
+            parent = lambda,
+            type = 'funcargs'
+        }
+    else
+        -- fake chunk to store locals
+        pushChunk(lambda)
+        LocalCount = 0
+        params = parseParams({}, true)
+        params.type   = 'funcargs'
+        params.start  = pipeLeft
+        params.finish = lastRightPosition()
+        params.parent = lambda
+        lambda.args   = params
+        skipSpace()
+        if Tokens[Index + 1] == '|' then
+            pipeRight = getPosition(Tokens[Index], 'right')
+            lambda.finish = pipeRight
+            lambda.bstart = pipeRight
+            if params then
+                params.finish = pipeRight
+            end
+            Index = Index + 2
+            skipSpace()
+        else
+            lambda.finish = lastRightPosition()
+            lambda.bstart = lambda.finish
+            if params then
+                params.finish = lambda.finish
+            end
+            missSymbol '|'
+        end
+    end
+    local child = parseExp()
+
+
+    -- don't want popChunk logic here as this is not a real chunk
+    Chunk[#Chunk] = nil
+
+    if child then
+        -- create dummy return
+        local rtn = {
+            type   = 'return',
+            start  = child.start,
+            finish = child.finish,
+            parent = lambda,
+            [1]    = child
+        }
+        child.parent = rtn
+        lambda[1] = rtn
+        lambda.returns = {rtn}
+        lambda.finish = child.finish
+        lambda.keyword[3] = child.finish
+        lambda.keyword[4] = child.finish
+    else
+        lambda.finish = lastRightPosition()
+        missExp()
+    end
+    lambda.bfinish = getPosition(Tokens[Index], 'left')
+    LocalCount = LastLocalCount
+    return lambda
 end
 
 local function checkNeedParen(source)
@@ -2463,9 +2577,18 @@ local function parseExpUnit()
         return parseFunction()
     end
 
+    -- FIXME: Use something other than nonstandardSymbol to check for lambda support
+    if State.options.nonstandardSymbol['|lambda|'] and (token == '|'
+    or token == '||') then
+        return parseLambda(token == '||')
+    end
+
     local node = parseName()
     if node then
-        return parseSimple(resolveName(node), false)
+        local nameNode = resolveName(node)
+        if nameNode then
+            return parseSimple(nameNode, false)
+        end
     end
 
     return nil
@@ -3014,6 +3137,7 @@ local function parseDo()
     pushChunk(obj)
     parseActions()
     popChunk()
+    obj.bfinish = getPosition(Tokens[Index], 'left')
     if Tokens[Index + 1] == 'end' then
         obj.finish     = getPosition(Tokens[Index] + 2, 'right')
         obj.keyword[3] = getPosition(Tokens[Index], 'left')
@@ -3233,6 +3357,7 @@ local function parseIfBlock(parent)
     parseActions()
     popChunk()
     ifblock.finish = getPosition(Tokens[Index], 'left')
+    ifblock.bfinish = ifblock.finish
     if ifblock.locals then
         LocalCount = LocalCount - #ifblock.locals
     end
@@ -3295,6 +3420,7 @@ local function parseElseIfBlock(parent)
     parseActions()
     popChunk()
     elseifblock.finish = getPosition(Tokens[Index], 'left')
+    elseifblock.bfinish = elseifblock.finish
     if elseifblock.locals then
         LocalCount = LocalCount - #elseifblock.locals
     end
@@ -3321,6 +3447,7 @@ local function parseElseBlock(parent)
     parseActions()
     popChunk()
     elseblock.finish = getPosition(Tokens[Index], 'left')
+    elseblock.bfinish = elseblock.finish
     if elseblock.locals then
         LocalCount = LocalCount - #elseblock.locals
     end
@@ -3416,6 +3543,7 @@ local function parseFor()
         forStateVars = 3
         LocalCount = LocalCount + forStateVars
         if name then
+            ---@cast name parser.object
             local loc = createLocal(name)
             loc.parent    = action
             action.finish = name.finish
@@ -3518,7 +3646,9 @@ local function parseFor()
             list.range  = lastName and lastName.range or inRight
             action.keys = list
             for i = 1, #list do
-                local loc = createLocal(list[i])
+                local obj = list[i]
+                ---@cast obj parser.object
+                local loc = createLocal(obj)
                 loc.parent = action
                 loc.effect = action.finish
             end
@@ -3533,7 +3663,7 @@ local function parseFor()
     or doToken == 'then' then
         local left  = getPosition(Tokens[Index], 'left')
         local right = getPosition(Tokens[Index] + #doToken - 1, 'right')
-        action.finish                     = left
+        action.finish                     = right
         action.bstart                     = action.finish
         action.keyword[#action.keyword+1] = left
         action.keyword[#action.keyword+1] = right
@@ -3560,8 +3690,8 @@ local function parseFor()
     skipSpace()
     parseActions()
     popChunk()
-
     skipSpace()
+    action.bfinish = getPosition(Tokens[Index], 'left')
     if Tokens[Index + 1] == 'end' then
         action.finish                     = getPosition(Tokens[Index] + 2, 'right')
         action.keyword[#action.keyword+1] = getPosition(Tokens[Index], 'left')
@@ -3613,7 +3743,7 @@ local function parseWhile()
         local left  = getPosition(Tokens[Index], 'left')
         local right = getPosition(Tokens[Index] + #doToken - 1, 'right')
         action.finish                     = left
-        action.bstart                     = action.finish
+        action.bstart                     = right
         action.keyword[#action.keyword+1] = left
         action.keyword[#action.keyword+1] = right
         if doToken == 'then' then
@@ -3643,6 +3773,7 @@ local function parseWhile()
     popChunk()
 
     skipSpace()
+    action.bfinish = getPosition(Tokens[Index], 'left')
     if Tokens[Index + 1] == 'end' then
         action.finish                     = getPosition(Tokens[Index] + 2, 'right')
         action.keyword[#action.keyword+1] = getPosition(Tokens[Index], 'left')
@@ -3677,6 +3808,7 @@ local function parseRepeat()
     parseActions()
 
     skipSpace()
+    action.bfinish = getPosition(Tokens[Index], 'left')
     if Tokens[Index + 1] == 'until' then
         action.finish                     = getPosition(Tokens[Index] + 4, 'right')
         action.keyword[#action.keyword+1] = getPosition(Tokens[Index], 'left')
@@ -3869,6 +4001,7 @@ local function parseLua()
         type   = 'main',
         start  = 0,
         finish = 0,
+        bstart = 0,
     }
     pushChunk(main)
     createLocal{
@@ -3894,6 +4027,7 @@ local function parseLua()
     end
     popChunk()
     main.finish = getPosition(#Lua, 'right')
+    main.bfinish = main.finish
 
     return main
 end
