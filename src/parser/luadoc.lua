@@ -319,7 +319,7 @@ local function slideToNextLine()
         return
     end
     NextComment()
-    parseTokens(nextComment.text:sub(2), nextComment.start + 1)
+    parseTokens(nextComment.text:sub(2), nextComment.start + 2)
 end
 
 local function parseTable(parent)
