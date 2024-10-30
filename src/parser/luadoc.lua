@@ -298,6 +298,30 @@ local function parseIndexField(parent)
     return field
 end
 
+local function slideToNextLine()
+    if peekToken() then
+        return
+    end
+    local nextComment = NextComment(0, true)
+    if not nextComment then
+        return
+    end
+    local currentComment = NextComment(-1, true)
+    local currentLine = guide.rowColOf(currentComment.start)
+    local nextLine = guide.rowColOf(nextComment.start)
+    if currentLine + 1 ~= nextLine then
+        return
+    end
+    if nextComment.text:sub(1, 1) ~= '-' then
+        return
+    end
+    if nextComment.text:match '^%-%s*%@' then
+        return
+    end
+    NextComment()
+    parseTokens(nextComment.text:sub(2), nextComment.start + 1)
+end
+
 local function parseTable(parent)
     if not checkToken('symbol', '{', 1) then
         return nil
@@ -311,6 +335,7 @@ local function parseTable(parent)
     }
 
     while true do
+        slideToNextLine()
         if checkToken('symbol', '}', 1) then
             nextToken()
             break
@@ -385,6 +410,7 @@ local function parseTuple(parent)
 
     local index = 1
     while true do
+        slideToNextLine()
         if checkToken('symbol', ']', 1) then
             nextToken()
             break
@@ -500,6 +526,7 @@ local function  parseTypeUnitFunction(parent)
         return nil
     end
     while true do
+        slideToNextLine()
         if checkToken('symbol', ')', 1) then
             nextToken()
             break
@@ -2139,10 +2166,10 @@ local function bindDocs(state)
             state.ast.docs.groups[#state.ast.docs.groups+1] = binded
         end
         binded[#binded+1] = doc
-		if doc.specialBindGroup then
-			bindDocWithSources(sources, doc.specialBindGroup)
-			binded = nil
-		elseif isTailComment(text, doc) and doc.type ~= "doc.class" and doc.type ~= "doc.field" then
+        if doc.specialBindGroup then
+            bindDocWithSources(sources, doc.specialBindGroup)
+            binded = nil
+        elseif isTailComment(text, doc) and doc.type ~= "doc.class" and doc.type ~= "doc.field" then
             bindDocWithSources(sources, binded)
             binded = nil
         else
@@ -2278,7 +2305,7 @@ return {
             doc.special = src
             doc.originalComment = comment
             doc.virtual = true
-			doc.specialBindGroup = group
+            doc.specialBindGroup = group
             ast.state.pluginDocs = pluginDocs
             return doc
         end

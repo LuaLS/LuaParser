@@ -917,3 +917,132 @@ LuaDoc [[
         },
     },
 }
+
+LuaDoc [[
+---@type {
+--- x: number,
+--- y: number,
+--- [number]: boolean,
+---}
+]]
+{
+    type   = "doc",
+    start  = 0,
+    finish = 50000,
+    parent = "<IGNORE>",
+    [1]    = {
+        type            = "doc.type",
+        start           = 9,
+        finish          = 40003,
+        range           = 40003,
+        parent          = "<IGNORE>",
+        firstFinish     = 40003,
+        originalComment = "<IGNORE>",
+        types           = {
+            [1] = {
+                type   = "doc.type.table",
+                start  = 9,
+                finish = 40003,
+                parent = "<IGNORE>",
+                fields = {
+                    [1] = {
+                        type    = "doc.type.field",
+                        start   = 10003,
+                        finish  = 10012,
+                        parent  = "<IGNORE>",
+                        extends = {
+                            type        = "doc.type",
+                            start       = 10006,
+                            finish      = 10012,
+                            parent      = "<IGNORE>",
+                            firstFinish = 10012,
+                            types       = {
+                                [1] = {
+                                    type   = "doc.type.name",
+                                    start  = 10006,
+                                    finish = 10012,
+                                    parent = "<IGNORE>",
+                                    [1]    = "number",
+                                },
+                            },
+                        },
+                        name    = {
+                            type   = "doc.field.name",
+                            start  = 10003,
+                            finish = 10004,
+                            parent = "<IGNORE>",
+                            [1]    = "x",
+                        },
+                    },
+                    [2] = {
+                        type    = "doc.type.field",
+                        start   = 20003,
+                        finish  = 20012,
+                        parent  = "<IGNORE>",
+                        extends = {
+                            type        = "doc.type",
+                            start       = 20006,
+                            finish      = 20012,
+                            parent      = "<IGNORE>",
+                            firstFinish = 20012,
+                            types       = {
+                                [1] = {
+                                    type   = "doc.type.name",
+                                    start  = 20006,
+                                    finish = 20012,
+                                    parent = "<IGNORE>",
+                                    [1]    = "number",
+                                },
+                            },
+                        },
+                        name    = {
+                            type   = "doc.field.name",
+                            start  = 20003,
+                            finish = 20004,
+                            parent = "<IGNORE>",
+                            [1]    = "y",
+                        },
+                    },
+                    [3] = {
+                        type    = "doc.type.field",
+                        start   = 30004,
+                        finish  = 30020,
+                        parent  = "<IGNORE>",
+                        extends = {
+                            type        = "doc.type",
+                            start       = 30013,
+                            finish      = 30020,
+                            parent      = "<IGNORE>",
+                            firstFinish = 30020,
+                            types       = {
+                                [1] = {
+                                    type   = "doc.type.name",
+                                    start  = 30013,
+                                    finish = 30020,
+                                    parent = "<IGNORE>",
+                                    [1]    = "boolean",
+                                },
+                            },
+                        },
+                        name    = {
+                            type        = "doc.type",
+                            start       = 30004,
+                            finish      = 30010,
+                            parent      = "<IGNORE>",
+                            firstFinish = 30010,
+                            types       = {
+                                [1] = {
+                                    type   = "doc.type.name",
+                                    start  = 30004,
+                                    finish = 30010,
+                                    parent = "<IGNORE>",
+                                    [1]    = "number",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+}
