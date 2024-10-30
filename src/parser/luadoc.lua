@@ -566,14 +566,17 @@ local function  parseTypeUnitFunction(parent)
             break
         end
     end
+    slideToNextLine()
     if checkToken('symbol', ':', 1) then
         nextToken()
+        slideToNextLine()
         local needCloseParen
         if checkToken('symbol', '(', 1) then
             nextToken()
             needCloseParen = true
         end
         while true do
+            slideToNextLine()
             local name
             try(function ()
                 local returnName = parseName('doc.return.name', typeUnit)
