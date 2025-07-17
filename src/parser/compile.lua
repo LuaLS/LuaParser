@@ -590,7 +590,7 @@ local function skipComment(isAction)
         local result, right = resolveLongString '*/'
         pushLongCommentError(left, right)
         State.comms[#State.comms+1] = {
-            type   = 'comment.long',
+            type   = 'comment.clong',
             start  = left,
             finish = right,
             text   = result,
@@ -706,12 +706,13 @@ local function parseLocalAttrs()
         else
             missSymbol '>'
         end
-        if State.version ~= 'Lua 5.4' then
+        if  State.version ~= 'Lua 5.4'
+        and State.version ~= 'Lua 5.5' then
             pushError {
                 type    = 'UNSUPPORT_SYMBOL',
                 start   = attr.start,
                 finish  = attr.finish,
-                version = 'Lua 5.4',
+                version = {'Lua 5.4', 'Lua 5.5'},
                 info    = {
                     version = State.version
                 }
@@ -906,13 +907,14 @@ local function parseStringUnicode()
     end
     if  State.version ~= 'Lua 5.3'
     and State.version ~= 'Lua 5.4'
+    and State.version ~= 'Lua 5.5'
     and State.version ~= 'LuaJIT'
     then
         pushError {
             type    = 'ERR_ESC',
             start   = leftPos - 2,
             finish  = rightPos,
-            version = {'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+            version = {'Lua 5.3', 'Lua 5.4', 'Lua 5.5', 'LuaJIT'},
             info = {
                 version = State.version,
             }
@@ -932,7 +934,7 @@ local function parseStringUnicode()
         end
         return nil, offset
     end
-    if State.version == 'Lua 5.4' then
+    if State.version == 'Lua 5.4' or State.version == 'Lua 5.5' then
         if byte < 0 or byte > 0x7FFFFFFF then
             pushError {
                 type   = 'UTF8_MAX',
@@ -951,7 +953,7 @@ local function parseStringUnicode()
                 type    = 'UTF8_MAX',
                 start   = leftPos,
                 finish  = rightPos,
-                version = byte <= 0x7FFFFFFF and 'Lua 5.4' or nil,
+                version = byte <= 0x7FFFFFFF and {'Lua 5.4', 'Lua 5.5'} or nil,
                 info = {
                     min = '000000',
                     max = '10FFFF',
@@ -1095,7 +1097,7 @@ local function parseShortString()
                         type    = 'ERR_ESC',
                         start   = left,
                         finish  = left + 4,
-                        version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+                        version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'Lua 5.5', 'LuaJIT'},
                         info = {
                             version = State.version,
                         }
@@ -1274,7 +1276,7 @@ local function parseNumber2(start)
             finish  = getPosition(offset - 1, 'right'),
             version = 'LuaJIT',
             info    = {
-                version = 'Lua 5.4',
+                version = State.version,
             }
         }
     end
@@ -2673,10 +2675,11 @@ local function parseBinaryOP(asAction, level)
     or token == '<<'
     or token == '>>' then
         if  State.version ~= 'Lua 5.3'
-        and State.version ~= 'Lua 5.4' then
+        and State.version ~= 'Lua 5.4'
+        and State.version ~= 'Lua 5.5' then
             pushError {
                 type    = 'UNSUPPORT_SYMBOL',
-                version = {'Lua 5.3', 'Lua 5.4'},
+                version = {'Lua 5.3', 'Lua 5.4', 'Lua 5.5'},
                 start   = op.start,
                 finish  = op.finish,
                 info    = {
@@ -3230,6 +3233,7 @@ local function parseLabel()
         local olabel = guide.getLabel(block, name)
         if olabel then
             if State.version == 'Lua 5.4'
+            or State.version == 'Lua 5.5'
             or block == guide.getBlock(olabel) then
                 pushError {
                     type   = 'REDEFINED_LABEL',
@@ -3252,7 +3256,7 @@ local function parseLabel()
             type   = 'UNSUPPORT_SYMBOL',
             start  = left,
             finish = lastRightPosition(),
-            version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+            version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'Lua 5.5', 'LuaJIT'},
             info = {
                 version = State.version,
             }
@@ -3544,7 +3548,22 @@ local function parseFor()
         LocalCount = LocalCount + forStateVars
         if name then
             ---@cast name parser.object
-            local loc = createLocal(name)
+            -- In Lua 5.5, for loop variables are treated as constants
+            local attrs
+            if State.version == 'Lua 5.5' then
+                attrs = {
+                    type = 'localattrs',
+                    [1] = {
+                        type = 'localattr',
+                        start = name.start,
+                        finish = name.finish,
+                        parent = nil, -- will be set by createLocal
+                        [1] = 'const',
+                    }
+                }
+                attrs[1].parent = attrs
+            end
+            local loc = createLocal(name, attrs)
             loc.parent    = action
             action.finish = name.finish
             action.bstart = action.finish
@@ -3634,7 +3653,8 @@ local function parseFor()
             missExp()
         end
 
-        if State.version == 'Lua 5.4' then
+        if State.version == 'Lua 5.4'
+        or State.version == 'Lua 5.5' then
             forStateVars = 4
         else
             forStateVars = 3
@@ -3648,7 +3668,22 @@ local function parseFor()
             for i = 1, #list do
                 local obj = list[i]
                 ---@cast obj parser.object
-                local loc = createLocal(obj)
+                -- In Lua 5.5, for loop variables are treated as constants
+                local attrs
+                if State.version == 'Lua 5.5' then
+                    attrs = {
+                        type = 'localattrs',
+                        [1] = {
+                            type = 'localattr',
+                            start = obj.start,
+                            finish = obj.finish,
+                            parent = nil, -- will be set by createLocal
+                            [1] = 'const',
+                        }
+                    }
+                    attrs[1].parent = attrs
+                end
+                local loc = createLocal(obj, attrs)
                 loc.parent = action
                 loc.effect = action.finish
             end

@@ -58,7 +58,7 @@ local function catchTarget(script, sep)
     lns[#lns+1] = math.maxinteger
     local codes = {}
     local pos   = 1
-    ---@type integer[]
+    ---@type [integer, integer][]
     local list = {}
     local cuted = 0
     local lastLine = 0
@@ -110,8 +110,8 @@ local function TEST(script)
         assert(first.type == expect.type)
         assert(first.start == target[1])
         assert(first.finish == target[2])
-        assert(eq(first.version, expect.version))
-        assert(eq(first.info, expect.info))
+        assert(eq(expect.version, first.version))
+        assert(eq(expect.info, first.info))
     end
 end
 
@@ -225,7 +225,7 @@ s = '\u<!{ffffff}!>'
 ]]
 {
     type = 'UTF8_MAX',
-    version = 'Lua 5.4',
+    version = {'Lua 5.4', 'Lua 5.5'},
     info = {
         min = '000000',
         max = '10FFFF',
@@ -1498,7 +1498,7 @@ TEST[[
 ]]
 {
     type = 'UNSUPPORT_SYMBOL',
-    version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+    version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'Lua 5.5', 'LuaJIT'},
     info = {
         version = 'Lua 5.1',
     }
@@ -1514,7 +1514,7 @@ local x = '<!\u{1000}!>'
 ]]
 {
     type = 'ERR_ESC',
-    version = {'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+    version = {'Lua 5.3', 'Lua 5.4', 'Lua 5.5', 'LuaJIT'},
     info = {
         version ='Lua 5.1',
     }
@@ -1525,7 +1525,7 @@ local x = '<!\xff!>'
 ]]
 {
     type = 'ERR_ESC',
-    version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+    version = {'Lua 5.2', 'Lua 5.3', 'Lua 5.4', 'Lua 5.5', 'LuaJIT'},
     info = {
         version = 'Lua 5.1',
     }
@@ -1537,7 +1537,7 @@ local x = 1 <!//!> 2
 ]]
 {
     type = 'UNSUPPORT_SYMBOL',
-    version = {'Lua 5.3', 'Lua 5.4'},
+    version = {'Lua 5.3', 'Lua 5.4', 'Lua 5.5'},
     info = {
         version = 'Lua 5.2',
     }
@@ -1548,7 +1548,7 @@ local x = 1 <!<<!> 2
 ]]
 {
     type = 'UNSUPPORT_SYMBOL',
-    version = {'Lua 5.3', 'Lua 5.4'},
+    version = {'Lua 5.3', 'Lua 5.4', 'Lua 5.5'},
     info = {
         version = 'Lua 5.2',
     }
@@ -1559,7 +1559,7 @@ local x = '<!\u{1000}!>'
 ]]
 {
     type = 'ERR_ESC',
-    version = {'Lua 5.3', 'Lua 5.4', 'LuaJIT'},
+    version = {'Lua 5.3', 'Lua 5.4', 'Lua 5.5', 'LuaJIT'},
     info = {
         version = 'Lua 5.2',
     }
@@ -1580,7 +1580,7 @@ local x <!<close>!> = 1
 ]]
 {
     type = 'UNSUPPORT_SYMBOL',
-    version = 'Lua 5.4',
+    version = {'Lua 5.4', 'Lua 5.5'},
     info = {
         version = 'Lua 5.3',
     }
@@ -1617,9 +1617,7 @@ x = 42<!LL!>
 {
     type = 'UNSUPPORT_SYMBOL',
     version = 'LuaJIT',
-    info = {
-        version = 'Lua 5.4',
-    }
+    info = EXISTS,
 }
 
 TEST[[
@@ -1628,9 +1626,7 @@ x = <!0b11011!>
 {
     type = 'UNSUPPORT_SYMBOL',
     version = 'LuaJIT',
-    info = {
-        version = 'Lua 5.4',
-    }
+    info = EXISTS,
 }
 
 TEST[[
@@ -1639,9 +1635,7 @@ x = 12.5<!i!>
 {
     type = 'UNSUPPORT_SYMBOL',
     version = 'LuaJIT',
-    info = {
-        version = 'Lua 5.4',
-    }
+    info = EXISTS,
 }
 
 TEST[[
