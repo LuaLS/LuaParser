@@ -2932,6 +2932,7 @@ local function bindValue(n, v, index, lastValue, isLocal, isSet)
 end
 
 local function parseMultiVars(n1, parser, isLocal)
+    local hasClose = guide.hasAttribute(n1, 'close')
     local n2, nrest = parseVarTails(parser, isLocal)
     skipSpace()
     local v1, v2, vrest
@@ -2957,6 +2958,16 @@ local function parseMultiVars(n1, parser, isLocal)
         lastValue = v2 or lastValue
         lastVar   = n2
         pushActionIntoCurrentChunk(n2)
+        if guide.hasAttribute(n2, 'close') then
+            if hasClose then
+                pushError {
+                    type   = 'MULTI_CLOSE',
+                    start  = n2.attrs[1].start,
+                    finish = n2.attrs[1].finish,
+                }
+            end
+            hasClose = true
+        end
     end
     if nrest then
         for i = 1, #nrest do
@@ -2970,6 +2981,16 @@ local function parseMultiVars(n1, parser, isLocal)
             lastValue = v or lastValue
             lastVar   = n
             pushActionIntoCurrentChunk(n)
+            if guide.hasAttribute(n, 'close') then
+                if hasClose then
+                    pushError {
+                        type   = 'MULTI_CLOSE',
+                        start  = n.attrs[1].start,
+                        finish = n.attrs[1].finish,
+                    }
+                end
+                hasClose = true
+            end
         end
     end
 

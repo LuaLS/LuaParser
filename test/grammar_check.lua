@@ -1595,6 +1595,20 @@ local x <<!close!>> = 1
 (nil)
 
 TEST[[
+local x <close>, y <!<close>!> = 1
+]]
+{
+    type = 'MULTI_CLOSE',
+}
+
+TEST[[
+local x <const>, y <close>, z <!<close>!> = 1
+]]
+{
+    type = 'MULTI_CLOSE',
+}
+
+TEST[[
 s = '<!\u{1FFFFF}!>'
 ]]
 (nil)

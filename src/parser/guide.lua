@@ -23,7 +23,7 @@ local type         = type
 ---@field effect                integer
 ---@field bstart                integer
 ---@field bfinish               integer
----@field attrs                 string[]
+---@field attrs                 table
 ---@field specials              parser.object[]
 ---@field labels                parser.object[]
 ---@field node                  parser.object
@@ -1350,6 +1350,22 @@ end
 function m.getParam(source, index)
     local args = m.getParams(source)
     return args and args[index] or nil
+end
+
+function m.hasAttribute(source, name)
+    if not source then
+        return false
+    end
+    local attrs = source.attrs
+    if not attrs or attrs.type ~= 'localattrs' then
+        return false
+    end
+    for _, attr in ipairs(attrs) do
+        if attr[1] == name then
+            return true
+        end
+    end
+    return false
 end
 
 return m
